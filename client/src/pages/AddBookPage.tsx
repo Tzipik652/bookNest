@@ -15,7 +15,7 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
-import { ArrowBack, Sparkles } from "lucide-react";
+import { ArrowBack, AutoAwesome } from '@mui/icons-material';
 
 export function AddBookPage() {
   const navigate = useNavigate();
@@ -86,7 +86,7 @@ export function AddBookPage() {
               )}
 
               <Alert
-                icon={<Sparkles size={20} color="#2563eb" />}
+                icon={<AutoAwesome fontSize="small" sx={{ color: '#2563eb' }} />}
                 severity="info"
                 sx={{
                   mb: 3,

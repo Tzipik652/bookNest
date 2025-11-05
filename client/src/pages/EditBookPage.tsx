@@ -16,7 +16,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { ArrowBack, Sparkles } from 'lucide-react';
+import { ArrowBack, AutoAwesome } from '@mui/icons-material';
 
 export function EditBookPage() {
   const { id } = useParams<{ id: string }>();
@@ -105,7 +105,7 @@ export function EditBookPage() {
             <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               {error && <Alert severity="error">{error}</Alert>}
 
-              <Alert icon={<Sparkles />} severity="info">
+              <Alert icon={<AutoAwesome />} severity="info">
                 AI summary will be regenerated if title, description, or category changes
               </Alert>
 
