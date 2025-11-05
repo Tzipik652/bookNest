@@ -2,19 +2,27 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getBookById, updateBook, getCurrentUser } from '../lib/storage';
 import { categories } from '../lib/mockData';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { Textarea } from '../components/ui/textarea';
-import { Label } from '../components/ui/label';
-import { Button } from '../components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardActions,
+  Container,
+  Typography,
+  TextField,
+  MenuItem,
+  Alert,
+  CircularProgress,
+} from '@mui/material';
+import { ArrowBack, Sparkles } from 'lucide-react';
 
 export function EditBookPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
+
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [description, setDescription] = useState('');
@@ -26,19 +34,18 @@ export function EditBookPage() {
 
   useEffect(() => {
     if (!id) return;
-    
+
     const book = getBookById(id);
     if (!book) {
       navigate('/home');
       return;
     }
-    
-    // Check if user is authorized to edit
+
     if (book.uploaderId !== currentUser?.id) {
       navigate(`/book/${id}`);
       return;
     }
-    
+
     setTitle(book.title);
     setAuthor(book.author);
     setDescription(book.description);
@@ -50,14 +57,14 @@ export function EditBookPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!title || !author || !description || !category || !id) {
       setError('Please fill in all required fields');
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       updateBook(id, {
         title,
@@ -65,12 +72,11 @@ export function EditBookPage() {
         description,
         category,
         imageUrl,
-        price: price ? parseFloat(price) : undefined
+        price: price ? parseFloat(price) : undefined,
       });
-      
-      // Simulate AI processing delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       navigate(`/book/${id}`);
     } catch (err) {
       setError('Failed to update book. Please try again.');
@@ -79,131 +85,110 @@ export function EditBookPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <Box sx={{ minHeight: '100vh', bgcolor: '#f9fafb', py: 6 }}>
+      <Container maxWidth="sm">
         <Button
-          variant="ghost"
           onClick={() => navigate(-1)}
-          className="mb-6 gap-2"
+          startIcon={<ArrowBack />}
+          sx={{ mb: 3, textTransform: 'none' }}
         >
-          <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Edit Book</CardTitle>
-            <CardDescription>
-              Update book information. AI will regenerate the summary if you change key details.
-            </CardDescription>
-          </CardHeader>
-          
+        <Card sx={{ p: 2 }}>
+          <CardHeader
+            title="Edit Book"
+            subheader="Update book information. AI will regenerate the summary if you change key details."
+          />
+
           <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-6">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {error && <Alert severity="error">{error}</Alert>}
 
-              <Alert>
-                <Sparkles className="h-4 w-4" />
-                <AlertDescription>
-                  AI summary will be regenerated if title, description, or category changes
-                </AlertDescription>
+              <Alert icon={<Sparkles />} severity="info">
+                AI summary will be regenerated if title, description, or category changes
               </Alert>
-              
-              <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter book title"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="author">Author *</Label>
-                <Input
-                  id="author"
-                  value={author}
-                  onChange={(e) => setAuthor(e.target.value)}
-                  placeholder="Enter author name"
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="description">Description *</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Enter a detailed description of the book"
-                  rows={5}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="category">Category *</Label>
-                <Select value={category} onValueChange={setCategory} required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.filter(cat => cat !== 'All').map(cat => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="imageUrl">Image URL</Label>
-                <Input
-                  id="imageUrl"
-                  type="url"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="price">Price (Optional)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="0.00"
-                />
-              </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button type="submit" className="flex-1" disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving Changes...' : 'Save Changes'}
-                </Button>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => navigate(-1)}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-              </div>
+              <TextField
+                label="Title *"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+
+              <TextField
+                label="Author *"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                required
+              />
+
+              <TextField
+                label="Description *"
+                multiline
+                rows={5}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              />
+
+              <TextField
+                select
+                label="Category *"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
+              >
+                {categories
+                  .filter((cat) => cat !== 'All')
+                  .map((cat) => (
+                    <MenuItem key={cat} value={cat}>
+                      {cat}
+                    </MenuItem>
+                  ))}
+              </TextField>
+
+              <TextField
+                label="Image URL"
+                type="url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://example.com/image.jpg"
+              />
+
+              <TextField
+                label="Price (Optional)"
+                type="number"
+                inputProps={{ step: '0.01', min: '0' }}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
             </CardContent>
+
+            <CardActions sx={{ gap: 2, px: 3, pb: 3 }}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+                disabled={isSubmitting}
+                startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
+              </Button>
+              <Button
+                type="button"
+                variant="outlined"
+                fullWidth
+                onClick={() => navigate(-1)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+            </CardActions>
           </form>
         </Card>
-      </div>
-    </div>
+      </Container>
+    </Box>
   );
 }
