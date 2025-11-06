@@ -1,7 +1,7 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, Heart, PlusCircle, Sparkles, LogOut, User, Home, Library } from 'lucide-react';
 import { getCurrentUser, logout } from '../lib/storage';
 import { Button } from './ui/button';
+import { BookOpen, Heart, PlusCircle, LogOut, User, Home, Library, Sparkles } from "lucide-react";
 
 export function Navbar() {
   const navigate = useNavigate();
