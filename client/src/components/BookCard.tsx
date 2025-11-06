@@ -36,7 +36,7 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
       <div onClick={() => navigate(`/book/${book.id}`)}>
         <div className="aspect-[3/4] overflow-hidden bg-gray-100">
           <ImageWithFallback
-            src={book.imageUrl}
+            src={book.img_url}
             alt={book.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
