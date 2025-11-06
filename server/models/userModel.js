@@ -1,6 +1,5 @@
 
 import sql from '../db/connection.js'; // נתיב יחסי נכון לקובץ החיבור שלך
-import bcrypt from 'bcrypt'; // ספרייה נפוצה להצפנת סיסמאות
 
 // --- 1. מציאת משתמשים ---
 

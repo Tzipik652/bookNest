@@ -6,6 +6,7 @@ import sql from '../db/connection.js'; // נתיב יחסי נכון לקובץ 
  * @returns {Promise<Object>} הספר שנוצר.
  */
 async function create(bookData) {
+
     const newBook = await sql`
         INSERT INTO books (title, author, description, category, img_url, price, ai_summary, user_id)
         VALUES (
@@ -15,8 +16,8 @@ async function create(bookData) {
             ${bookData.category}, 
             ${bookData.imgUrl}, 
             ${bookData.price}, 
-            ${bookData?.aiSummary}, 
-            ${bookData.userId} -- user_id הוא ה-UUID של המשתמש המעלה
+            ${bookData.aiSummary}, 
+            ${bookData.user_id} -- user_id הוא ה-UUID של המשתמש המעלה
         )
         RETURNING *; -- מחזיר את כל שדות הספר שנוצר
     `;
@@ -51,22 +52,37 @@ async function findById(id) {
     return books.length ? books[0] : null;
 }
 
-// --- 3. עדכון ומחיקה ---
-
-/**
- * מעדכן פרטי ספר קיים.
- * @param {string} id - מזהה UUID של הספר.
- * @param {Object} updates - השדות לעדכון.
- * @returns {Promise<Object | null>} הספר המעודכן.
- */
 async function update(id, updates) {
-    // זו דוגמה לשאילתה דינמית יותר ב-postgres:
+    // 1. Define the keys that are allowed to be updated.
+    const validKeys = [
+        'title', 'author', 'description', 'category', 'img_url', 
+        'price', 'ai_summary'
+    ];
+    
+    // 2. Filter: Create a new object containing only valid keys 
+    //    that exist and are not undefined in the 'updates' object.
+    const filteredUpdates = Object.keys(updates).reduce((acc, key) => {
+        // Check if the key is valid AND the value is not undefined.
+        if (validKeys.includes(key) && updates[key] !== undefined) {
+            acc[key] = updates[key];
+        }
+        return acc;
+    }, {});
+
+    // 3. Exit if there's nothing valid to update.
+    if (Object.keys(filteredUpdates).length === 0) {
+        return null; 
+    }
+    
+    // 4. Construct a secure, dynamic SQL UPDATE query.
     const updatedBook = await sql`
         UPDATE books
-        SET ${sql(updates, 'title', 'author', 'description', 'category', 'img_url', 'price', 'ai_summary')}
+        SET ${sql(filteredUpdates)}
         WHERE _id = ${id}
         RETURNING *;
     `;
+    
+    // Return the updated record or null if the book was not found
     return updatedBook.length ? updatedBook[0] : null;
 }
 
