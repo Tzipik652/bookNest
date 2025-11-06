@@ -114,7 +114,6 @@ export async function getBooksByCategory(catName: string, page = 1, limit = 10) 
   }
 }
 
-// קבלת ספרים לפי משתמש
 export async function getBooksByUserId(userId: string) {
   try {
     const res = await axios.get(`${API_BASE}/user/${userId}`);
