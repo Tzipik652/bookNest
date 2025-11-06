@@ -6,8 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { isFavorite, toggleFavorite } from '../lib/storage';
 import { useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { useUser } from '../context/UserContext';
-
+import { useUserStore } from '../store/useUserStore';
 interface BookCardProps {
   book: Book;
   onFavoriteChange?: () => void;
@@ -15,7 +14,7 @@ interface BookCardProps {
 
 export function BookCard({ book, onFavoriteChange }: BookCardProps) {
   const navigate = useNavigate();
-  const { user: currentUser } = useUser();
+  const { user: currentUser } = useUserStore();
   const [favorited, setFavorited] = useState(isFavorite(book.id));
 
   const handleFavoriteClick = (e: React.MouseEvent) => {

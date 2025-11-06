@@ -220,12 +220,12 @@ import {
   Delete,
   AutoAwesome,
 } from "@mui/icons-material";
-import { useUser } from "../context/UserContext";
+import { useUserStore } from "../store/useUserStore";
 
 export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user: currentUser } = useUser();
+  const { user: currentUser } = useUserStore();
   const [favorited, setFavorited] = useState(id ? isFavorite(id) : false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -251,7 +251,7 @@ export function BookDetailsPage() {
     );
   }
 
-  const isOwner = currentUser?.id === book.uploaderId;
+  const isOwner = currentUser?._id === book.uploaderId;
 
   const handleFavoriteToggle = () => {
     if (!currentUser) {

@@ -1,8 +1,7 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
-import { login } from "../lib/storage";
+import { loginLocal, loginWithGoogle } from "../lib/storage";
 import { BookOpen } from "lucide-react";
 import {
   Box,
@@ -17,46 +16,42 @@ import {
   Container,
   Divider,
 } from "@mui/material";
-import { useUser } from "../context/UserContext";
-const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:5000";
+import { useUserStore } from "../store/useUserStore";
 export function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { setUser } = useUser();
+  const { login } = useUserStore();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    const user = login(email, password);
-    if (user) {
-      navigate("/home");
-    } else {
-      setError("Invalid email or password");
+    try {
+      const result = await loginLocal(email, password);
+      if (result) {
+        const { user, token } = result;
+        login(user, token);
+        navigate("/home");
+      }
+    } catch (err: any) {
+      setError("Invalid email or password  || " + err.toString());
     }
   };
 
-const handleGoogleLogin = async (credentialResponse: any) => {
-  try {
-    const id_token = credentialResponse.credential;
-    const { data } = await axios.post(`${SERVER_URL}/auth/google`, { id_token });
-
-    if (data.success) {
-      localStorage.setItem("token", data.token);
-      setUser(data.user);
-      navigate("/home");
-    } else {
-      setError("Google login failed");
+  const handleGoogleLogin = async (credentialResponse: any) => {
+    try {
+      const result = await loginWithGoogle(credentialResponse);
+      if (result) {
+        const { user, token } = result;
+        login(user, token);
+        navigate("/home");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Google login error");
     }
-  } catch (err) {
-    console.error(err);
-    setError("Google login error");
-  }
-};
-
-
+  };
 
   return (
     <Box

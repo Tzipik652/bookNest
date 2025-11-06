@@ -16,10 +16,9 @@ import { EditBookPage } from "./pages/EditBookPage";
 import { MyBooksPage } from "./pages/MyBooksPage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { AIRecommendationsPage } from "./pages/AIRecommendationsPage";
-import { useUser } from "./context/UserContext";
+import { useUserStore } from "./store/useUserStore";
 function App() {
-  const { user: currentUser } = useUser();
-
+  const { user: currentUser } = useUserStore();
   return (
     <Router>
       <div className="min-h-screen bg-white">

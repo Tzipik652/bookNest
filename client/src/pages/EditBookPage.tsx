@@ -17,13 +17,13 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { ArrowBack, AutoAwesome } from '@mui/icons-material';
-import { useUser } from '../context/UserContext';
+import { useUserStore } from '../store/useUserStore';
 
 export function EditBookPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user: currentUser } = useUser();
-
+  const { user: currentUser } = useUserStore();
+  
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [description, setDescription] = useState('');
@@ -42,7 +42,7 @@ export function EditBookPage() {
       return;
     }
 
-    if (book.uploaderId !== currentUser?.id) {
+    if (book.uploaderId !== currentUser?._id) {
       navigate(`/book/${id}`);
       return;
     }

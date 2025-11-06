@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { register } from '../lib/storage';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { register } from "../lib/storage";
 import {
   Box,
   Card,
@@ -11,55 +11,56 @@ import {
   Button,
   Typography,
   Alert,
-} from '@mui/material';
-import BookIcon from '@mui/icons-material/Book';
+} from "@mui/material";
+import BookIcon from "@mui/icons-material/Book";
+import { useUserStore } from "../store/useUserStore";
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const { login } = useUserStore();
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError("Password must be at least 6 characters");
       return;
     }
-
-    const user = register(email, password, name);
-    if (user) {
-      navigate('/home');
-    } else {
-      setError('Email already exists');
+    try {
+      const {user, token} =await register(email, password, name);
+      login(user, token);
+      navigate("/home");
+    } catch (err: any) {
+      setError("Registration failed  || " + err.toString());
     }
   };
 
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(to bottom right, #eff6ff, #ede9fe)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: "100vh",
+        background: "linear-gradient(to bottom right, #eff6ff, #ede9fe)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         p: 2,
       }}
     >
-      <Card sx={{ width: '100%', maxWidth: 420, boxShadow: 3 }}>
+      <Card sx={{ width: "100%", maxWidth: 420, boxShadow: 3 }}>
         <CardHeader
           title={
             <Box textAlign="center">
-              <BookIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+              <BookIcon sx={{ fontSize: 48, color: "primary.main", mb: 1 }} />
               <Typography variant="h5" fontWeight="bold">
                 Join BookNest
               </Typography>
@@ -71,7 +72,9 @@ export function RegisterPage() {
         />
 
         <form onSubmit={handleSubmit}>
-          <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <CardContent
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
             {error && <Alert severity="error">{error}</Alert>}
 
             <TextField
@@ -112,14 +115,26 @@ export function RegisterPage() {
           </CardContent>
 
           <CardActions
-            sx={{ flexDirection: 'column', alignItems: 'stretch', gap: 2, p: 2 }}
+            sx={{
+              flexDirection: "column",
+              alignItems: "stretch",
+              gap: 2,
+              p: 2,
+            }}
           >
             <Button type="submit" variant="contained" fullWidth>
               Register
             </Button>
-            <Typography variant="body2" textAlign="center" color="text.secondary">
-              Already have an account?{' '}
-              <Link to="/login" style={{ color: '#1976d2', textDecoration: 'none' }}>
+            <Typography
+              variant="body2"
+              textAlign="center"
+              color="text.secondary"
+            >
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                style={{ color: "#1976d2", textDecoration: "none" }}
+              >
                 Login here
               </Link>
             </Typography>
@@ -129,3 +144,4 @@ export function RegisterPage() {
     </Box>
   );
 }
+
