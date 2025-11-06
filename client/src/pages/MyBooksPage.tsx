@@ -1,6 +1,6 @@
 // import { useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
-// import { getUserBooks } from '../lib/storage';
+// import { getBooksByUserId } from '../lib/storage';
 // import { BookCard } from '../components/BookCard';
 // import { Search, BookPlus } from 'lucide-react';
 // import {
@@ -18,7 +18,7 @@
 //   const [searchQuery, setSearchQuery] = useState('');
 //   const [refreshKey, setRefreshKey] = useState(0);
 
-//   const books = getUserBooks();
+//   const books = getBooksByUserId();
 
 //   const filteredBooks = books.filter((book) => {
 //     const matchesSearch =
@@ -112,26 +112,35 @@
 //     </Box>
 //   );
 // }
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUserBooks } from '../lib/storage';
+import { Book } from '../types/index';
+import { getBooksByUserId } from '../services/bookService';
 import { BookCard } from '../components/BookCard';
 import { Search, BookPlus } from 'lucide-react';
 import { Box, Typography, Button, TextField, InputAdornment, Container } from '@mui/material';
+import { getCurrentUser } from '../lib/storage';
 
 export function MyBooksPage() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [books, setBooks] = useState<Book[]>([]);
+const [searchQuery, setSearchQuery] = useState('');
+const [refreshKey, setRefreshKey] = useState(0);
 
-  const books = getUserBooks();
+useEffect(() => {
+  async function fetchBooks() {
+    const user = getCurrentUser(); // או דרך context
+    const data = await getBooksByUserId(user?.id || '');
+    setBooks(data || []);
+  }
+  fetchBooks();
+}, [refreshKey]);
 
-  const filteredBooks = books.filter((book) => {
-    const matchesSearch =
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
-  });
+const filteredBooks = books.filter((book) =>
+  book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  book.author.toLowerCase().includes(searchQuery.toLowerCase())
+);
+
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f9fafb', py: 8 }}>
