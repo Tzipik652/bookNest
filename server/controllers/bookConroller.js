@@ -8,7 +8,7 @@ export const createBook = async (req, res) => {
         //need to add ai summary generation here
         const summary = await generateBookSummary(bookData.title, bookData.author, bookData.description);
         bookData.aiSummary = summary;
-        const newBook = await bookModel.create({ ...bookData, aiSummary: summary });
+        const newBook = await bookModel.create({ ...bookData, aiSummary: summary ,user_id: req.user._id});
         return res.status(201).json(newBook);
     } catch (error) {
         console.log(error);
@@ -41,6 +41,14 @@ export const updateBook = async (req, res) => {
     //need to add validation that only the owner can update
     const { id } = req.params;
     const updates = req.body;
+    const userId = req.user._id;
+    const userBook = await bookModel.findById(id);
+    if (!userBook) {
+        return res.status(404).json({ error: "Book not found" });
+    }
+    if (userBook.user_id !== userId) {
+        return res.status(403).json({ error: "Forbidden" });
+    }
     try {
         const updatedBook = await bookModel.update(id, updates);
         if (!updatedBook) {
@@ -53,8 +61,15 @@ export const updateBook = async (req, res) => {
     }
 }
 export const deleteBook = async (req, res) => {
-    //need to add validation that only the owner can delete
+const userId = req.user._id;
+    const userBook = await bookModel.findById(req.params.id);
     const { id } = req.params;
+    if (!userBook) {
+        return res.status(404).json({ error: "Book not found" });
+    }
+    if (userBook.user_id !== userId) {
+        return res.status(403).json({ error: "Forbidden" });
+    }
     try {
         const book = await bookModel.remove(id);
         if (!book) {
@@ -120,6 +135,9 @@ export const getBooksByCategory = async (req, res) => {
 //get books by user id
 export const getBooksByUserId = async (req, res) => {
     const { userId } = req.params;
+    if(req.user._id !== userId){
+        return  res.status(403).json({ error: "Forbidden" });
+    }
     try {
         const books = await bookModel.findAll();
         const filteredBooks = books.filter(book => book.userId === userId);
