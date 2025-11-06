@@ -29,7 +29,7 @@
 //   const [author, setAuthor] = useState('');
 //   const [description, setDescription] = useState('');
 //   const [category, setCategory] = useState('');
-//   const [imageUrl, setImageUrl] = useState('');
+//   const [img_url, setimg_url] = useState('');
 //   const [price, setPrice] = useState('');
 //   const [error, setError] = useState('');
 //   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,7 +52,7 @@
 //     setAuthor(book.author);
 //     setDescription(book.description);
 //     setCategory(book.category);
-//     setImageUrl(book.imageUrl);
+//     setimg_url(book.img_url);
 //     setPrice(book.price?.toString() || '');
 //   }, [id, currentUser, navigate]);
 
@@ -73,7 +73,7 @@
 //         author,
 //         description,
 //         category,
-//         imageUrl,
+//         img_url,
 //         price: price ? parseFloat(price) : undefined,
 //       });
 
@@ -153,8 +153,8 @@
 //               <TextField
 //                 label="Image URL"
 //                 type="url"
-//                 value={imageUrl}
-//                 onChange={(e) => setImageUrl(e.target.value)}
+//                 value={img_url}
+//                 onChange={(e) => setimg_url(e.target.value)}
 //                 placeholder="https://example.com/image.jpg"
 //               />
 
@@ -226,7 +226,7 @@ export function EditBookPage() {
   const [author, setAuthor] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [img_url, setimg_url] = useState('');
   const [price, setPrice] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -252,7 +252,7 @@ export function EditBookPage() {
         setAuthor(data.author);
         setDescription(data.description);
         setCategory(data.category);
-        setImageUrl(data.imageUrl);
+        setimg_url(data.img_url);
         setPrice(data.price?.toString() || '');
       } catch (err) {
         console.error(err);
@@ -282,7 +282,7 @@ export function EditBookPage() {
         author,
         description,
         category,
-        imageUrl,
+        img_url,
         price: price ? parseFloat(price) : undefined,
       });
 
@@ -369,8 +369,8 @@ export function EditBookPage() {
               <TextField
                 label="Image URL"
                 type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
+                value={img_url}
+                onChange={(e) => setimg_url(e.target.value)}
                 placeholder="https://example.com/image.jpg"
               />
 
