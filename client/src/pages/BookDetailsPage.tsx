@@ -191,14 +191,10 @@
 //   );
 // }
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import {
-  getBookById,
-  getCurrentUser,
-  isFavorite,
-  toggleFavorite,
-  deleteBook,
-} from "../lib/storage";
+import { useState, useEffect } from "react";
+import { Book } from "../types";
+import { getCurrentUser, isFavorite, toggleFavorite } from "../lib/storage";
+import { getBookById, deleteBook } from "../services/bookService";
 import {
   Box,
   Button,
@@ -219,10 +215,41 @@ export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
+
+  const [book, setBook] = useState<Book | null>(null);
   const [favorited, setFavorited] = useState(id ? isFavorite(id) : false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const book = id ? getBookById(id) : null;
+  // טענת הספרים
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchBook = async () => {
+      try {
+        const data = await getBookById(id);
+        setBook(data);
+      } catch (err) {
+        console.error(err);
+        setBook(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBook();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center">
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
 
   if (!book) {
     return (

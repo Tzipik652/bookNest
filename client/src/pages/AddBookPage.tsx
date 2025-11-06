@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addBook } from "../lib/storage";
+import { addBook } from "../services/bookService";
 import { categories } from "../lib/mockData";
+
 import {
   Box,
   Button,
@@ -39,12 +40,12 @@ export function AddBookPage() {
 
     setIsSubmitting(true);
     try {
-      const newBook = addBook({
+      const newBook = await addBook({
         title,
         author,
         description,
         category,
-        imageUrl:
+        imgUrl:
           imageUrl ||
           "https://images.unsplash.com/photo-1560362415-c88a4c066155?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
         price: price ? parseFloat(price) : undefined,
