@@ -10,7 +10,7 @@ export interface Book {
   author: string;
   description: string;
   category: string;
-  imageUrl: string;
+  img_url: string;
   price?: number;
   aiSummary: string;
   uploaderId: string;

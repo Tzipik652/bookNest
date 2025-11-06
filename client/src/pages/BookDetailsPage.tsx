@@ -78,7 +78,7 @@
 //             <Card sx={{ overflow: "hidden" }}>
 //               <CardMedia
 //                 component="img"
-//                 image={book.imageUrl}
+//                 image={book.img_url}
 //                 alt={book.title}
 //                 sx={{ aspectRatio: "3 / 4", objectFit: "cover" }}
 //               />
@@ -297,7 +297,7 @@ export function BookDetailsPage() {
             <Card sx={{ overflow: "hidden" }}>
               <CardMedia
                 component="img"
-                image={book.imageUrl}
+                image={book.img_url}
                 alt={book.title}
                 sx={{ aspectRatio: "3 / 4", objectFit: "cover" }}
               />

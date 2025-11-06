@@ -61,7 +61,7 @@ export async function addBook(bookData: {
       author: serverBook.author,
       description: serverBook.description,
       category: serverBook.category,
-      imageUrl: serverBook.img_url,
+      img_url: serverBook.img_url,
       price: serverBook.price,
       uploaderId: serverBook.user_id,
       uploaderName: currentUser.name,
