@@ -5,16 +5,21 @@ import cors from 'cors';
 import authRoutes from './routes/auth.js';
 import { verifyJWT } from './middleware/auth.js';
 dotenv.config();
+import bookRouter from './routes/bookRouter.js';
 
 const app = express();
 
 // Middleware
 app.use(cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/auth', authRoutes);
+// app.use('/books', verifyJWT, bookRouter);
+app.use('/books', bookRouter);
+
 
 // Example of a protected route
 app.get('/api/profile', verifyJWT, async (req, res) => {
