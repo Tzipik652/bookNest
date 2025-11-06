@@ -1,12 +1,13 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { getCurrentUser, logout } from '../lib/storage';
+import { logout } from '../lib/storage';
 import { Button } from './ui/button';
 import { BookOpen, Heart, PlusCircle, LogOut, User, Home, Library, Sparkles } from "lucide-react";
+import { useUser } from '../context/UserContext';
 
 export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const currentUser = getCurrentUser();
+  const { user: currentUser } = useUser();
 
   const handleLogout = () => {
     logout();

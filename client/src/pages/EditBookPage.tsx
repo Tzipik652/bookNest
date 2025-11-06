@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getBookById, updateBook, getCurrentUser } from '../lib/storage';
+import { getBookById, updateBook } from '../lib/storage';
 import { categories } from '../lib/mockData';
 import {
   Box,
@@ -17,11 +17,12 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { ArrowBack, AutoAwesome } from '@mui/icons-material';
+import { useUser } from '../context/UserContext';
 
 export function EditBookPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const currentUser = getCurrentUser();
+  const { user: currentUser } = useUser();
 
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');

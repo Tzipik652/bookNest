@@ -3,9 +3,10 @@ import { Book } from '../types';
 import { Card, CardContent, CardFooter } from './ui/card';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
-import { isFavorite, toggleFavorite, getCurrentUser } from '../lib/storage';
+import { isFavorite, toggleFavorite } from '../lib/storage';
 import { useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useUser } from '../context/UserContext';
 
 interface BookCardProps {
   book: Book;
@@ -14,7 +15,7 @@ interface BookCardProps {
 
 export function BookCard({ book, onFavoriteChange }: BookCardProps) {
   const navigate = useNavigate();
-  const currentUser = getCurrentUser();
+  const { user: currentUser } = useUser();
   const [favorited, setFavorited] = useState(isFavorite(book.id));
 
   const handleFavoriteClick = (e: React.MouseEvent) => {

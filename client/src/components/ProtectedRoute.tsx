@@ -1,12 +1,11 @@
 import { Navigate } from 'react-router-dom';
-import { getCurrentUser } from '../lib/storage';
-
+import { useUser } from '../context/UserContext';
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const currentUser = getCurrentUser();
+  const { user: currentUser } = useUser();
 
   if (!currentUser) {
     return <Navigate to="/login" replace />;

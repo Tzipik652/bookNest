@@ -194,7 +194,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   getBookById,
-  getCurrentUser,
   isFavorite,
   toggleFavorite,
   deleteBook,
@@ -213,12 +212,20 @@ import {
   DialogActions,
 } from "@mui/material";
 
-import { Favorite, FavoriteBorder, ArrowBack, Edit, Delete, AutoAwesome } from "@mui/icons-material";
+import {
+  Favorite,
+  FavoriteBorder,
+  ArrowBack,
+  Edit,
+  Delete,
+  AutoAwesome,
+} from "@mui/icons-material";
+import { useUser } from "../context/UserContext";
 
 export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const currentUser = getCurrentUser();
+  const { user: currentUser } = useUser();
   const [favorited, setFavorited] = useState(id ? isFavorite(id) : false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -226,10 +233,19 @@ export function BookDetailsPage() {
 
   if (!book) {
     return (
-      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Box
+        minHeight="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
         <Box textAlign="center">
-          <Typography variant="h5" mb={2}>Book Not Found</Typography>
-          <Button variant="contained" onClick={() => navigate(-1)}>Go Back</Button>
+          <Typography variant="h5" mb={2}>
+            Book Not Found
+          </Typography>
+          <Button variant="contained" onClick={() => navigate(-1)}>
+            Go Back
+          </Button>
         </Box>
       </Box>
     );
@@ -281,15 +297,23 @@ export function BookDetailsPage() {
           <Box flex={1}>
             <Card elevation={0} sx={{ bgcolor: "transparent" }}>
               <CardContent>
-                <Typography variant="h4" gutterBottom>{book.title}</Typography>
+                <Typography variant="h4" gutterBottom>
+                  {book.title}
+                </Typography>
                 <Typography variant="h6" color="text.secondary" gutterBottom>
                   by {book.author}
                 </Typography>
 
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
-                  <Chip label={book.category} color="default" variant="outlined" />
+                  <Chip
+                    label={book.category}
+                    color="default"
+                    variant="outlined"
+                  />
                   {book.price && (
-                    <Typography variant="h6">${book.price.toFixed(2)}</Typography>
+                    <Typography variant="h6">
+                      ${book.price.toFixed(2)}
+                    </Typography>
                   )}
                 </Box>
 
@@ -340,7 +364,9 @@ export function BookDetailsPage() {
                   p={3}
                   borderRadius={2}
                   border="1px solid #e0e0e0"
-                  sx={{ background: "linear-gradient(135deg, #eef2ff, #f3e8ff)" }}
+                  sx={{
+                    background: "linear-gradient(135deg, #eef2ff, #f3e8ff)",
+                  }}
                   mb={3}
                 >
                   <Box display="flex" alignItems="center" gap={1} mb={1}>
@@ -365,11 +391,15 @@ export function BookDetailsPage() {
       </Box>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={showDeleteDialog} onClose={() => setShowDeleteDialog(false)}>
+      <Dialog
+        open={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+      >
         <DialogTitle>Are you sure?</DialogTitle>
         <DialogContent>
           <Typography>
-            This will permanently delete "{book.title}" from your library. This action cannot be undone.
+            This will permanently delete "{book.title}" from your library. This
+            action cannot be undone.
           </Typography>
         </DialogContent>
         <DialogActions>
