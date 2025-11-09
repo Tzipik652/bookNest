@@ -17,8 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/user', userRoutes);
-app.use('/books', verifyJWT, bookRouter);
-// app.use('/books', bookRouter);
+app.use('/books', bookRouter);
 
 
 // Error handling

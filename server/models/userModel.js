@@ -5,7 +5,7 @@ export async function getUserById(id) {
   const { data, error } = await supabase
     .from('users')
     .select('*')
-    .eq('id', id)
+    .eq('_id', id)
     .single();
 
   if (error) throw error;
@@ -27,7 +27,7 @@ export async function updateUser(id, updates) {
   const { data, error } = await supabase
     .from('users')
     .update(updates)
-    .eq('id', id)
+    .eq('_id', id)
     .select()
     .single();
 
