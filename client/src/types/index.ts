@@ -1,7 +1,10 @@
 export interface User {
-  id: string;
+  _id: string;
   email: string;
   name: string;
+  auth_provider: string;
+  favorites: string[];
+  profile_picture?: string;
 }
 
 export interface Book {

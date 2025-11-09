@@ -1,10 +1,9 @@
 import axios from "axios";
-import { Book } from "../types";
-import { getCurrentUser } from "../lib/storage"; // או מאיפה שזה נמצא
+import { Book, Favorite } from "../types";
+import { useUserStore } from "../store/useUserStore";
 
-const API_BASE = "http://localhost:5000/books"; // שנה לפורט הנכון של ה-backend
+const API_BASE = "http://localhost:5000/books";
 
-// עזר להדפסת שגיאות
 function handleAxiosError(error: any): never {
   if (axios.isAxiosError(error)) {
     throw new Error(
@@ -17,7 +16,6 @@ function handleAxiosError(error: any): never {
   }
 }
 
-// קבלת כל הספרים
 export async function getBooks(): Promise<Book[]> {
   try {
     const res = await axios.get(API_BASE);
@@ -27,7 +25,6 @@ export async function getBooks(): Promise<Book[]> {
   }
 }
 
-// קבלת ספר לפי מזהה
 export async function getBookById(id: string): Promise<Book> {
   try {
     const res = await axios.get(`${API_BASE}/${id}`);
@@ -37,7 +34,6 @@ export async function getBookById(id: string): Promise<Book> {
   }
 }
 
-// הוספת ספר חדש
 export async function addBook(bookData: {
   title: string;
   author: string;
@@ -47,10 +43,11 @@ export async function addBook(bookData: {
   price?: number;
 }): Promise<Book> {
   try {
-    const currentUser = getCurrentUser();
-    if (!currentUser) throw new Error("Must be logged in to add books");
+    const currentUser = useUserStore.getState().user
 
-    const payload = { ...bookData, user_id: currentUser.id };
+  if (!currentUser) throw new Error("Must be logged in to add books");
+
+    const payload = { ...bookData, user_id: currentUser._id };
     const res = await axios.post(API_BASE, payload);
 
     const serverBook = res.data;
@@ -68,14 +65,12 @@ export async function addBook(bookData: {
       aiSummary: serverBook.ai_summary,
       createdAt: serverBook.date_created || new Date().toISOString(),
     };
-
     return newBook;
   } catch (error) {
     handleAxiosError(error);
   }
 }
 
-// עדכון ספר קיים
 export async function updateBook(id: string, updates: Partial<Book>): Promise<Book> {
   try {
     const res = await axios.put(`${API_BASE}/${id}`, updates);
@@ -85,7 +80,6 @@ export async function updateBook(id: string, updates: Partial<Book>): Promise<Bo
   }
 }
 
-// מחיקת ספר
 export async function deleteBook(id: string): Promise<void> {
   try {
     await axios.delete(`${API_BASE}/${id}`);
@@ -94,7 +88,6 @@ export async function deleteBook(id: string): Promise<void> {
   }
 }
 
-// חיפוש ספרים לפי מחרוזת
 export async function searchBooks(search: string, page = 1, limit = 10) {
   try {
     const res = await axios.get(`${API_BASE}/search`, { params: { s: search, page, limit } });
@@ -104,7 +97,6 @@ export async function searchBooks(search: string, page = 1, limit = 10) {
   }
 }
 
-// סינון לפי קטגוריה
 export async function getBooksByCategory(catName: string, page = 1, limit = 10) {
   try {
     const res = await axios.get(`${API_BASE}/category/${catName}`, { params: { page, limit } });
@@ -122,3 +114,5 @@ export async function getBooksByUserId(userId: string) {
     handleAxiosError(error);
   }
 }
+
+

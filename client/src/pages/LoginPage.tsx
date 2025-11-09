@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../lib/storage';
-import { BookOpen } from 'lucide-react';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
+import { BookOpen } from "lucide-react";
 import {
   Box,
   Card,
@@ -13,34 +13,54 @@ import {
   Button,
   Alert,
   Container,
-} from '@mui/material';
-
+  Divider,
+} from "@mui/material";
+import { useUserStore } from "../store/useUserStore";
+import { loginLocal, loginWithGoogle } from "../services/userService";
 export function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { login } = useUserStore();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
+    try {
+      const result = await loginLocal(email, password);
+      if (result) {
+        const { user, token } = result;
+        login(user, token);
+        navigate("/home");
+      }
+    } catch (err: any) {
+      setError("Invalid email or password  || " + err.toString());
+    }
+  };
 
-    const user = login(email, password);
-    if (user) {
-      navigate('/home');
-    } else {
-      setError('Invalid email or password');
+  const handleGoogleLogin = async (credentialResponse: any) => {
+    try {
+      const result = await loginWithGoogle(credentialResponse);
+      if (result) {
+        const { user, token } = result;
+        login(user, token);
+        navigate("/home");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Google login error");
     }
   };
 
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        bgcolor: 'linear-gradient(to bottom right, #eff6ff, #f3e8ff)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: "100vh",
+        bgcolor: "linear-gradient(to bottom right, #eff6ff, #f3e8ff)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         py: 4,
       }}
     >
@@ -49,7 +69,11 @@ export function LoginPage() {
           <CardHeader
             title={
               <Box textAlign="center">
-                <BookOpen size={48} color="#1976d2" style={{ marginBottom: 8 }} />
+                <BookOpen
+                  size={48}
+                  color="#1976d2"
+                  style={{ marginBottom: 8 }}
+                />
                 <Typography variant="h5" fontWeight="bold">
                   Welcome Back to BookNest
                 </Typography>
@@ -61,7 +85,9 @@ export function LoginPage() {
           />
 
           <form onSubmit={handleSubmit}>
-            <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <CardContent
+              sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+            >
               {error && <Alert severity="error">{error}</Alert>}
 
               <Alert severity="info">
@@ -93,14 +119,28 @@ export function LoginPage() {
               />
             </CardContent>
 
-            <CardActions sx={{ flexDirection: 'column', gap: 2, mt: 2 }}>
+            <CardActions sx={{ flexDirection: "column", gap: 2, mt: 2 }}>
               <Button type="submit" variant="contained" fullWidth size="large">
                 Login
               </Button>
 
-              <Typography variant="body2" color="text.secondary" textAlign="center">
-                Don’t have an account?{' '}
-                <Link to="/register" style={{ color: '#1976d2', textDecoration: 'none' }}>
+              <Divider sx={{ my: 1 }}>or</Divider>
+
+              <GoogleLogin
+                onSuccess={handleGoogleLogin}
+                onError={() => setError("Google login failed")}
+              />
+
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                textAlign="center"
+              >
+                Don’t have an account?{" "}
+                <Link
+                  to="/register"
+                  style={{ color: "#1976d2", textDecoration: "none" }}
+                >
                   Register here
                 </Link>
               </Typography>
