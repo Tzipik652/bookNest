@@ -7,7 +7,7 @@ router.get('/', getAllBooks);
 router.post('/',verifyJWT, createBook);
 // router.get('/page',getBooksByPage);
 ///books/search?s=harry&page=1
-router.get('/search',(req,res)=> console.log("in searc") ,searchBooks);
+router.get('/search' ,searchBooks);
 router.get('/recommendations',verifyJWT,getRecomendedBooks);
 ///books/category/:catName
 router.get('/category/:catName',getBooksByCategory);

@@ -19,17 +19,16 @@ export function MyBooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
-  const { user: currentUser } = useUserStore();
 
   useEffect(() => {
     async function fetchBooks() {
-      const data = await getBooksByUserId(currentUser?._id || "");
+      const data = await getBooksByUserId();
       setBooks(data || []);
     }
     fetchBooks();
   }, [refreshKey]);
 
-  const filteredBooks = books.filter(
+  const filteredBooks = books?.filter(
     (book) =>
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase())
@@ -59,7 +58,7 @@ export function MyBooksPage() {
           </Button>
         </Box>
 
-        {books.length > 0 ? (
+        {books?.length > 0 ? (
           <>
             {/* Search */}
             <TextField
@@ -83,7 +82,7 @@ export function MyBooksPage() {
               <Box display="flex" flexWrap="wrap" gap={3}>
                 {filteredBooks.map((book) => (
                   <Box
-                    key={`${book.id}-${refreshKey}`}
+                    key={`${book._id}-${refreshKey}`}
                     flex="1 1 calc(25% - 24px)"
                     minWidth={250}
                     maxWidth={300}

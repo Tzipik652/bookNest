@@ -55,7 +55,7 @@ export function AddBookPage() {
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      navigate(`/book/${newBook.id}`);
+      navigate(`/book/${newBook._id}`);
     } catch (err) {
       setError("Failed to add book. Please try again.");
       setIsSubmitting(false);

@@ -8,14 +8,14 @@ export interface User {
 }
 
 export interface Book {
-  id: string;
+  _id: string;
   title: string;
   author: string;
   description: string;
   category: string;
   img_url: string;
   price?: number;
-  aiSummary: string;
+  ai_summary: string;
   uploaderId: string;
   uploaderName: string;
   createdAt: string;

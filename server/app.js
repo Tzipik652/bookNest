@@ -2,7 +2,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './routes/authRouter.js';
+import userRoutes from './routes/userRouter.js';
 import { verifyJWT } from './middleware/auth.js';
 dotenv.config();
 import bookRouter from './routes/bookRouter.js';
@@ -16,8 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/auth', authRoutes);
-// app.use('/books', verifyJWT, bookRouter);
+app.use('/user', userRoutes);
 app.use('/books', bookRouter);
 
 

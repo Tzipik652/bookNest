@@ -15,7 +15,7 @@ interface BookCardProps {
 export function BookCard({ book, onFavoriteChange }: BookCardProps) {
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
-  const [favorited, setFavorited] = useState(isFavorite(book.id));
+  const [favorited, setFavorited] = useState(isFavorite(book._id));
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -26,14 +26,14 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
       return;
     }
     
-    const newState = toggleFavorite(book.id);
+    const newState = toggleFavorite(book._id);
     setFavorited(newState);
     onFavoriteChange?.();
   };
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
-      <div onClick={() => navigate(`/book/${book.id}`)}>
+      <div onClick={() => navigate(`/book/${book._id}`)}>
         <div className="aspect-[3/4] overflow-hidden bg-gray-100">
           <ImageWithFallback
             src={book.img_url}
@@ -59,13 +59,13 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
           <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm mb-3">
             {book.category}
           </span>
-          <p className="text-sm text-gray-700 line-clamp-3">{book.aiSummary}</p>
+          <p className="text-sm text-gray-700 line-clamp-3">{book.ai_summary}</p>
         </CardContent>
       </div>
       <CardFooter className="p-4 pt-0">
         <Button 
           className="w-full"
-          onClick={() => navigate(`/book/${book.id}`)}
+          onClick={() => navigate(`/book/${book._id}`)}
         >
           View Details
         </Button>

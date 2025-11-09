@@ -2,13 +2,12 @@ import bookModel from "../models/bookModel.js";
 import { generateBookSummary, getBookRecommendations } from "../services/aiService.js";
 
 export const createBook = async (req, res) => {
-    console.log('Creating book with data:', req.body);
     const bookData = req.body;
     try {
         //need to add ai summary generation here
         const summary = await generateBookSummary(bookData.title, bookData.author, bookData.description);
-        bookData.aiSummary = summary;
-        const newBook = await bookModel.create({ ...bookData, aiSummary: summary ,user_id: req.user._id});
+        bookData.ai_summary = summary;
+        const newBook = await bookModel.create({ ...bookData, ai_summary: summary ,user_id: req.user._id});
         return res.status(201).json(newBook);
     } catch (error) {
         console.log(error);
@@ -20,7 +19,6 @@ export const createBook = async (req, res) => {
 export const getAllBooks = async (req, res) => {
     try {
         const books = await bookModel.findAll();
-        console.log(books);
         
         return res.status(200).json(books);
     } catch (error) {
@@ -33,6 +31,7 @@ export const getBookById = async (req, res) => {
     const { id } = req.params;
     try {
         const book = await bookModel.findById(id);
+        console.log("the book is",book);
         if (!book) {
             return res.status(404).json({ error: "Book not found" });
         }
@@ -144,8 +143,8 @@ export const getBooksByUserId = async (req, res) => {
     }
     try {
         const books = await bookModel.findAll();
-        const filteredBooks = books.filter(book => book.userId === userId);
-        return res.status(200).json({ filteredBooks });
+        const booksByUserId = books.filter(book => book.userId === userId);
+        return res.status(200).json({booksByUserId});
     } catch (error) {
         return res.status(500).json({ error: "Failed to retrieve books" });
     }
