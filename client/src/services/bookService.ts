@@ -57,7 +57,7 @@ export async function addBook(bookData: {
 
     const serverBook = res.data;
     const newBook: Book = {
-      id: serverBook._id || serverBook.id,
+      _id: serverBook._id || serverBook.id,
       title: serverBook.title,
       author: serverBook.author,
       description: serverBook.description,
@@ -66,7 +66,7 @@ export async function addBook(bookData: {
       price: serverBook.price,
       uploaderId: serverBook.user_id,
       uploaderName: currentUser.name,
-      aiSummary: serverBook.ai_summary,
+      ai_summary: serverBook.ai_summary,
       createdAt: serverBook.date_created || new Date().toISOString(),
     };
     return newBook;

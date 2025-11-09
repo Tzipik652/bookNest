@@ -282,7 +282,7 @@ export function LandingPage() {
         {filteredBooks.length > 0 ? (
           <Box display="flex" flexWrap="wrap" gap={3} justifyContent="flex-start">
             {filteredBooks.map((book) => (
-              <Box key={book.id} flex="1 1 calc(25% - 24px)" minWidth={250} maxWidth={300}>
+              <Box key={book._id} flex="1 1 calc(25% - 24px)" minWidth={250} maxWidth={300}>
                 <BookCard book={book} />
               </Box>
             ))}
