@@ -46,6 +46,7 @@ export function BookDetailsPage() {
 
     const fetchBook = async () => {
       try {
+        console.log("Fetching book with id:", id);
         const data = await getBookById(id);
         setBook(data);
       } catch (err) {
@@ -94,12 +95,12 @@ export function BookDetailsPage() {
       navigate("/login");
       return;
     }
-    const newState = toggleFavorite(book.id);
+    const newState = toggleFavorite(book._id);
     setFavorited(newState);
   };
 
   const handleDelete = () => {
-    deleteBook(book.id);
+    deleteBook(book._id);
     navigate("/my-books");
   };
 
@@ -168,7 +169,7 @@ export function BookDetailsPage() {
                       <Button
                         variant="outlined"
                         startIcon={<Edit />}
-                        onClick={() => navigate(`/edit-book/${book.id}`)}
+                        onClick={() => navigate(`/edit-book/${book._id}`)}
                       >
                         Edit
                       </Button>
@@ -209,7 +210,7 @@ export function BookDetailsPage() {
                     <Typography variant="h6">AI Summary</Typography>
                   </Box>
                   <Typography variant="body1" color="text.secondary">
-                    {book.aiSummary}
+                    {book.ai_summary}
                   </Typography>
                 </Box>
 

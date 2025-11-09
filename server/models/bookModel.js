@@ -15,7 +15,7 @@ export async function create(bookData) {
       category: bookData.category,
       img_url: bookData.imgUrl,
       price: bookData.price,
-      ai_summary: bookData.aiSummary,
+      ai_summary: bookData.ai_summary,
       user_id: bookData.user_id,
     })
     .select()
