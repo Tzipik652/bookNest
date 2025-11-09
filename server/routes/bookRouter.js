@@ -1,5 +1,5 @@
 import express from 'express';
-import { createBook, deleteBook, getAllBooks, getBookById, getBooksByCategory, getBooksByUserId, searchBooks, updateBook } from '../controllers/bookConroller.js';
+import { createBook, deleteBook, getAllBooks, getBookById, getBooksByCategory, getBooksByUserId, getRecomendedBooks, searchBooks, updateBook } from '../controllers/bookConroller.js';
 import { verifyJWT } from '../middleware/auth.js';
 const router = express.Router();
 
@@ -8,6 +8,7 @@ router.post('/',verifyJWT, createBook);
 // router.get('/page',getBooksByPage);
 ///books/search?s=harry&page=1
 router.get('/search',(req,res)=> console.log("in searc") ,searchBooks);
+router.get('/recommendations',verifyJWT,getRecomendedBooks);
 ///books/category/:catName
 router.get('/category/:catName',getBooksByCategory);
 router.get('/user/:userId',verifyJWT, getBooksByUserId);

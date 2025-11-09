@@ -54,53 +54,86 @@ export async function generateBookSummary(title, author, description) {
 /**
  * מספק המלצות לספרים על בסיס רשימת ספרים מועדפים.
  * @param {Array<Object>} favoriteBooks - רשימת הספרים המועדפים של המשתמש (עם שדות title).
+ * @param {Array<Object>} candidateBooks - רשימת הספרים הזמינים במערכת (עם שדות id, title, author).
  * @returns {Promise<Array<Object>>} רשימת המלצות (עד 5) בפורמט JSON.
  */
-export async function getBookRecommendations(favoriteBooks) {
-    // יצירת רשימה מופרדת בפסיקים של כותרי הספרים
-    const bookTitles = favoriteBooks.map(book => book.title).join(', ');
+// export async function getBookRecommendations(favoriteBooks) {
+//     // יצירת רשימה מופרדת בפסיקים של כותרי הספרים
+//     const bookTitles = favoriteBooks.map(book => book.title).join(', ');
     
-    // הנחיה ל-Gemini לעבוד בפורמט JSON
-    const prompt = `
-        המשתמש אוהב את הספרים הבאים: ${bookTitles}. 
-        הצע לו 5 המלצות לספרים דומים (שם ספר ומחבר) המתאימים לסגנון, ז'אנר ונושא הספרים שהוא אוהב. 
-        ספק את התוצאה בפורמט JSON בלבד.
-    `;
+//     // הנחיה ל-Gemini לעבוד בפורמט JSON
+//     const prompt = `
+//         המשתמש אוהב את הספרים הבאים: ${bookTitles}. 
+//         הצע לו 5 המלצות לספרים דומים (שם ספר ומחבר) המתאימים לסגנון, ז'אנר ונושא הספרים שהוא אוהב. 
+//         ספק את התוצאה בפורמט JSON בלבד.
+//     `;
 
-    try {
-        // ✅ הקריאה המתוקנת ל-Gemini JSON Mode
-        const response = await ai.models.generateContent({
-             model: MODEL_NAME,
-             contents: prompt,
-             config: {
-                 responseMimeType: "application/json", 
-                 responseSchema: { // הגדרת מבנה ה-JSON הצפוי
-                     type: "object",
-                     properties: {
-                         recommendations: {
-                             type: "array",
-                             items: {
-                                 type: "object",
-                                 properties: {
-                                     title: { type: "string" },
-                                     author: { type: "string" }
-                                 },
-                                 required: ["title", "author"]
-                             }
-                         }
-                     },
-                     required: ["recommendations"]
-                 }
-             }
-        });
+//     try {
+//         // ✅ הקריאה המתוקנת ל-Gemini JSON Mode
+//         const response = await ai.models.generateContent({
+//              model: MODEL_NAME,
+//              contents: prompt,
+//              config: {
+//                  responseMimeType: "application/json", 
+//                  responseSchema: { // הגדרת מבנה ה-JSON הצפוי
+//                      type: "object",
+//                      properties: {
+//                          recommendations: {
+//                              type: "array",
+//                              items: {
+//                                  type: "object",
+//                                  properties: {
+//                                      title: { type: "string" },
+//                                      author: { type: "string" }
+//                                  },
+//                                  required: ["title", "author"]
+//                              }
+//                          }
+//                      },
+//                      required: ["recommendations"]
+//                  }
+//              }
+//         });
 
-        // ניתוח פלט ה-JSON
-        const jsonText = response.text.trim();
-        const result = JSON.parse(jsonText);
-        return result.recommendations;
+//         // ניתוח פלט ה-JSON
+//         const jsonText = response.text.trim();
+//         const result = JSON.parse(jsonText);
+//         return result.recommendations;
 
-    } catch (error) {
-        console.error("Gemini Recommendation Error:", error);
-        return [];
-    }
+//     } catch (error) {
+//         console.error("Gemini Recommendation Error:", error);
+//         return [];
+//     }
+// }
+export async function getBookRecommendations(favoriteBooks, candidateBooks) {
+  const prompt = `
+  המשתמש אהב את הספרים הבאים:
+  ${JSON.stringify(favoriteBooks, null, 2)}
+
+  הנה ספרים זמינים במערכת:
+  ${JSON.stringify(candidateBooks, null, 2)}
+
+  בחר עד 5 ספרים רק מתוך רשימת המועמדים.
+  החזר בפורמט JSON:
+  {
+    "recommendations": [ { "id": "string", "reason": "string" } ]
+  }
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: MODEL_NAME,
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
+
+    const result = JSON.parse(response.text.trim());
+    return result.recommendations;
+
+  } catch (error) {
+    console.error("Gemini Recommendation Error:", error);
+    return [];
+  }
 }

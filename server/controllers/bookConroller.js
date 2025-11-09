@@ -1,5 +1,5 @@
 import bookModel from "../models/bookModel.js";
-import { generateBookSummary } from "../services/aiService.js";
+import { generateBookSummary, getBookRecommendations } from "../services/aiService.js";
 
 export const createBook = async (req, res) => {
     console.log('Creating book with data:', req.body);
@@ -38,7 +38,7 @@ export const getBookById = async (req, res) => {
     }
 }
 export const updateBook = async (req, res) => {
-    //need to add validation that only the owner can update
+    //validation that only the owner can update
     const { id } = req.params;
     const updates = req.body;
     const userId = req.user._id;
@@ -144,5 +144,21 @@ export const getBooksByUserId = async (req, res) => {
         return res.status(200).json({ filteredBooks });
     } catch (error) {
         return res.status(500).json({ error: "Failed to retrieve books" });
+    }
+}
+export const getRecomendedBooks = async (req, res) => {
+    const userId = req.user._id;
+    if(!userId){
+        return res.status(403).json({ error: "Forbidden" });
+    }
+    try {
+        const favoriteBooks = await bookModel.getFavoriteBooks(userId);
+        const allBooks = await bookModel.findAll();
+        //call ai service to get recommendations
+        const recommendations = await getBookRecommendations(favoriteBooks, allBooks);
+        return res.status(200).json(recommendations);
+    }catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: "Failed to retrieve recommendations" });
     }
 }

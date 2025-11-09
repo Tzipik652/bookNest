@@ -1,5 +1,6 @@
 // bookModel.js - using Supabase client
 import supabase from "../config/supabaseClient.js";
+import { getFavoriteBooksList } from "./userModel.js";
 
 /**
  * Create a new book
@@ -98,5 +99,23 @@ export async function remove(id) {
   if (error && error.code !== "PGRST116") throw error; // not found
   return !!data;
 }
+export async function getFavoriteBooks(userId) {
+  try {
+    const favoriteBooksList=await getFavoriteBooksList(userId);
+    const { data, error } = await supabase
+    .from("books")
+    .select("*")
+    .eq("user_id", userId)
+    .in("_id", favoriteBooksList)
+    .order("date_created", { ascending: false });
 
-export default { create, findAll, findById, update, remove };
+  if (error) throw error;
+  return data;
+  } catch (error) {
+    console.log(error);
+    return [];    
+  }
+  
+}
+
+export default { create, findAll, findById, update, remove ,getFavoriteBooks};

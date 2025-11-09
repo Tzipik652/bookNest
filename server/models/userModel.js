@@ -34,3 +34,12 @@ export async function updateUser(id, updates) {
   if (error) throw error;
   return data;
 }
+export async function getFavoriteBooksList(id) {
+  const { data, error } = await supabase
+    .from('users')
+    .select('favorites')
+    .eq('id', id);
+
+  if (error) throw error;
+  return data.favorites;
+}
