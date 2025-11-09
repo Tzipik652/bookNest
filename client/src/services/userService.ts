@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  `process.env.REACT_APP_SERVER_URL${"/auth"}` || "http://localhost:5000/auth";
+  `process.env.REACT_APP_SERVER_URL${"/user"}` || "http://localhost:5000/user";
 import axios from "axios";
 import { User } from "../types";
 
