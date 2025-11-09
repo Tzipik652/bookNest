@@ -33,6 +33,7 @@ export const getBookById = async (req, res) => {
     const { id } = req.params;
     try {
         const book = await bookModel.findById(id);
+        console.log("the book is",book);
         if (!book) {
             return res.status(404).json({ error: "Book not found" });
         }
