@@ -29,13 +29,21 @@ export async function create(bookData) {
  * Get all books
  */
 export async function findAll() {
-  const { data, error } = await supabase
-    .from("books")
-    .select("*")
-    .order("date_created", { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from("books")
+      .select("*")
+      .order("date_created", { ascending: false });
 
-  if (error) throw error;
-  return data;
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (err) {
+    console.error("Failed to fetch books:", err);
+    throw err;
+  }
 }
 
 /**
