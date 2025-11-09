@@ -38,7 +38,7 @@ export async function getFavoriteBooksList(id) {
   const { data, error } = await supabase
     .from('users')
     .select('favorites')
-    .eq('id', id);
+    .eq('_id', id);
 
   if (error) throw error;
   return data.favorites;
