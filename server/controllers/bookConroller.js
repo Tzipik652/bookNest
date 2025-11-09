@@ -2,7 +2,6 @@ import bookModel from "../models/bookModel.js";
 import { generateBookSummary, getBookRecommendations } from "../services/aiService.js";
 
 export const createBook = async (req, res) => {
-    console.log('Creating book with data:', req.body);
     const bookData = req.body;
     try {
         //need to add ai summary generation here
@@ -20,7 +19,6 @@ export const createBook = async (req, res) => {
 export const getAllBooks = async (req, res) => {
     try {
         const books = await bookModel.findAll();
-        console.log(books);
         
         return res.status(200).json(books);
     } catch (error) {
@@ -144,8 +142,8 @@ export const getBooksByUserId = async (req, res) => {
     }
     try {
         const books = await bookModel.findAll();
-        const filteredBooks = books.filter(book => book.userId === userId);
-        return res.status(200).json({ filteredBooks });
+        const booksByUserId = books.filter(book => book.userId === userId);
+        return res.status(200).json({booksByUserId});
     } catch (error) {
         return res.status(500).json({ error: "Failed to retrieve books" });
     }

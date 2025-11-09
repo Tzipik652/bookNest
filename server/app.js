@@ -2,7 +2,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './routes/authRouter.js';
+import userRoutes from './routes/userRouter.js';
 import { verifyJWT } from './middleware/auth.js';
 dotenv.config();
 import bookRouter from './routes/bookRouter.js';
@@ -16,20 +16,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/auth', authRoutes);
-// app.use('/books', verifyJWT, bookRouter);
+app.use('/user', userRoutes);
 app.use('/books', bookRouter);
 
-
-// Example of a protected route
-app.get('/api/profile', verifyJWT, async (req, res) => {
-  res.json({ user: req.user });
-});
-
-// Example route for AI recommendations
-app.get('/api/recommendations', verifyJWT, async (req, res) => {
-  res.json({ message: `AI recommendations for ${req.user.email}` });
-});
 
 // Error handling
 app.use((err, req, res, next) => {

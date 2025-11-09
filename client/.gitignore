@@ -18,6 +18,11 @@
 .env.test.local
 .env.production.local
 .env
+<<<<<<<<< Temporary merge branch 1
+
+=========
+>>>>>>>>> Temporary merge branch 2
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.env
