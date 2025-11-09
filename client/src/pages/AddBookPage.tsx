@@ -51,7 +51,7 @@ export function AddBookPage() {
           img_url ||
           "https://images.unsplash.com/photo-1560362415-c88a4c066155?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
         price: price ? parseFloat(price) : undefined,
-      }, currentUser?._id||"0", currentUser?.name||"someone");
+      });
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 

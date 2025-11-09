@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Book, Favorite } from "../types";
+import { useUserStore } from "../store/useUserStore";
 
 const API_BASE = "http://localhost:5000/books";
 
@@ -40,10 +41,13 @@ export async function addBook(bookData: {
   category: string;
   imgUrl?: string;
   price?: number;
-},  userId: string,
-  uploaderName: string): Promise<Book> {
+}): Promise<Book> {
   try {
-    const payload = { ...bookData, user_id: userId };
+    const currentUser = useUserStore.getState().user
+
+  if (!currentUser) throw new Error("Must be logged in to add books");
+
+    const payload = { ...bookData, user_id: currentUser._id };
     const res = await axios.post(API_BASE, payload);
 
     const serverBook = res.data;
@@ -57,7 +61,7 @@ export async function addBook(bookData: {
       img_url: serverBook.img_url,
       price: serverBook.price,
       uploaderId: serverBook.user_id,
-      uploaderName,
+      uploaderName: currentUser.name,
       aiSummary: serverBook.ai_summary,
       createdAt: serverBook.date_created || new Date().toISOString(),
     };
