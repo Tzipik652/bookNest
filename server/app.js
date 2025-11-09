@@ -2,7 +2,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './routes/auth.js';
+import authRoutes from './routes/authRouter.js';
 import { verifyJWT } from './middleware/auth.js';
 dotenv.config();
 import bookRouter from './routes/bookRouter.js';
