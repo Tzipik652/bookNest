@@ -216,9 +216,9 @@ export function BookDetailsPage() {
 
                 {/* Uploader Info */}
                 <Typography variant="body2" color="text.secondary">
-                  Uploaded by {book.uploaderName}
+                  Uploaded by {book.user.name}
                   <br />
-                  {new Date(book.createdAt).toLocaleDateString()}
+                  {new Date(book.date_created).toLocaleDateString()}
                 </Typography>
               </CardContent>
             </Card>

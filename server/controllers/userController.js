@@ -146,7 +146,7 @@ export const googleLogin = async (req, res) => {
             name: profile.name,
             auth_provider: "google",
             profile_picture: profile.picture,
-            favorites: user.favorites,
+            // favorites: user.favorites,
           },
         ])
         .select()
