@@ -115,7 +115,6 @@ export function BookDetailsPage() {
           Back
         </Button>
 
-        {/* Flexbox container במקום Grid */}
         <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={4}>
           {/* Book Cover */}
           <Box flex={1}>
