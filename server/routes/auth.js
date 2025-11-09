@@ -75,6 +75,7 @@ router.post("/register", async (req, res) => {
         email: user.email,
         name: user.name,
         auth_provider: user.auth_provider,
+        favorites: user.favorites
       },
     });
   } catch (err) {
@@ -115,6 +116,7 @@ router.post("/login", async (req, res) => {
         email: user.email,
         name: user.name,
         auth_provider: user.auth_provider,
+        favorites: user.favorites
       },
     });
   } catch (err) {
@@ -192,6 +194,7 @@ router.post("/google", async (req, res) => {
         name: user.name,
         auth_provider: user.auth_provider,
         profile_picture: user.profile_picture,
+        favorites: user.favorites
       },
     });
   } catch (err) {

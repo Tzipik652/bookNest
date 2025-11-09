@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addBook } from "../lib/storage";
+import { addBook } from "../services/bookService";
 import { categories } from "../lib/mockData";
+
 import {
   Box,
   Button,
@@ -16,6 +17,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { ArrowBack, AutoAwesome } from '@mui/icons-material';
+import { useUserStore } from "../store/useUserStore";
 
 export function AddBookPage() {
   const navigate = useNavigate();
@@ -23,10 +25,11 @@ export function AddBookPage() {
   const [author, setAuthor] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [img_url, setimg_url] = useState("");
   const [price, setPrice] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user: currentUser } = useUserStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,16 +42,16 @@ export function AddBookPage() {
 
     setIsSubmitting(true);
     try {
-      const newBook = addBook({
+      const newBook = await addBook({
         title,
         author,
         description,
         category,
-        imageUrl:
-          imageUrl ||
+        imgUrl:
+          img_url ||
           "https://images.unsplash.com/photo-1560362415-c88a4c066155?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
         price: price ? parseFloat(price) : undefined,
-      });
+      }, currentUser?._id||"0", currentUser?.name||"someone");
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -147,8 +150,8 @@ export function AddBookPage() {
               <TextField
                 fullWidth
                 label="Image URL (Optional)"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
+                value={img_url}
+                onChange={(e) => setimg_url(e.target.value)}
                 type="url"
                 margin="normal"
                 helperText="Leave blank to use a default image"

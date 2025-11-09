@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
-import { loginLocal, loginWithGoogle } from "../lib/storage";
 import { BookOpen } from "lucide-react";
 import {
   Box,
@@ -17,6 +16,7 @@ import {
   Divider,
 } from "@mui/material";
 import { useUserStore } from "../store/useUserStore";
+import { loginLocal, loginWithGoogle } from "../services/userService";
 export function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");

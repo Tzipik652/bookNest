@@ -1,0 +1,70 @@
+const API_BASE_URL =
+  `process.env.REACT_APP_SERVER_URL${"/auth"}` || "http://localhost:5000/auth";
+import axios from "axios";
+import { User } from "../types";
+
+function handleAxiosError(error: any): never {
+  if (axios.isAxiosError(error)) {
+    throw new Error(
+      error.response?.data?.message ||
+      error.message ||
+      "Something went wrong with the API request"
+    );
+  } else {
+    throw new Error("Unexpected error: " + error);
+  }
+}
+
+
+export const loginLocal = async (email: string, password: string): Promise<{ user: User; token: string }>  => {
+  try {
+    const res = await axios.post(`${API_BASE_URL}/login`, {
+      email,
+      password,
+    });
+    const { user, token } : { user: User; token: string }= res.data;
+
+    return { user, token };
+  } catch (error: any) {
+      handleAxiosError(error);
+  }
+};
+
+export const register = async (
+  email: string,
+  password: string,
+  name: string
+) : Promise<{ user: User; token: string }>=> {
+  try {
+    const res = await axios.post(`${API_BASE_URL}/register`, {
+      email,
+      password,
+      name,
+    });
+
+    const { user, token }: { user: User; token: string } = res.data;
+
+    return { user, token };
+  } catch (error) {
+    handleAxiosError(error);
+  }
+};
+
+export const loginWithGoogle = async (credentialResponse: any): Promise<{ user: User; token: string }> => {
+  try {
+    const id_token = credentialResponse.credential;
+    const { data } = await axios.post(`${API_BASE_URL}/google`, {
+      id_token,
+    });
+
+    if (data.success) {
+      localStorage.setItem("token", data.token);
+      return {user:data.user, token: data.token};
+    } else {
+      throw new Error("Google login failed");
+    }
+  } catch (error) {
+    handleAxiosError(error);
+  }
+};
+

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getBookById, updateBook } from '../lib/storage';
+// import { getBookById, updateBook } from '../lib/storage';
+import { Book } from '../types';
+import { getBookById, updateBook } from '../services/bookService';
 import { categories } from '../lib/mockData';
 import {
   Box,
@@ -24,35 +26,53 @@ export function EditBookPage() {
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
   
+
+  const [book, setBook] = useState<Book | null>(null);
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [img_url, setimg_url] = useState('');
   const [price, setPrice] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
 
-    const book = getBookById(id);
-    if (!book) {
-      navigate('/home');
-      return;
-    }
+    const fetchBook = async () => {
+      try {
+        const data = await getBookById(id);
+        if (!data) {
+          navigate('/home');
+          return;
+        }
+        if (data.uploaderId !== currentUser?._id) {
+          navigate(`/book/${id}`);
+          return;
+        }
 
-    if (book.uploaderId !== currentUser?._id) {
+    if (book?.uploaderId !== currentUser?._id) {
       navigate(`/book/${id}`);
       return;
     }
+        setBook(data);
+        setTitle(data.title);
+        setAuthor(data.author);
+        setDescription(data.description);
+        setCategory(data.category);
+        setimg_url(data.img_url);
+        setPrice(data.price?.toString() || '');
+      } catch (err) {
+        console.error(err);
+        navigate('/home');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setTitle(book.title);
-    setAuthor(book.author);
-    setDescription(book.description);
-    setCategory(book.category);
-    setImageUrl(book.imageUrl);
-    setPrice(book.price?.toString() || '');
+    fetchBook();
   }, [id, currentUser, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,23 +87,30 @@ export function EditBookPage() {
     setIsSubmitting(true);
 
     try {
-      updateBook(id, {
+      await updateBook(id, {
         title,
         author,
         description,
         category,
-        imageUrl,
+        img_url,
         price: price ? parseFloat(price) : undefined,
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       navigate(`/book/${id}`);
     } catch (err) {
+      console.error(err);
       setError('Failed to update book. Please try again.');
       setIsSubmitting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f9fafb', py: 6 }}>
@@ -152,8 +179,8 @@ export function EditBookPage() {
               <TextField
                 label="Image URL"
                 type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
+                value={img_url}
+                onChange={(e) => setimg_url(e.target.value)}
                 placeholder="https://example.com/image.jpg"
               />
 

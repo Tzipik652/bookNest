@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { register } from "../lib/storage";
 import {
   Box,
   Card,
@@ -14,6 +13,7 @@ import {
 } from "@mui/material";
 import BookIcon from "@mui/icons-material/Book";
 import { useUserStore } from "../store/useUserStore";
+import { register } from "../services/userService";
 
 export function RegisterPage() {
   const navigate = useNavigate();

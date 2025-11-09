@@ -1,7 +1,10 @@
 export interface User {
-  id: string;
+  _id: string;
   email: string;
   name: string;
+  auth_provider: string;
+  favorites: string[];
+  profile_picture?: string;
 }
 
 export interface Book {
@@ -10,7 +13,7 @@ export interface Book {
   author: string;
   description: string;
   category: string;
-  imageUrl: string;
+  img_url: string;
   price?: number;
   aiSummary: string;
   uploaderId: string;

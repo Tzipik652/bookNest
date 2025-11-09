@@ -20,8 +20,12 @@ export const createBook = async (req, res) => {
 export const getAllBooks = async (req, res) => {
     try {
         const books = await bookModel.findAll();
+        console.log(books);
+        
         return res.status(200).json(books);
     } catch (error) {
+        console.log("error", error);
+        
         return res.status(500).json({ error: "Failed to retrieve books" });
     }
 }
