@@ -82,7 +82,7 @@ export function MyBooksPage() {
               <Box display="flex" flexWrap="wrap" gap={3}>
                 {filteredBooks.map((book) => (
                   <Box
-                    key={`${book.id}-${refreshKey}`}
+                    key={`${book._id}-${refreshKey}`}
                     flex="1 1 calc(25% - 24px)"
                     minWidth={250}
                     maxWidth={300}

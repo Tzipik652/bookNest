@@ -6,8 +6,8 @@ export const createBook = async (req, res) => {
     try {
         //need to add ai summary generation here
         const summary = await generateBookSummary(bookData.title, bookData.author, bookData.description);
-        bookData.aiSummary = summary;
-        const newBook = await bookModel.create({ ...bookData, aiSummary: summary ,user_id: req.user._id});
+        bookData.ai_summary = summary;
+        const newBook = await bookModel.create({ ...bookData, ai_summary: summary ,user_id: req.user._id});
         return res.status(201).json(newBook);
     } catch (error) {
         console.log(error);

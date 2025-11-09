@@ -81,7 +81,7 @@ export function AIRecommendationsPage() {
         >
           {recommendations.map((book) => (
             <Box
-              key={`${book.id}-${refreshKey}`}
+              key={`${book._id}-${refreshKey}`}
               sx={{
                 flex: "1 1 calc(25% - 24px)", // 4 קלפים בשורה עם רווח
                 minWidth: 250,

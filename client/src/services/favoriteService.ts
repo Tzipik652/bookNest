@@ -116,7 +116,7 @@ export const getAIRecommendations = (): Book[] => {
 };
 
 // Helper function to generate mock AI summaries
-function generateMockAISummary(title: string, description: string, category: string): string {
+function generateMockai_summary(title: string, description: string, category: string): string {
   const summaries = [
     `An engaging ${category.toLowerCase()} work that explores ${description.toLowerCase()}. This book offers unique insights and compelling narratives that will keep readers engaged from start to finish.`,
     `${title} is a remarkable ${category.toLowerCase()} title that delves into ${description.toLowerCase()}. Rich in detail and thoughtfully crafted, this book provides both entertainment and intellectual stimulation.`,
