@@ -17,6 +17,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { ArrowBack, AutoAwesome } from '@mui/icons-material';
+import { useUserStore } from "../store/useUserStore";
 
 export function AddBookPage() {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ export function AddBookPage() {
   const [price, setPrice] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user: currentUser } = useUserStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

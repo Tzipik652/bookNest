@@ -1,13 +1,16 @@
 // controllers/authController.js
-import dotenv from 'dotenv';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import fetch from 'node-fetch';
-import { createClient } from '@supabase/supabase-js';
+import dotenv from "dotenv";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import fetch from "node-fetch";
+import { createClient } from "@supabase/supabase-js";
 
 dotenv.config();
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 const JWT_SECRET = process.env.SUPABASE_JWT_SECRET;
 
 // Helper: Generate JWT
@@ -17,10 +20,10 @@ const generateJWT = (user) => {
       _id: user._id,
       email: user.email,
       name: user.name,
-      auth_provider: user.auth_provider
+      auth_provider: user.auth_provider,
     },
     JWT_SECRET,
-    { expiresIn: '24h' }
+    { expiresIn: "24h" }
   );
 };
 
@@ -31,21 +34,23 @@ export const register = async (req, res) => {
   try {
     const { email, password, name } = req.body;
     if (!email || !password || !name)
-      return res.status(400).json({ error: 'All fields are required' });
+      return res.status(400).json({ error: "All fields are required" });
 
     const { data: existing } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
+      .from("users")
+      .select("*")
+      .eq("email", email)
       .single();
 
-    if (existing) return res.status(400).json({ error: 'User already exists' });
+    if (existing) return res.status(400).json({ error: "User already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const { data: user, error } = await supabase
-      .from('users')
-      .insert([{ email, password: hashedPassword, name, auth_provider: 'local' }])
+      .from("users")
+      .insert([
+        { email, password: hashedPassword, name, auth_provider: "local" },
+      ])
       .select()
       .single();
 
@@ -55,11 +60,17 @@ export const register = async (req, res) => {
     res.json({
       success: true,
       token,
-      user: { _id: user._id, email: user.email, name: user.name, auth_provider: user.auth_provider }
+      user: {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        auth_provider: user.auth_provider,
+        favorites: user.favorites,
+      },
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Registration failed' });
+    res.status(500).json({ error: "Registration failed" });
   }
 };
 
@@ -70,30 +81,36 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
-      return res.status(400).json({ error: 'Email and password required' });
+      return res.status(400).json({ error: "Email and password required" });
 
     const { data: user } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
+      .from("users")
+      .select("*")
+      .eq("email", email)
       .single();
 
-    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
-    if (user.auth_provider !== 'local')
-      return res.status(401).json({ error: 'Please login with Google' });
+    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    if (user.auth_provider !== "local")
+      return res.status(401).json({ error: "Please login with Google" });
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!match) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = generateJWT(user);
     res.json({
       success: true,
       token,
-      user: { _id: user._id, email: user.email, name: user.name, auth_provider: user.auth_provider }
+      user: {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        auth_provider: user.auth_provider,
+        favorites: user.favorites,
+      },
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Login failed' });
+    res.status(500).json({ error: "Login failed" });
   }
 };
 
@@ -104,38 +121,43 @@ export const googleLogin = async (req, res) => {
   try {
     const { id_token } = req.body;
     if (!id_token)
-      return res.status(400).json({ error: 'Google ID token required' });
+      return res.status(400).json({ error: "Google ID token required" });
 
-    const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${id_token}`);
+    const response = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?id_token=${id_token}`
+    );
     const profile = await response.json();
 
     if (!profile.email)
-      return res.status(401).json({ error: 'Invalid Google token' });
+      return res.status(401).json({ error: "Invalid Google token" });
 
     let { data: user } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', profile.email)
+      .from("users")
+      .select("*")
+      .eq("email", profile.email)
       .single();
 
     if (!user) {
       const { data: newUser, error: insertError } = await supabase
-        .from('users')
-        .insert([{
-          email: profile.email,
-          name: profile.name,
-          auth_provider: 'google',
-          profile_picture: profile.picture
-        }])
+        .from("users")
+        .insert([
+          {
+            email: profile.email,
+            name: profile.name,
+            auth_provider: "google",
+            profile_picture: profile.picture,
+            favorites: user.favorites,
+          },
+        ])
         .select()
         .single();
       if (insertError) throw insertError;
       user = newUser;
-    } else if (!user.auth_provider.includes('google')) {
+    } else if (!user.auth_provider.includes("google")) {
       const { data: updatedUser, error: updateError } = await supabase
-        .from('users')
-        .update({ auth_provider: 'both', profile_picture: profile.picture })
-        .eq('_id', user._id)
+        .from("users")
+        .update({ auth_provider: "both", profile_picture: profile.picture })
+        .eq("_id", user._id)
         .select()
         .single();
       if (updateError) throw updateError;
@@ -151,11 +173,11 @@ export const googleLogin = async (req, res) => {
         email: user.email,
         name: user.name,
         auth_provider: user.auth_provider,
-        profile_picture: user.profile_picture
-      }
+        profile_picture: user.profile_picture,
+      },
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Google login failed' });
+    res.status(500).json({ error: "Google login failed" });
   }
 };

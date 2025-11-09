@@ -21,16 +21,6 @@ app.use('/auth', authRoutes);
 app.use('/books', bookRouter);
 
 
-// Example of a protected route
-app.get('/api/profile', verifyJWT, async (req, res) => {
-  res.json({ user: req.user });
-});
-
-// Example route for AI recommendations
-app.get('/api/recommendations', verifyJWT, async (req, res) => {
-  res.json({ message: `AI recommendations for ${req.user.email}` });
-});
-
 // Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
