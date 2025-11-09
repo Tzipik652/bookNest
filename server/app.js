@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use('/auth', userRoutes);
+app.use('/user', userRoutes);
 app.use('/books', verifyJWT, bookRouter);
 // app.use('/books', bookRouter);
 
