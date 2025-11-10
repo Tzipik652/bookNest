@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Book, Favorite } from "../types";
+import { Book } from "../types";
 import { useUserStore } from "../store/useUserStore";
 
 const API_BASE_URL =
