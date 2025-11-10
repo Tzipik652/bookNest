@@ -140,7 +140,7 @@ export async function getBooksByUserId() {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },
     });
-    return res.data.booksByUserId;
+    return res.data;
   } catch (error) {
     handleAxiosError(error);
   }

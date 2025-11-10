@@ -96,10 +96,9 @@ export const getBooksByCategory = catchAsync(async (req, res) => {
 });
 
 export const getBooksByUserId = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
-  if (req.user._id !== userId) throw new AppError("Forbidden", 403);
-
-  const books = await bookModel.findAll();
+  const userId = req.user._id;
+  if (!userId) throw new AppError("Forbidden", 403);
+    const books = await bookModel.findAll();
   const userBooks = books.filter((b) => b.user_id === userId);
   res.status(200).json(userBooks);
 });
