@@ -164,13 +164,14 @@ export const getBooksByUserId = async (req, res) => {
     return res.status(500).json({ error: "Failed to retrieve books" });
   }
 };
+
 export const getRecomendedBooks = async (req, res) => {
   const userId = req.user._id;
   if (!userId) {
     return res.status(403).json({ error: "Forbidden" });
   }
   try {
-    const favoriteBooks = await bookModel.getFavoriteBooks(userId);
+    const favoriteBooks = await bookModel.getFavoriteBooks(userId);    
     const allBooks = await bookModel.findAll();
     //call ai service to get recommendations
     const recommendations = await getBookRecommendations(

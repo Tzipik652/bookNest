@@ -30,16 +30,6 @@ export async function create(bookData) {
  */
 export async function findAll() {
   try {
-    // const { data, error } = await supabase
-    //   .from("books")
-    //   .select("*")
-    //   .order("date_created", { ascending: false });
-
-    // if (error) {
-    //   throw error;
-    // }
-
-    // return data;
     //join with users to get uploader name
     const { data, error } = await supabase
       .from("books")
@@ -127,6 +117,7 @@ export async function remove(id) {
 export async function getFavoriteBooks(userId) {
   try {
     const favoriteBooksList=await getFavoriteBooksList(userId);
+    
     const { data, error } = await supabase
     .from("books")
     .select("* , user: user_id ( name, email )")
@@ -137,6 +128,8 @@ export async function getFavoriteBooks(userId) {
   if (error) throw error;
   return data;
   } catch (error) {
+    console.log(`in getFavoriteBooks`);
+    
     console.log(error);
     return [];    
   }
