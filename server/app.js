@@ -6,6 +6,10 @@ import { verifyJWT } from './middleware/auth.js';
 dotenv.config();
 import userRoutes from './routes/userRouter.js';
 import bookRouter from './routes/bookRouter.js';
+import favoritesRouter from './routes/favoritesRouter.js';
+
+dotenv.config();
+
 import categoryRouter from './routes/categoryRouter.js';
 const app = express();
 
@@ -18,6 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/user', userRoutes);
 app.use('/books', bookRouter);
+app.use('/favorites', favoritesRouter);
 app.use('/categories', categoryRouter);
 
 

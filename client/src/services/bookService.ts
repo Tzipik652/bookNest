@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Book, Favorite } from "../types";
+import { Book } from "../types";
 import { useUserStore } from "../store/useUserStore";
 
 const API_BASE_URL =
@@ -135,12 +135,11 @@ export async function getBooksByCategory(
 
 export async function getBooksByUserId() {
   try {
-    const res = await axios.get(`${API_BASE_URL}/user/${useUserStore.getState().user?._id}`, {
+    const res = await axios.get(`${API_BASE_URL}/user`, {
       headers: {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },
     });
-    console.log(res.data);
     return res.data.booksByUserId;
   } catch (error) {
     handleAxiosError(error);
