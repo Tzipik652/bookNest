@@ -7,11 +7,11 @@ export const createBook = async (req, res) => {
         //need to add ai summary generation here
         const summary = await generateBookSummary(bookData.title, bookData.author, bookData.description);
         bookData.ai_summary = summary;
-        const newBook = await bookModel.create({ ...bookData, ai_summary: summary ,user_id: req.user._id});
+        const newBook = await bookModel.create({ ...bookData, ai_summary: summary, user_id: req.user._id });
         return res.status(201).json(newBook);
     } catch (error) {
         console.log(error);
-        
+
         return res.status(500).json({ error: "Failed to create book" });
     }
 }
@@ -19,11 +19,11 @@ export const createBook = async (req, res) => {
 export const getAllBooks = async (req, res) => {
     try {
         const books = await bookModel.findAll();
-        
+
         return res.status(200).json(books);
     } catch (error) {
         console.log("error", error);
-        
+
         return res.status(500).json({ error: "Failed to retrieve books" });
     }
 }
@@ -31,7 +31,7 @@ export const getBookById = async (req, res) => {
     const { id } = req.params;
     try {
         const book = await bookModel.findById(id);
-        console.log("the book is",book);
+        console.log("the book is", book);
         if (!book) {
             return res.status(404).json({ error: "Book not found" });
         }
@@ -64,7 +64,7 @@ export const updateBook = async (req, res) => {
     }
 }
 export const deleteBook = async (req, res) => {
-const userId = req.user._id;
+    const userId = req.user._id;
     const userBook = await bookModel.findById(req.params.id);
     const { id } = req.params;
     if (!userBook) {
@@ -113,10 +113,10 @@ export const searchBooks = async (req, res) => {
         return res.status(200).json({ totalPages, currentPageBooks });
     } catch (error) {
         console.log(error);
-        
+
         return res.status(500).json({ error: "Failed to retrieve books" });
     }
-}   
+}
 // /books/category/:catName
 
 export const getBooksByCategory = async (req, res) => {
@@ -138,29 +138,32 @@ export const getBooksByCategory = async (req, res) => {
 //get books by user id
 export const getBooksByUserId = async (req, res) => {
     const { userId } = req.params;
-    if(req.user._id !== userId){
-        return  res.status(403).json({ error: "Forbidden" });
+    if (req.user._id !== userId) {
+        return res.status(403).json({ error: "Forbidden" });
     }
     try {
         const books = await bookModel.findAll();
         const booksByUserId = books.filter(book => book.user_id === userId);
-        return res.status(200).json({booksByUserId});
+        return res.status(200).json({ booksByUserId });
     } catch (error) {
         return res.status(500).json({ error: "Failed to retrieve books" });
     }
 }
-export const getRecomendedBooks = async (req, res) => {
+
+export const getRecommendedBooks = async (req, res) => {
     const userId = req.user._id;
-    if(!userId){
+    if (!userId) {
         return res.status(403).json({ error: "Forbidden" });
     }
     try {
         const favoriteBooks = await bookModel.getFavoriteBooks(userId);
         const allBooks = await bookModel.findAll();
-        //call ai service to get recommendations
-        const recommendations = await getBookRecommendations(favoriteBooks, allBooks);
-        return res.status(200).json(recommendations);
-    }catch (error) {
+        const recommendationsWithReasons = await getBookRecommendations(favoriteBooks, allBooks);
+        const recommendedIds = recommendationsWithReasons.map(rec => rec.id);
+
+        const fullBooks = await bookModel.findBooksByIds(recommendedIds);
+        return res.status(200).json(fullBooks);
+    } catch (error) {
         console.log(error);
         return res.status(500).json({ error: "Failed to retrieve recommendations" });
     }
