@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import fetch from "node-fetch";
 import { createClient } from "@supabase/supabase-js";
-
+import crypto from 'crypto';
 dotenv.config();
 
 const supabase = createClient(
@@ -65,7 +65,6 @@ export const register = async (req, res) => {
         email: user.email,
         name: user.name,
         auth_provider: user.auth_provider,
-        favorites: user.favorites,
       },
     });
   } catch (err) {
@@ -105,7 +104,6 @@ export const login = async (req, res) => {
         email: user.email,
         name: user.name,
         auth_provider: user.auth_provider,
-        favorites: user.favorites,
       },
     });
   } catch (err) {
@@ -138,15 +136,16 @@ export const googleLogin = async (req, res) => {
       .single();
 
     if (!user) {
+      const password =crypto.randomBytes(Math.ceil(12 / 2)).toString("hex").slice(0, 12);
       const { data: newUser, error: insertError } = await supabase
         .from("users")
         .insert([
           {
             email: profile.email,
             name: profile.name,
+            password: password,
             auth_provider: "google",
             profile_picture: profile.picture,
-            // favorites: user.favorites,
           },
         ])
         .select()
