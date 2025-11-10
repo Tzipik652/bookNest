@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BookCard } from '../components/BookCard';
 import { getBooks } from '../services/bookService';
-import { categories } from '../lib/mockData';
+import { getCategories } from "../services/categoryService";
 import { Search } from 'lucide-react';
 import {
   Box,
@@ -15,7 +15,7 @@ import {
   MenuItem,
   CircularProgress,
 } from '@mui/material';
-import { Book } from '../types';
+import { Book, Category } from '../types';
 
 export function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,6 +23,20 @@ export function HomePage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -87,9 +101,9 @@ export function HomePage() {
               onChange={(e) => setSelectedCategory(e.target.value)}
               label="Category"
             >
-              {categories.map((category) => (
-                <MenuItem key={category} value={category}>
-                  {category}
+              {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.name}>
+                  {cat.name}
                 </MenuItem>
               ))}
             </Select>
