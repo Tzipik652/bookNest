@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/user', userRoutes);
 app.use('/books', bookRouter);
-app.use('/favorites', favoriteRouter);
+app.use('/favorites', favoritesRouter);
 
 
 // Error handling
