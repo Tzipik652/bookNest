@@ -1,11 +1,12 @@
 import express from "express";
-import {
-  toggleFavorite,
-  isFavorite,
-  getFavorites,
-  getBookLikes
-} from "../controllers/favoritesConroller";
-import {verifyJWT} from '../middleware/auth';
+// import {
+//   toggleFavorite,
+//   isFavorite,
+//   getFavorites,
+//   getBookLikes
+// } from "../controllers/favoritesConroller";
+import {verifyJWT} from '../middleware/auth.js';
+import { getBookLikes, getFavorites, isFavorite, toggleFavorite } from '../controllers/favoritesConroller.js';
 
 const router = express.Router();
 

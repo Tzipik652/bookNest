@@ -1,5 +1,5 @@
 // controllers/favoriteController.js
-import * as favoriteModel from "../models/favoriteModel.js";
+// import * as favoriteModel from "../models/favoriteModel.js";
 
 /**
  * Toggle favorite (add/remove)

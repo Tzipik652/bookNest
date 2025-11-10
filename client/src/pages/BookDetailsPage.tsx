@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 import { useState, useEffect } from "react";
 import { Book } from "../types";
@@ -31,6 +31,7 @@ import { useUserStore } from "../store/useUserStore";
 export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user: currentUser } = useUserStore();
 
   const [book, setBook] = useState<Book | null>(null);
@@ -92,7 +93,9 @@ export function BookDetailsPage() {
 
   const handleFavoriteToggle = () => {
     if (!currentUser) {
-      navigate("/login");
+      const currentPath = location.pathname;
+      const encodedPath = encodeURIComponent(currentPath);
+      navigate(`/login?redirect=${encodedPath}`);
       return;
     }
     const newState = toggleFavorite(book._id);
