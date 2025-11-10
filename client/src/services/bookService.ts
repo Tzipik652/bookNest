@@ -9,8 +9,8 @@ function handleAxiosError(error: any): never {
   if (axios.isAxiosError(error)) {
     throw new Error(
       error.response?.data?.message ||
-        error.message ||
-        "Something went wrong with the API request"
+      error.message ||
+      "Something went wrong with the API request"
     );
   } else {
     throw new Error("Unexpected error: " + error);
@@ -65,9 +65,13 @@ export async function addBook(bookData: {
       img_url: serverBook.img_url,
       price: serverBook.price,
       uploaderId: serverBook.user_id,
-      uploaderName: currentUser.name,
+      user: {
+        name: currentUser.name,
+        email: currentUser.email,
+      },
+      user_id: currentUser.name,
       ai_summary: serverBook.ai_summary,
-      createdAt: serverBook.date_created || new Date().toISOString(),
+      date_created: serverBook.date_created || new Date().toISOString(),
     };
     return newBook;
   } catch (error) {
@@ -80,7 +84,7 @@ export async function updateBook(
   updates: Partial<Book>
 ): Promise<Book> {
   try {
-    const res = await axios.put(`${API_BASE_URL}/${id}`, updates,{
+    const res = await axios.put(`${API_BASE_URL}/${id}`, updates, {
       headers: {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },
@@ -93,7 +97,7 @@ export async function updateBook(
 
 export async function deleteBook(id: string): Promise<void> {
   try {
-    await axios.delete(`${API_BASE_URL}/${id}`,{
+    await axios.delete(`${API_BASE_URL}/${id}`, {
       headers: {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },

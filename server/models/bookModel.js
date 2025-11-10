@@ -1,5 +1,6 @@
 // bookModel.js - using Supabase client
 import supabase from "../config/supabaseClient.js";
+import { getFavoriteBooksList } from "./userModel.js";
 
 /**
  * Create a new book
@@ -29,9 +30,26 @@ export async function create(bookData) {
  */
 export async function findAll() {
   try {
+    // const { data, error } = await supabase
+    //   .from("books")
+    //   .select("*")
+    //   .order("date_created", { ascending: false });
+
+    // if (error) {
+    //   throw error;
+    // }
+
+    // return data;
+    //join with users to get uploader name
     const { data, error } = await supabase
       .from("books")
-      .select("*")
+      .select(`
+        *,
+        user: user_id (
+      name,
+      email
+    )
+      `)
       .order("date_created", { ascending: false });
 
     if (error) {
@@ -51,7 +69,7 @@ export async function findAll() {
 export async function findById(id) {
   const { data, error } = await supabase
     .from("books")
-    .select("*")
+    .select("* , user: user_id ( name, email )")
     .eq("_id", id)
     .single();
 
@@ -106,5 +124,23 @@ export async function remove(id) {
   if (error && error.code !== "PGRST116") throw error; // not found
   return !!data;
 }
+export async function getFavoriteBooks(userId) {
+  try {
+    const favoriteBooksList=await getFavoriteBooksList(userId);
+    const { data, error } = await supabase
+    .from("books")
+    .select("* , user: user_id ( name, email )")
+    .eq("user_id", userId)
+    .in("_id", favoriteBooksList)
+    .order("date_created", { ascending: false });
 
-export default { create, findAll, findById, update, remove };
+  if (error) throw error;
+  return data;
+  } catch (error) {
+    console.log(error);
+    return [];    
+  }
+  
+}
+
+export default { create, findAll, findById, update, remove ,getFavoriteBooks};

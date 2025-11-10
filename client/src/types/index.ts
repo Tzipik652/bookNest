@@ -17,8 +17,12 @@ export interface Book {
   price?: number;
   ai_summary: string;
   uploaderId: string;
-  uploaderName: string;
-  createdAt: string;
+  user_id: string;
+  user: {
+    name: string;
+    email: string;
+  };
+  date_created: string;
 }
 
 export interface Favorite {
