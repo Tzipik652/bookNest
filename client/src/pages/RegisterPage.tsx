@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import {
   Box,
   Card,
@@ -17,12 +17,20 @@ import { register } from "../services/userService";
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useUserStore();
+
+  const getRedirectPath = () => {
+    const params = new URLSearchParams(location.search);
+    const redirect = params.get("redirect");
+    return redirect ? decodeURIComponent(redirect) : "/home";
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -37,9 +45,9 @@ export function RegisterPage() {
       return;
     }
     try {
-      const {user, token} =await register(email, password, name);
+      const { user, token } = await register(email, password, name);
       login(user, token);
-      navigate("/home");
+      navigate(getRedirectPath());
     } catch (err: any) {
       setError("Registration failed  || " + err.toString());
     }

@@ -2,7 +2,7 @@ import { Heart } from 'lucide-react';
 import { Book } from '../types';
 import { Card, CardContent, CardFooter } from './ui/card';
 import { Button } from './ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { isFavorite, toggleFavorite } from '../services/favoriteService';
 import { useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -14,6 +14,7 @@ interface BookCardProps {
 
 export function BookCard({ book, onFavoriteChange }: BookCardProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user: currentUser } = useUserStore();
   const [favorited, setFavorited] = useState(isFavorite(book._id));
 
@@ -22,7 +23,9 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
     
     // If user is not logged in, redirect to login
     if (!currentUser) {
-      navigate('/login');
+      const currentPath = location.pathname;
+      const encodedPath = encodeURIComponent(currentPath);
+      navigate(`/login?redirect=${encodedPath}`);
       return;
     }
     

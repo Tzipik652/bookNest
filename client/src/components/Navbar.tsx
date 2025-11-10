@@ -14,6 +14,8 @@ export function Navbar() {
   };
 
   const isActive = (path: string) => location.pathname === path;
+  const currentPath = location.pathname;
+  const encodedPath = encodeURIComponent(currentPath);
 
   return (
     <nav className="border-b bg-white sticky top-0 z-50">
@@ -96,10 +98,10 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <Link to="/login">
+                <Link to={`/login?redirect=${encodedPath}`}>
                   <Button variant="ghost">Login</Button>
                 </Link>
-                <Link to="/register">
+                <Link to={`/register?redirect=${encodedPath}`}>
                   <Button>Register</Button>
                 </Link>
               </>
