@@ -142,5 +142,24 @@ export async function getFavoriteBooks(userId) {
   }
   
 }
+/**
+ * Fetch a list of complete books by an array of UUID identifiers.
+ * @param {string[]} ids - Array of recommended book identifiers.
+ * @returns {Promise<Object[]>} - List of complete book objects.
+ */
+const findBooksByIds = async (ids) => {
+    // Supabase (Postgres) uses `.in()` to execute SQL query with WHERE id IN (...)
+    const { data: books, error } = await supabase
+        .from('books')
+        .select('*') // fetch all columns of the book
+        .in('_id', ids); // where the 'id' field is in the ids array we received
 
-export default { create, findAll, findById, update, remove ,getFavoriteBooks};
+    if (error) {
+        console.error("Error fetching books by IDs:", error);
+        throw new Error(error.message);
+    }
+    
+    return books || [];
+};
+
+export default { create, findAll, findById, update, remove, getFavoriteBooks ,findBooksByIds};

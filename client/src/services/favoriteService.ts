@@ -73,43 +73,6 @@ export async function getBookLikes(bookId: string): Promise<number> {
   }
 };
 
-
-
-
-// AI Recommendations
-export const getAIRecommendations = (): Book[] => {
-  return [];
-  // const favoriteBooks = getFavoriteBooks();
-  // const allBooks = getBooks();
-
-  // if (favoriteBooks.length === 0) {
-  //   // If no favorites, return random selection
-  //   return allBooks.slice(0, 5);
-  // }
-
-  // // Get categories from favorite books
-  // const favoriteCategories = favoriteBooks.map(b => b.category);
-
-  // // Find books with similar categories that aren't already favorited
-  // const favoriteIds = new Set(favoriteBooks.map(b => b.id));
-  // const recommendations = allBooks
-  //   .filter(b => !favoriteIds.has(b.id))
-  //   .filter(b => favoriteCategories.includes(b.category))
-  //   .slice(0, 5);
-
-  // // If not enough recommendations, add some random ones
-  // if (recommendations.length < 5) {
-  //   const remainingBooks = allBooks
-  //     .filter(b => !favoriteIds.has(b.id))
-  //     .filter(b => !recommendations.some(r => r.id === b.id))
-  //     .slice(0, 5 - recommendations.length);
-
-  //   recommendations.push(...remainingBooks);
-  // }
-
-  // return recommendations;
-};
-
 // Helper function to generate mock AI summaries
 function generateMockai_summary(
   title: string,
