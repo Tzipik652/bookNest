@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
 import { BookCard } from "../components/BookCard";
 import {
-  getAIRecommendations,
-  getFavoriteBooks,
-} from "../services/favoriteService";
-import {
   Box,
   Button,
   Typography,
@@ -15,15 +11,18 @@ import {
 import { AutoAwesome, Refresh } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { Book } from "../types";
+import { getAIRecommendations } from "../services/bookService";
+import { getBookLikes, getFavoriteBooks } from "../services/favoriteService";
 
 export function AIRecommendationsPage() {
   const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [error, setError] = useState<string | null>(null);
-const favoriteBooks = getFavoriteBooks();
+// const favoriteBooks = getFavoriteBooks();
   const [refreshKey, setRefreshKey] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [favoriteBooksNumber, setFavoriteBooksNumber] = useState<number>(0);
 
   useEffect(() => {
     async function fetchRecommendedBooks() {
@@ -31,6 +30,8 @@ const favoriteBooks = getFavoriteBooks();
       try {
         const data = await getAIRecommendations();
         setBooks(data || []);
+        const favoriteBooksList=await getFavoriteBooks();
+        setFavoriteBooksNumber(favoriteBooksList.length);
       } catch (error) {
         setError("Failed to load recommendations. Please try again later.");
         console.error("Failed to fetch recommendations:", error);
@@ -82,17 +83,10 @@ const favoriteBooks = getFavoriteBooks();
           <AlertTitle>
             <AutoAwesome fontSize="small" color="primary" sx={{ mr: 1 }} />
           </AlertTitle>
-          {/* <Typography variant="body2">
-            {favoriteBooks.length > 0
-              ? `Based on your ${favoriteBooks.length} favorite ${
-                  favoriteBooks.length === 1 ? "book" : "books"
-                }, we've found these recommendations for you.`
-              : "Add some books to your favorites to get personalized recommendations."}
-          </Typography> */}
            <Typography variant="body2">
-            {books.length > 0
-              ? `Based on your ${books.length} favorite ${
-                  books.length === 1 ? "book" : "books"
+            {favoriteBooksNumber > 0
+              ? `Based on your ${favoriteBooksNumber} favorite ${
+                  favoriteBooksNumber === 1 ? "book" : "books"
                 }, we've found these recommendations for you.`
               : "Add some books to your favorites to get personalized recommendations."}
           </Typography>
