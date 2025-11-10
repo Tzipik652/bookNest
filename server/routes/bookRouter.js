@@ -1,5 +1,5 @@
 import express from 'express';
-import { createBook, deleteBook, getAllBooks, getBookById, getBooksByCategory, getBooksByUserId, getRecomendedBooks, searchBooks, updateBook } from '../controllers/bookController.js';
+import { createBook, deleteBook, getAllBooks, getBookById, getBooksByCategory, getBooksByUserId, getRecomendedBooks, searchBooks, updateBook } from '../controllers/bookConroller.js';
 import { verifyJWT } from '../middleware/auth.js';
 const router = express.Router();
 
