@@ -3,9 +3,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import userRoutes from './routes/userRouter.js';
-import { verifyJWT } from './middleware/auth.js';
-dotenv.config();
 import bookRouter from './routes/bookRouter.js';
+import favoritesRouter from './routes/favoritesRouter.js';
+
+dotenv.config();
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/user', userRoutes);
 app.use('/books', bookRouter);
+app.use('/favorites', favoriteRouter);
 
 
 // Error handling
