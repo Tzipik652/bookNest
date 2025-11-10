@@ -14,7 +14,7 @@ export async function toggleFavorite(req, res) {
     const alreadyFavorite = await favoritesModel.isFavorite(userId, bookId);
 
     if (alreadyFavorite) {
-      await favoriteModel.removeFavorite(userId, bookId);
+      await favoritesModel.removeFavorite(userId, bookId);
       return res.json({ success: true, message: "Removed from favorites" });
     } else {
       await favoritesModel.addFavorite(userId, bookId);
