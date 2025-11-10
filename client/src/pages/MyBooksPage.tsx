@@ -24,6 +24,7 @@ export function MyBooksPage() {
     async function fetchBooks() {
       const data = await getBooksByUserId();
       setBooks(data || []);
+      console.log(data);
     }
     fetchBooks();
   }, [refreshKey]);

@@ -52,8 +52,7 @@ export async function getFavorites(req, res) {
     const userId = req.user._id;
     if (!userId)
       return res.status(400).json({ error: "userId is required" });
-
-    const favoriteBooks = await favoritesModel.getFavoriteBooks(userId);
+    const favoriteBooks = await favoritesModel.getFavoriteBooks(userId);    
     res.json(favoriteBooks);
   } catch (error) {
     console.error("getFavorites error:", error);
