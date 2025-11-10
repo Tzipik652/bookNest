@@ -2,11 +2,11 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import userRoutes from './routes/userRouter.js';
 import { verifyJWT } from './middleware/auth.js';
 dotenv.config();
+import userRoutes from './routes/userRouter.js';
 import bookRouter from './routes/bookRouter.js';
-
+import categoryRouter from './routes/categoryRouter.js';
 const app = express();
 
 // Middleware
@@ -18,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/user', userRoutes);
 app.use('/books', bookRouter);
+app.use('/categories', categoryRouter);
 
 
 // Error handling

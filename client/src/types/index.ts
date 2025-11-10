@@ -25,3 +25,9 @@ export interface Favorite {
   userId: string;
   bookId: string;
 }
+
+export interface Category {
+  id: string;
+  name: string;
+  created_at: string;
+}
