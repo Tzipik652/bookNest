@@ -5,6 +5,7 @@ import cors from 'cors';
 import userRoutes from './routes/userRouter.js';
 import bookRouter from './routes/bookRouter.js';
 import favoritesRouter from './routes/favoritesRouter.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
 
