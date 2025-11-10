@@ -13,5 +13,5 @@ const router = express.Router();
 router.post("/toggle", verifyJWT, toggleFavorite);        // add/remove favorite
 router.get("/:userId/:bookId", verifyJWT, isFavorite);    // check single favorite
 router.get("/:userId", verifyJWT, getFavorites);          // get all favorites
-router.get("/count/:bookId", verifyJWT, getBookLikes);
+router.get("/count/:bookId", getBookLikes);
 export default router;
