@@ -12,10 +12,10 @@ export async function getUserById(id) {
   return data;
 }
 
-export async function createUser({ id, name, email, role = 'user', favorites = [] }) {
+export async function createUser({ id, name, email, role = 'user' }) {
   const { data, error } = await supabase
     .from('users')
-    .insert([{ id, name, email, role, favorites }])
+    .insert([{ id, name, email, role }])
     .select()
     .single();
 
