@@ -7,6 +7,7 @@ dotenv.config();
 import userRoutes from './routes/userRouter.js';
 import bookRouter from './routes/bookRouter.js';
 import favoritesRouter from './routes/favoritesRouter.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
 
@@ -27,10 +28,8 @@ app.use('/categories', categoryRouter);
 
 
 // Error handling
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Server error' });
-});
+app.use(errorHandler);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
