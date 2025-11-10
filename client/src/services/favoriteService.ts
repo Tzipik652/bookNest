@@ -78,7 +78,7 @@ export async function getBookLikes(bookId: string): Promise<number> {
 // AI Recommendations
 export const getAIRecommendations = async (): Promise<Book[]> => {
   try {
-    const res = await axios.get(`${API_BASE}/recommendations`, {
+    const res = await axios.get(`${API_BASE_URL}/recommendations`, {
       headers: {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },
