@@ -21,7 +21,7 @@ function handleAxiosError(error: any): never {
 //Favorites
 export async function getFavoriteBooks(): Promise<Book[]> {
  try {
-    const res = await axios.get(`${API_BASE_URL}/${useUserStore.getState().user?._id}`, {
+    const res = await axios.get(`${API_BASE_URL}`, {
       headers: {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },
@@ -34,7 +34,7 @@ export async function getFavoriteBooks(): Promise<Book[]> {
 
 export async function isFavorite(bookId: string): Promise<boolean> {
  try {
-    const res = await axios.get(`${API_BASE_URL}/${useUserStore.getState().user?._id}/${bookId}`, {
+    const res = await axios.get(`${API_BASE_URL}/${bookId}`, {
       headers: {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },
