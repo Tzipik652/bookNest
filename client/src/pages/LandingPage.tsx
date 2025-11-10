@@ -1,96 +1,167 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookCard } from '../components/BookCard';
-import { getBooks } from '../lib/storage';
-import { categories } from '../lib/mockData';
-import { Input } from '../components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { getBooks } from '../services/bookService';
+import { getCategories } from '../services/categoryService';
 import { Search } from 'lucide-react';
+import {
+  Box,
+  Button,
+  Container,
+  Typography,
+  TextField,
+  InputAdornment,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  CircularProgress,
+} from '@mui/material';
+import { Book, Category} from '../types';
 
 export function LandingPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  
-  const books = getBooks();
-  
-  const filteredBooks = books.filter(book => {
-    const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         book.author.toLowerCase().includes(searchQuery.toLowerCase());
+  const [books, setBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
+const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      setLoading(true);
+      try {
+        const data = await getBooks();
+        setBooks(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBooks();
+  }, []);
+
+  const filteredBooks = books.filter((book) => {
+    const matchesSearch =
+      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || book.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
+  if (loading) {
+    return (
+      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <Box sx={{ minHeight: '100vh', bgcolor: '#f9fafb' }}>
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="mb-6">Welcome to BookNest</h1>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
+      <Box sx={{ bgcolor: 'primary.main', color: 'white', py: 12, textAlign: 'center' }}>
+        <Container maxWidth="md">
+          <Typography variant="h3" component="h1" gutterBottom>
+            Welcome to BookNest
+          </Typography>
+          <Typography variant="h6" mb={4}>
             Discover, organize, and share your favorite books with AI-powered recommendations
-          </p>
-          <div className="flex gap-4 justify-center">
-            <button
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+            <Button
+              variant="contained"
+              color="secondary"
               onClick={() => navigate('/login')}
-              className="px-8 py-3 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors"
             >
               Login
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outlined"
+              color="inherit"
               onClick={() => navigate('/register')}
-              className="px-8 py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors border-2 border-white"
+              sx={{
+                borderColor: 'white',
+                color: 'white',
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' },
+              }}
             >
               Register
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </Box>
+        </Container>
+      </Box>
 
       {/* Browse Section */}
-      <div className="container mx-auto px-4 py-12">
-        <h2 className="mb-8 text-center">Browse Our Collection</h2>
-        
-        {/* Filters */}
-        <div className="flex gap-4 mb-8 max-w-2xl mx-auto">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Search books or authors..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map(category => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <Container maxWidth="lg" sx={{ py: 8 }}>
+        <Typography variant="h4" textAlign="center" mb={6}>
+          Browse Our Collection
+        </Typography>
 
-        {/* Books Grid */}
+        {/* Filters */}
+        <Box sx={{ display: 'flex', gap: 2, mb: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <TextField
+            placeholder="Search books or authors..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ minWidth: 250, flex: 1, maxWidth: 400 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search size={18} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <FormControl sx={{ minWidth: 150 }}>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              label="Category"
+            >
+              {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.name}>
+                  {cat.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+
+        {/* Books Flexbox */}
         {filteredBooks.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredBooks.map(book => (
-              <BookCard key={book.id} book={book} />
+          <Box display="flex" flexWrap="wrap" gap={3} justifyContent="flex-start">
+            {filteredBooks.map((book) => (
+              <Box key={book._id} flex="1 1 calc(25% - 24px)" minWidth={250} maxWidth={300}>
+                <BookCard book={book} />
+              </Box>
             ))}
-          </div>
+          </Box>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No books found matching your criteria.</p>
-          </div>
+          <Box textAlign="center" py={12}>
+            <Typography color="text.secondary">
+              No books found matching your criteria.
+            </Typography>
+          </Box>
         )}
-      </div>
-    </div>
+      </Container>
+    </Box>
   );
 }

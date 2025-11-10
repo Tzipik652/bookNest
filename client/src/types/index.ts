@@ -1,24 +1,37 @@
 export interface User {
-  id: string;
+  _id: string;
   email: string;
   name: string;
+  auth_provider: string;
+  favorites: string[];
+  profile_picture?: string;
 }
 
 export interface Book {
-  id: string;
+  _id: string;
   title: string;
   author: string;
   description: string;
   category: string;
-  imageUrl: string;
+  img_url: string;
   price?: number;
-  aiSummary: string;
+  ai_summary: string;
   uploaderId: string;
-  uploaderName: string;
-  createdAt: string;
+  user_id: string;
+  user: {
+    name: string;
+    email: string;
+  };
+  date_created: string;
 }
 
 export interface Favorite {
   userId: string;
   bookId: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  created_at: string;
 }

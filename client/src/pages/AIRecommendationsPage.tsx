@@ -1,78 +1,110 @@
-import { useState } from 'react';
-import { BookCard } from '../components/BookCard';
-import { getAIRecommendations, getFavoriteBooks } from '../lib/storage';
-import { Sparkles, RefreshCw } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Alert, AlertDescription } from '../components/ui/alert';
+import { useState } from "react";
+import { BookCard } from "../components/BookCard";
+import { getAIRecommendations, getFavoriteBooks } from "../services/favoriteService";
+import { Box, Button, Typography, Alert, AlertTitle, CircularProgress } from "@mui/material";
+import { AutoAwesome, Refresh } from "@mui/icons-material";
 
 export function AIRecommendationsPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+
   const recommendations = getAIRecommendations();
   const favoriteBooks = getFavoriteBooks();
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setRefreshKey(k => k + 1);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setRefreshKey((k) => k + 1);
     setIsRefreshing(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Sparkles className="h-8 w-8 text-blue-600" />
-            <h1>AI Recommendations</h1>
-          </div>
-          
-          <p className="text-center text-gray-600 mb-6">
-            Our AI analyzes your favorite books to suggest titles you might enjoy
-          </p>
+    <Box minHeight="100vh" bgcolor="#f9fafb" py={10} px={3}>
+      <Box maxWidth="md" mx="auto" textAlign="center" mb={8}>
+        <Box display="flex" alignItems="center" justifyContent="center" gap={1} mb={2}>
+          <AutoAwesome fontSize="large" color="primary" />
+          <Typography variant="h4" fontWeight="bold">
+            AI Recommendations
+          </Typography>
+        </Box>
 
-          <Alert className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-            <Sparkles className="h-4 w-4 text-blue-600" />
-            <AlertDescription>
-              {favoriteBooks.length > 0 
-                ? `Based on your ${favoriteBooks.length} favorite ${favoriteBooks.length === 1 ? 'book' : 'books'}, we've found these recommendations for you`
-                : 'Add some books to your favorites to get personalized recommendations'}
-            </AlertDescription>
-          </Alert>
+        <Typography variant="body1" color="text.secondary" mb={3}>
+          Our AI analyzes your favorite books to suggest titles you might enjoy
+        </Typography>
 
-          <div className="flex justify-center mt-6">
-            <Button 
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="gap-2"
+        <Alert
+          severity="info"
+          sx={{
+            background: "linear-gradient(to right, #eff6ff, #f5f3ff)",
+            border: "1px solid #bfdbfe",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            mb: 4,
+          }}
+        >
+          <AlertTitle>
+            <AutoAwesome fontSize="small" color="primary" sx={{ mr: 1 }} />
+          </AlertTitle>
+          <Typography variant="body2">
+            {favoriteBooks.length > 0
+              ? `Based on your ${favoriteBooks.length} favorite ${
+                  favoriteBooks.length === 1 ? "book" : "books"
+                }, we've found these recommendations for you.`
+              : "Add some books to your favorites to get personalized recommendations."}
+          </Typography>
+        </Alert>
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+          startIcon={isRefreshing ? <CircularProgress color="inherit" size={18} /> : <Refresh />}
+        >
+          {isRefreshing ? "Generating..." : "Get More Recommendations"}
+        </Button>
+      </Box>
+
+      {/* Recommendations Flexbox */}
+      {recommendations.length > 0 ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 3,
+            justifyContent: "center",
+            maxWidth: "1200px",
+            mx: "auto",
+          }}
+          key={refreshKey}
+        >
+          {recommendations.map((book) => (
+            <Box
+              key={`${book._id}-${refreshKey}`}
+              sx={{
+                flex: "1 1 calc(25% - 24px)", // 4 קלפים בשורה עם רווח
+                minWidth: 250,
+              }}
             >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              {isRefreshing ? 'Generating...' : 'Get More Recommendations'}
-            </Button>
-          </div>
-        </div>
-
-        {/* Recommendations Grid */}
-        {recommendations.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {recommendations.map(book => (
-              <BookCard 
-                key={`${book.id}-${refreshKey}`} 
+              <BookCard
                 book={book}
-                onFavoriteChange={() => setRefreshKey(k => k + 1)}
+                onFavoriteChange={() => setRefreshKey((k) => k + 1)}
               />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <Sparkles className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h2 className="mb-2">No Recommendations Available</h2>
-            <p className="text-gray-600">Add some books to your favorites to get started</p>
-          </div>
-        )}
-      </div>
-    </div>
+            </Box>
+          ))}
+        </Box>
+      ) : (
+        <Box textAlign="center" py={10}>
+          <AutoAwesome sx={{ fontSize: 64, color: "#d1d5db", mb: 2 }} />
+          <Typography variant="h6" gutterBottom>
+            No Recommendations Available
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Add some books to your favorites to get started
+          </Typography>
+        </Box>
+      )}
+    </Box>
   );
 }

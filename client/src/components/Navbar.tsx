@@ -1,12 +1,12 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, Heart, PlusCircle, Sparkles, LogOut, User, Home, Library } from 'lucide-react';
-import { getCurrentUser, logout } from '../lib/storage';
 import { Button } from './ui/button';
+import { BookOpen, Heart, PlusCircle, LogOut, User, Home, Library, Sparkles } from "lucide-react";
+import { useUserStore } from '../store/useUserStore';
 
 export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const currentUser = getCurrentUser();
+  const { logout, user } = useUserStore();
 
   const handleLogout = () => {
     logout();
@@ -25,7 +25,7 @@ export function Navbar() {
           </Link>
 
           <div className="flex items-center gap-6">
-            {currentUser ? (
+            {user ? (
               <>
                 <Link to="/home">
                   <Button 
@@ -80,7 +80,7 @@ export function Navbar() {
                 <div className="flex items-center gap-3 ml-4 pl-4 border-l">
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    <span className="text-sm">{currentUser.name}</span>
+                    <span className="text-sm">{user.name}</span>
                   </div>
                   
                   <Button 

@@ -1,175 +1,250 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { getBookById, getCurrentUser, isFavorite, toggleFavorite, deleteBook } from '../lib/storage';
-import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { Heart, ArrowLeft, Edit, Trash2, Sparkles } from 'lucide-react';
-import { ImageWithFallback } from '../components/figma/ImageWithFallback';
+import { useParams, useNavigate } from "react-router-dom";
+
+import { useState, useEffect } from "react";
+import { Book } from "../types";
+import { isFavorite, toggleFavorite } from "../services/favoriteService";
+import { getBookById, deleteBook } from "../services/bookService";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '../components/ui/alert-dialog';
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
+
+import {
+  Favorite,
+  FavoriteBorder,
+  ArrowBack,
+  Edit,
+  Delete,
+  AutoAwesome,
+} from "@mui/icons-material";
+import { useUserStore } from "../store/useUserStore";
 
 export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const currentUser = getCurrentUser();
-  const [favorited, setFavorited] = useState(id ? isFavorite(id) : false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
-  const book = id ? getBookById(id) : null;
+  const { user: currentUser } = useUserStore();
 
-  if (!book) {
+  const [book, setBook] = useState<Book | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [favorited, setFavorited] = useState(id ? isFavorite(id) : false);
+
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchBook = async () => {
+      try {
+        console.log("Fetching book with id:", id);
+        const data = await getBookById(id);
+        setBook(data);
+      } catch (err) {
+        console.error(err);
+        setBook(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBook();
+  }, [id]);
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="mb-4">Book Not Found</h2>
-          <Button onClick={() => navigate(-1)}>Go Back</Button>
-        </div>
-      </div>
+      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center">
+        <Typography>Loading...</Typography>
+      </Box>
     );
   }
 
-  const isOwner = currentUser?.id === book.uploaderId;
+  if (!book) {
+    return (
+      <Box
+        minHeight="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Box textAlign="center">
+          <Typography variant="h5" mb={2}>
+            Book Not Found
+          </Typography>
+          <Button variant="contained" onClick={() => navigate(-1)}>
+            Go Back
+          </Button>
+        </Box>
+      </Box>
+    );
+  }
+
+  const isOwner = currentUser?._id === book.uploaderId;
 
   const handleFavoriteToggle = () => {
     if (!currentUser) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
-    const newState = toggleFavorite(book.id);
+    const newState = toggleFavorite(book._id);
     setFavorited(newState);
   };
 
   const handleDelete = () => {
-    try {
-      deleteBook(book.id);
-      navigate('/my-books');
-    } catch (error) {
-      console.error('Failed to delete book:', error);
-    }
+    deleteBook(book._id);
+    navigate("/my-books");
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+    <Box minHeight="100vh" bgcolor="#f9fafb" py={6}>
+      <Box maxWidth="md" mx="auto" px={2}>
         <Button
-          variant="ghost"
+          startIcon={<ArrowBack />}
           onClick={() => navigate(-1)}
-          className="mb-6 gap-2"
+          variant="text"
+          sx={{ mb: 3 }}
         >
-          <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={4}>
           {/* Book Cover */}
-          <div>
-            <Card className="overflow-hidden">
-              <div className="aspect-[3/4]">
-                <ImageWithFallback
-                  src={book.imageUrl}
-                  alt={book.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+          <Box flex={1}>
+            <Card sx={{ overflow: "hidden" }}>
+              <CardMedia
+                component="img"
+                image={book.img_url}
+                alt={book.title}
+                sx={{ aspectRatio: "3 / 4", objectFit: "cover" }}
+              />
             </Card>
-          </div>
+          </Box>
 
           {/* Book Details */}
-          <div className="space-y-6">
-            <div>
-              <h1 className="mb-2">{book.title}</h1>
-              <p className="text-xl text-gray-600 mb-4">by {book.author}</p>
-              <div className="flex items-center gap-3 mb-4">
-                <Badge variant="secondary">{book.category}</Badge>
-                {book.price && (
-                  <span className="text-xl">${book.price.toFixed(2)}</span>
-                )}
-              </div>
-            </div>
+          <Box flex={1}>
+            <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+              <CardContent>
+                <Typography variant="h4" gutterBottom>
+                  {book.title}
+                </Typography>
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  by {book.author}
+                </Typography>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <Button
-                onClick={handleFavoriteToggle}
-                variant={favorited ? 'default' : 'outline'}
-                className="gap-2"
-              >
-                <Heart className={favorited ? 'fill-current' : ''} />
-                {favorited ? 'Remove from Favorites' : 'Add to Favorites'}
-              </Button>
+                <Box display="flex" alignItems="center" gap={2} mb={2}>
+                  <Chip
+                    label={book.category}
+                    color="default"
+                    variant="outlined"
+                  />
+                  {book.price && (
+                    <Typography variant="h6">
+                      ${book.price.toFixed(2)}
+                    </Typography>
+                  )}
+                </Box>
 
-              {isOwner && (
-                <>
+                {/* Action Buttons */}
+                <Box display="flex" gap={2} mb={3} flexWrap="wrap">
                   <Button
-                    onClick={() => navigate(`/edit-book/${book.id}`)}
-                    variant="outline"
-                    className="gap-2"
+                    variant={favorited ? "contained" : "outlined"}
+                    color="primary"
+                    startIcon={favorited ? <Favorite /> : <FavoriteBorder />}
+                    onClick={handleFavoriteToggle}
                   >
-                    <Edit className="h-4 w-4" />
-                    Edit
+                    {favorited ? "Remove from Favorites" : "Add to Favorites"}
                   </Button>
-                  <Button
-                    onClick={() => setShowDeleteDialog(true)}
-                    variant="destructive"
-                    className="gap-2"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete
-                  </Button>
-                </>
-              )}
-            </div>
 
-            {/* Description */}
-            <div>
-              <h3 className="mb-3">Description</h3>
-              <p className="text-gray-700 leading-relaxed">{book.description}</p>
-            </div>
+                  {isOwner && (
+                    <>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Edit />}
+                        onClick={() => navigate(`/edit-book/${book._id}`)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="error"
+                        startIcon={<Delete />}
+                        onClick={() => setShowDeleteDialog(true)}
+                      >
+                        Delete
+                      </Button>
+                    </>
+                  )}
+                </Box>
 
-            {/* AI Summary */}
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-lg border">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-5 w-5 text-blue-600" />
-                <h3>AI Summary</h3>
-              </div>
-              <p className="text-gray-700 leading-relaxed">{book.aiSummary}</p>
-            </div>
+                {/* Description */}
+                <Box mb={4}>
+                  <Typography variant="h6" gutterBottom>
+                    Description
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    {book.description}
+                  </Typography>
+                </Box>
 
-            {/* Uploader Info */}
-            <div className="text-sm text-gray-500">
-              <p>Uploaded by {book.uploaderName}</p>
-              <p>{new Date(book.createdAt).toLocaleDateString()}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+                {/* AI Summary */}
+                <Box
+                  p={3}
+                  borderRadius={2}
+                  border="1px solid #e0e0e0"
+                  sx={{
+                    background: "linear-gradient(135deg, #eef2ff, #f3e8ff)",
+                  }}
+                  mb={3}
+                >
+                  <Box display="flex" alignItems="center" gap={1} mb={1}>
+                    <AutoAwesome color="primary" />
+                    <Typography variant="h6">AI Summary</Typography>
+                  </Box>
+                  <Typography variant="body1" color="text.secondary">
+                    {book.ai_summary}
+                  </Typography>
+                </Box>
+
+                {/* Uploader Info */}
+                <Typography variant="body2" color="text.secondary">
+                  Uploaded by {book.user.name}
+                  <br />
+                  {new Date(book.date_created).toLocaleDateString()}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Box>
+        </Box>
+      </Box>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete "{book.title}" from your library. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+      <Dialog
+        open={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+      >
+        <DialogTitle>Are you sure?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            This will permanently delete "{book.title}" from your library. This
+            action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+          <Button onClick={handleDelete} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }
