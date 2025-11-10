@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 // import { getBookById, updateBook } from '../lib/storage';
-import { Book } from '../types';
+import { Book, Category } from '../types';
 import { getBookById, updateBook } from '../services/bookService';
-import { categories } from '../lib/mockData';
+import { getCategories } from "../services/categoryService";
 import {
   Box,
   Button,
@@ -37,6 +37,21 @@ export function EditBookPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+
+const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -167,13 +182,11 @@ export function EditBookPage() {
                 onChange={(e) => setCategory(e.target.value)}
                 required
               >
-                {categories
-                  .filter((cat) => cat !== 'All')
-                  .map((cat) => (
-                    <MenuItem key={cat} value={cat}>
-                      {cat}
-                    </MenuItem>
-                  ))}
+                {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.name}>
+                  {cat.name}
+                </MenuItem>
+              ))}
               </TextField>
 
               <TextField

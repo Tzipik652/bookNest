@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { addBook } from "../services/bookService";
-import { categories } from "../lib/mockData";
+import { getCategories } from "../services/categoryService";
+// import { categories } from "../lib/mockData";
 
 import {
   Box,
@@ -18,6 +19,7 @@ import {
 } from "@mui/material";
 import { ArrowBack, AutoAwesome } from '@mui/icons-material';
 import { useUserStore } from "../store/useUserStore";
+import { Category } from '../types';
 
 export function AddBookPage() {
   const navigate = useNavigate();
@@ -30,6 +32,21 @@ export function AddBookPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user: currentUser } = useUserStore();
+
+const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,13 +155,11 @@ export function AddBookPage() {
                 margin="normal"
                 required
               >
-                {categories
-                  .filter((cat) => cat !== "All")
-                  .map((cat) => (
-                    <MenuItem key={cat} value={cat}>
-                      {cat}
-                    </MenuItem>
-                  ))}
+                {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.name}>
+                  {cat.name}
+                </MenuItem>
+              ))}
               </TextField>
 
               <TextField
