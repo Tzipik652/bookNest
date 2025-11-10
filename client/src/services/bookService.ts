@@ -135,12 +135,11 @@ export async function getBooksByCategory(
 
 export async function getBooksByUserId() {
   try {
-    const res = await axios.get(`${API_BASE_URL}/user/${useUserStore.getState().user?._id}`, {
+    const res = await axios.get(`${API_BASE_URL}/user`, {
       headers: {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },
     });
-    console.log(res.data);
     return res.data.booksByUserId;
   } catch (error) {
     handleAxiosError(error);

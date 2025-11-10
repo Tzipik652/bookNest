@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
 import { BookCard } from "../components/BookCard";
-import { getAIRecommendations, getFavoriteBooks } from "../services/favoriteService";
-import { Box, Button, Typography, Alert, AlertTitle, CircularProgress } from "@mui/material";
+import {
+  getAIRecommendations,
+  getFavoriteBooks,
+} from "../services/favoriteService";
+import {
+  Box,
+  Button,
+  Typography,
+  Alert,
+  AlertTitle,
+  CircularProgress,
+} from "@mui/material";
 import { AutoAwesome, Refresh } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { Book } from "../types";
@@ -41,7 +51,13 @@ const favoriteBooks = getFavoriteBooks();
   return (
     <Box minHeight="100vh" bgcolor="#f9fafb" py={10} px={3}>
       <Box maxWidth="md" mx="auto" textAlign="center" mb={8}>
-        <Box display="flex" alignItems="center" justifyContent="center" gap={1} mb={2}>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          gap={1}
+          mb={2}
+        >
           <AutoAwesome fontSize="large" color="primary" />
           <Typography variant="h4" fontWeight="bold">
             AI Recommendations
@@ -87,7 +103,13 @@ const favoriteBooks = getFavoriteBooks();
           color="primary"
           onClick={handleRefresh}
           disabled={isRefreshing}
-          startIcon={isRefreshing ? <CircularProgress color="inherit" size={18} /> : <Refresh />}
+          startIcon={
+            isRefreshing ? (
+              <CircularProgress color="inherit" size={18} />
+            ) : (
+              <Refresh />
+            )
+          }
         >
           {isRefreshing ? "Generating..." : "Get More Recommendations"}
         </Button>

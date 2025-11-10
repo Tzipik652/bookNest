@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter } from './ui/card';
 import { Button } from './ui/button';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { isFavorite, toggleFavorite } from '../services/favoriteService';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useUserStore } from '../store/useUserStore';
 interface BookCardProps {
@@ -16,20 +16,30 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user: currentUser } = useUserStore();
-  const [favorited, setFavorited] = useState(isFavorite(book._id));
+  const [favorited, setFavorited] = useState(false);
 
-  const handleFavoriteClick = (e: React.MouseEvent) => {
+  // load favorite status on mount
+  useEffect(() => {
+    let mounted = true;
+    async function fetchFavorite() {
+      if (!currentUser) return;
+      const isFav = await isFavorite(book._id);
+      if (mounted) setFavorited(isFav);
+    }
+    fetchFavorite();
+    return () => { mounted = false; };
+  }, [book._id, currentUser]);
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    // If user is not logged in, redirect to login
+
     if (!currentUser) {
-      const currentPath = location.pathname;
-      const encodedPath = encodeURIComponent(currentPath);
+      const encodedPath = encodeURIComponent(location.pathname);
       navigate(`/login?redirect=${encodedPath}`);
       return;
     }
-    
-    const newState = toggleFavorite(book._id);
+
+    const newState = await toggleFavorite(book._id);
     setFavorited(newState);
     onFavoriteChange?.();
   };
@@ -53,7 +63,7 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
               onClick={handleFavoriteClick}
               className="shrink-0"
             >
-              <Heart 
+              <Heart
                 className={`h-5 w-5 ${favorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
               />
             </Button>
@@ -76,3 +86,4 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
     </Card>
   );
 }
+

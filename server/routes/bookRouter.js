@@ -11,7 +11,7 @@ router.get('/search' ,searchBooks);
 router.get('/recommendations',verifyJWT,getRecommendedBooks);
 ///books/category/:catName
 router.get('/category/:catName',getBooksByCategory);
-router.get('/user/:userId',verifyJWT, getBooksByUserId);
+router.get('/user',verifyJWT, getBooksByUserId);
 router.get('/:id',getBookById);
 router.put('/:id',verifyJWT, updateBook);
 router.delete('/:id',verifyJWT, deleteBook);
