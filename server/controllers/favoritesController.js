@@ -1,22 +1,23 @@
 // controllers/favoriteController.js
-// import * as favoriteModel from "../models/favoriteModel.js";
+import favoritesModel from "../models/favoritesModel.js";
 
 /**
  * Toggle favorite (add/remove)
  */
 export async function toggleFavorite(req, res) {
   try {
-    const { userId, bookId } = req.body;
+    const userId = req.user._id;
+    const { bookId } = req.body;
     if (!userId || !bookId)
       return res.status(400).json({ error: "userId and bookId are required" });
 
-    const alreadyFavorite = await favoriteModel.isFavorite(userId, bookId);
+    const alreadyFavorite = await favoritesModel.isFavorite(userId, bookId);
 
     if (alreadyFavorite) {
       await favoriteModel.removeFavorite(userId, bookId);
       return res.json({ success: true, message: "Removed from favorites" });
     } else {
-      await favoriteModel.addFavorite(userId, bookId);
+      await favoritesModel.addFavorite(userId, bookId);
       return res.json({ success: true, message: "Added to favorites" });
     }
   } catch (error) {
@@ -30,11 +31,12 @@ export async function toggleFavorite(req, res) {
  */
 export async function isFavorite(req, res) {
   try {
-    const { userId, bookId } = req.params;
+    const userId = req.user._id;
+    const { bookId } = req.params;
     if (!userId || !bookId)
       return res.status(400).json({ error: "userId and bookId are required" });
 
-    const result = await favoriteModel.isFavorite(userId, bookId);
+    const result = await favoritesModel.isFavorite(userId, bookId);
     res.json({ favorite: result });
   } catch (error) {
     console.error("isFavorite error:", error);
@@ -47,11 +49,11 @@ export async function isFavorite(req, res) {
  */
 export async function getFavorites(req, res) {
   try {
-    const { userId } = req.params;
+    const userId = req.user._id;
     if (!userId)
       return res.status(400).json({ error: "userId is required" });
 
-    const favoriteBooks = await favoriteModel.getFavoriteBooks(userId);
+    const favoriteBooks = await favoritesModel.getFavoriteBooks(userId);
     res.json(favoriteBooks);
   } catch (error) {
     console.error("getFavorites error:", error);
@@ -68,7 +70,7 @@ export async function getBookLikes(req, res) {
     if (!bookId)
       return res.status(400).json({ error: "bookId is required" });
 
-    const count = await favoriteModel.countBookFavorites(bookId);
+    const count = await favoritesModel.countBookFavorites(bookId);
     res.json({bookId, favoritesCount: count});
   } catch (error) {
     console.error("getBookLikes error:", error);

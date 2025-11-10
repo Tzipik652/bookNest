@@ -21,11 +21,12 @@ function handleAxiosError(error: any): never {
 //Favorites
 export async function getFavoriteBooks(): Promise<Book[]> {
  try {
-    const res = await axios.get(`${API_BASE_URL}/${useUserStore.getState().user?._id}`, {
+    const res = await axios.get(`${API_BASE_URL}`, {
       headers: {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },
     });
+    console.log("Favorite Books:", res.data);
     return res.data;
   } catch (error) {
     handleAxiosError(error);
@@ -34,12 +35,12 @@ export async function getFavoriteBooks(): Promise<Book[]> {
 
 export async function isFavorite(bookId: string): Promise<boolean> {
  try {
-    const res = await axios.get(`${API_BASE_URL}/${useUserStore.getState().user?._id}/${bookId}`, {
+    const res = await axios.get(`${API_BASE_URL}/${bookId}`, {
       headers: {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },
     });
-    return res.data;
+    return res.data.favorite;
   } catch (error) {
     handleAxiosError(error);
   }
@@ -49,7 +50,7 @@ export async function isFavorite(bookId: string): Promise<boolean> {
 export async function toggleFavorite(bookId: string) {
   try {
     const res = await axios.post(
-      `${API_BASE_URL}/favorites/toggle`,
+      `${API_BASE_URL}/toggle`,
       { bookId }, 
       {
         headers: {
@@ -57,7 +58,7 @@ export async function toggleFavorite(bookId: string) {
         },
       }
     );
-    return res.data;
+    return res.data.message.includes("Added");
   } catch (error) {
     handleAxiosError(error);
   }

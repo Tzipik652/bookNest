@@ -1,16 +1,36 @@
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { BookCard } from "../components/BookCard";
-import { getAIRecommendations, getFavoriteBooks } from "../services/favoriteService";
-import { Box, Button, Typography, Alert, AlertTitle, CircularProgress } from "@mui/material";
+import {
+  getAIRecommendations,
+  getFavoriteBooks,
+} from "../services/favoriteService";
+import {
+  Box,
+  Button,
+  Typography,
+  Alert,
+  AlertTitle,
+  CircularProgress,
+} from "@mui/material";
 import { AutoAwesome, Refresh } from "@mui/icons-material";
+import { Book } from "../types";
 
 export function AIRecommendationsPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [recommendations, setRecommendations] = useState<Book[]>([]);
+  const [favoriteBooks, setFavoriteBooks] = useState<Book[]>([]);
 
-  const recommendations = getAIRecommendations();
-  const favoriteBooks = getFavoriteBooks();
-
+  useEffect(() => {
+    async function fetchData() {
+      const rec = await getAIRecommendations();
+      const fav = await getFavoriteBooks();
+      setRecommendations(rec);
+      setFavoriteBooks(fav);
+    }
+    fetchData();
+  }, [refreshKey]);
+ 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -21,7 +41,13 @@ export function AIRecommendationsPage() {
   return (
     <Box minHeight="100vh" bgcolor="#f9fafb" py={10} px={3}>
       <Box maxWidth="md" mx="auto" textAlign="center" mb={8}>
-        <Box display="flex" alignItems="center" justifyContent="center" gap={1} mb={2}>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          gap={1}
+          mb={2}
+        >
           <AutoAwesome fontSize="large" color="primary" />
           <Typography variant="h4" fontWeight="bold">
             AI Recommendations
@@ -60,7 +86,13 @@ export function AIRecommendationsPage() {
           color="primary"
           onClick={handleRefresh}
           disabled={isRefreshing}
-          startIcon={isRefreshing ? <CircularProgress color="inherit" size={18} /> : <Refresh />}
+          startIcon={
+            isRefreshing ? (
+              <CircularProgress color="inherit" size={18} />
+            ) : (
+              <Refresh />
+            )
+          }
         >
           {isRefreshing ? "Generating..." : "Get More Recommendations"}
         </Button>
