@@ -1,21 +1,29 @@
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { BookCard } from '../components/BookCard';
 import { getFavoriteBooks } from '../services/favoriteService';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Search } from 'lucide-react';
 import { Box, Container, Typography, TextField, InputAdornment, Button } from '@mui/material';
+import { Book } from '../types';
 
 export function FavoritesPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [favoriteBooks, setFavoriteBooks] = useState<Book[]>([]);
 
-  const books = getFavoriteBooks();
+  useEffect(()=>{
+    async function fetchFavorites() {
+      const books = await getFavoriteBooks();
+      setFavoriteBooks(books);
+    }
+    fetchFavorites();
+  },[refreshKey]);
 
-  const filteredBooks = books.filter((book) => {
+  const filteredBooks = favoriteBooks.filter((favoriteBooks) => {
     const matchesSearch =
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase());
+      favoriteBooks.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      favoriteBooks.author.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
@@ -26,7 +34,7 @@ export function FavoritesPage() {
           My Favorites
         </Typography>
 
-        {books.length > 0 ? (
+        {favoriteBooks.length > 0 ? (
           <>
             {/* Search Field */}
             <Box sx={{ maxWidth: 400, mb: 6 }}>
@@ -55,7 +63,7 @@ export function FavoritesPage() {
                   justifyContent: 'flex-start',
                 }}
               >
-                {filteredBooks.map((book) => (
+                {filteredBooks.map((book: Book) => (
                   <Box
                     key={`${book._id}-${refreshKey}`}
                     sx={{

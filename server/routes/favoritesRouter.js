@@ -1,17 +1,11 @@
 import express from "express";
-// import {
-//   toggleFavorite,
-//   isFavorite,
-//   getFavorites,
-//   getBookLikes
-// } from "../controllers/favoritesConroller";
 import {verifyJWT} from '../middleware/auth.js';
-import { getBookLikes, getFavorites, isFavorite, toggleFavorite } from '../controllers/favoritesConroller.js';
+import { getBookLikes, getFavorites, isFavorite, toggleFavorite } from '../controllers/favoritesController.js';
 
 const router = express.Router();
 
+router.get("/", verifyJWT, getFavorites);          // get all favorites
 router.post("/toggle", verifyJWT, toggleFavorite);        // add/remove favorite
-router.get("/:userId/:bookId", verifyJWT, isFavorite);    // check single favorite
-router.get("/:userId", verifyJWT, getFavorites);          // get all favorites
 router.get("/count/:bookId", getBookLikes);
+router.get("/:bookId", verifyJWT, isFavorite);    // check single favorite
 export default router;
