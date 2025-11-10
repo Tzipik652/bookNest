@@ -16,9 +16,21 @@ interface UserStore {
   logout: () => void;
 }
 
+const storedToken = localStorage.getItem("token");
+const storedUser = localStorage.getItem("user");
+let initialUser: User | null = null;
+if(storedUser) {
+  try {
+    initialUser = JSON.parse(storedUser);
+  } catch (error) {
+console.error("Failed to parse user from localStorage:", error);
+localStorage.removeItem("user");
+localStorage.removeItem("token");    
+  }
+}
 export const useUserStore = create<UserStore>((set) => ({
-  user: null,
-  token: null,
+  user: initialUser,
+  token: storedToken,
 
   login: (user, token) => {
     localStorage.setItem("token", token);

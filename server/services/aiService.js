@@ -57,54 +57,6 @@ export async function generateBookSummary(title, author, description) {
  * @param {Array<Object>} candidateBooks - List of available books in the system (with id, title, author fields).
  * @returns {Promise<Array<Object>>} List of recommendations (up to 5) in JSON format.
  */
-// export async function getBookRecommendations(favoriteBooks) {
-//     // Creating a comma-separated list of book titles
-//     const bookTitles = favoriteBooks.map(book => book.title).join(', ');
-    
-//     // Instructions for Gemini to work in JSON format
-//     const prompt = `
-//         The user likes the following books: ${bookTitles}. 
-//         Suggest 5 similar book recommendations (book title and author) that match the style, genre and theme of the books they like.
-//         Provide the result in JSON format only.
-//     `;
-
-//     try {
-//         // ✅ Corrected call for Gemini JSON Mode
-//         const response = await ai.models.generateContent({
-//              model: MODEL_NAME,
-//              contents: prompt,
-//              config: {
-//                  responseMimeType: "application/json", 
-//                  responseSchema: { // Expected JSON structure definition
-//                      type: "object",
-//                      properties: {
-//                          recommendations: {
-//                              type: "array",
-//                              items: {
-//                                  type: "object",
-//                                  properties: {
-//                                      title: { type: "string" },
-//                                      author: { type: "string" }
-//                                  },
-//                                  required: ["title", "author"]
-//                              }
-//                          }
-//                      },
-//                      required: ["recommendations"]
-//                  }
-//              }
-//         });
-
-//         // Parse JSON output
-//         const jsonText = response.text.trim();
-//         const result = JSON.parse(jsonText);
-//         return result.recommendations;
-
-//     } catch (error) {
-//         console.error("Gemini Recommendation Error:", error);
-//         return [];
-//     }
-// }
 export async function getBookRecommendations(favoriteBooks, candidateBooks) {
   const prompt = `
   The user liked the following books:

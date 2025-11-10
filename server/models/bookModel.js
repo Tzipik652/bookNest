@@ -30,9 +30,26 @@ export async function create(bookData) {
  */
 export async function findAll() {
   try {
+    // const { data, error } = await supabase
+    //   .from("books")
+    //   .select("*")
+    //   .order("date_created", { ascending: false });
+
+    // if (error) {
+    //   throw error;
+    // }
+
+    // return data;
+    //join with users to get uploader name
     const { data, error } = await supabase
       .from("books")
-      .select("*")
+      .select(`
+        *,
+        user: user_id (
+      name,
+      email
+    )
+      `)
       .order("date_created", { ascending: false });
 
     if (error) {
@@ -52,7 +69,7 @@ export async function findAll() {
 export async function findById(id) {
   const { data, error } = await supabase
     .from("books")
-    .select("*")
+    .select("* , user: user_id ( name, email )")
     .eq("_id", id)
     .single();
 
@@ -112,7 +129,7 @@ export async function getFavoriteBooks(userId) {
     const favoriteBooksList=await getFavoriteBooksList(userId);
     const { data, error } = await supabase
     .from("books")
-    .select("*")
+    .select("* , user: user_id ( name, email )")
     .eq("user_id", userId)
     .in("_id", favoriteBooksList)
     .order("date_created", { ascending: false });
