@@ -89,7 +89,7 @@ export function BookDetailsPage() {
     );
   }
 
-  const isOwner = currentUser?._id === book.uploaderId;
+  const isOwner = currentUser?._id === book.user_id;
 
   const handleFavoriteToggle = () => {
     if (!currentUser) {

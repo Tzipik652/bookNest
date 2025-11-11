@@ -27,6 +27,7 @@ export function MyBooksPage() {
       try {
         const data = await getBooksByUserId();
         setBooks(data || []);
+        console.log(data);
       } catch (error) {
         console.error("Failed to fetch user's books:", error);
       } finally {
