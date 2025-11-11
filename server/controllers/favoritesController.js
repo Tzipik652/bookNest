@@ -128,10 +128,14 @@ export const getFavorites = catchAsync(async (req, res, next) => {
     throw new AppError("userId is required", 400);
   }
 
-  const favorites = await favoritesModel.getFavoriteBooks(userId);
-  res.status(200).json(favorites);
+  try {
+    const favoriteBooks = await favoritesModel.getFavoriteBooks(userId);
+    res.status(200).json(favoriteBooks);
+  } catch (error) {
+    console.error("getFavorites error:", error);
+    throw new AppError("Failed to fetch favorite books", 500);
+  }
 });
-
 /**
  * מספר המועדפים של ספר מסוים
  */
