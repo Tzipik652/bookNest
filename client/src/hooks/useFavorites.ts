@@ -12,10 +12,7 @@ export function useFavoriteBooks() {
   });
 
   const toggleMutation = useMutation({
-    mutationFn: async (bookId: string) => {
-      const result = toggleFavorite(bookId);
-      return result;
-    },
+    mutationFn: toggleFavorite,
     onMutate: async (bookId: string) => {
       await queryClient.cancelQueries({ queryKey: ['favoriteBooks'] });
 

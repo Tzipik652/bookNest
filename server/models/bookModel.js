@@ -30,16 +30,6 @@ export async function create(bookData) {
  */
 export async function findAll() {
   try {
-    // const { data, error } = await supabase
-    //   .from("books")
-    //   .select("*")
-    //   .order("date_created", { ascending: false });
-
-    // if (error) {
-    //   throw error;
-    // }
-
-    // return data;
     //join with users to get uploader name
     const { data, error } = await supabase
       .from("books")
@@ -127,6 +117,7 @@ export async function remove(id) {
 export async function getFavoriteBooks(userId) {
   try {
     const favoriteBooksList=await getFavoriteBooksList(userId);
+    
     const { data, error } = await supabase
     .from("books")
     .select("* , user: user_id ( name, email )")
@@ -137,10 +128,31 @@ export async function getFavoriteBooks(userId) {
   if (error) throw error;
   return data;
   } catch (error) {
+    console.log(`in getFavoriteBooks`);
+    
     console.log(error);
     return [];    
   }
   
 }
+/**
+ * Fetch a list of complete books by an array of UUID identifiers.
+ * @param {string[]} ids - Array of recommended book identifiers.
+ * @returns {Promise<Object[]>} - List of complete book objects.
+ */
+const findBooksByIds = async (ids) => {
+    // Supabase (Postgres) uses `.in()` to execute SQL query with WHERE id IN (...)
+    const { data: books, error } = await supabase
+        .from('books')
+        .select('*') // fetch all columns of the book
+        .in('_id', ids); // where the 'id' field is in the ids array we received
 
-export default { create, findAll, findById, update, remove ,getFavoriteBooks};
+    if (error) {
+        console.error("Error fetching books by IDs:", error);
+        throw new Error(error.message);
+    }
+    
+    return books || [];
+};
+
+export default { create, findAll, findById, update, remove, getFavoriteBooks ,findBooksByIds};

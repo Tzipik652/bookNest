@@ -1,8 +1,8 @@
-import { useParams, useNavigate } from "react-router-dom";
-
 import { useState, useEffect } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+
 import { Book } from "../types";
-import { isFavorite, toggleFavorite } from "../services/favoriteService";
+
 import { getBookById, deleteBook } from "../services/bookService";
 import {
   Box,
@@ -26,17 +26,21 @@ import {
   Delete,
   AutoAwesome,
 } from "@mui/icons-material";
+
 import { useUserStore } from "../store/useUserStore";
+import { useFavoriteBooks } from "../hooks/useFavorites";
 
 export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user: currentUser } = useUserStore();
 
   const [book, setBook] = useState<Book | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [favorited, setFavorited] = useState(id ? isFavorite(id) : false);
+ const { isFavorited, toggleMutation } = useFavoriteBooks();
+  const favorited = isFavorited(id || "");
 
   useEffect(() => {
     if (!id) {
@@ -46,7 +50,6 @@ export function BookDetailsPage() {
 
     const fetchBook = async () => {
       try {
-        console.log("Fetching book with id:", id);
         const data = await getBookById(id);
         setBook(data);
       } catch (err) {
@@ -88,15 +91,15 @@ export function BookDetailsPage() {
     );
   }
 
-  const isOwner = currentUser?._id === book.uploaderId;
+  const isOwner = currentUser?._id === book.user_id;
 
   const handleFavoriteToggle = () => {
     if (!currentUser) {
-      navigate("/login");
+      const encodedPath = encodeURIComponent(location.pathname);
+      navigate(`/login?redirect=${encodedPath}`);
       return;
     }
-    const newState = toggleFavorite(book._id);
-    setFavorited(newState);
+    toggleMutation.mutate(book._id);
   };
 
   const handleDelete = () => {

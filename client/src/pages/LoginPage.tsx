@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { BookOpen } from "lucide-react";
 import {
@@ -17,12 +17,19 @@ import {
 } from "@mui/material";
 import { useUserStore } from "../store/useUserStore";
 import { loginLocal, loginWithGoogle } from "../services/userService";
+
 export function LoginPage() {
   const navigate = useNavigate();
+  const location=useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useUserStore();
+const getRedirectPath=()=>{
+  const params=new URLSearchParams(location.search);
+  const redirect=params.get("redirect");
+return redirect ? decodeURIComponent(redirect) : "/home";
+}
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +39,7 @@ export function LoginPage() {
       if (result) {
         const { user, token } = result;
         login(user, token);
-        navigate("/home");
+        navigate(getRedirectPath());
       }
     } catch (err: any) {
       setError("Invalid email or password  || " + err.toString());
@@ -45,7 +52,7 @@ export function LoginPage() {
       if (result) {
         const { user, token } = result;
         login(user, token);
-        navigate("/home");
+        navigate(getRedirectPath());
       }
     } catch (err) {
       console.error(err);
