@@ -1,32 +1,44 @@
-// src/hooks/useFavorites.ts
+// src/hooks/useFavoriteBooks.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getFavoriteBooksIDs, toggleFavorite } from '../services/favoriteService';
+import { getFavoriteBooks, toggleFavorite } from '../services/favoriteService';
+import { Book } from '../types';
 
-export function useFavorites() {
+export function useFavoriteBooks() {
   const queryClient = useQueryClient();
 
-  const favoritesQuery = useQuery({
-    queryKey: ['favorites'],
-    queryFn: getFavoriteBooksIDs,
+  const favoriteBooksQuery = useQuery<Book[]>({
+    queryKey: ['favoriteBooks'],
+    queryFn: getFavoriteBooks,
   });
 
   const toggleMutation = useMutation({
     mutationFn: toggleFavorite,
-    onMutate: async (bookId:string) => {
-      await queryClient.cancelQueries({ queryKey: ['favorites'] });
-      const prev = queryClient.getQueryData<string[]>(['favorites']);
-      queryClient.setQueryData<string[]>(['favorites'], (old:string[] = []) =>
-        old.includes(bookId) ? old.filter(id => id !== bookId) : [...old, bookId]
-      );
-      return { prev };
+    onMutate: async (bookId: string) => {
+      await queryClient.cancelQueries({ queryKey: ['favoriteBooks'] });
+
+      const prevBooks = queryClient.getQueryData<Book[]>(['favoriteBooks']);
+
+      queryClient.setQueryData<Book[]>(['favoriteBooks'], (oldBooks: Book[] = []) => {
+        const exists = oldBooks.find((b) => b._id === bookId);
+        if (exists) return oldBooks.filter((b) => b._id !== bookId);
+        return [...oldBooks, { _id: bookId } as Book];
+      });
+
+      return { prevBooks };
     },
-    onError: (err:any, _:any, context:any) => {
-      if (context?.prev) queryClient.setQueryData(['favorites'], context.prev);
+    onError: (err, bookId, context) => {
+      if (context?.prevBooks) {
+        queryClient.setQueryData(['favoriteBooks'], context.prevBooks);
+      }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      queryClient.invalidateQueries({ queryKey: ['favoriteBooks'] });
     },
   });
 
-  return { favoritesQuery, toggleMutation };
+  const isFavorited = (bookId: string) => {
+    return favoriteBooksQuery.data?.some((b) => b._id === bookId);
+  };
+
+  return { favoriteBooksQuery, toggleMutation, isFavorited };
 }

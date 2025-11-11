@@ -1,7 +1,8 @@
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 
-import { useState, useEffect } from "react";
 import { Book } from "../types";
+
 import { getBookById, deleteBook } from "../services/bookService";
 import {
   Box,
@@ -25,8 +26,9 @@ import {
   Delete,
   AutoAwesome,
 } from "@mui/icons-material";
+
 import { useUserStore } from "../store/useUserStore";
-import { useFavorites } from "../hooks/useFavorites";
+import { useFavoriteBooks } from "../hooks/useFavorites";
 
 export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -37,9 +39,8 @@ export function BookDetailsPage() {
   const [book, setBook] = useState<Book | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [loading, setLoading] = useState(true);
- const { favoritesQuery, toggleMutation } = useFavorites();
-  const isFavorite =
-    favoritesQuery.data?.includes(id || '-1') || false;
+ const { isFavorited, toggleMutation } = useFavoriteBooks();
+  const favorited = isFavorited(id || "");
 
   useEffect(() => {
     if (!id) {
@@ -158,12 +159,12 @@ export function BookDetailsPage() {
                 {/* Action Buttons */}
                 <Box display="flex" gap={2} mb={3} flexWrap="wrap">
                   <Button
-                    variant={isFavorite ? "contained" : "outlined"}
+                    variant={favorited ? "contained" : "outlined"}
                     color="primary"
-                    startIcon={isFavorite ? <Favorite /> : <FavoriteBorder />}
+                    startIcon={favorited ? <Favorite /> : <FavoriteBorder />}
                     onClick={handleFavoriteToggle}
                   >
-                    {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+                    {favorited ? "Remove from Favorites" : "Add to Favorites"}
                   </Button>
 
                   {isOwner && (

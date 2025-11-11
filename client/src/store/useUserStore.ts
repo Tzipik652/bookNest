@@ -1,6 +1,5 @@
 // src/store/useUserStore.ts
 import { create } from "zustand";
-import { Book } from "../types";
 
 interface User {
   _id: string;

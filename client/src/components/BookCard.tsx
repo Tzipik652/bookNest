@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useUserStore } from "../store/useUserStore";
-import { useFavorites } from "../hooks/useFavorites";
+import { useFavoriteBooks } from "../hooks/useFavorites";
 interface BookCardProps {
   book: Book;
 }
@@ -14,9 +14,9 @@ export function BookCard({ book }: BookCardProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user: currentUser } = useUserStore();
-  const { favoritesQuery, toggleMutation } = useFavorites();
-  const isFavorite =
-    favoritesQuery.data?.includes(book._id) || false;
+  const { toggleMutation, isFavorited } = useFavoriteBooks();
+
+  const favorited = isFavorited(book._id);
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -51,7 +51,7 @@ export function BookCard({ book }: BookCardProps) {
             >
               <Heart
                 className={`h-5 w-5 ${
-                  isFavorite ? "fill-red-500 text-red-500" : "text-gray-400"
+                  favorited ? "fill-red-500 text-red-500" : "text-gray-400"
                 }`}
               />
             </Button>
