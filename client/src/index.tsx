@@ -33,7 +33,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 const queryClient = new QueryClient();
 
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID!;
-const queryClient = new QueryClient(); // <-- יוצר QueryClient
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
