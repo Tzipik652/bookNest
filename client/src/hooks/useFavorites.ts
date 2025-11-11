@@ -26,7 +26,7 @@ export function useFavoriteBooks() {
 
       return { prevBooks };
     },
-    onError: (err, bookId, context) => {
+    onError: (err: any, bookId: string, context: any) => {
       if (context?.prevBooks) {
         queryClient.setQueryData(['favoriteBooks'], context.prevBooks);
       }
@@ -37,7 +37,7 @@ export function useFavoriteBooks() {
   });
 
   const isFavorited = (bookId: string) => {
-    return favoriteBooksQuery.data?.some((b) => b._id === bookId);
+    return favoriteBooksQuery.data?.some((b: Book) => b._id === bookId);
   };
 
   return { favoriteBooksQuery, toggleMutation, isFavorited };

@@ -24,7 +24,7 @@ export function FavoritesPage() {
   const favoriteBooks = favoriteBooksQuery.data || [];
 
 
-  const filteredBooks = favoriteBooks.filter((book) => {
+  const filteredBooks = favoriteBooks.filter((book: Book) => {
     const matchesSearch =
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase());
