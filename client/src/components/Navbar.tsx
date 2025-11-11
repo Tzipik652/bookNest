@@ -5,17 +5,22 @@ import {
   BookOpen, Heart, PlusCircle, LogOut, User, Home, Library, Sparkles, Menu, X 
 } from "lucide-react";
 import { useUserStore } from '../store/useUserStore';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { logout, user } = useUserStore();
   const [open, setOpen] = useState(false);
 
   const handleLogout = () => {
+    queryClient.removeQueries({ queryKey: ['favoriteBooks'] });
     logout();
     navigate('/');
   };
+
+
 
   const isActive = (path: string) => location.pathname === path;
   const currentPath = location.pathname;
