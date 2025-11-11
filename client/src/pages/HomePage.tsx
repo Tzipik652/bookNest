@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BookCard } from "../components/BookCard";
-import { getBooks } from "../services/bookService";
+import { getBooks, getBooksByCategory } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
 import { Search } from "lucide-react";
 import {
@@ -14,16 +14,29 @@ import {
   Select,
   MenuItem,
   CircularProgress,
+  Pagination,
 } from "@mui/material";
 import { Book, Category } from "../types";
+const BOOKS_PER_PAGE = 20;
 
 export function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  // Handler for changing the page using the Pagination component
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    // Only update the page state if the value is different
+    if (value !== currentPage) {
+      setCurrentPage(value);
+    }
+  };
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -36,23 +49,41 @@ export function HomePage() {
 
     fetchCategories();
   }, []);
+  const fetchBooks = useCallback(async (page: number, limit: number) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setLoading(true);
+    try {
+      let response;
+      if (selectedCategory && selectedCategory === 'All') {
+        response = await getBooks({ page, limit });
+      }
+      else {
+        response = await getBooksByCategory(selectedCategory, page, limit);
+      }
+      const {
+        books: fetchedBooks,
+        totalPages: fetchedTotalPages,
+        totalItems: fetchedTotalItems,
+      } = response;
+      setBooks(fetchedBooks || []);
+      setTotalPages(fetchedTotalPages || 1);
+      setTotalItems(fetchedTotalItems || 0);
+      if (page > fetchedTotalPages && fetchedTotalPages > 0) {
+        setCurrentPage(fetchedTotalPages);
+      }
+    } catch (error) {
+      console.error('Failed to fetch books:', error);
+      setBooks([]);
+    } finally {
+      setLoading(false);
+    }
+
+  }, [selectedCategory]);
+
 
   useEffect(() => {
-    const fetchBooks = async () => {
-      setLoading(true);
-      try {
-        const data = await getBooks();
-        setBooks(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBooks();
-  }, []);
-
+    fetchBooks(currentPage, BOOKS_PER_PAGE);
+  }, [currentPage, fetchBooks]);
 
   const filteredBooks = books.filter((book) => {
     const matchesSearch =
@@ -103,7 +134,10 @@ export function HomePage() {
             <InputLabel>Category</InputLabel>
             <Select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value);
+                setCurrentPage(1);
+              }}
               label="Category"
             >
               {categories.map((cat) => (
@@ -143,7 +177,23 @@ export function HomePage() {
             </Typography>
           </Box>
         )}
+        {/* PAGINATION UI */}
+        {totalPages > 1 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              variant="outlined"
+              shape="rounded"
+              size="large"
+              // Disable the pagination control during loading state
+              disabled={loading}
+            />
+          </Box>
+        )}
       </Container>
     </Box>
+
   );
 }

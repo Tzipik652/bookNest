@@ -34,9 +34,65 @@ export const createBook = catchAsync(async (req, res, next) => {
   res.status(201).json(newBook);
 });
 
+// export const getAllBooks = catchAsync(async (req, res) => {
+//   const books = await bookModel.findAll();
+//   res.status(200).json(books);
+// });
 export const getAllBooks = catchAsync(async (req, res) => {
-  const books = await bookModel.findAll();
-  res.status(200).json(books);
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const { data: books, count: totalItems } = await bookModel.findPaginated(page, limit);
+    const totalPages = Math.ceil(totalItems / limit);
+    res.status(200).json({
+      books: books,
+      currentPage: page,
+      limit: limit,
+      totalItems: totalItems,
+      totalPages: totalPages,
+    });
+
+  } catch (error) {
+    console.error("Error fetching paginated books:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+export const getBooksByCategory = catchAsync(async (req, res) => {
+  const pageParam = req.query.page;
+  if (!pageParam) {    
+    try {
+      const { catName } = req.params;
+      let books;
+      if (catName === 'All') {
+        books = await bookModel.findAll();
+      } else {
+        books = await bookModel.getBooksByCategory(catName);
+      }
+      res.status(200).json(books);
+    } catch (error) {
+      console.error("Error fetching books by category:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  } else {
+    try {
+      const { catName } = req.params;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const { data: books, count: totalItems } = await bookModel.findPaginated(page, limit, catName);
+      const totalPages = Math.ceil(totalItems / limit);
+      res.status(200).json({
+        books: books,
+        currentPage: page,
+        limit: limit,
+        totalItems: totalItems,
+        totalPages: totalPages,
+      });
+
+    } catch (error) {
+      console.error("Error fetching paginated books:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
 });
 
 export const getBookById = catchAsync(async (req, res, next) => {
@@ -88,17 +144,11 @@ export const searchBooks = catchAsync(async (req, res) => {
   res.status(200).json({ totalPages, currentPageBooks });
 });
 
-export const getBooksByCategory = catchAsync(async (req, res) => {
-  const { catName } = req.params;
-  const books = await bookModel.findAll();
-  const filtered = books.filter((b) => b.category === catName);
-  res.status(200).json(filtered);
-});
 
 export const getBooksByUserId = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   if (!userId) throw new AppError("Forbidden", 403);
-    const books = await bookModel.findAll();
+  const books = await bookModel.findAll();
   const userBooks = books.filter((b) => b.user_id === userId);
   res.status(200).json(userBooks);
 });
