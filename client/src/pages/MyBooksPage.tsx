@@ -11,20 +11,28 @@ import {
   TextField,
   InputAdornment,
   Container,
+  CircularProgress,
 } from "@mui/material";
-import { useUserStore } from "../store/useUserStore";
 
 export function MyBooksPage() {
   const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchBooks() {
-      const data = await getBooksByUserId();
-      setBooks(data || []);
-      console.log(data);
+      setIsLoading(true);
+      try {
+        const data = await getBooksByUserId();
+        setBooks(data || []);
+        console.log(data);
+      } catch (error) {
+        console.error("Failed to fetch user's books:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchBooks();
   }, [refreshKey]);
@@ -77,29 +85,40 @@ export function MyBooksPage() {
                 ),
               }}
             />
-
-            {/* Books Flexbox */}
-            {filteredBooks.length > 0 ? (
-              <Box display="flex" flexWrap="wrap" gap={3}>
-                {filteredBooks.map((book) => (
-                  <Box
-                    key={`${book._id}-${refreshKey}`}
-                    flex="1 1 calc(25% - 24px)"
-                    minWidth={250}
-                    maxWidth={300}
-                  >
-                    <BookCard
-                      book={book}
-                    />
-                  </Box>
-                ))}
+            {isLoading ? (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                minHeight="50vh"
+              >
+                <CircularProgress />
               </Box>
             ) : (
-              <Box textAlign="center" py={10}>
-                <Typography color="text.secondary">
-                  No books found matching your search.
-                </Typography>
-              </Box>
+              <>
+                {filteredBooks.length > 0 ? (
+                  <Box display="flex" flexWrap="wrap" gap={3}>
+                    {filteredBooks.map((book) => (
+                      <Box
+                        key={`${book._id}-${refreshKey}`}
+                        flex="1 1 calc(25% - 24px)"
+                        minWidth={250}
+                        maxWidth={300}
+                      >
+                        <BookCard
+                          book={book}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+                ) : (
+                  <Box textAlign="center" py={10}>
+                    <Typography color="text.secondary">
+                      No books found matching your search.
+                    </Typography>
+                  </Box>
+                )}
+              </>
             )}
           </>
         ) : (

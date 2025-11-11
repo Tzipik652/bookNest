@@ -1,8 +1,8 @@
 import { use, useEffect, useState } from "react";
 import { BookCard } from "../components/BookCard";
-import { getFavoriteBooks } from "../services/favoriteService";
 import { useNavigate } from "react-router-dom";
 import { Heart, Search } from "lucide-react";
+
 import {
   Box,
   Container,
@@ -10,6 +10,7 @@ import {
   TextField,
   InputAdornment,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import { Book } from "../types";
 import { useFavoriteBooks } from "../hooks/useFavorites";
@@ -17,15 +18,16 @@ import { useFavoriteBooks } from "../hooks/useFavorites";
 export function FavoritesPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [isLoading, setIsLoading] = useState(true);
+  
   const { favoriteBooksQuery } = useFavoriteBooks();
   const favoriteBooks = favoriteBooksQuery.data || [];
 
 
-  const filteredBooks = favoriteBooks.filter((favoriteBooks) => {
+  const filteredBooks = favoriteBooks.filter((book) => {
     const matchesSearch =
-      favoriteBooks.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      favoriteBooks.author.toLowerCase().includes(searchQuery.toLowerCase());
+      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
@@ -36,7 +38,7 @@ export function FavoritesPage() {
           My Favorites
         </Typography>
 
-        {favoriteBooks.length > 0 ? (
+        {favoriteBooks.length > 0 || isLoading ? (
           <>
             {/* Search Field */}
             <Box sx={{ maxWidth: 400, mb: 6 }}>
@@ -55,23 +57,24 @@ export function FavoritesPage() {
               />
             </Box>
 
-            {/* Books Flexbox */}
-            {filteredBooks.length > 0 ? (
+            {isLoading ? (
+              <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+                <CircularProgress />
+              </Box>
+            ) : filteredBooks.length > 0 ? (
               <Box
                 sx={{
                   display: "flex",
                   flexWrap: "wrap",
                   gap: 3,
-                  justifyContent: "flex-start",
                 }}
               >
                 {filteredBooks.map((book: Book) => (
                   <Box
-                    key={book._id}
-                    sx={{
-                      flex: "1 1 calc(25% - 24px)",
-                      minWidth: 250,
-                    }}
+                    key={`${book._id}`}
+                   flex="1 1 calc(25% - 24px)"
+                        minWidth={250}
+                        maxWidth={300}
                   >
                     <BookCard book={book} />
                   </Box>
