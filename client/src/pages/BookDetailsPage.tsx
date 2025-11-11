@@ -2,7 +2,6 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 import { useState, useEffect } from "react";
 import { Book } from "../types";
-import { isFavorite, toggleFavorite } from "../services/favoriteService";
 import { getBookById, deleteBook } from "../services/bookService";
 import {
   Box,
@@ -27,6 +26,7 @@ import {
   AutoAwesome,
 } from "@mui/icons-material";
 import { useUserStore } from "../store/useUserStore";
+import { useFavorites } from "../hooks/useFavorites";
 
 export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -37,7 +37,9 @@ export function BookDetailsPage() {
   const [book, setBook] = useState<Book | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [favorited, setFavorited] = useState(id ? isFavorite(id) : false);
+ const { favoritesQuery, toggleMutation } = useFavorites();
+  const isFavorite =
+    favoritesQuery.data?.includes(id || '-1') || false;
 
   useEffect(() => {
     if (!id) {
@@ -47,7 +49,6 @@ export function BookDetailsPage() {
 
     const fetchBook = async () => {
       try {
-        console.log("Fetching book with id:", id);
         const data = await getBookById(id);
         setBook(data);
       } catch (err) {
@@ -93,13 +94,11 @@ export function BookDetailsPage() {
 
   const handleFavoriteToggle = () => {
     if (!currentUser) {
-      const currentPath = location.pathname;
-      const encodedPath = encodeURIComponent(currentPath);
+      const encodedPath = encodeURIComponent(location.pathname);
       navigate(`/login?redirect=${encodedPath}`);
       return;
     }
-    const newState = toggleFavorite(book._id);
-    setFavorited(newState);
+    toggleMutation.mutate(book._id);
   };
 
   const handleDelete = () => {
@@ -159,12 +158,12 @@ export function BookDetailsPage() {
                 {/* Action Buttons */}
                 <Box display="flex" gap={2} mb={3} flexWrap="wrap">
                   <Button
-                    variant={favorited ? "contained" : "outlined"}
+                    variant={isFavorite ? "contained" : "outlined"}
                     color="primary"
-                    startIcon={favorited ? <Favorite /> : <FavoriteBorder />}
+                    startIcon={isFavorite ? <Favorite /> : <FavoriteBorder />}
                     onClick={handleFavoriteToggle}
                   >
-                    {favorited ? "Remove from Favorites" : "Add to Favorites"}
+                    {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
                   </Button>
 
                   {isOwner && (

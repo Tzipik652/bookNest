@@ -3,34 +3,20 @@ import { Book } from "../types";
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Button } from "./ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
-import { isFavorite, toggleFavorite } from "../services/favoriteService";
-import { useEffect, useState } from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useUserStore } from "../store/useUserStore";
+import { useFavorites } from "../hooks/useFavorites";
 interface BookCardProps {
   book: Book;
-  onFavoriteChange?: () => void;
 }
 
-export function BookCard({ book, onFavoriteChange }: BookCardProps) {
+export function BookCard({ book }: BookCardProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user: currentUser } = useUserStore();
-  const [favorited, setFavorited] = useState(false);
-
-  // load favorite status on mount
-  useEffect(() => {
-    let mounted = true;
-    async function fetchFavorite() {
-      if (!currentUser) return;
-      const isFav = await isFavorite(book._id);
-      if (mounted) setFavorited(isFav);
-    }
-    fetchFavorite();
-    return () => {
-      mounted = false;
-    };
-  }, [book._id, currentUser]);
+  const { favoritesQuery, toggleMutation } = useFavorites();
+  const isFavorite =
+    favoritesQuery.data?.includes(book._id) || false;
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -41,16 +27,7 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
       return;
     }
 
-    const previousState = favorited;
-    setFavorited(!favorited);
-
-    try {
-      await toggleFavorite(book._id);
-      onFavoriteChange?.();
-    } catch (error) {
-      console.error("Failed to toggle favorite:", error);
-      setFavorited(previousState);
-    }
+    toggleMutation.mutate(book._id);
   };
 
   return (
@@ -74,7 +51,7 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
             >
               <Heart
                 className={`h-5 w-5 ${
-                  favorited ? "fill-red-500 text-red-500" : "text-gray-400"
+                  isFavorite ? "fill-red-500 text-red-500" : "text-gray-400"
                 }`}
               />
             </Button>

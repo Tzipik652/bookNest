@@ -18,7 +18,6 @@ export function AIRecommendationsPage() {
   const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [error, setError] = useState<string | null>(null);
-// const favoriteBooks = getFavoriteBooks();
   const [refreshKey, setRefreshKey] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -133,7 +132,6 @@ export function AIRecommendationsPage() {
               >
                 <BookCard
                   book={book}
-                  onFavoriteChange={() => setRefreshKey((k) => k + 1)}
                 />
               </Box>
             ))}

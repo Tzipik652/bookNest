@@ -16,8 +16,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Book, Category } from "../types";
-import { useFavoritesStore } from "../store/useFavoritesStore";
-import { getFavoriteBooks } from "../services/favoriteService";
 
 export function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -56,13 +54,7 @@ export function HomePage() {
 
     fetchBooks();
   }, []);
-  
-  useEffect(() => {
-    (async () => {
-      const favorites = await getFavoriteBooks();
-      useFavoritesStore.getState().setFavorites(favorites.map((b) => b._id));
-    })();
-  }, []);
+
 
   const filteredBooks = books.filter((book) => {
     const matchesSearch =
@@ -142,7 +134,6 @@ export function HomePage() {
               >
                 <BookCard
                   book={book}
-                  onFavoriteChange={() => setRefreshKey((k) => k + 1)}
                 />
               </Box>
             ))}

@@ -90,7 +90,6 @@ export function MyBooksPage() {
                   >
                     <BookCard
                       book={book}
-                      onFavoriteChange={() => setRefreshKey((k) => k + 1)}
                     />
                   </Box>
                 ))}

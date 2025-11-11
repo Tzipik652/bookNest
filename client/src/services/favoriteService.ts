@@ -26,12 +26,21 @@ export async function getFavoriteBooks(): Promise<Book[]> {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },
     });
-    console.log("Favorite Books:", res.data);
     return res.data;
   } catch (error) {
     handleAxiosError(error);
   }
 };
+export async function getFavoriteBooksIDs(): Promise<string[]> {
+ try {
+    const favoriteBooks = await getFavoriteBooks();
+    const favoriteIds = favoriteBooks.map(f => f._id);
+    return favoriteIds;
+  } catch (error) {
+    handleAxiosError(error);
+  }
+};
+
 
 export async function isFavorite(bookId: string): Promise<boolean> {
  try {
