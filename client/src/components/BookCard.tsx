@@ -1,34 +1,22 @@
-import { Heart } from 'lucide-react';
-import { Book } from '../types';
-import { Card, CardContent, CardFooter } from './ui/card';
-import { Button } from './ui/button';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { isFavorite, toggleFavorite } from '../services/favoriteService';
-import { useEffect, useState } from 'react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
-import { useUserStore } from '../store/useUserStore';
+import { Heart } from "lucide-react";
+import { Book } from "../types";
+import { Card, CardContent, CardFooter } from "./ui/card";
+import { Button } from "./ui/button";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { useUserStore } from "../store/useUserStore";
+import { useFavoriteBooks } from "../hooks/useFavorites";
 interface BookCardProps {
   book: Book;
-  onFavoriteChange?: () => void;
 }
 
-export function BookCard({ book, onFavoriteChange }: BookCardProps) {
+export function BookCard({ book }: BookCardProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user: currentUser } = useUserStore();
-  const [favorited, setFavorited] = useState(false);
+  const { toggleMutation, isFavorited } = useFavoriteBooks();
 
-  // load favorite status on mount
-  useEffect(() => {
-    let mounted = true;
-    async function fetchFavorite() {
-      if (!currentUser) return;
-      const isFav = await isFavorite(book._id);
-      if (mounted) setFavorited(isFav);
-    }
-    fetchFavorite();
-    return () => { mounted = false; };
-  }, [book._id, currentUser]);
+  const favorited = isFavorited(book._id);
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -39,9 +27,7 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
       return;
     }
 
-    const newState = await toggleFavorite(book._id);
-    setFavorited(newState);
-    onFavoriteChange?.();
+    toggleMutation.mutate(book._id);
   };
 
   return (
@@ -64,7 +50,9 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
               className="shrink-0"
             >
               <Heart
-                className={`h-5 w-5 ${favorited ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}
+                className={`h-5 w-5 ${
+                  favorited ? "fill-red-500 text-red-500" : "text-gray-400"
+                }`}
               />
             </Button>
           </div>
@@ -72,11 +60,13 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
           <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm mb-3">
             {book.category}
           </span>
-          <p className="text-sm text-gray-700 line-clamp-3">{book.ai_summary}</p>
+          <p className="text-sm text-gray-700 line-clamp-3">
+            {book.ai_summary}
+          </p>
         </CardContent>
       </div>
       <CardFooter className="p-4 pt-0">
-        <Button 
+        <Button
           className="w-full"
           onClick={() => navigate(`/book/${book._id}`)}
         >
@@ -86,4 +76,3 @@ export function BookCard({ book, onFavoriteChange }: BookCardProps) {
     </Card>
   );
 }
-

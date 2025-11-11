@@ -27,6 +27,7 @@ export function MyBooksPage() {
       try {
         const data = await getBooksByUserId();
         setBooks(data || []);
+        console.log(data);
       } catch (error) {
         console.error("Failed to fetch user's books:", error);
       } finally {
@@ -84,7 +85,6 @@ export function MyBooksPage() {
                 ),
               }}
             />
-
             {isLoading ? (
               <Box
                 display="flex"
@@ -107,7 +107,6 @@ export function MyBooksPage() {
                       >
                         <BookCard
                           book={book}
-                          onFavoriteChange={() => setRefreshKey((k) => k + 1)}
                         />
                       </Box>
                     ))}

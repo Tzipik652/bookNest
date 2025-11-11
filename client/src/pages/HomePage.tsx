@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
-import { BookCard } from '../components/BookCard';
-import { getBooks, getBooksByCategory } from '../services/bookService';
+import { useCallback, useEffect, useState } from "react";
+import { BookCard } from "../components/BookCard";
+import { getBooks, getBooksByCategory } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
-import { Search } from 'lucide-react';
+import { Search } from "lucide-react";
 import {
   Box,
   Container,
@@ -15,17 +15,16 @@ import {
   MenuItem,
   CircularProgress,
   Pagination,
-} from '@mui/material';
-import { Book, Category } from '../types';
+} from "@mui/material";
+import { Book, Category } from "../types";
 const BOOKS_PER_PAGE = 20;
 
 export function HomePage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [categories, setCategories] = useState<Category[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -91,27 +90,33 @@ export function HomePage() {
     const matchesSearch =
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || book.category === selectedCategory;
+    const matchesCategory =
+      selectedCategory === "All" || book.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   if (loading) {
     return (
-      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Box
+        minHeight="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
         <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f9fafb', py: 8 }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#f9fafb", py: 8 }}>
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight="bold" mb={6}>
           Discover Books
         </Typography>
 
         {/* Filters */}
-        <Box sx={{ display: 'flex', gap: 2, mb: 6, flexWrap: 'wrap' }}>
+        <Box sx={{ display: "flex", gap: 2, mb: 6, flexWrap: "wrap" }}>
           <TextField
             placeholder="Search books or authors..."
             value={searchQuery}
@@ -147,17 +152,21 @@ export function HomePage() {
 
         {/* Books Flexbox */}
         {filteredBooks.length > 0 ? (
-          <Box display="flex" flexWrap="wrap" gap={3} justifyContent="flex-start">
+          <Box
+            display="flex"
+            flexWrap="wrap"
+            gap={3}
+            justifyContent="flex-start"
+          >
             {filteredBooks.map((book) => (
               <Box
-                key={`${book._id}-${refreshKey}`}
+                key={book._id}
                 flex="1 1 calc(25% - 24px)"
                 minWidth={250}
                 maxWidth={300}
               >
                 <BookCard
                   book={book}
-                  onFavoriteChange={() => setRefreshKey((k) => k + 1)}
                 />
               </Box>
             ))}

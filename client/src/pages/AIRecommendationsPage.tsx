@@ -9,43 +9,23 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { AutoAwesome, Refresh } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import { Book } from "../types";
-import { getAIRecommendations } from "../services/bookService";
-import { getBookLikes, getFavoriteBooks } from "../services/favoriteService";
+import { useAIRecommendations } from "../hooks/useAIRecommendations";
+import { useFavoriteBooks } from "../hooks/useFavorites";
 
 export function AIRecommendationsPage() {
-  const navigate = useNavigate();
-  const [books, setBooks] = useState<Book[]>([]);
   const [error, setError] = useState<string | null>(null);
-// const favoriteBooks = getFavoriteBooks();
-  const [refreshKey, setRefreshKey] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [favoriteBooksNumber, setFavoriteBooksNumber] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { countFavorites } = useFavoriteBooks();
+  const favoriteBooksNumber = countFavorites();
 
-  useEffect(() => {
-    async function fetchRecommendedBooks() {
-      setIsLoading(true);
-      try {
-        const data = await getAIRecommendations();
-        setBooks(data || []);
-        const favoriteBooksList=await getFavoriteBooks();
-        setFavoriteBooksNumber(favoriteBooksList.length);
-      } catch (error) {
-        setError("Failed to load recommendations. Please try again later.");
-        console.error("Failed to fetch recommendations:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchRecommendedBooks();
-  }, [refreshKey]);
+  const { AIRecommendationsQuery } = useAIRecommendations();
+  const AIRecommendations = AIRecommendationsQuery.data || [];
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setRefreshKey((k) => k + 1);
+    await AIRecommendationsQuery.refetch();
     setIsRefreshing(false);
   };
 
@@ -83,7 +63,7 @@ export function AIRecommendationsPage() {
           <AlertTitle>
             <AutoAwesome fontSize="small" color="primary" sx={{ mr: 1 }} />
           </AlertTitle>
-           <Typography variant="body2">
+          <Typography variant="body2">
             {favoriteBooksNumber > 0
               ? `Based on your ${favoriteBooksNumber} favorite ${
                   favoriteBooksNumber === 1 ? "book" : "books"
@@ -111,45 +91,44 @@ export function AIRecommendationsPage() {
 
       {/* Recommendations Flexbox */}
       {isLoading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+        >
           <CircularProgress />
         </Box>
+      ) : AIRecommendations.length > 0 ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 3,
+          }}
+        >
+          {AIRecommendations.map((book) => (
+            <Box
+              key={`${book._id}`}
+              flex="1 1 calc(25% - 24px)"
+              minWidth={250}
+              maxWidth={300}
+            >
+              <BookCard book={book} />
+            </Box>
+          ))}
+        </Box>
       ) : (
-        books.length > 0 ? (
-          <Box 
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 3,
-            }}
-            key={refreshKey}
-          >
-            {books.map((book) => (
-              <Box
-                key={`${book._id}-${refreshKey}`}
-                 flex="1 1 calc(25% - 24px)"
-                    minWidth={250}
-                    maxWidth={300}
-              >
-                <BookCard
-                  book={book}
-                  onFavoriteChange={() => setRefreshKey((k) => k + 1)}
-                />
-              </Box>
-            ))}
-          </Box>
-        ) : (
-          <Box textAlign="center" py={10}>
-            <AutoAwesome sx={{ fontSize: 64, color: "#d1d5db", mb: 2 }} />
-            <Typography variant="h6" gutterBottom>
-              No Recommendations Available
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Add some books to your favorites to get started
-            </Typography>
-          </Box>
-        ))
-      }
+        <Box textAlign="center" py={10}>
+          <AutoAwesome sx={{ fontSize: 64, color: "#d1d5db", mb: 2 }} />
+          <Typography variant="h6" gutterBottom>
+            No Recommendations Available
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Add some books to your favorites to get started
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 }
