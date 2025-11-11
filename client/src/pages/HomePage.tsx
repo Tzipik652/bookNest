@@ -82,9 +82,8 @@ export function HomePage() {
 
 
   useEffect(() => {
-    // Dependencies: currentPage and refreshKey (for manual re-fetch, e.g., favorite change)
     fetchBooks(currentPage, BOOKS_PER_PAGE);
-  }, [currentPage, refreshKey, fetchBooks]);
+  }, [currentPage, fetchBooks]);
 
   const filteredBooks = books.filter((book) => {
     const matchesSearch =
