@@ -7,8 +7,8 @@ export function useAIRecommendations() {
   const AIRecommendationsQuery = useQuery<Book[]>({
     queryKey: ["aiRecommendations"],
     queryFn: getAIRecommendations,
-    enabled: false,
-    retry: 1,
+    staleTime: 1000 * 60 * 10,
+    refetchOnMount: true,
   });
   return { AIRecommendationsQuery };
 }
