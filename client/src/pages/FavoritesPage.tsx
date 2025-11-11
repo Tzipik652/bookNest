@@ -18,7 +18,7 @@ import { useFavoriteBooks } from "../hooks/useFavorites";
 export function FavoritesPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   
   const { favoriteBooksQuery } = useFavoriteBooks();
   const favoriteBooks = favoriteBooksQuery.data || [];
