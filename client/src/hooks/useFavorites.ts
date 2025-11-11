@@ -40,5 +40,9 @@ export function useFavoriteBooks() {
     return favoriteBooksQuery.data?.some((b: Book) => b._id === bookId);
   };
 
-  return { favoriteBooksQuery, toggleMutation, isFavorited };
+   const countFavorites = () => {
+    return favoriteBooksQuery.data?.length || 0;
+  };
+
+  return { favoriteBooksQuery, toggleMutation, isFavorited, countFavorites };
 }

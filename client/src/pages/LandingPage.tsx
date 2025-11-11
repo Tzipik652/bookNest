@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { BookCard } from '../components/BookCard';
-import { getBooks } from '../services/bookService';
-import { getCategories } from '../services/categoryService';
-import { Search } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { BookCard } from "../components/BookCard";
+import { getBooks } from "../services/bookService";
+import { getCategories } from "../services/categoryService";
+import { Search } from "lucide-react";
 import {
   Box,
   Button,
@@ -16,16 +16,16 @@ import {
   FormControl,
   InputLabel,
   CircularProgress,
-} from '@mui/material';
-import { Book, Category} from '../types';
+} from "@mui/material";
+import { Book, Category } from "../types";
 
 export function LandingPage() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
-const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -60,45 +60,66 @@ const [categories, setCategories] = useState<Category[]>([]);
     const matchesSearch =
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || book.category === selectedCategory;
+    const matchesCategory =
+      selectedCategory === "All" || book.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   if (loading) {
     return (
-      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Box
+        minHeight="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
         <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f9fafb' }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#f9fafb" }}>
       {/* Hero Section */}
-      <Box sx={{ bgcolor: 'primary.main', color: 'white', py: 12, textAlign: 'center' }}>
+      <Box
+        sx={{
+          bgcolor: "primary.main",
+          color: "white",
+          py: 12,
+          textAlign: "center",
+        }}
+      >
         <Container maxWidth="md">
           <Typography variant="h3" component="h1" gutterBottom>
             Welcome to BookNest
           </Typography>
           <Typography variant="h6" mb={4}>
-            Discover, organize, and share your favorite books with AI-powered recommendations
+            Discover, organize, and share your favorite books with AI-powered
+            recommendations
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 2,
+              flexWrap: "wrap",
+            }}
+          >
             <Button
               variant="contained"
               color="secondary"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate("/login")}
             >
               Login
             </Button>
             <Button
               variant="outlined"
               color="inherit"
-              onClick={() => navigate('/register')}
+              onClick={() => navigate("/register")}
               sx={{
-                borderColor: 'white',
-                color: 'white',
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' },
+                borderColor: "white",
+                color: "white",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
               }}
             >
               Register
@@ -114,7 +135,15 @@ const [categories, setCategories] = useState<Category[]>([]);
         </Typography>
 
         {/* Filters */}
-        <Box sx={{ display: 'flex', gap: 2, mb: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            mb: 6,
+            flexWrap: "wrap",
+            justifyContent: "center",
+          }}
+        >
           <TextField
             placeholder="Search books or authors..."
             value={searchQuery}
@@ -147,9 +176,19 @@ const [categories, setCategories] = useState<Category[]>([]);
 
         {/* Books Flexbox */}
         {filteredBooks.length > 0 ? (
-          <Box display="flex" flexWrap="wrap" gap={3} justifyContent="flex-start">
+          <Box
+            display="flex"
+            flexWrap="wrap"
+            gap={3}
+            justifyContent="flex-start"
+          >
             {filteredBooks.map((book) => (
-              <Box key={book._id} flex="1 1 calc(25% - 24px)" minWidth={250} maxWidth={300}>
+              <Box
+                key={book._id}
+                flex="1 1 calc(25% - 24px)"
+                minWidth={250}
+                maxWidth={300}
+              >
                 <BookCard book={book} />
               </Box>
             ))}

@@ -22,7 +22,6 @@ export function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
@@ -43,7 +42,6 @@ export function HomePage() {
       setLoading(true);
       try {
         const data = await getBooks();
-        console.log(data);
         setBooks(data);
       } catch (err) {
         console.error(err);
@@ -127,7 +125,7 @@ export function HomePage() {
           >
             {filteredBooks.map((book) => (
               <Box
-                key={`${book._id}-${refreshKey}`}
+                key={book._id}
                 flex="1 1 calc(25% - 24px)"
                 minWidth={250}
                 maxWidth={300}
