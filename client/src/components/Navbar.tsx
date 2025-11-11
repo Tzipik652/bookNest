@@ -2,16 +2,21 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
 import { BookOpen, Heart, PlusCircle, LogOut, User, Home, Library, Sparkles } from "lucide-react";
 import { useUserStore } from '../store/useUserStore';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { logout, user } = useUserStore();
 
   const handleLogout = () => {
+    queryClient.removeQueries({ queryKey: ['favoriteBooks'] });
     logout();
     navigate('/');
   };
+
+
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -28,7 +33,7 @@ export function Navbar() {
             {user ? (
               <>
                 <Link to="/home">
-                  <Button 
+                  <Button
                     variant={isActive('/home') ? 'default' : 'ghost'}
                     className="gap-2"
                   >
@@ -36,9 +41,9 @@ export function Navbar() {
                     Home
                   </Button>
                 </Link>
-                
+
                 <Link to="/my-books">
-                  <Button 
+                  <Button
                     variant={isActive('/my-books') ? 'default' : 'ghost'}
                     className="gap-2"
                   >
@@ -46,9 +51,9 @@ export function Navbar() {
                     My Books
                   </Button>
                 </Link>
-                
+
                 <Link to="/favorites">
-                  <Button 
+                  <Button
                     variant={isActive('/favorites') ? 'default' : 'ghost'}
                     className="gap-2"
                   >
@@ -56,9 +61,9 @@ export function Navbar() {
                     Favorites
                   </Button>
                 </Link>
-                
+
                 <Link to="/add-book">
-                  <Button 
+                  <Button
                     variant={isActive('/add-book') ? 'default' : 'ghost'}
                     className="gap-2"
                   >
@@ -66,9 +71,9 @@ export function Navbar() {
                     Add Book
                   </Button>
                 </Link>
-                
+
                 <Link to="/recommendations">
-                  <Button 
+                  <Button
                     variant={isActive('/recommendations') ? 'default' : 'ghost'}
                     className="gap-2"
                   >
@@ -82,9 +87,9 @@ export function Navbar() {
                     <User className="h-4 w-4" />
                     <span className="text-sm">{user.name}</span>
                   </div>
-                  
-                  <Button 
-                    variant="outline" 
+
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={handleLogout}
                     className="gap-2"
