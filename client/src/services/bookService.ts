@@ -133,6 +133,7 @@ export async function getBooksByCategory(
   }
 }
 
+// שירות לקליינט
 export async function getBooksByUserId() {
   try {
     const res = await axios.get(`${API_BASE_URL}/user`, {
@@ -145,6 +146,7 @@ export async function getBooksByUserId() {
     handleAxiosError(error);
   }
 }
+
 
 // AI Recommendations
 export const getAIRecommendations = async (): Promise<Book[]> => {
