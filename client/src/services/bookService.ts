@@ -17,15 +17,38 @@ function handleAxiosError(error: any): never {
   }
 }
 
-export async function getBooks(): Promise<Book[]> {
-  try {
-    const res = await axios.get(API_BASE_URL);
-    return res.data;
-  } catch (error) {
-    handleAxiosError(error);
-  }
-}
+// export async function getBooks(): Promise<Book[]> {
+//   try {
+//     const res = await axios.get(API_BASE_URL);
+//     return res.data;
+//   } catch (error) {
+//     handleAxiosError(error);
+//   }
+// }
+/**
+ * Fetches books with optional pagination parameters.
+ * @param {object} params - The request parameters.
+ * @param {number} [params.page=1] - The current page number.
+ * @param {number} [params.limit=20] - The limit of items per page.
+ * @returns {Promise<{books: Object[], currentPage: number, limit: number, totalItems: number, totalPages: number}>}
+ */
+export async function getBooks(params = { page: 1, limit: 20 }) {
+    try {
+        const query = new URLSearchParams({ 
+            page: (params.page || 1).toString(), 
+            limit: (params.limit || 20).toString() 
+        });
 
+        const response = await axios.get(`${API_BASE_URL}?${query.toString()}`);
+        
+        // The backend should return the structured data (books, currentPage, totalPages, etc.)
+        return response.data; 
+
+    } catch (error) {
+        console.error('Error fetching books from API:', error);
+        throw error;
+    }
+}
 export async function getBookById(id: string): Promise<Book> {
   try {
     const res = await axios.get(`${API_BASE_URL}/${id}`);
