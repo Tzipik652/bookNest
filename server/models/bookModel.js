@@ -40,7 +40,7 @@ export async function findAll() {
       email
     )
       `)
-      .order("date_created", { ascending: false });
+      .order("title", { ascending: true });
 
     if (error) {
       throw error;
@@ -77,7 +77,7 @@ export async function findPaginated(page = 1, limit = 10, category = null) {
         `,
         { count: 'exact' }
       )
-      .order("date_created", { ascending: false })
+      .order("title", { ascending: true })
     // .range(start, end);
 
     // אם קיימת קטגוריה, נוסיף filter
@@ -164,7 +164,7 @@ export async function getFavoriteBooks(userId) {
       .select("* , user: user_id ( name, email )")
       .eq("user_id", userId)
       .in("_id", favoriteBooksList)
-      .order("date_created", { ascending: false });
+      .order("title", { ascending: true });
 
     if (error) throw error;
     return data;
@@ -186,7 +186,8 @@ const findBooksByIds = async (ids) => {
   const { data: books, error } = await supabase
     .from('books')
     .select('*') // fetch all columns of the book
-    .in('_id', ids); // where the 'id' field is in the ids array we received
+    .in('_id', ids) // where the 'id' field is in the ids array we received
+    .order("title", { ascending: true });
 
   if (error) {
     console.error("Error fetching books by IDs:", error);
@@ -200,7 +201,9 @@ export const getBooksByCategory = async (category) => {
   const { data: books, error } = await supabase
     .from('books')
     .select('*') // fetch all columns of the book
-    .eq('category', category); // where the 'category' field matches the category we received
+    .eq('category', category) // where the 'category' field matches the category we received
+    .order("title", { ascending: true });
+
   if (error) {
     console.error("Error fetching books by category:", error);
     throw new Error(error.message);
