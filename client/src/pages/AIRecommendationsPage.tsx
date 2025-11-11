@@ -16,13 +16,24 @@ export function AIRecommendationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { countFavorites } = useFavoriteBooks();
   const favoriteBooksNumber = countFavorites();
 
   const { AIRecommendationsQuery } = useAIRecommendations();
   const AIRecommendations = AIRecommendationsQuery.data || [];
+  useEffect(() => {
+  setIsLoading(AIRecommendationsQuery.isLoading);
 
+  }, [AIRecommendationsQuery.isLoading]);
+  useEffect(() => {
+    if (AIRecommendationsQuery.error) {
+      setError("Failed to load AI recommendations.");
+    } else {
+      setError(null);
+    }
+  }, [AIRecommendationsQuery.error]);
+  
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await AIRecommendationsQuery.refetch();

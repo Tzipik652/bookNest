@@ -19,10 +19,22 @@ export function FavoritesPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [error, setError] = useState<string | null>(null);
+
   const { favoriteBooksQuery } = useFavoriteBooks();
   const favoriteBooks = favoriteBooksQuery.data || [];
+  
+  useEffect(() => {
+    setIsLoading(favoriteBooksQuery.isLoading);
+  }, [favoriteBooksQuery.isLoading]);
 
+  useEffect(() => {
+    if (favoriteBooksQuery.error) {
+      setError("Failed to load favorite books.");
+    } else {
+      setError(null);
+    }
+  }, [favoriteBooksQuery.error]);
 
   const filteredBooks = favoriteBooks.filter((book: Book) => {
     const matchesSearch =
@@ -58,7 +70,12 @@ export function FavoritesPage() {
             </Box>
 
             {isLoading ? (
-              <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                minHeight="50vh"
+              >
                 <CircularProgress />
               </Box>
             ) : filteredBooks.length > 0 ? (
@@ -72,9 +89,9 @@ export function FavoritesPage() {
                 {filteredBooks.map((book: Book) => (
                   <Box
                     key={`${book._id}`}
-                   flex="1 1 calc(25% - 24px)"
-                        minWidth={250}
-                        maxWidth={300}
+                    flex="1 1 calc(25% - 24px)"
+                    minWidth={250}
+                    maxWidth={300}
                   >
                     <BookCard book={book} />
                   </Box>
