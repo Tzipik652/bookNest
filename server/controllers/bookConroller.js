@@ -201,7 +201,7 @@
 //         return res.status(201).json(newBook);
 //     } catch (error) {
 //         console.log(error);
-        
+
 //         return res.status(500).json({ error: "Failed to create book" });
 //     }
 // }
@@ -209,11 +209,11 @@
 // export const getAllBooks = async (req, res) => {
 //     try {
 //         const books = await bookModel.findAll();
-        
+
 //         return res.status(200).json(books);
 //     } catch (error) {
 //         console.log("error", error);
-        
+
 //         return res.status(500).json({ error: "Failed to retrieve books" });
 //     }
 // }
@@ -303,7 +303,7 @@
 //         return res.status(200).json({ totalPages, currentPageBooks });
 //     } catch (error) {
 //         console.log(error);
-        
+
 //         return res.status(500).json({ error: "Failed to retrieve books" });
 //     }
 // }   
@@ -403,8 +403,9 @@ export const deleteBook = catchAsync(async (req, res, next) => {
 
   const book = await bookModel.findById(id);
   if (!book) throw new AppError("Book not found", 404);
-  if (book.user_id !== userId) throw new AppError("Forbidden", 403);
-
+  if (req.user._id !== userId) {
+    throw new AppError("Forbidden", 403);
+  }
   await bookModel.remove(id);
   res.status(200).json({ message: "Book deleted successfully" });
 });
@@ -437,12 +438,11 @@ export const getBooksByCategory = catchAsync(async (req, res) => {
 
 // לפי משתמש
 export const getBooksByUserId = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
-  if (req.user._id !== userId) throw new AppError("Forbidden", 403);
-
+  console.log("user in getBooksByUserId:", req.user);
+  const userId = req.user._id; // נשלף מתוך ה-token
   const books = await bookModel.findAll();
   const userBooks = books.filter((b) => b.user_id === userId);
-  res.status(200).json(userBooks);
+  res.status(200).json({ booksByUserId: userBooks });
 });
 
 // המלצות
@@ -457,20 +457,20 @@ export const getRecomendedBooks = catchAsync(async (req, res, next) => {
   res.status(200).json(recommendations);
 });
 export const getRecommendedBooks = async (req, res) => {
-    const userId = req.user._id;
-    if (!userId) {
-        return res.status(403).json({ error: "Forbidden" });
-    }
-    try {
-        const favoriteBooks = await bookModel.getFavoriteBooks(userId);
-        const allBooks = await bookModel.findAll();
-        const recommendationsWithReasons = await getBookRecommendations(favoriteBooks, allBooks);
-        const recommendedIds = recommendationsWithReasons.map(rec => rec.id);
+  const userId = req.user._id;
+  if (!userId) {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+  try {
+    const favoriteBooks = await bookModel.getFavoriteBooks(userId);
+    const allBooks = await bookModel.findAll();
+    const recommendationsWithReasons = await getBookRecommendations(favoriteBooks, allBooks);
+    const recommendedIds = recommendationsWithReasons.map(rec => rec.id);
 
-        const fullBooks = await bookModel.findBooksByIds(recommendedIds);
-        return res.status(200).json(fullBooks);
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ error: "Failed to retrieve recommendations" });
-    }
+    const fullBooks = await bookModel.findBooksByIds(recommendedIds);
+    return res.status(200).json(fullBooks);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Failed to retrieve recommendations" });
+  }
 }
