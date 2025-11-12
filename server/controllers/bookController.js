@@ -5,6 +5,7 @@ import {
   generateBookSummary,
   getBookRecommendations,
 } from "../services/aiService.js";
+import redisClient from "../config/redisClient.js";
 
 export const createBook = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
@@ -34,10 +35,6 @@ export const createBook = catchAsync(async (req, res, next) => {
   res.status(201).json(newBook);
 });
 
-// export const getAllBooks = catchAsync(async (req, res) => {
-//   const books = await bookModel.findAll();
-//   res.status(200).json(books);
-// });
 export const getAllBooks = catchAsync(async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -59,6 +56,7 @@ export const getAllBooks = catchAsync(async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 export const getBooksByCategory = catchAsync(async (req, res) => {
   const pageParam = req.query.page;
   if (!pageParam) {
@@ -168,35 +166,22 @@ export const getCachedRecommendations = catchAsync(async (req, res, next) => {
     .join(",")}`;
 
   const cached = await redisClient.get(cacheKey);
-  if (cached) return JSON.parse(cached);
+  if (cached) return res.status(200).json(JSON.parse(cached));
 
-  const recommendations = await getBookRecommendations(favoriteBooks, allBooks);
+  const recommendationsWithReasons = await getBookRecommendations(
+    favoriteBooks,
+    allBooks
+  );
+  const recommendedIds = recommendationsWithReasons.map((rec) => rec.id);
 
-  await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(recommendations));
+  const fullBooks = await bookModel.findBooksByIds(recommendedIds);
 
-  res.status(200).json(recommendations);
+  await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(fullBooks));
+
+  res.status(200).json(fullBooks);
 });
 
-
-//   const userId = req.user._id;
-//   if (!userId) {
-//     return res.status(403).json({ error: "Forbidden" });
-//   }
-//   try {
-//     const favoriteBooks = await bookModel.getFavoriteBooks(userId);
-//     const allBooks = await bookModel.findAll();
-//     const recommendationsWithReasons = await getBookRecommendations(
-//       favoriteBooks,
-//       allBooks
-//     );
-//     const recommendedIds = recommendationsWithReasons.map((rec) => rec.id);
-
-//     const fullBooks = await bookModel.findBooksByIds(recommendedIds);
-//     return res.status(200).json(fullBooks);
-//   } catch (error) {
-//     console.log(error);
-//     return res
-//       .status(500)
-//       .json({ error: "Failed to retrieve recommendations" });
-//   }
-// };
+export const invalidateRecommendationsCache = catchAsync(async (userId) => {
+  const keys = await redisClient.keys(`recommendations:${userId}:*`);
+  if (keys.length) await redisClient.del(keys);
+});

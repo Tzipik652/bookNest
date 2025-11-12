@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { Book, Category } from "../types";
 import { useUserStore } from "../store/useUserStore";
-import Landing from "../components/Landing";
+import LandingComponent from "../components/LandingComponent";
 const BOOKS_PER_PAGE = 20;
 
 export function HomePage() {
@@ -111,7 +111,7 @@ export function HomePage() {
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f9fafb", paddingBottom: 8 }}>
-      {!user ? (<Landing />) : <></>}
+      {!user ? (<LandingComponent />) : <></>}
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight="bold" mb={2} py={2}>
         Discover Books

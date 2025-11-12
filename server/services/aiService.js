@@ -3,8 +3,6 @@
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 dotenv.config();
-import redisClient from "../config/redisClient.js";
-import { strict } from "assert";
 
 const apiKey = process.env.GEMINI_API_KEY;
 const MODEL_NAME = "gemini-2.5-flash"; // Recommended model for speed and efficiency
