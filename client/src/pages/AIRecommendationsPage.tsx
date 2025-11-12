@@ -15,14 +15,20 @@ import { Book } from "../types";
 
 export function AIRecommendationsPage() {
   const [error, setError] = useState<string | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { countFavorites } = useFavoriteBooks();
   const favoriteBooksNumber = countFavorites();
 
   const { AIRecommendationsQuery } = useAIRecommendations();
   const AIRecommendations = AIRecommendationsQuery.data || [];
+  useEffect(() => {
+    setIsLoading(AIRecommendationsQuery.isLoading);
+  }, [AIRecommendationsQuery.isLoading]);
+  useEffect(() => {
+    setError(AIRecommendationsQuery.error as string | null);
+  }, [AIRecommendationsQuery.error]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -68,8 +74,9 @@ export function AIRecommendationsPage() {
           </AlertTitle>
           <Typography variant="body2">
             {favoriteBooksNumber > 0
-              ? `Based on your ${favoriteBooksNumber} favorite ${favoriteBooksNumber === 1 ? "book" : "books"
-              }, we've found these recommendations for you.`
+              ? `Based on your ${favoriteBooksNumber} favorite ${
+                  favoriteBooksNumber === 1 ? "book" : "books"
+                }, we've found these recommendations for you.`
               : "Add some books to your favorites to get personalized recommendations."}
           </Typography>
         </Alert>

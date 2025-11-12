@@ -106,11 +106,7 @@ export function BookDetailsPage() {
       navigate(`/login?redirect=${encodedPath}`);
       return;
     }
-    toggleMutation.mutate(book._id, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["aiRecommendations"] });
-      },
-    });
+    toggleMutation.mutate(book._id);
   };
 
   const handleDelete = () => {

@@ -28,11 +28,7 @@ export function BookCard({ book }: BookCardProps) {
       return;
     }
 
-    toggleMutation.mutate(book._id, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["aiRecommendations"] });
-      },
-    });
+    toggleMutation.mutate(book._id);
   };
 
   return (
