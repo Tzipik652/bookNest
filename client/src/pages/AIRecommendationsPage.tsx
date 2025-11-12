@@ -8,7 +8,7 @@ import {
   AlertTitle,
   CircularProgress,
 } from "@mui/material";
-import { AutoAwesome, Refresh } from "@mui/icons-material";
+import { AutoAwesome,Info, Refresh } from "@mui/icons-material";
 import { useAIRecommendations } from "../hooks/useAIRecommendations";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import { Book } from "../types";
@@ -51,10 +51,12 @@ export function AIRecommendationsPage() {
         </Typography>
 
         <Alert
-          severity="info"
+          severity="info" 
+          // icon={<Info fontSize="small" color="primary" sx={{ mr: 1 }} />}
+          icon={false}
           sx={{
-            background: "linear-gradient(to right, #eff6ff, #f5f3ff)",
-            border: "1px solid #bfdbfe",
+  background: "linear-gradient(to right, #dffdd7ff, #dbf3bcff)",
+              border: "1px solid #d1febfff",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

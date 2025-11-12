@@ -57,7 +57,7 @@ export function BookCard({ book }: BookCardProps) {
             </Button>
           </div>
           <p className="text-gray-600 mb-2">{book.author}</p>
-          <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm mb-3">
+          <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm mb-3">
             {book.category}
           </span>
           <p className="text-sm text-gray-700 line-clamp-3">
