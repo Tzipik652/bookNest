@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { HomePage } from "./pages/HomePage";
@@ -28,7 +27,8 @@ function App() {
           <Route
             path="/"
             element={
-              currentUser ? <Navigate to="/home" replace /> : <LandingPage />
+              // currentUser ? <Navigate to="/home" replace /> : <LandingPage />
+            <HomePage />
             }
           />
           <Route path="/login" element={<LoginPage />} />
@@ -37,9 +37,9 @@ function App() {
           <Route
             path="/home"
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <HomePage />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
           />
 
