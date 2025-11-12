@@ -42,7 +42,10 @@ export const getAllBooks = catchAsync(async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { data: books, count: totalItems } = await bookModel.findPaginated(page, limit);
+    const { data: books, count: totalItems } = await bookModel.findPaginated(
+      page,
+      limit
+    );
     const totalPages = Math.ceil(totalItems / limit);
     res.status(200).json({
       books: books,
@@ -51,7 +54,6 @@ export const getAllBooks = catchAsync(async (req, res) => {
       totalItems: totalItems,
       totalPages: totalPages,
     });
-
   } catch (error) {
     console.error("Error fetching paginated books:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -59,11 +61,11 @@ export const getAllBooks = catchAsync(async (req, res) => {
 });
 export const getBooksByCategory = catchAsync(async (req, res) => {
   const pageParam = req.query.page;
-  if (!pageParam) {    
+  if (!pageParam) {
     try {
       const { catName } = req.params;
       let books;
-      if (catName === 'All') {
+      if (catName === "All") {
         books = await bookModel.findAll();
       } else {
         books = await bookModel.getBooksByCategory(catName);
@@ -78,7 +80,11 @@ export const getBooksByCategory = catchAsync(async (req, res) => {
       const { catName } = req.params;
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
-      const { data: books, count: totalItems } = await bookModel.findPaginated(page, limit, catName);
+      const { data: books, count: totalItems } = await bookModel.findPaginated(
+        page,
+        limit,
+        catName
+      );
       const totalPages = Math.ceil(totalItems / limit);
       res.status(200).json({
         books: books,
@@ -87,7 +93,6 @@ export const getBooksByCategory = catchAsync(async (req, res) => {
         totalItems: totalItems,
         totalPages: totalPages,
       });
-
     } catch (error) {
       console.error("Error fetching paginated books:", error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -144,7 +149,6 @@ export const searchBooks = catchAsync(async (req, res) => {
   res.status(200).json({ totalPages, currentPageBooks });
 });
 
-
 export const getBooksByUserId = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   if (!userId) throw new AppError("Forbidden", 403);
@@ -153,16 +157,26 @@ export const getBooksByUserId = catchAsync(async (req, res, next) => {
   res.status(200).json(userBooks);
 });
 
-export const getRecommendedBooks = catchAsync(async (req, res, next) => {
+export const getCachedRecommendations = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   if (!userId) throw new AppError("Forbidden", 403);
 
   const favoriteBooks = await bookModel.getFavoriteBooks(userId);
   const allBooks = await bookModel.findAll();
+  const cacheKey = `recommendations:${userId}:${favoriteBooks
+    .map((b) => b._id)
+    .join(",")}`;
+
+  const cached = await redisClient.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+
   const recommendations = await getBookRecommendations(favoriteBooks, allBooks);
+
+  await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(recommendations));
 
   res.status(200).json(recommendations);
 });
+
 
 //   const userId = req.user._id;
 //   if (!userId) {
