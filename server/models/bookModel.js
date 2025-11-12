@@ -40,7 +40,7 @@ export async function findAll() {
       email
     )
       `)
-      .order("date_created", { ascending: false });
+      .order("title", { ascending: true });
 
     if (error) {
       throw error;
@@ -49,6 +49,47 @@ export async function findAll() {
     return data;
   } catch (err) {
     console.error("Failed to fetch books:", err);
+    throw err;
+  }
+}
+/**
+ * Fetch a paginated list of books with pagination support.
+ * @param {number} page - Current page number (starting at 1).
+ * @param {number} limit - Maximum items per page.
+ * @returns {Promise<{data: Object[], count: number}>} - The data and total record count.
+ */
+export async function findPaginated(page = 1, limit = 10, category = null) {
+  try {
+    const pageNum = Math.max(1, page);
+    const limitNum = Math.max(1, limit);
+    const start = (pageNum - 1) * limitNum;
+    const end = start + limitNum - 1;
+
+    let query = supabase
+      .from("books")
+      .select(
+        `
+          *,
+          user: user_id (
+            name,
+            email
+          )
+        `,
+        { count: 'exact' }
+      )
+      .order("title", { ascending: true })
+    // .range(start, end);
+
+    // אם קיימת קטגוריה, נוסיף filter
+    if (category) {
+      query = query.eq('category', category);
+    }
+
+    query = query.range(start, end);
+    const { data, count } = await query;
+    return { data, count };
+  } catch (err) {
+    console.error("Failed to fetch books in findAll model:", err);
     throw err;
   }
 }
@@ -116,24 +157,24 @@ export async function remove(id) {
 }
 export async function getFavoriteBooks(userId) {
   try {
-    const favoriteBooksList=await getFavoriteBooksList(userId);
-    
-    const { data, error } = await supabase
-    .from("books")
-    .select("* , user: user_id ( name, email )")
-    .eq("user_id", userId)
-    .in("_id", favoriteBooksList)
-    .order("date_created", { ascending: false });
+    const favoriteBooksList = await getFavoriteBooksList(userId);
 
-  if (error) throw error;
-  return data;
+    const { data, error } = await supabase
+      .from("books")
+      .select("* , user: user_id ( name, email )")
+      .eq("user_id", userId)
+      .in("_id", favoriteBooksList)
+      .order("title", { ascending: true });
+
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.log(`in getFavoriteBooks`);
-    
+
     console.log(error);
-    return [];    
+    return [];
   }
-  
+
 }
 /**
  * Fetch a list of complete books by an array of UUID identifiers.
@@ -141,18 +182,32 @@ export async function getFavoriteBooks(userId) {
  * @returns {Promise<Object[]>} - List of complete book objects.
  */
 const findBooksByIds = async (ids) => {
-    // Supabase (Postgres) uses `.in()` to execute SQL query with WHERE id IN (...)
-    const { data: books, error } = await supabase
-        .from('books')
-        .select('*') // fetch all columns of the book
-        .in('_id', ids); // where the 'id' field is in the ids array we received
+  // Supabase (Postgres) uses `.in()` to execute SQL query with WHERE id IN (...)
+  const { data: books, error } = await supabase
+    .from('books')
+    .select('*') // fetch all columns of the book
+    .in('_id', ids) // where the 'id' field is in the ids array we received
+    .order("title", { ascending: true });
 
-    if (error) {
-        console.error("Error fetching books by IDs:", error);
-        throw new Error(error.message);
-    }
-    
-    return books || [];
+  if (error) {
+    console.error("Error fetching books by IDs:", error);
+    throw new Error(error.message);
+  }
+
+  return books || [];
 };
 
-export default { create, findAll, findById, update, remove, getFavoriteBooks ,findBooksByIds};
+export const getBooksByCategory = async (category) => {
+  const { data: books, error } = await supabase
+    .from('books')
+    .select('*') // fetch all columns of the book
+    .eq('category', category) // where the 'category' field matches the category we received
+    .order("title", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching books by category:", error);
+    throw new Error(error.message);
+  }
+  return books;
+}
+export default { create, findAll, findById, update, remove, getFavoriteBooks, findBooksByIds, findPaginated, getBooksByCategory };

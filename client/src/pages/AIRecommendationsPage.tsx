@@ -11,6 +11,7 @@ import {
 import { AutoAwesome, Refresh } from "@mui/icons-material";
 import { useAIRecommendations } from "../hooks/useAIRecommendations";
 import { useFavoriteBooks } from "../hooks/useFavorites";
+import { Book } from "../types";
 
 export function AIRecommendationsPage() {
   const [error, setError] = useState<string | null>(null);
@@ -107,7 +108,7 @@ export function AIRecommendationsPage() {
             gap: 3,
           }}
         >
-          {AIRecommendations.map((book) => (
+          {AIRecommendations.map((book: Book) => (
             <Box
               key={`${book._id}`}
               flex="1 1 calc(25% - 24px)"
