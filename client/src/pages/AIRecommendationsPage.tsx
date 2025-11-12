@@ -8,7 +8,7 @@ import {
   AlertTitle,
   CircularProgress,
 } from "@mui/material";
-import { AutoAwesome, Refresh } from "@mui/icons-material";
+import { AutoAwesome, Info, Refresh } from "@mui/icons-material";
 import { useAIRecommendations } from "../hooks/useAIRecommendations";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import { Book } from "../types";
@@ -17,7 +17,7 @@ export function AIRecommendationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { countFavorites } = useFavoriteBooks();
   const favoriteBooksNumber = countFavorites();
 
@@ -52,9 +52,11 @@ export function AIRecommendationsPage() {
 
         <Alert
           severity="info"
+          // icon={<Info fontSize="small" color="primary" sx={{ mr: 1 }} />}
+          icon={false}
           sx={{
-            background: "linear-gradient(to right, #eff6ff, #f5f3ff)",
-            border: "1px solid #bfdbfe",
+            background: "linear-gradient(to right, #dffdd7ff, #dbf3bcff)",
+            border: "1px solid #d1febfff",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -66,9 +68,8 @@ export function AIRecommendationsPage() {
           </AlertTitle>
           <Typography variant="body2">
             {favoriteBooksNumber > 0
-              ? `Based on your ${favoriteBooksNumber} favorite ${
-                  favoriteBooksNumber === 1 ? "book" : "books"
-                }, we've found these recommendations for you.`
+              ? `Based on your ${favoriteBooksNumber} favorite ${favoriteBooksNumber === 1 ? "book" : "books"
+              }, we've found these recommendations for you.`
               : "Add some books to your favorites to get personalized recommendations."}
           </Typography>
         </Alert>

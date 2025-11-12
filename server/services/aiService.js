@@ -28,7 +28,8 @@ export async function generateBookSummary(title, author, description) {
   const prompt = `
         Create a concise and engaging summary (2-3 sentences) for the book titled:
         "${title}" by "${author}".
-        Use the following book description as reference: "${description}".
+        Use the following book description as reference: "${description},
+        and search the internet for additional context if needed.
         Make sure the summary is clear and well-written.
     `;
 

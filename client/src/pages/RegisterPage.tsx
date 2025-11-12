@@ -141,7 +141,7 @@ export function RegisterPage() {
               Already have an account?{" "}
               <Link
                 to="/login"
-                style={{ color: "#1976d2", textDecoration: "none" }}
+                style={{ color: "#16A34A", textDecoration: "none" }}
               >
                 Login here
               </Link>
