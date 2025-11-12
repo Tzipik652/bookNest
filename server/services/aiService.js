@@ -1,7 +1,9 @@
 // src/services/aiService.js
 
 import { GoogleGenAI } from '@google/genai';
-import 'dotenv/config'; // Modern method for loading .env (if you haven't used import dotenv)
+import dotenv from 'dotenv';
+dotenv.config();
+import redisClient from '../config/redisClient.js';
 
 const apiKey = process.env.GEMINI_API_KEY;
 const MODEL_NAME = "gemini-2.5-flash"; // Recommended model for speed and efficiency
@@ -88,4 +90,17 @@ export async function getBookRecommendations(favoriteBooks, candidateBooks) {
     console.error("Gemini Recommendation Error:", error);
     return [];
   }
+}
+
+export async function getCachedRecommendations(favoriteBooks, candidateBooks) {
+  const cacheKey = `recommendations:${JSON.stringify(favoriteBooks.map(b => b._id))}`;
+
+  const cached = await redisClient.get(cacheKey);
+  if (cached) return JSON.parse(cached);
+
+  const recommendations = await getBookRecommendations(favoriteBooks, candidateBooks);
+
+  await redisClient.setEx(cacheKey, 21600, JSON.stringify(recommendations));
+
+  return recommendations;
 }
