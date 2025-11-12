@@ -33,7 +33,7 @@ export function AddBookPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user: currentUser } = useUserStore();
 
-const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -156,10 +156,10 @@ const [categories, setCategories] = useState<Category[]>([]);
                 required
               >
                 {categories.map((cat) => (
-                <MenuItem key={cat.id} value={cat.name}>
-                  {cat.name}
-                </MenuItem>
-              ))}
+                  <MenuItem key={cat.id} value={cat.name}>
+                    {cat.name}
+                  </MenuItem>
+                ))}
               </TextField>
 
               <TextField
