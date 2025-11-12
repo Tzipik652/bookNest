@@ -56,28 +56,153 @@ export async function getFavoriteBooksList(userId) {
 }
 
 /**
- * Get all favorite books (joined with books table)
+ * Get all favorite books (joined with books table, returning category name)
  */
 export async function getFavoriteBooks(userId) {
-  const { data, error } = await supabase
-    .from("user_favorites")
-    .select("book_id, books(*)")
-    .eq("user_id", userId)
-    .order("date_added", { ascending: false });
+  try {
+    // השאילתה משתמשת ב-JOIN ובוחרת עמודות ספציפיות כדי לכלול את שם הקטגוריה
+    const { data, error } = await supabase
+      .from("user_favorites")
+      .select(`
+        book_id, 
+        books(
+          _id, 
+          title, 
+          author, 
+          description, 
+          img_url, 
+          price, 
+          ai_summary, 
+          user_id, 
+          date_created, 
+          user: user_id ( name, email ),
+          category_details: category ( name ) 
+        )
+      `)
+      .eq("user_id", userId)
+      .order("date_added", { ascending: false });
 
-  if (error) throw error;
-  return data.map((entry) => entry.books);
+    if (error) throw error;
+    
+    // שיטוח הנתונים המוחזרים: הפיכת category_details.name לשדה category
+    return data.map((entry) => {
+        const book = entry.books;
+        const { category_details, ...rest } = book;
+        return {
+            ...rest,
+            category: category_details?.name || null
+        };
+    });
+  } catch (error) {
+    console.log(`in getFavoriteBooks`);
+    console.log(error);
+    return [];
+  }
 }
 
 export async function countBookFavorites(bookId) {
-   const { count, error } = await supabase
-    .from("user_favorites")
-    .select("book_id", { count: "exact", head: true })
-    .eq("book_id", bookId);
+    const { count, error } = await supabase
+     .from("user_favorites")
+     .select("book_id", { count: "exact", head: true })
+     .eq("book_id", bookId);
 
   if (error) throw error;
   return count || 0;
 }
+
+/**
+ * Fetch a list of complete books by an array of UUID identifiers.
+ * @param {string[]} ids - Array of recommended book identifiers.
+ * @returns {Promise<Object[]>} - List of complete book objects.
+ */
+const findBooksByIds = async (ids) => {
+  const { data: books, error } = await supabase
+    .from('books')
+    // בחירה מפורשת וצירוף שם קטגוריה
+    .select(`
+        _id,
+        title,
+        author,
+        description,
+        img_url,
+        price,
+        ai_summary,
+        user_id,
+        date_created,
+        user: user_id ( name, email ),
+        category_details: category ( name ) 
+    `) 
+    .in('_id', ids) 
+    .order("title", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching books by IDs:", error);
+    throw new Error(error.message);
+  }
+
+  // שיטוח הנתונים
+  const cleanedBooks = (books || []).map(book => {
+      const { category_details, ...rest } = book;
+      return {
+          ...rest,
+          category: category_details?.name || null
+      };
+  });
+
+  return cleanedBooks;
+};
+
+export const getBooksByCategory = async (category) => {
+    
+  // **1. איתור ה-UUID לפי שם הקטגוריה (הכרחי)**
+  let categoryId = null;
+  const { data: categoryData, error: categoryError } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("name", category)
+    .single();
+
+  if (categoryError) {
+     console.warn(`Category name '${category}' not found, returning empty array.`);
+     return [];
+  }
+  categoryId = categoryData.id;
+
+  // **2. שליפת הספרים לפי ה-UUID וצירוף שם הקטגוריה**
+  const { data: books, error } = await supabase
+    .from('books')
+    .select(`
+      _id,
+      title,
+      author,
+      description,
+      img_url,
+      price,
+      ai_summary,
+      user_id,
+      date_created,
+      user: user_id ( name, email ),
+      category_details: category ( name ) 
+    `)
+    .eq('category', categoryId) 
+    .order("title", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching books by category:", error);
+    throw new Error(error.message);
+  }
+  
+  const cleanedBooks = (books || []).map(book => {
+      const { category_details, ...rest } = book;
+      return {
+          ...rest,
+          category: category_details?.name || null
+      };
+  });
+  
+  return cleanedBooks;
+}
+
 
 export default {
   addFavorite,
