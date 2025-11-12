@@ -46,7 +46,7 @@ export async function generateBookSummary(title, author, description) {
         
     } catch (error) {
         console.error("Gemini Summary Error:", error);
-        return "AI summary is not available at the moment."; // default value in case of error
+        throw error; // default value in case of error
     }
 }
 

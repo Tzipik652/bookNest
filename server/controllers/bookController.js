@@ -18,20 +18,32 @@ export const createBook = catchAsync(async (req, res, next) => {
   if (!bookData.title || !bookData.description) {
     throw new AppError("Missing required fields: title or description", 400);
   }
-
-  const summary = await generateBookSummary(
-    bookData.title,
-    bookData.author,
-    bookData.description
-  );
+try {
+  //   const summary = await generateBookSummary(
+  //   bookData.title,
+  //   bookData.author,
+  //   bookData.description
+  // );
 
   const newBook = await bookModel.create({
     ...bookData,
-    ai_summary: summary,
+    // ai_summary: summary,
+    ai_summary: "AI summary is not available at the moment.",
     user_id: req.user._id,
   });
 
   res.status(201).json(newBook);
+} catch (error) {
+  if (error.message.includes("AI service error") || error.code===503) {
+    return res.status(503).json({ error: "AI service is currently unavailable. Please try again later." });
+  } else if (error.message.includes("duplicate") || error.code===23505) {
+    console.log(error);   
+    return res.status(409).json({ error: "A book with the same title already exists." });
+  } 
+  console.error("Error creating book:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+}
+
 });
 
 // export const getAllBooks = catchAsync(async (req, res) => {

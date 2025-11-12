@@ -60,7 +60,14 @@ export async function create(bookData) {
     .select()
     .single();
 
-  if (error) throw error;
+     if (error.code === "23505") {
+      console.warn(`duplication,Category name '${bookData.category}' already exists.`);  
+      throw error;
+    }
+    else if (error) {
+      console.error("Error creating book:", error);
+      throw error;
+    }
   return data;
 }
 /**
