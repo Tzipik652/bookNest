@@ -60,7 +60,7 @@ export async function create(bookData) {
     .select()
     .single();
 
-     if (error.code === "23505") {
+     if (error && error.code === "23505") {
       console.warn(`duplication,Category name '${bookData.category}' already exists.`);  
       throw error;
     }

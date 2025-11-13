@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { addBook } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
-// import { categories } from "../lib/mockData";
-
 import {
   Box,
   Button,
@@ -13,11 +11,11 @@ import {
   CardActions,
   TextField,
   MenuItem,
-  Typography,
   Alert,
   CircularProgress,
+  Snackbar,
 } from "@mui/material";
-import { ArrowBack, AutoAwesome } from '@mui/icons-material';
+import { ArrowBack, AutoAwesome, CheckCircle } from '@mui/icons-material';
 import { useUserStore } from "../store/useUserStore";
 import { Category } from '../types';
 
@@ -27,10 +25,13 @@ export function AddBookPage() {
   const [author, setAuthor] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [img_url, setimg_url] = useState("");
+  const [img_url, setImg_url] = useState("");
   const [price, setPrice] = useState("");
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const { user: currentUser } = useUserStore();
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -44,16 +45,17 @@ export function AddBookPage() {
         console.error(err);
       }
     };
-
     fetchCategories();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
 
     if (!title || !author || !description || !category) {
       setError("Please fill in all required fields");
+      setShowAlert(true);
       return;
     }
 
@@ -70,11 +72,22 @@ export function AddBookPage() {
         price: price ? parseFloat(price) : undefined,
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setSuccessMessage(`${newBook.title} was added successfully!`);
+      setShowSuccess(true);
 
-      navigate(`/book/${newBook._id}`);
-    } catch (err) {
-      setError("Failed to add book. Please try again.");
+      setTimeout(() => {
+        navigate(`/book/${newBook._id}`);
+      }, 1500);
+    } catch (err: any) {
+      console.log(err);
+
+      if (err.message === "Book already exists.") {
+        setError("This book already exists in the database.");
+      } else {
+        setError("Failed to add book. Please try again.");
+      }
+
+      setShowAlert(true);
       setIsSubmitting(false);
     }
   };
@@ -99,12 +112,6 @@ export function AddBookPage() {
 
           <form onSubmit={handleSubmit}>
             <CardContent>
-              {error && (
-                <Alert severity="error" sx={{ mb: 3 }}>
-                  {error}
-                </Alert>
-              )}
-
               <Alert
                 icon={<AutoAwesome fontSize="small" sx={{ color: '#16A34A' }} />}
                 severity="info"
@@ -166,7 +173,7 @@ export function AddBookPage() {
                 fullWidth
                 label="Image URL (Optional)"
                 value={img_url}
-                onChange={(e) => setimg_url(e.target.value)}
+                onChange={(e) => setImg_url(e.target.value)}
                 type="url"
                 margin="normal"
                 helperText="Leave blank to use a default image"
@@ -210,6 +217,41 @@ export function AddBookPage() {
           </form>
         </Card>
       </Box>
+
+      {/*  error message*/}
+      <Snackbar
+        open={showAlert}
+        autoHideDuration={4000}
+        onClose={() => setShowAlert(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setShowAlert(false)}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
+
+      {/*  success message */}
+      <Snackbar
+        open={showSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccess(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          icon={<CheckCircle fontSize="inherit" />}
+          onClose={() => setShowSuccess(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

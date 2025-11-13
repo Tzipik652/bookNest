@@ -33,7 +33,7 @@ export async function generateBookSummary(title, author, description) {
     `;
 
     try {
-        // ✅ Corrected call according to documentation
+        //  Corrected call according to documentation
         const response = await ai.models.generateContent({
              model: MODEL_NAME,
              contents: prompt,
