@@ -7,6 +7,8 @@ dotenv.config();
 import userRoutes from './routes/userRouter.js';
 import bookRouter from './routes/bookRouter.js';
 import favoritesRouter from './routes/favoritesRouter.js';
+import commentRouter from "./routes/commentRouter.js";
+import commentReactionRouter from "./routes/commentReactionRouter.js";
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -25,6 +27,8 @@ app.use('/user', userRoutes);
 app.use('/books', bookRouter);
 app.use('/favorites', favoritesRouter);
 app.use('/categories', categoryRouter);
+app.use("/comments", commentRouter);
+app.use("/comment-reactions", commentReactionRouter);
 
 
 // Error handling

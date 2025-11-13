@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { Book, Category } from "../types";
 import { useUserStore } from "../store/useUserStore";
-import Landing from "../components/Landing";
+import Landing from "../components/landing";
 const BOOKS_PER_PAGE = 20;
 
 export function HomePage() {

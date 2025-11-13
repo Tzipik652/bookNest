@@ -35,3 +35,35 @@ export interface Category {
   name: string;
   created_at: string;
 }
+
+export type ReactionType = "like" | "dislike" | "happy" | "angry";
+
+export interface ReactionCounts {
+  like: number;
+  dislike: number;
+  happy: number;
+  angry: number;
+}
+
+export interface CommentReaction {
+  id: string;
+  comment_id: string;
+  user_id: string;
+  reaction_type: ReactionType;
+  created_at: string;
+}
+
+export interface Comment {
+  id: string;
+  book_id: string;
+  user_id: string;
+  text: string;
+  created_at: string;
+  updated_at: string;
+  reactions: CommentReaction[];
+}
+
+export type CommentWithReactions = Comment & {
+  userReaction?: ReactionType;
+  reactionCounts: ReactionCounts;
+};
