@@ -60,7 +60,6 @@ export async function getFavoriteBooksList(userId) {
  */
 export async function getFavoriteBooks(userId) {
   try {
-    // השאילתה משתמשת ב-JOIN ובוחרת עמודות ספציפיות כדי לכלול את שם הקטגוריה
     const { data, error } = await supabase
       .from("user_favorites")
       .select(`
@@ -84,7 +83,6 @@ export async function getFavoriteBooks(userId) {
 
     if (error) throw error;
     
-    // שיטוח הנתונים המוחזרים: הפיכת category_details.name לשדה category
     return data.map((entry) => {
         const book = entry.books;
         const { category_details, ...rest } = book;
@@ -94,7 +92,6 @@ export async function getFavoriteBooks(userId) {
         };
     });
   } catch (error) {
-    console.log(`in getFavoriteBooks`);
     console.log(error);
     return [];
   }
