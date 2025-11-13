@@ -12,6 +12,7 @@ import { AutoAwesome, Info, Refresh } from "@mui/icons-material";
 import { useAIRecommendations } from "../hooks/useAIRecommendations";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import { Book } from "../types";
+import BookGridSkeleton from "../components/BookGridSkeleton";
 
 export function AIRecommendationsPage() {
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +33,6 @@ export function AIRecommendationsPage() {
   }, [AIRecommendationsQuery.error]);
 
   const handleRefresh = async () => {
-    console.log("Refreshing AI recommendations...");
     setIsRefreshing(true);
     await AIRecommendationsQuery.refetch();
     setIsRefreshing(false);
@@ -60,7 +60,6 @@ export function AIRecommendationsPage() {
 
         <Alert
           severity="info"
-          // icon={<Info fontSize="small" color="primary" sx={{ mr: 1 }} />}
           icon={false}
           sx={{
             background: "linear-gradient(to right, #dffdd7ff, #dbf3bcff)",
@@ -102,14 +101,7 @@ export function AIRecommendationsPage() {
 
       {/* Recommendations Flexbox */}
       {isLoading ? (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="100vh"
-        >
-          <CircularProgress />
-        </Box>
+        <BookGridSkeleton count={4} />
       ) : AIRecommendations.length > 0 ? (
         <Box
           sx={{

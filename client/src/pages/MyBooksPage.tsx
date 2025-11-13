@@ -13,12 +13,12 @@ import {
   Container,
   CircularProgress,
 } from "@mui/material";
+import BookGridSkeleton from "../components/BookGridSkeleton";
 
 export function MyBooksPage() {
   const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [refreshKey, setRefreshKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -27,7 +27,6 @@ export function MyBooksPage() {
       try {
         const data = await getBooksByUserId();
         setBooks(data || []);
-        console.log(data);
       } catch (error) {
         console.error("Failed to fetch user's books:", error);
       } finally {
@@ -35,7 +34,7 @@ export function MyBooksPage() {
       }
     }
     fetchBooks();
-  }, [refreshKey]);
+  }, []);
 
   const filteredBooks = books?.filter(
     (book) =>
@@ -86,28 +85,19 @@ export function MyBooksPage() {
               }}
             />
             {isLoading ? (
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                minHeight="50vh"
-              >
-                <CircularProgress />
-              </Box>
+              <BookGridSkeleton count={4} />
             ) : (
               <>
                 {filteredBooks.length > 0 ? (
                   <Box display="flex" flexWrap="wrap" gap={3}>
                     {filteredBooks.map((book) => (
                       <Box
-                        key={`${book._id}-${refreshKey}`}
+                        key={`${book._id}`}
                         flex="1 1 calc(25% - 24px)"
                         minWidth={250}
                         maxWidth={300}
                       >
-                        <BookCard
-                          book={book}
-                        />
+                        <BookCard book={book} />
                       </Box>
                     ))}
                   </Box>
