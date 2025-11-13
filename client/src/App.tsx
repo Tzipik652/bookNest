@@ -17,81 +17,95 @@ import { MyBooksPage } from "./pages/MyBooksPage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { AIRecommendationsPage } from "./pages/AIRecommendationsPage";
 import { useUserStore } from "./store/useUserStore";
+
 function App() {
   const { user: currentUser } = useUserStore();
+  
   return (
     <Router>
       <div className="min-h-screen bg-white">
+        {/* Skip to main content link for keyboard users */}
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded"
+        >
+          Skip to main content
+        </a>
+        
         <Navbar />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              // currentUser ? <Navigate to="/home" replace /> : <LandingPage />
-            <HomePage />
-            }
-          />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-
-          <Route
-            path="/home"
-            element={
-              // <ProtectedRoute>
+        
+        {/* Wrap Routes in <main> with id for skip link */}
+        <main id="main-content">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                // currentUser ? <Navigate to="/home" replace /> : <LandingPage />
                 <HomePage />
-              // </ProtectedRoute>
-            }
-          />
+              }
+            />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-          <Route path="/book/:id" element={<BookDetailsPage />} />
+            <Route
+              path="/home"
+              element={
+                // <ProtectedRoute>
+                  <HomePage />
+                // </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/add-book"
-            element={
-              <ProtectedRoute>
-                <AddBookPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route path="/book/:id" element={<BookDetailsPage />} />
 
-          <Route
-            path="/edit-book/:id"
-            element={
-              <ProtectedRoute>
-                <EditBookPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/add-book"
+              element={
+                <ProtectedRoute>
+                  <AddBookPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/my-books"
-            element={
-              <ProtectedRoute>
-                <MyBooksPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/edit-book/:id"
+              element={
+                <ProtectedRoute>
+                  <EditBookPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/favorites"
-            element={
-              <ProtectedRoute>
-                <FavoritesPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/my-books"
+              element={
+                <ProtectedRoute>
+                  <MyBooksPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/recommendations"
-            element={
-              <ProtectedRoute>
-                <AIRecommendationsPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/favorites"
+              element={
+                <ProtectedRoute>
+                  <FavoritesPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            <Route
+              path="/recommendations"
+              element={
+                <ProtectedRoute>
+                  <AIRecommendationsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
       </div>
     </Router>
   );

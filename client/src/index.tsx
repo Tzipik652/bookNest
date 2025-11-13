@@ -32,6 +32,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import theme from "./theme";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import AccessibilityMenu from "./components/AccessibilityMenu";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ root.render(
       <QueryClientProvider client={queryClient}>
        <ThemeProvider theme={theme}>
         <CssBaseline />
+        <AccessibilityMenu />
         <App />
        </ThemeProvider>
       </QueryClientProvider>
