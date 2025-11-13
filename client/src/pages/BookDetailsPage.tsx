@@ -239,7 +239,7 @@ export function BookDetailsPage() {
 
       {/* Comment Section */}
       <Box className="mt-12">
-        <CommentSection bookId={book._id} bookOwnerId={book.uploaderId} />
+        <CommentSection bookId={book._id} bookOwnerId={book.user_id} />
       </Box>
 
       {/* Delete Confirmation Dialog */ }
