@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const redisClient = createClient({
-  url: process.env.REDIS_URL || "redis://red-xxxxxxx.internal:6379",
+  url: process.env.REDIS_URL || "rediss://red-xxxxxxx.internal:6379",
   socket: {
     tls: true,
 
