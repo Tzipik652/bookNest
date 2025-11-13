@@ -23,39 +23,27 @@ import { useUserStore } from '../store/useUserStore';
 
 export function EditBookPage() {
   const { id } = useParams<{ id: string }>();
+
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
-  
+
 
   const [book, setBook] = useState<Book | null>(null);
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  const [img_url, setimg_url] = useState('');
+  const [img_url, setImg_url] = useState('');
   const [price, setPrice] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
 
-const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await getCategories();
-        setCategories(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
+    console.log(`id: ${id}`);
     if (!id) return;
-
     const fetchBook = async () => {
       try {
         const data = await getBookById(id);
@@ -63,21 +51,16 @@ const [categories, setCategories] = useState<Category[]>([]);
           navigate('/home');
           return;
         }
-        if (data.uploaderId !== currentUser?._id) {
+        if (data.user_id !== currentUser?._id) {
           navigate(`/book/${id}`);
           return;
         }
-
-    if (book?.uploaderId !== currentUser?._id) {
-      navigate(`/book/${id}`);
-      return;
-    }
         setBook(data);
         setTitle(data.title);
         setAuthor(data.author);
         setDescription(data.description);
         setCategory(data.category);
-        setimg_url(data.img_url);
+        setImg_url(data.img_url);
         setPrice(data.price?.toString() || '');
       } catch (err) {
         console.error(err);
@@ -86,9 +69,20 @@ const [categories, setCategories] = useState<Category[]>([]);
         setLoading(false);
       }
     };
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error(err);
+      }
 
+    };
+
+    fetchCategories();
     fetchBook();
-  }, [id, currentUser, navigate]);
+  }, [id]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,16 +135,12 @@ const [categories, setCategories] = useState<Category[]>([]);
         <Card sx={{ p: 2 }}>
           <CardHeader
             title="Edit Book"
-            subheader="Update book information. AI will regenerate the summary if you change key details."
+            subheader="Update book information."
           />
 
           <form onSubmit={handleSubmit}>
             <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               {error && <Alert severity="error">{error}</Alert>}
-
-              <Alert icon={<AutoAwesome />} severity="info">
-                AI summary will be regenerated if title, description, or category changes
-              </Alert>
 
               <TextField
                 label="Title *"
@@ -183,17 +173,17 @@ const [categories, setCategories] = useState<Category[]>([]);
                 required
               >
                 {categories.map((cat) => (
-                <MenuItem key={cat.id} value={cat.name}>
-                  {cat.name}
-                </MenuItem>
-              ))}
+                  <MenuItem key={cat.id} value={cat.name}>
+                    {cat.name}
+                  </MenuItem>
+                ))}
               </TextField>
 
               <TextField
                 label="Image URL"
                 type="url"
                 value={img_url}
-                onChange={(e) => setimg_url(e.target.value)}
+                onChange={(e) => setImg_url(e.target.value)}
                 placeholder="https://example.com/image.jpg"
               />
 

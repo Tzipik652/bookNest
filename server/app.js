@@ -1,17 +1,14 @@
-// server.js
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { verifyJWT } from './middleware/auth.js';
-dotenv.config();
 import userRoutes from './routes/userRouter.js';
 import bookRouter from './routes/bookRouter.js';
 import favoritesRouter from './routes/favoritesRouter.js';
 import commentRouter from "./routes/commentRouter.js";
 import commentReactionRouter from "./routes/commentReactionRouter.js";
 import { errorHandler } from './middleware/errorHandler.js';
-
 dotenv.config();
+
 
 import categoryRouter from './routes/categoryRouter.js';
 const app = express();

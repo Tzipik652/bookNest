@@ -29,6 +29,9 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import theme from "./theme";
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 
 const queryClient = new QueryClient();
 
@@ -42,7 +45,10 @@ root.render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <QueryClientProvider client={queryClient}>
+       <ThemeProvider theme={theme}>
+        <CssBaseline />
         <App />
+       </ThemeProvider>
       </QueryClientProvider>
     </GoogleOAuthProvider>
   </React.StrictMode>

@@ -8,23 +8,31 @@ import {
   AlertTitle,
   CircularProgress,
 } from "@mui/material";
-import { AutoAwesome, Refresh } from "@mui/icons-material";
+import { AutoAwesome, Info, Refresh } from "@mui/icons-material";
 import { useAIRecommendations } from "../hooks/useAIRecommendations";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import { Book } from "../types";
 
 export function AIRecommendationsPage() {
   const [error, setError] = useState<string | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const { countFavorites } = useFavoriteBooks();
   const favoriteBooksNumber = countFavorites();
 
   const { AIRecommendationsQuery } = useAIRecommendations();
   const AIRecommendations = AIRecommendationsQuery.data || [];
 
+  useEffect(() => {
+    setIsLoading(AIRecommendationsQuery.isLoading);
+  }, [AIRecommendationsQuery.isLoading]);
+  useEffect(() => {
+    setError(AIRecommendationsQuery.error as string | null);
+  }, [AIRecommendationsQuery.error]);
+
   const handleRefresh = async () => {
+    console.log("Refreshing AI recommendations...");
     setIsRefreshing(true);
     await AIRecommendationsQuery.refetch();
     setIsRefreshing(false);
@@ -52,9 +60,11 @@ export function AIRecommendationsPage() {
 
         <Alert
           severity="info"
+          // icon={<Info fontSize="small" color="primary" sx={{ mr: 1 }} />}
+          icon={false}
           sx={{
-            background: "linear-gradient(to right, #eff6ff, #f5f3ff)",
-            border: "1px solid #bfdbfe",
+            background: "linear-gradient(to right, #dffdd7ff, #dbf3bcff)",
+            border: "1px solid #d1febfff",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

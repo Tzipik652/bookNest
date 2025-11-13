@@ -30,6 +30,7 @@ import {
 
 import { useUserStore } from "../store/useUserStore";
 import { useFavoriteBooks } from "../hooks/useFavorites";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function BookDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -40,6 +41,7 @@ export function BookDetailsPage() {
   const [book, setBook] = useState<Book | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const { isFavorited, toggleMutation } = useFavoriteBooks();
   const favorited = isFavorited(id || "");
 
@@ -66,7 +68,12 @@ export function BookDetailsPage() {
 
   if (loading) {
     return (
-      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Box
+        minHeight="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
         <Typography>Loading...</Typography>
       </Box>
     );

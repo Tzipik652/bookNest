@@ -78,7 +78,7 @@ return redirect ? decodeURIComponent(redirect) : "/home";
               <Box textAlign="center">
                 <BookOpen
                   size={48}
-                  color="#1976d2"
+                  color="#16A34A"
                   style={{ marginBottom: 8 }}
                 />
                 <Typography variant="h5" fontWeight="bold">
@@ -96,16 +96,6 @@ return redirect ? decodeURIComponent(redirect) : "/home";
               sx={{ display: "flex", flexDirection: "column", gap: 3 }}
             >
               {error && <Alert severity="error">{error}</Alert>}
-
-              <Alert severity="info">
-                <Typography variant="body2">
-                  <strong>Demo Credentials:</strong>
-                  <br />
-                  Email: demo@booknest.com
-                  <br />
-                  Password: demo123
-                </Typography>
-              </Alert>
 
               <TextField
                 label="Email"
@@ -146,7 +136,7 @@ return redirect ? decodeURIComponent(redirect) : "/home";
                 Don’t have an account?{" "}
                 <Link
                   to="/register"
-                  style={{ color: "#1976d2", textDecoration: "none" }}
+                  style={{ color: "#16A34A", textDecoration: "none" }}
                 >
                   Register here
                 </Link>

@@ -16,13 +16,19 @@ import { Book } from "../types";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 
 export function FavoritesPage() {
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   
   const { favoriteBooksQuery } = useFavoriteBooks();
   const favoriteBooks = favoriteBooksQuery.data || [];
-
+  useEffect(() => {
+    setIsLoading(favoriteBooksQuery.isLoading);
+  }, [favoriteBooksQuery.isLoading]);
+  useEffect(() => {
+    setError(favoriteBooksQuery.error as string | null);
+  }, [favoriteBooksQuery.error]);
 
   const filteredBooks = favoriteBooks.filter((book: Book) => {
     const matchesSearch =

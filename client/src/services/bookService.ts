@@ -77,7 +77,6 @@ export async function addBook(bookData: {
         Authorization: `Bearer ${useUserStore.getState().token}`,
       },
     });
-
     const serverBook = res.data;
     const newBook: Book = {
       _id: serverBook._id || serverBook.id,
@@ -87,7 +86,6 @@ export async function addBook(bookData: {
       category: serverBook.category,
       img_url: serverBook.img_url,
       price: serverBook.price,
-      uploaderId: serverBook.user_id,
       user: {
         name: currentUser.name,
         email: currentUser.email,
@@ -98,6 +96,9 @@ export async function addBook(bookData: {
     };
     return newBook;
   } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 409) {
+      throw new Error("Book already exists.");
+    }
     handleAxiosError(error);
   }
 }

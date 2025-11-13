@@ -16,7 +16,6 @@ export interface Book {
   img_url: string;
   price?: number;
   ai_summary: string;
-  uploaderId: string;
   user_id: string;
   user: {
     name: string;
