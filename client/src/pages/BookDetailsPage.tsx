@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { CommentSection } from '../components/CommentSection';
 
 import { Book } from "../types";
 
@@ -236,25 +237,30 @@ export function BookDetailsPage() {
         </Box>
       </Box>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
-      >
-        <DialogTitle>Are you sure?</DialogTitle>
-        <DialogContent>
-          <Typography>
-            This will permanently delete "{book.title}" from your library. This
-            action cannot be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
-          <Button onClick={handleDelete} color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+      {/* Comment Section */}
+      <Box className="mt-12">
+        <CommentSection bookId={book._id} bookOwnerId={book.user_id} />
+      </Box>
+
+      {/* Delete Confirmation Dialog */ }
+  <Dialog
+    open={showDeleteDialog}
+    onClose={() => setShowDeleteDialog(false)}
+  >
+    <DialogTitle>Are you sure?</DialogTitle>
+    <DialogContent>
+      <Typography>
+        This will permanently delete "{book.title}" from your library. This
+        action cannot be undone.
+      </Typography>
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+      <Button onClick={handleDelete} color="error" variant="contained">
+        Delete
+      </Button>
+    </DialogActions>
+  </Dialog>
+    </Box >
   );
 }
