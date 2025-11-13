@@ -20,11 +20,16 @@ export function Navbar() {
     navigate('/');
   };
 
-  const isActive = (path: string) => location.pathname === path;
+const isActive = (path: string) => {
+  if (path === '/home') {
+    return location.pathname === '/' || location.pathname.startsWith('/home');
+  }
+  return location.pathname.startsWith(path);
+};
+
   const currentPath = location.pathname;
   const encodedPath = encodeURIComponent(currentPath);
 
-  // פונקציה שמחזירה עיצוב לפי מצב העמוד
   const getButtonClasses = (path: string) =>
     `gap-2 transition-colors duration-200 ${
       isActive(path)
