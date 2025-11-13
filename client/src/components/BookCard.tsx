@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useUserStore } from "../store/useUserStore";
 import { useFavoriteBooks } from "../hooks/useFavorites";
+import { useQueryClient } from "@tanstack/react-query";
 interface BookCardProps {
   book: Book;
 }
@@ -15,7 +16,7 @@ export function BookCard({ book }: BookCardProps) {
   const location = useLocation();
   const { user: currentUser } = useUserStore();
   const { toggleMutation, isFavorited } = useFavoriteBooks();
-
+  const queryClient = useQueryClient();
   const favorited = isFavorited(book._id);
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {

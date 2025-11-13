@@ -454,4 +454,4 @@ export const getBooksByCategory = async (category) => {
   
   return cleanedBooks;
 }
-export default { create, findAll, findById, update, remove, getFavoriteBooks, findBooksByIds, findPaginated, getBooksByCategory };
+export default { create, findAll, findById, update, remove, findBooksByIds,getFavoriteBooks, findPaginated, getBooksByCategory };
