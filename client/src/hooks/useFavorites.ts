@@ -2,9 +2,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getFavoriteBooks, toggleFavorite } from "../services/favoriteService";
 import { Book } from "../types";
+import { useUserStore } from "../store/useUserStore";
 
 export function useFavoriteBooks() {
   const queryClient = useQueryClient();
+  const user = useUserStore((state) => state.user);
 
   const favoriteBooksQuery = useQuery<Book[]>({
     queryKey: ["favoriteBooks"],
@@ -28,7 +30,7 @@ export function useFavoriteBooks() {
       );
 
       const prevAIRecommendations = queryClient.getQueryData<Book[]>([
-        "aiRecommendations",
+        "aiRecommendations", user?._id
       ]);
 
       return { prevBooks, prevAIRecommendations };
@@ -39,7 +41,7 @@ export function useFavoriteBooks() {
       }
       if (context?.prevAIRecommendations) {
         queryClient.setQueryData(
-          ["aiRecommendations"],
+          ["aiRecommendations", user?._id],
           context.prevAIRecommendations
         );
       }
@@ -48,7 +50,7 @@ export function useFavoriteBooks() {
       queryClient.invalidateQueries({ queryKey: ["favoriteBooks"] });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["aiRecommendations"] });
+      queryClient.invalidateQueries({ queryKey: ["aiRecommendations", user?._id] });
     },
   });
 

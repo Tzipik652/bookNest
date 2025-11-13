@@ -11,7 +11,7 @@ export const toggleFavorite = catchAsync(async (req, res, next) => {
     throw new AppError("userId and bookId are required", 400);
   }
 
-  await invalidateRecommendationsCache(userId);
+  invalidateRecommendationsCache(userId);
 
   const alreadyFavorite = await favoritesModel.isFavorite(userId, bookId);
 

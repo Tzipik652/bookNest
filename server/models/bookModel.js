@@ -155,27 +155,7 @@ export async function remove(id) {
   if (error && error.code !== "PGRST116") throw error; // not found
   return !!data;
 }
-export async function getFavoriteBooks(userId) {
-  try {
-    const favoriteBooksList = await getFavoriteBooksList(userId);
 
-    const { data, error } = await supabase
-      .from("books")
-      .select("* , user: user_id ( name, email )")
-      .eq("user_id", userId)
-      .in("_id", favoriteBooksList)
-      .order("title", { ascending: true });
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.log(`in getFavoriteBooks`);
-
-    console.log(error);
-    return [];
-  }
-
-}
 /**
  * Fetch a list of complete books by an array of UUID identifiers.
  * @param {string[]} ids - Array of recommended book identifiers.
@@ -210,4 +190,4 @@ export const getBooksByCategory = async (category) => {
   }
   return books;
 }
-export default { create, findAll, findById, update, remove, getFavoriteBooks, findBooksByIds, findPaginated, getBooksByCategory };
+export default { create, findAll, findById, update, remove, findBooksByIds, findPaginated, getBooksByCategory };

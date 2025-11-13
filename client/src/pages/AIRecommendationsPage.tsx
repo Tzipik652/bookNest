@@ -23,6 +23,7 @@ export function AIRecommendationsPage() {
 
   const { AIRecommendationsQuery } = useAIRecommendations();
   const AIRecommendations = AIRecommendationsQuery.data || [];
+
   useEffect(() => {
     setIsLoading(AIRecommendationsQuery.isLoading);
   }, [AIRecommendationsQuery.isLoading]);
@@ -31,6 +32,7 @@ export function AIRecommendationsPage() {
   }, [AIRecommendationsQuery.error]);
 
   const handleRefresh = async () => {
+    console.log("Refreshing AI recommendations...");
     setIsRefreshing(true);
     await AIRecommendationsQuery.refetch();
     setIsRefreshing(false);

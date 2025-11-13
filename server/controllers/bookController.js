@@ -6,6 +6,7 @@ import {
   getBookRecommendations,
 } from "../services/aiService.js";
 import redisClient from "../config/redisClient.js";
+import favoritesModel from "../models/favoritesModel.js";
 
 export const createBook = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
@@ -159,26 +160,43 @@ export const getCachedRecommendations = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   if (!userId) throw new AppError("Forbidden", 403);
 
-  const favoriteBooks = await bookModel.getFavoriteBooks(userId);
+  const favoriteBooks = await favoritesModel.getFavoriteBooks(userId);
+  console.log("favorite book: ", favoriteBooks);
+  if (!favoriteBooks.length) {
+    console.log(`no favorite books ${userId}`)
+    return res.status(200).json([]);
+  }
   const allBooks = await bookModel.findAll();
   const cacheKey = `recommendations:${userId}:${favoriteBooks
     .map((b) => b._id)
     .join(",")}`;
 
-  const cached = await redisClient.get(cacheKey);
-  if (cached) return res.status(200).json(JSON.parse(cached));
+  try {
+    const cached = await redisClient.get(cacheKey);
+    if (cached) return res.status(200).json(JSON.parse(cached));
 
-  const recommendationsWithReasons = await getBookRecommendations(
-    favoriteBooks,
-    allBooks
-  );
-  const recommendedIds = recommendationsWithReasons.map((rec) => rec.id);
+    const recommendationsWithReasons = await getBookRecommendations(
+      favoriteBooks,
+      allBooks
+    );
 
-  const fullBooks = await bookModel.findBooksByIds(recommendedIds);
+    const recommendedIds = recommendationsWithReasons.map((rec) => rec.id);
+    const fullBooks = await bookModel.findBooksByIds(recommendedIds);
 
-  await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(fullBooks));
+    await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(fullBooks));
 
-  res.status(200).json(fullBooks);
+    return res.status(200).json(fullBooks);
+  } catch (error) {
+    console.error("AI Recommendation Error:", error);
+
+    const cachedFallback = await redisClient.get(cacheKey);
+    if (cachedFallback) {
+      console.warn("⚠️ Using cached recommendations due to AI failure.");
+      return res.status(200).json(JSON.parse(cachedFallback));
+    }
+
+    return next(new AppError("Failed to generate recommendations", 500));
+  }
 });
 
 export const invalidateRecommendationsCache = catchAsync(async (userId) => {
