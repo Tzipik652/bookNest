@@ -32,13 +32,18 @@ export function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  
+  useEffect(() => {
+    if (!loading) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [loading]);
 
-  // Handler for changing the page using the Pagination component
+
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     value: number
   ) => {
-    // Only update the page state if the value is different
     if (value !== currentPage) {
       setCurrentPage(value);
     }
@@ -57,7 +62,6 @@ export function HomePage() {
   }, []);
   const fetchBooks = useCallback(
     async (page: number, limit: number) => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
       setLoading(true);
       try {
         let response;
