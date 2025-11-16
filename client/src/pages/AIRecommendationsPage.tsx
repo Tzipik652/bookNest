@@ -39,7 +39,7 @@ export function AIRecommendationsPage() {
   };
 
   return (
-    <Box minHeight="100vh" bgcolor="#f9fafb" py={10} px={3}>
+    <Box minHeight="100vh" py={10} px={3}>
       <Box maxWidth="md" mx="auto" textAlign="center" mb={8}>
         <Box
           display="flex"
@@ -62,7 +62,7 @@ export function AIRecommendationsPage() {
           severity="info"
           icon={false}
           sx={{
-            background: "linear-gradient(to right, #dffdd7ff, #dbf3bcff)",
+            // background: "linear-gradient(to right, #dffdd7ff, #dbf3bcff)",
             border: "1px solid #d1febfff",
             display: "flex",
             alignItems: "center",

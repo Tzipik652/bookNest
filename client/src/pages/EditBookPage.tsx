@@ -122,11 +122,13 @@ export function EditBookPage() {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f9fafb', py: 6 }}>
+    <Box sx={{ minHeight: '100vh', py: 6 }}>
       <Container maxWidth="sm">
         <Button
           onClick={() => navigate(-1)}
           startIcon={<ArrowBack />}
+          color="primary"
+          variant="text"
           sx={{ mb: 3, textTransform: 'none' }}
         >
           Back

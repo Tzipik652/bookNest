@@ -115,7 +115,7 @@ export function MyBooksPage() {
   };
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f9fafb", py: 8 }}>
+    <Box sx={{ minHeight: "100vh", py: 8 }}>
       <Container maxWidth="lg">
         <Box
           sx={{

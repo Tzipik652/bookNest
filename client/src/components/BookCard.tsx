@@ -6,17 +6,18 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useUserStore } from "../store/useUserStore";
 import { useFavoriteBooks } from "../hooks/useFavorites";
-import { useQueryClient } from "@tanstack/react-query";
+import { useDynamicTheme } from "../theme";
+
 interface BookCardProps {
   book: Book;
 }
 
 export function BookCard({ book }: BookCardProps) {
+  const theme = useDynamicTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const { user: currentUser } = useUserStore();
   const { toggleMutation, isFavorited } = useFavoriteBooks();
-  const queryClient = useQueryClient();
   const favorited = isFavorited(book._id);
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
@@ -32,7 +33,10 @@ export function BookCard({ book }: BookCardProps) {
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
+    <Card
+      className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
+      style={{ backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}
+    >
       <div onClick={() => navigate(`/book/${book._id}`)}>
         <div className="aspect-[3/4] overflow-hidden bg-gray-100">
           <ImageWithFallback
@@ -51,17 +55,16 @@ export function BookCard({ book }: BookCardProps) {
               className="shrink-0"
             >
               <Heart
-                className={`h-5 w-5 ${
-                  favorited ? "fill-red-500 text-red-500" : "text-gray-400"
-                }`}
+                className={`h-5 w-5 ${favorited ? "fill-red-500 text-red-500" : "text-gray-400"
+                  }`}
               />
             </Button>
           </div>
-          <p className="text-gray-600 mb-2">{book.author}</p>
-          <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm mb-3">
+          <p className="text-gray-600 mb-2" style={{ color: theme.palette.text.secondary }}>{book.author}</p>
+          <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm mb-3" >
             {book.category}
           </span>
-          <p className="text-sm text-gray-700 line-clamp-3">
+          <p className="text-sm text-gray-700 line-clamp-3" style={{ color: theme.palette.text.secondary }}>
             {book.ai_summary}
           </p>
         </CardContent>
