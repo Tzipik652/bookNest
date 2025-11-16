@@ -9,7 +9,7 @@ const LandingComponent = () => {
     <Box
         sx={{
           bgcolor: "primary.main",
-          color: "white",
+          color: "primary.contrastText",
           py: 12,
           textAlign: "center",
         }}
@@ -43,7 +43,7 @@ const LandingComponent = () => {
               onClick={() => navigate("/register")}
               sx={{
                 borderColor: "white",
-                color: "white",
+                color: "main.contrastText",
                 "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
               }}
             >

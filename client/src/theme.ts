@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
-import { useAccessibilityStore } from "../src/store/accessibilityStore"; 
+import { useAccessibilityStore } from "../src/store/accessibilityStore";
 
 export const useDynamicTheme = () => {
   const {
@@ -16,17 +16,17 @@ export const useDynamicTheme = () => {
     palette: {
       mode: darkMode ? "dark" : "light",
       background: {
-        default: highContrast ? "#000" : darkMode ? "#121212" : "#fff",
-        paper: highContrast ? "#000" : darkMode ? "#1E1E1E" : "#fff",
+        default: highContrast ? "#000" : darkMode ? "#121212" : "#f9fafb",
+        paper: highContrast ? "#000" : darkMode ? "#1E1E1E" : "#f9fafb",
       },
       text: {
         primary: highContrast ? "#fff" : darkMode ? "#fff" : "#000",
         secondary: highContrast ? "#fff" : darkMode ? "#dddddd" : "#333",
       },
       primary: {
-        main: highContrast ? "#fff" : "#16A34A",
-        dark: highContrast ? "#fff" : "#12803A",
-        contrastText: highContrast ? "#000" : "#fff",
+        main: highContrast || darkMode ? "#fff" : "#16A34A",
+        dark: highContrast || darkMode? "#fff" : "#12803A",
+        contrastText: highContrast || darkMode ? "#000" : "#fff",
       },
     },
     typography: {
@@ -43,10 +43,26 @@ export const useDynamicTheme = () => {
           },
         },
       },
+        MuiAlert: {
+    styleOverrides: {
+      root: ({ ownerState }) => ({
+        background:
+          ownerState.severity === "info"
+            ? highContrast
+              ? "#000" // high contrast dark bg
+              : darkMode
+              ? "#1E1E1E" // dark mode bg
+              : "#dffdd7" // light bg
+            : undefined,
+        color: highContrast || darkMode ? "#fff" : "#000",
+        border: highContrast ? "1px solid #fff" : undefined,
+      }),
+    },
+  },
       MuiCard: {
         styleOverrides: {
           root: {
-            backgroundColor: highContrast ? "#000" : darkMode ? "#1E1E1E" : "#fff",
+            backgroundColor: highContrast ? "#000" : darkMode ? "#1E1E1E" : "#f9fafb",
             color: highContrast || darkMode ? "#fff" : "#000",
             transition: reduceMotion ? "none" : "all 0.2s ease",
           },
@@ -55,7 +71,7 @@ export const useDynamicTheme = () => {
       MuiPaper: {
         styleOverrides: {
           root: {
-            backgroundColor: highContrast ? "#000" : darkMode ? "#1E1E1E" : "#fff",
+            backgroundColor: highContrast ? "#000" : darkMode ? "#1E1E1E" : "#f9fafb",
             color: highContrast || darkMode ? "#fff" : "#000",
             transition: reduceMotion ? "none" : "all 0.2s ease",
           },
