@@ -52,7 +52,7 @@ function CommentItem({ comment, isBookOwner, currentUserId, onDelete, onReaction
                                 </Typography>
                             </Stack>
                         </Stack>
-                        {isBookOwner && (
+                        {(isBookOwner || currentUserId === comment.user_id) && (
                             <IconButton onClick={onDelete} color="error" size="small" sx={{ '&:hover': { bgcolor: 'error.lighter' } }}>
                                 <Trash2 size={18} />
                             </IconButton>

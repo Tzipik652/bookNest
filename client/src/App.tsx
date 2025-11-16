@@ -90,7 +90,7 @@ function App() {
               }
             />
 
-            <Route path="/book/:id" element={<LazyEditBookPage />} />
+            <Route path="/book/:id" element={<LazyBookDetailsPage />} />
 
             <Route
               path="/add-book"

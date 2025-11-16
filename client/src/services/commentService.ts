@@ -77,3 +77,25 @@ export async function deleteComment(commentId: string): Promise<{ success: boole
     throw error;
   }
 }
+
+/**
+ * קבלת תגובה בודדת לפי ID
+ */
+export async function getCommentById(commentId: string): Promise<Comment> {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/single/${commentId}`);
+    const serverComment = res.data;
+    return {
+      id: serverComment.id || serverComment._id,
+      book_id: serverComment.book_id,
+      user_id: serverComment.user_id,
+      text: serverComment.text,
+      created_at: serverComment.created_at || new Date().toISOString(),
+      updated_at: serverComment.updated_at || new Date().toISOString(),
+      reactions: serverComment.reactions || [],
+    };
+  } catch (error) {
+    handleAxiosError(error);
+    throw error;
+  }
+}
