@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import { CircularProgress, Box } from "@mui/material";
 import { Navbar } from "./components/Navbar";
+import { Footer } from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 import { useUserStore } from "./store/useUserStore";
@@ -65,7 +66,6 @@ const RouteFallback = () => (
   </Box>
 );
 
-import { Footer } from "./components/Footer";
 function App() {
   const { user: currentUser } = useUserStore();
   return (
