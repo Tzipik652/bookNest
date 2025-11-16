@@ -6,13 +6,17 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { CircularProgress, Box } from "@mui/material";
+import { CircularProgress, Box, GlobalStyles } from "@mui/material";
+
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 import { useUserStore } from "./store/useUserStore";
+import { useAccessibilityStore } from "./store/accessibilityStore";
+import AccessibilityMenu from "./components/AccessibilityMenu";
 
+// Lazy-loaded pages
 const LazyLoginPage = React.lazy(() =>
   import("./pages/LoginPage").then((module) => ({ default: module.LoginPage }))
 );
@@ -55,12 +59,13 @@ const LazyAIRecommendationsPage = React.lazy(() =>
   }))
 );
 
+// Loader for lazy routes
 const RouteFallback = () => (
   <Box
     display="flex"
     justifyContent="center"
     alignItems="center"
-    sx={{ minHeight: "calc(100vh - 64px)", padding: 4 }}
+    sx={{ minHeight: "calc(100vh - 64px)", p: 4 }}
   >
     <CircularProgress size={50} />
   </Box>
@@ -68,16 +73,68 @@ const RouteFallback = () => (
 
 function App() {
   const { user: currentUser } = useUserStore();
+
+  const {
+    darkMode,
+    highContrast,
+    largeText,
+    reduceMotion,
+    underlineLinks,
+    dyslexicFont,
+    screenReader,
+  } = useAccessibilityStore();
+
+  // Auto ARIA-label for icon-only buttons
+document.querySelectorAll("button, [role='button'], a").forEach((el) => {
+  const text = el.textContent;
+  if (!el.getAttribute("aria-label") && text && text.trim() === "") {
+    el.setAttribute("aria-label", "button");
+  }
+});
+
+
   return (
     <Router>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen">
+
+        {/* Skip link */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded"
+        >
+          Skip to main content
+        </a>
+
         <Navbar />
+        <AccessibilityMenu />
+
+        {/* Global Accessibility Overrides */}
+        <GlobalStyles
+          styles={{
+            body: {
+              backgroundColor: darkMode
+                ? "#121212"
+                : highContrast
+                ? "#000"
+                : "#fff",
+
+              color: darkMode || highContrast ? "#fff" : "#000",
+              fontSize: largeText ? "1.2rem" : "1rem",
+              transition: reduceMotion ? "none" : "all 0.3s ease",
+              fontFamily: dyslexicFont ? "OpenDyslexic, Arial" : "inherit",
+            },
+
+            a: {
+              textDecoration: underlineLinks ? "underline" : "none",
+            },
+          }}
+        />
+
         <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route path="/" element={<LazyHomePage />} />
             <Route path="/login" element={<LazyLoginPage />} />
             <Route path="/register" element={<LazyRegisterPage />} />
-
             <Route path="/home" element={<LazyHomePage />} />
 
             <Route path="/book/:id" element={<LazyBookDetailsPage />} />
@@ -130,6 +187,26 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
+
+
+        {/* Screen reader ARIA announcements */}
+        {screenReader && (
+          <div
+            aria-live="assertive"
+            style={{
+              position: "absolute",
+              width: "1px",
+              height: "1px",
+              margin: "-1px",
+              padding: "0",
+              overflow: "hidden",
+              clip: "rect(0 0 0 0)",
+              border: "0",
+            }}
+          >
+            Screen reader mode enabled
+          </div>
+        )}
 
         <Footer />
       </div>

@@ -105,7 +105,7 @@ export function HomePage() {
 
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f9fafb", paddingBottom: 8 }}>
+    <Box sx={{ minHeight: "100vh", paddingBottom: 8 }}>
       {!user ? <LandingComponent /> : <></>}
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight="bold" mb={2} py={2}>

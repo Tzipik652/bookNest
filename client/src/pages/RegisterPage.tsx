@@ -130,7 +130,8 @@ export function RegisterPage() {
               p: 2,
             }}
           >
-            <Button type="submit" variant="contained" fullWidth>
+            <Button type="submit" variant="contained" fullWidth sx={{ backgroundColor: "primary.main" ,color:"primary.contrastText"
+              }}>
               Register
             </Button>
             <Typography

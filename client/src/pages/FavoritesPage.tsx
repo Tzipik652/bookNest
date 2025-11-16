@@ -39,7 +39,7 @@ export function FavoritesPage() {
   });
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f9fafb", py: 8 }}>
+    <Box sx={{ minHeight: "100vh", py: 8 }}>
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight="bold" mb={6}>
           My Favorites

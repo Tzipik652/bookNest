@@ -31,8 +31,10 @@ import {
 import { useUserStore } from "../store/useUserStore";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import { useQueryClient } from "@tanstack/react-query";
+import { useDynamicTheme } from "../theme";
 
 export function BookDetailsPage() {
+  const theme = useDynamicTheme();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,7 +43,6 @@ export function BookDetailsPage() {
   const [book, setBook] = useState<Book | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [loading, setLoading] = useState(true);
-  const queryClient = useQueryClient();
   const { isFavorited, toggleMutation } = useFavoriteBooks();
   const favorited = isFavorited(id || "");
 
@@ -87,7 +88,9 @@ export function BookDetailsPage() {
         alignItems="center"
         justifyContent="center"
       >
-        <Box textAlign="center">
+        <Box textAlign="center"
+          style={{ backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}
+        >
           <Typography variant="h5" mb={2}>
             Book Not Found
           </Typography>
@@ -116,7 +119,10 @@ export function BookDetailsPage() {
   };
 
   return (
-    <Box minHeight="100vh" bgcolor="#f9fafb" py={6}>
+    <Box
+      style={{ backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}
+
+      minHeight="100vh" bgcolor="#f9fafb" py={6}>
       <Box maxWidth="md" mx="auto" px={2}>
         <Button
           startIcon={<ArrowBack />}
@@ -216,7 +222,7 @@ export function BookDetailsPage() {
                   borderRadius={2}
                   border="1px solid #e0e0e0"
                   sx={{
-                    background: "linear-gradient(135deg, #eef2ff, #f3e8ff)",
+                    // background: "linear-gradient(135deg, #eef2ff, #f3e8ff)",
                   }}
                   mb={3}
                 >

@@ -117,7 +117,7 @@ export function AddBookPage() {
                 severity="info"
                 sx={{
                   mb: 3,
-                  background: "linear-gradient(to right, #dffdd7ff, #cee4b1ff)",
+                  // background: "linear-gradient(to right, #dffdd7ff, #cee4b1ff)",
                 }}
               >
                 AI will automatically generate a summary based on your title,

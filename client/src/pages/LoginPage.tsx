@@ -117,7 +117,8 @@ return redirect ? decodeURIComponent(redirect) : "/home";
             </CardContent>
 
             <CardActions sx={{ flexDirection: "column", gap: 2, mt: 2 }}>
-              <Button type="submit" variant="contained" fullWidth size="large">
+              <Button type="submit" variant="contained" fullWidth size="large" sx={{ backgroundColor: "primary.main" ,color:"primary.contrastText"
+              }}>
                 Login
               </Button>
 

@@ -15,6 +15,22 @@ export const getComments = catchAsync(async (req, res, next) => {
   res.status(200).json(comments);
 });
 
+export const getCommentById = catchAsync(async (req, res, next) => {
+  const { commentId } = req.params;
+  
+  if (!commentId) {
+    throw new AppError("Comment ID is required", 400);
+  }
+
+  const comment = await CommentModel.findById(commentId);
+  
+  if (!comment) {
+    throw new AppError("Comment not found", 404);
+  }
+
+  res.status(200).json(comment);
+});
+
 export const addComment = catchAsync(async (req, res, next) => {
   const { bookId, text } = req.body;
   const user = req.user;
