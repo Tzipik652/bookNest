@@ -11,7 +11,7 @@ export function Footer() {
           {/* Brand Section */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <BookOpen className="h-8 w-8 text-blue-400" />
+              <BookOpen className="h-8 w-8 text-green-400" />
               <span className="text-white text-2xl">BookNest</span>
             </div>
             <p className="text-slate-400 max-w-md">
@@ -24,25 +24,25 @@ export function Footer() {
             <h3 className="text-white mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/home" className="hover:text-blue-400 transition-colors flex items-center gap-2">
+                <Link to="/home" className="hover:text-green-400 transition-colors flex items-center gap-2">
                   <Home className="h-4 w-4" />
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/my-books" className="hover:text-blue-400 transition-colors flex items-center gap-2">
+                <Link to="/my-books" className="hover:text-green-400 transition-colors flex items-center gap-2">
                   <BookOpen className="h-4 w-4" />
                   My Books
                 </Link>
               </li>
               <li>
-                <Link to="/favorites" className="hover:text-blue-400 transition-colors flex items-center gap-2">
+                <Link to="/favorites" className="hover:text-green-400 transition-colors flex items-center gap-2">
                   <Heart className="h-4 w-4" />
                   Favorites
                 </Link>
               </li>
               <li>
-                <Link to="/recommendations" className="hover:text-blue-400 transition-colors flex items-center gap-2">
+                <Link to="/recommendations" className="hover:text-green-400 transition-colors flex items-center gap-2">
                   <Sparkles className="h-4 w-4" />
                   AI Recommendations
                 </Link>
@@ -68,13 +68,13 @@ export function Footer() {
             © {currentYear} BookNest. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm">
-            <button className="text-slate-400 hover:text-blue-400 transition-colors">
+            <button className="text-slate-400 hover:text-green-400 transition-colors">
               Privacy Policy
             </button>
-            <button className="text-slate-400 hover:text-blue-400 transition-colors">
+            <button className="text-slate-400 hover:text-green-400 transition-colors">
               Terms of Service
             </button>
-            <button className="text-slate-400 hover:text-blue-400 transition-colors">
+            <button className="text-slate-400 hover:text-green-400 transition-colors">
               Contact
             </button>
           </div>
