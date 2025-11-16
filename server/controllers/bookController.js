@@ -178,7 +178,6 @@ export const getCachedRecommendations = catchAsync(async (req, res, next) => {
   if (!userId) throw new AppError("Forbidden", 403);
 
   const favoriteBooks = await bookModel.getFavoriteBooks(userId);
-  console.log("favorite book: ", favoriteBooks);
   if (!favoriteBooks.length) {
     console.log(`no favorite books ${userId}`)
     return res.status(200).json([]);

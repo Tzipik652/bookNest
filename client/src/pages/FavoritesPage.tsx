@@ -14,13 +14,14 @@ import {
 } from "@mui/material";
 import { Book } from "../types";
 import { useFavoriteBooks } from "../hooks/useFavorites";
+import BookGridSkeleton from "../components/BookGridSkeleton";
 
 export function FavoritesPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   const { favoriteBooksQuery } = useFavoriteBooks();
   const favoriteBooks = favoriteBooksQuery.data || [];
   useEffect(() => {
@@ -64,9 +65,7 @@ export function FavoritesPage() {
             </Box>
 
             {isLoading ? (
-              <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-                <CircularProgress />
-              </Box>
+              <BookGridSkeleton />
             ) : filteredBooks.length > 0 ? (
               <Box
                 sx={{
@@ -78,9 +77,9 @@ export function FavoritesPage() {
                 {filteredBooks.map((book: Book) => (
                   <Box
                     key={`${book._id}`}
-                   flex="1 1 calc(25% - 24px)"
-                        minWidth={250}
-                        maxWidth={300}
+                    flex="1 1 calc(25% - 24px)"
+                    minWidth={250}
+                    maxWidth={300}
                   >
                     <BookCard book={book} />
                   </Box>

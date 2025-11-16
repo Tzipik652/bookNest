@@ -19,6 +19,7 @@ import {
 import { Book, Category } from "../types";
 import { useUserStore } from "../store/useUserStore";
 import LandingComponent from "../components/LandingComponent";
+import BookGridSkeleton from "../components/BookGridSkeleton";
 const BOOKS_PER_PAGE = 20;
 
 export function HomePage() {
@@ -33,7 +34,10 @@ export function HomePage() {
   const [totalItems, setTotalItems] = useState(0);
 
   // Handler for changing the page using the Pagination component
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
     // Only update the page state if the value is different
     if (value !== currentPage) {
       setCurrentPage(value);
@@ -51,37 +55,37 @@ export function HomePage() {
 
     fetchCategories();
   }, []);
-  const fetchBooks = useCallback(async (page: number, limit: number) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setLoading(true);
-    try {
-      let response;
-      if (selectedCategory && selectedCategory === 'All') {
-        response = await getBooks({ page, limit });
+  const fetchBooks = useCallback(
+    async (page: number, limit: number) => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setLoading(true);
+      try {
+        let response;
+        if (selectedCategory && selectedCategory === "All") {
+          response = await getBooks({ page, limit });
+        } else {
+          response = await getBooksByCategory(selectedCategory, page, limit);
+        }
+        const {
+          books: fetchedBooks,
+          totalPages: fetchedTotalPages,
+          totalItems: fetchedTotalItems,
+        } = response;
+        setBooks(fetchedBooks || []);
+        setTotalPages(fetchedTotalPages || 1);
+        setTotalItems(fetchedTotalItems || 0);
+        if (page > fetchedTotalPages && fetchedTotalPages > 0) {
+          setCurrentPage(fetchedTotalPages);
+        }
+      } catch (error) {
+        console.error("Failed to fetch books:", error);
+        setBooks([]);
+      } finally {
+        setLoading(false);
       }
-      else {
-        response = await getBooksByCategory(selectedCategory, page, limit);
-      }
-      const {
-        books: fetchedBooks,
-        totalPages: fetchedTotalPages,
-        totalItems: fetchedTotalItems,
-      } = response;
-      setBooks(fetchedBooks || []);
-      setTotalPages(fetchedTotalPages || 1);
-      setTotalItems(fetchedTotalItems || 0);
-      if (page > fetchedTotalPages && fetchedTotalPages > 0) {
-        setCurrentPage(fetchedTotalPages);
-      }
-    } catch (error) {
-      console.error('Failed to fetch books:', error);
-      setBooks([]);
-    } finally {
-      setLoading(false);
-    }
-
-  }, [selectedCategory]);
-
+    },
+    [selectedCategory]
+  );
 
   useEffect(() => {
     fetchBooks(currentPage, BOOKS_PER_PAGE);
@@ -96,107 +100,94 @@ export function HomePage() {
     return matchesSearch && matchesCategory;
   });
 
-  if (loading) {
-    return (
-      <Box
-        minHeight="100vh"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#f9fafb", paddingBottom: 8 }}>
-      {!user ? (<LandingComponent />) : <></>}
+      {!user ? <LandingComponent /> : <></>}
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight="bold" mb={2} py={2}>
-        Discover Books
-      </Typography>
+          Discover Books
+        </Typography>
 
-      {/* Filters */}
-      <Box sx={{ display: "flex", gap: 2, mb: 6, flexWrap: "wrap" }}>
-        <TextField
-          placeholder="Search books or authors..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ flex: 1, minWidth: 250, maxWidth: 400 }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search size={18} />
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        <FormControl sx={{ minWidth: 150 }}>
-          <InputLabel>Category</InputLabel>
-          <Select
-            value={selectedCategory}
-            onChange={(e) => {
-              setSelectedCategory(e.target.value);
-              setCurrentPage(1);
+        {/* Filters */}
+        <Box sx={{ display: "flex", gap: 2, mb: 6, flexWrap: "wrap" }}>
+          <TextField
+            placeholder="Search books or authors..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ flex: 1, minWidth: 250, maxWidth: 400 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search size={18} />
+                </InputAdornment>
+              ),
             }}
-            label="Category"
-          >
-            {categories.map((cat) => (
-              <MenuItem key={cat.id} value={cat.name}>
-                {cat.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-
-      {/* Books Flexbox */}
-      {filteredBooks.length > 0 ? (
-        <Box
-          display="flex"
-          flexWrap="wrap"
-          gap={3}
-          justifyContent="flex-start"
-        >
-          {filteredBooks.map((book) => (
-            <Box
-              key={book._id}
-              flex="1 1 calc(25% - 24px)"
-              minWidth={250}
-              maxWidth={300}
-            >
-              <BookCard
-                book={book}
-              />
-            </Box>
-          ))}
-        </Box>
-      ) : (
-        <Box textAlign="center" py={12}>
-          <Typography color="text.secondary">
-            No books found matching your criteria.
-          </Typography>
-        </Box>
-      )}
-      {/* PAGINATION UI */}
-      {totalPages > 1 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={handlePageChange}
-            variant="outlined"
-            shape="rounded"
-            size="large"
-            // Disable the pagination control during loading state
-            disabled={loading}
           />
-        </Box>
-      )}
-    </Container>
-    </Box >
 
+          <FormControl sx={{ minWidth: 150 }}>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={selectedCategory}
+              onChange={(e) => {
+                setSelectedCategory(e.target.value);
+                setCurrentPage(1);
+              }}
+              label="Category"
+            >
+              {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.name}>
+                  {cat.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+
+        {/* Books Flexbox */}
+        {loading ? (
+          <BookGridSkeleton count={20} />
+        ) : filteredBooks.length > 0 ? (
+          <Box
+            display="flex"
+            flexWrap="wrap"
+            gap={3}
+            justifyContent="flex-start"
+          >
+            {filteredBooks.map((book) => (
+              <Box
+                key={book._id}
+                flex="1 1 calc(25% - 24px)"
+                minWidth={250}
+                maxWidth={300}
+              >
+                <BookCard book={book} />
+              </Box>
+            ))}
+          </Box>
+        ) : (
+          <Box textAlign="center" py={12}>
+            <Typography color="text.secondary">
+              No books found matching your criteria.
+            </Typography>
+          </Box>
+        )}
+        {/* PAGINATION UI */}
+        {totalPages > 1 && (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              variant="outlined"
+              shape="rounded"
+              size="large"
+              // Disable the pagination control during loading state
+              disabled={loading}
+            />
+          </Box>
+        )}
+      </Container>
+    </Box>
   );
 }

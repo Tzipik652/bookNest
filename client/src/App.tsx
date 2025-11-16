@@ -1,22 +1,71 @@
 // client/src/App.tsx
+import React, { Suspense } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from "react-router-dom";
+import { CircularProgress, Box } from "@mui/material";
 import { Navbar } from "./components/Navbar";
+import { Footer } from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { LoginPage } from "./pages/LoginPage";
-import { RegisterPage } from "./pages/RegisterPage";
-import { HomePage } from "./pages/HomePage";
-import { BookDetailsPage } from "./pages/BookDetailsPage";
-import { AddBookPage } from "./pages/AddBookPage";
-import { EditBookPage } from "./pages/EditBookPage";
-import { MyBooksPage } from "./pages/MyBooksPage";
-import { FavoritesPage } from "./pages/FavoritesPage";
-import { AIRecommendationsPage } from "./pages/AIRecommendationsPage";
+
 import { useUserStore } from "./store/useUserStore";
+
+
+const LazyLoginPage = React.lazy(() =>
+  import("./pages/LoginPage").then((module) => ({ default: module.LoginPage }))
+);
+const LazyRegisterPage = React.lazy(() =>
+  import("./pages/RegisterPage").then((module) => ({
+    default: module.RegisterPage,
+  }))
+);
+const LazyHomePage = React.lazy(() =>
+  import("./pages/HomePage").then((module) => ({ default: module.HomePage }))
+);
+const LazyBookDetailsPage = React.lazy(() =>
+  import("./pages/BookDetailsPage").then((module) => ({
+    default: module.BookDetailsPage,
+  }))
+);
+const LazyAddBookPage = React.lazy(() =>
+  import("./pages/AddBookPage").then((module) => ({
+    default: module.AddBookPage,
+  }))
+);
+const LazyEditBookPage = React.lazy(() =>
+  import("./pages/EditBookPage").then((module) => ({
+    default: module.EditBookPage,
+  }))
+);
+const LazyMyBooksPage = React.lazy(() =>
+  import("./pages/MyBooksPage").then((module) => ({
+    default: module.MyBooksPage,
+  }))
+);
+const LazyFavoritesPage = React.lazy(() =>
+  import("./pages/FavoritesPage").then((module) => ({
+    default: module.FavoritesPage,
+  }))
+);
+const LazyAIRecommendationsPage = React.lazy(() =>
+  import("./pages/AIRecommendationsPage").then((module) => ({
+    default: module.AIRecommendationsPage,
+  }))
+);
+
+const RouteFallback = () => (
+  <Box
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    sx={{ minHeight: "calc(100vh - 64px)", padding: 4 }}
+  >
+    <CircularProgress size={50} />
+  </Box>
+);
 
 function App() {
   const { user: currentUser } = useUserStore();
@@ -33,36 +82,31 @@ function App() {
         </a>
         
         <Navbar />
-        
-        {/* Wrap Routes in <main> with id for skip link */}
-        <main id="main-content">
+        <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route
               path="/"
               element={
-                // currentUser ? <Navigate to="/home" replace /> : <LandingPage />
-                <HomePage />
+                <LazyHomePage />
               }
             />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LazyLoginPage />} />
+            <Route path="/register" element={<LazyRegisterPage />} />
 
             <Route
               path="/home"
               element={
-                // <ProtectedRoute>
-                  <HomePage />
-                // </ProtectedRoute>
+                <LazyHomePage />
               }
             />
 
-            <Route path="/book/:id" element={<BookDetailsPage />} />
+            <Route path="/book/:id" element={<LazyEditBookPage />} />
 
             <Route
               path="/add-book"
               element={
                 <ProtectedRoute>
-                  <AddBookPage />
+                  <LazyAddBookPage />
                 </ProtectedRoute>
               }
             />
@@ -71,7 +115,7 @@ function App() {
               path="/edit-book/:id"
               element={
                 <ProtectedRoute>
-                  <EditBookPage />
+                  <LazyEditBookPage />
                 </ProtectedRoute>
               }
             />
@@ -80,7 +124,7 @@ function App() {
               path="/my-books"
               element={
                 <ProtectedRoute>
-                  <MyBooksPage />
+                  <LazyMyBooksPage />
                 </ProtectedRoute>
               }
             />
@@ -89,7 +133,7 @@ function App() {
               path="/favorites"
               element={
                 <ProtectedRoute>
-                  <FavoritesPage />
+                  <LazyFavoritesPage />
                 </ProtectedRoute>
               }
             />
@@ -98,14 +142,16 @@ function App() {
               path="/recommendations"
               element={
                 <ProtectedRoute>
-                  <AIRecommendationsPage />
+                  <LazyAIRecommendationsPage />
                 </ProtectedRoute>
               }
             />
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </main>
+        </Suspense>
+
+        <Footer/>
       </div>
     </Router>
   );
