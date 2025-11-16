@@ -40,7 +40,6 @@ export async function getBooks(params = { page: 1, limit: 20 }) {
         });
 
         const response = await axios.get(`${API_BASE_URL}?${query.toString()}`);
-        
         // The backend should return the structured data (books, currentPage, totalPages, etc.)
         return response.data; 
 
@@ -157,7 +156,6 @@ export async function getBooksByCategory(
   }
 }
 
-// שירות לקליינט
 export async function getBooksByUserId() {
   try {
     const res = await axios.get(`${API_BASE_URL}/user`, {

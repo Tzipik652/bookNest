@@ -22,6 +22,7 @@ export interface Book {
     email: string;
   };
   date_created: string;
+  favorites_count?: number;
 }
 
 export interface Favorite {

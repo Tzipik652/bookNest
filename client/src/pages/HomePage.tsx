@@ -13,7 +13,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  CircularProgress,
   Pagination,
 } from "@mui/material";
 import { Book, Category } from "../types";
@@ -90,10 +89,10 @@ export function HomePage() {
     },
     [selectedCategory]
   );
-
   useEffect(() => {
     fetchBooks(currentPage, BOOKS_PER_PAGE);
   }, [currentPage, fetchBooks]);
+
 
   const filteredBooks = books.filter((book) => {
     const matchesSearch =

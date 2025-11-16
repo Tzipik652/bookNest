@@ -44,18 +44,24 @@ export function BookCard({ book }: BookCardProps) {
         <CardContent className="p-4">
           <div className="flex items-start justify-between gap-2 mb-2">
             <h3 className="line-clamp-2">{book.title}</h3>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleFavoriteClick}
-              className="shrink-0"
-            >
-              <Heart
-                className={`h-5 w-5 ${
-                  favorited ? "fill-red-500 text-red-500" : "text-gray-400"
-                }`}
-              />
-            </Button>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-gray-600">
+                {book.favorites_count ?? 0}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleFavoriteClick}
+                className="shrink-0"
+              >
+                <Heart
+                  className={`h-5 w-5 ${
+                    favorited ? "fill-red-500 text-red-500" : "text-gray-400"
+                  }`}
+                />
+              </Button>
+
+            </div>
           </div>
           <p className="text-gray-600 mb-2">{book.author}</p>
           <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm mb-3">

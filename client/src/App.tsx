@@ -74,23 +74,13 @@ function App() {
         <Navbar />
         <Suspense fallback={<RouteFallback />}>
           <Routes>
-            <Route
-              path="/"
-              element={
-                <LazyHomePage />
-              }
-            />
+            <Route path="/" element={<LazyHomePage />} />
             <Route path="/login" element={<LazyLoginPage />} />
             <Route path="/register" element={<LazyRegisterPage />} />
 
-            <Route
-              path="/home"
-              element={
-                <LazyHomePage />
-              }
-            />
+            <Route path="/home" element={<LazyHomePage />} />
 
-            <Route path="/book/:id" element={<LazyEditBookPage />} />
+            <Route path="/book/:id" element={<LazyBookDetailsPage />} />
 
             <Route
               path="/add-book"
@@ -141,7 +131,7 @@ function App() {
           </Routes>
         </Suspense>
 
-        <Footer/>
+        <Footer />
       </div>
     </Router>
   );
