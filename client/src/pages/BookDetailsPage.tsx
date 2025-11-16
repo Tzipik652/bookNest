@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { CommentSection } from '../components/CommentSection';
+import { CommentSection } from "../components/CommentSection";
 
 import { Book } from "../types";
 
@@ -195,7 +195,11 @@ export function BookDetailsPage() {
                     </>
                   )}
                 </Box>
-
+                <Box mb={4}>
+                  <Typography variant="body1" color="text.secondary">
+                    {book.favorites_count} other users liked this book
+                  </Typography>
+                </Box>
                 {/* Description */}
                 <Box mb={4}>
                   <Typography variant="h6" gutterBottom>
@@ -242,25 +246,25 @@ export function BookDetailsPage() {
         <CommentSection bookId={book._id} bookOwnerId={book.user_id} />
       </Box>
 
-      {/* Delete Confirmation Dialog */ }
-  <Dialog
-    open={showDeleteDialog}
-    onClose={() => setShowDeleteDialog(false)}
-  >
-    <DialogTitle>Are you sure?</DialogTitle>
-    <DialogContent>
-      <Typography>
-        This will permanently delete "{book.title}" from your library. This
-        action cannot be undone.
-      </Typography>
-    </DialogContent>
-    <DialogActions>
-      <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
-      <Button onClick={handleDelete} color="error" variant="contained">
-        Delete
-      </Button>
-    </DialogActions>
-  </Dialog>
-    </Box >
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+      >
+        <DialogTitle>Are you sure?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            This will permanently delete "{book.title}" from your library. This
+            action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+          <Button onClick={handleDelete} color="error" variant="contained">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 }
