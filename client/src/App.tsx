@@ -17,6 +17,7 @@ import { MyBooksPage } from "./pages/MyBooksPage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { AIRecommendationsPage } from "./pages/AIRecommendationsPage";
 import { useUserStore } from "./store/useUserStore";
+import { Footer } from "./components/Footer";
 function App() {
   const { user: currentUser } = useUserStore();
   return (
@@ -92,6 +93,7 @@ function App() {
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <Footer/>
       </div>
     </Router>
   );
