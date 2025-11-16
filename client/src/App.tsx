@@ -65,6 +65,7 @@ const RouteFallback = () => (
   </Box>
 );
 
+import { Footer } from "./components/Footer";
 function App() {
   const { user: currentUser } = useUserStore();
   return (
@@ -139,6 +140,8 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
+
+        <Footer/>
       </div>
     </Router>
   );
