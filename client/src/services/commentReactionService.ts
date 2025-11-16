@@ -66,3 +66,9 @@ export async function getUserReactionOnComment(commentId: string, userId: string
     return null;
   }
 }
+
+export const getCommentReactions = async (commentId: string, userId: string) => {
+    const reactionCounts = await getCommentReactionCounts({ id: commentId } as Comment);
+    const userReaction = await getUserReactionOnComment(commentId, userId);
+    return { reactionCounts, userReaction };
+};
