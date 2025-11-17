@@ -43,8 +43,9 @@ export function BookDetailsPage() {
   const [book, setBook] = useState<Book | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { isFavorited, toggleMutation } = useFavoriteBooks();
-  const favorited = isFavorited(id || "");
+  const { toggleMutation, isFavorited } = useFavoriteBooks();
+  const [favorited, setFavorited] = useState(isFavorited(id || ""));
+  const [likesCount, setLikesCount] = useState<number>(0);
 
   useEffect(() => {
     if (!id) {
@@ -56,6 +57,7 @@ export function BookDetailsPage() {
       try {
         const data = await getBookById(id);
         setBook(data);
+        setLikesCount(data.favorites_count || 0);
       } catch (err) {
         console.error(err);
         setBook(null);
@@ -88,8 +90,12 @@ export function BookDetailsPage() {
         alignItems="center"
         justifyContent="center"
       >
-        <Box textAlign="center"
-          style={{ backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}
+        <Box
+          textAlign="center"
+          style={{
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
+          }}
         >
           <Typography variant="h5" mb={2}>
             Book Not Found
@@ -111,6 +117,8 @@ export function BookDetailsPage() {
       return;
     }
     toggleMutation.mutate(book._id);
+    setFavorited(!favorited);
+    setLikesCount((prev) => (favorited ? prev - 1 : prev + 1));
   };
 
   const handleDelete = () => {
@@ -120,9 +128,14 @@ export function BookDetailsPage() {
 
   return (
     <Box
-      style={{ backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}
-
-      minHeight="100vh" bgcolor="#f9fafb" py={6}>
+      style={{
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+      }}
+      minHeight="100vh"
+      bgcolor="#f9fafb"
+      py={6}
+    >
       <Box maxWidth="md" mx="auto" px={2}>
         <Button
           startIcon={<ArrowBack />}
@@ -203,7 +216,7 @@ export function BookDetailsPage() {
                 </Box>
                 <Box mb={4}>
                   <Typography variant="body1" color="text.secondary">
-                    {book.favorites_count} other users liked this book
+                    {likesCount} other users liked this book
                   </Typography>
                 </Box>
                 {/* Description */}
@@ -221,9 +234,11 @@ export function BookDetailsPage() {
                   p={3}
                   borderRadius={2}
                   border="1px solid #e0e0e0"
-                  sx={{
-                    // background: "linear-gradient(135deg, #eef2ff, #f3e8ff)",
-                  }}
+                  sx={
+                    {
+                      // background: "linear-gradient(135deg, #eef2ff, #f3e8ff)",
+                    }
+                  }
                   mb={3}
                 >
                   <Box display="flex" alignItems="center" gap={1} mb={1}>

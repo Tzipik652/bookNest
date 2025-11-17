@@ -67,3 +67,7 @@ export type CommentWithReactions = Comment & {
   userReaction?: ReactionType;
   reactionCounts: ReactionCounts;
 };
+
+export type BookWithFavorite = Book & {
+  isFavorited: boolean;
+};

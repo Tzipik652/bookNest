@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { BookCard } from "../components/BookCard";
 import { getBooks, getBooksByCategory } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
@@ -31,13 +33,13 @@ export function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  
+  const queryClient = useQueryClient();
+
   useEffect(() => {
     if (!loading) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [loading]);
-
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -80,6 +82,9 @@ export function HomePage() {
         if (page > fetchedTotalPages && fetchedTotalPages > 0) {
           setCurrentPage(fetchedTotalPages);
         }
+        fetchedBooks?.forEach((b: Book) => {
+          queryClient.setQueryData(["book", b._id], b);
+        });
       } catch (error) {
         console.error("Failed to fetch books:", error);
         setBooks([]);
@@ -93,7 +98,6 @@ export function HomePage() {
     fetchBooks(currentPage, BOOKS_PER_PAGE);
   }, [currentPage, fetchBooks]);
 
-
   const filteredBooks = books.filter((book) => {
     const matchesSearch =
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -102,7 +106,6 @@ export function HomePage() {
       selectedCategory === "All" || book.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
 
   return (
     <Box sx={{ minHeight: "100vh", paddingBottom: 8 }}>

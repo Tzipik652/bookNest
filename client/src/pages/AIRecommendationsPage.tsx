@@ -19,8 +19,8 @@ export function AIRecommendationsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { countFavorites } = useFavoriteBooks();
-  const favoriteBooksNumber = countFavorites();
+  const { countFavoritesForUser } = useFavoriteBooks();
+  const favoriteBooksNumber = countFavoritesForUser();
 
   const { AIRecommendationsQuery } = useAIRecommendations();
   const AIRecommendations = AIRecommendationsQuery.data || [];

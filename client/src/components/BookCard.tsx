@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Heart } from "lucide-react";
 import { Book } from "../types";
 import { Card, CardContent, CardFooter } from "./ui/card";
@@ -13,13 +14,16 @@ interface BookCardProps {
 }
 
 export function BookCard({ book }: BookCardProps) {
+  const { toggleMutation, isFavorited } = useFavoriteBooks();
+  const [favorited, setFavorited] = useState(isFavorited(book._id));
+  const [likesCount, setLikesCount] = useState<number>(
+    book.favorites_count ?? 0
+  );
   const theme = useDynamicTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const { user: currentUser } = useUserStore();
-  const { toggleMutation, isFavorited } = useFavoriteBooks();
-  const favorited = isFavorited(book._id);
-
+  
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
@@ -30,12 +34,17 @@ export function BookCard({ book }: BookCardProps) {
     }
 
     toggleMutation.mutate(book._id);
+    setFavorited(!favorited);
+    setLikesCount((prev) => (favorited ? prev - 1 : prev + 1));
   };
 
   return (
     <Card
       className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-      style={{ backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}
+      style={{
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+      }}
     >
       <div onClick={() => navigate(`/book/${book._id}`)}>
         <div className="aspect-[3/4] overflow-hidden bg-gray-100">
@@ -49,9 +58,7 @@ export function BookCard({ book }: BookCardProps) {
           <div className="flex items-start justify-between gap-2 mb-2">
             <h3 className="line-clamp-2">{book.title}</h3>
             <div className="flex items-center gap-1">
-              <span className="text-sm text-gray-600">
-                {book.favorites_count ?? 0}
-              </span>
+              <span className="text-sm text-gray-600">{likesCount ?? 0}</span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -64,15 +71,21 @@ export function BookCard({ book }: BookCardProps) {
                   }`}
                 />
               </Button>
-
             </div>
-
           </div>
-          <p className="text-gray-600 mb-2" style={{ color: theme.palette.text.secondary }}>{book.author}</p>
-          <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm mb-3" >
+          <p
+            className="text-gray-600 mb-2"
+            style={{ color: theme.palette.text.secondary }}
+          >
+            {book.author}
+          </p>
+          <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm mb-3">
             {book.category}
           </span>
-          <p className="text-sm text-gray-700 line-clamp-3" style={{ color: theme.palette.text.secondary }}>
+          <p
+            className="text-sm text-gray-700 line-clamp-3"
+            style={{ color: theme.palette.text.secondary }}
+          >
             {book.ai_summary}
           </p>
         </CardContent>
