@@ -38,6 +38,9 @@ export const createBook = catchAsync(async (req, res, next) => {
       const errorCode = error.code || error.status;
       if (errorCode === 503 || String(error.message).toLowerCase().includes("overloaded") || String(error.message).toLowerCase().includes("unavailable")) {
         console.log("Gemini service unavailable (503 or overload). Using default summary.");
+      const errorCode = error.code || error.status;
+      if (errorCode === 503 || String(error.message).toLowerCase().includes("overloaded") || String(error.message).toLowerCase().includes("unavailable")) {
+        console.log("Gemini service unavailable (503 or overload). Using default summary.");
         summary = "AI summary is not available at the moment.";
       }
       else {
@@ -133,6 +136,19 @@ export const getBookById = catchAsync(async (req, res, next) => {
   res.status(200).json(book);
 });
 
+// export const updateBook = catchAsync(async (req, res, next) => {
+//   const { id } = req.params;
+//   const updates = req.body;
+//   const userId = req.user._id;
+
+//   const book = await bookModel.findById(id);
+//   if (!book) throw new AppError("Book not found", 404);
+//   if (book.user_id !== userId) throw new AppError("Forbidden", 403);
+
+//   const updatedBook = await bookModel.update(id, updates);
+//   res.status(200).json(updatedBook);
+// });
+
 export const updateBook = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const updates = req.body;
@@ -141,10 +157,40 @@ export const updateBook = catchAsync(async (req, res, next) => {
   const book = await bookModel.findById(id);
   if (!book) throw new AppError("Book not found", 404);
   if (book.user_id !== userId) throw new AppError("Forbidden", 403);
-  const { error, value } = updateBookSchema.validate(req.body, { abortEarly: false });
-  if (error) {
-    const messages = error.details.map(d => d.message);
-    return next(new AppError(messages.join(", "), 400));
+
+  // אם נשלחו שדות שמאפשרים ליצור סיכום חדש
+  if (updates.title || updates.description || updates.author) {
+    try {
+      let summary = "";
+      try {
+        summary = await generateBookSummary(
+          updates.title || book.title,
+          updates.author || book.author,
+          updates.description || book.description
+        );
+      } catch (error) {
+        const errorCode = error.code || error.status;
+        if (
+          errorCode === 503 ||
+          String(error.message).toLowerCase().includes("overloaded") ||
+          String(error.message).toLowerCase().includes("unavailable")
+        ) {
+          console.log("Gemini service unavailable. Using default summary.");
+          summary = "AI summary is not available at the moment.";
+        } else {
+          console.error("Unrecoverable Gemini Error:", error);
+          throw error;
+        }
+      }
+      updates.ai_summary = summary;
+    } catch (error) {
+      if (error.message.includes("AI service error") || error.code === 503) {
+        return res
+          .status(503)
+          .json({ error: "AI service is currently unavailable. Please try again later." });
+      }
+      console.error("Error generating AI summary:", error);
+    }
   }
 
   const updatedBook = await bookModel.update(id, value);

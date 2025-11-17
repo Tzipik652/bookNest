@@ -11,7 +11,6 @@ import { CircularProgress, Box, GlobalStyles } from "@mui/material";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-
 import { useUserStore } from "./store/useUserStore";
 import { useAccessibilityStore } from "./store/accessibilityStore";
 import AccessibilityMenu from "./components/AccessibilityMenu";
@@ -59,6 +58,30 @@ const LazyAIRecommendationsPage = React.lazy(() =>
   }))
 );
 
+const LazyNotFoundPage = React.lazy(() =>
+  import("./pages/NotFoundPage").then((module) => ({
+    default: module.NotFoundPage,
+  }))
+);
+
+const LazyContactPage = React.lazy(() =>
+  import("./pages/ContactPage").then((module) => ({
+    default: module.ContactPage,
+  }))
+);
+
+const LazyPrivacyPolicyPage = React.lazy(() =>
+  import("./pages/PrivacyPolicyPage").then((module) => ({
+    default: module.PrivacyPolicyPage,
+  }))
+);
+
+const LazyTermsOfServicePage = React.lazy(() =>
+  import("./pages/TermsOfServicePage").then((module) => ({
+    default: module.TermsOfServicePage,
+  }))
+);
+
 // Loader for lazy routes
 const RouteFallback = () => (
   <Box
@@ -85,12 +108,12 @@ function App() {
   } = useAccessibilityStore();
 
   // Auto ARIA-label for icon-only buttons
-document.querySelectorAll("button, [role='button'], a").forEach((el) => {
-  const text = el.textContent;
-  if (!el.getAttribute("aria-label") && text && text.trim() === "") {
-    el.setAttribute("aria-label", "button");
-  }
-});
+  document.querySelectorAll("button, [role='button'], a").forEach((el) => {
+    const text = el.textContent;
+    if (!el.getAttribute("aria-label") && text && text.trim() === "") {
+      el.setAttribute("aria-label", "button");
+    }
+  });
 
 
   return (
@@ -115,8 +138,8 @@ document.querySelectorAll("button, [role='button'], a").forEach((el) => {
               backgroundColor: darkMode
                 ? "#121212"
                 : highContrast
-                ? "#000"
-                : "#fff",
+                  ? "#000"
+                  : "#fff",
 
               color: darkMode || highContrast ? "#fff" : "#000",
               fontSize: largeText ? "1.2rem" : "1rem",
@@ -184,7 +207,10 @@ document.querySelectorAll("button, [role='button'], a").forEach((el) => {
               }
             />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<LazyNotFoundPage />} />
+            <Route path="/contact" element={<LazyContactPage />} />
+            <Route path="/privacy-policy" element={<LazyPrivacyPolicyPage />} />
+            <Route path="/terms-of-service" element={<LazyTermsOfServicePage />} />
           </Routes>
         </Suspense>
 
