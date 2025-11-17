@@ -11,7 +11,7 @@ import { CircularProgress, Box, GlobalStyles } from "@mui/material";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-
+import { NotFoundPage } from './pages/NotFoundPage';
 import { useUserStore } from "./store/useUserStore";
 import { useAccessibilityStore } from "./store/accessibilityStore";
 import AccessibilityMenu from "./components/AccessibilityMenu";
@@ -56,6 +56,12 @@ const LazyFavoritesPage = React.lazy(() =>
 const LazyAIRecommendationsPage = React.lazy(() =>
   import("./pages/AIRecommendationsPage").then((module) => ({
     default: module.AIRecommendationsPage,
+  }))
+);
+
+const LazyNotFoundPage = React.lazy(() =>
+  import("./pages/NotFoundPage").then((module) => ({
+    default: module.NotFoundPage,
   }))
 );
 
@@ -184,7 +190,7 @@ document.querySelectorAll("button, [role='button'], a").forEach((el) => {
               }
             />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<LazyNotFoundPage />} />
           </Routes>
         </Suspense>
 

@@ -32,7 +32,7 @@ const LandingComponent = () => {
           >
             <Button
               variant="contained"
-              color="secondary"
+              color="primary"
               onClick={() => navigate("/login")}
             >
               Login
