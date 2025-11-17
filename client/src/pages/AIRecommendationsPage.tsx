@@ -62,7 +62,6 @@ export function AIRecommendationsPage() {
           severity="info"
           icon={false}
           sx={{
-            // background: "linear-gradient(to right, #dffdd7ff, #dbf3bcff)",
             border: "1px solid #d1febfff",
             display: "flex",
             alignItems: "center",
@@ -81,11 +80,10 @@ export function AIRecommendationsPage() {
               : "Add some books to your favorites to get personalized recommendations."}
           </Typography>
         </Alert>
-
-        <Button
+       <Button
           variant="contained"
-          color="primary"
           onClick={handleRefresh}
+          sx={{ backgroundColor: "primary.main" ,color:"primary.contrastText"}}
           disabled={isRefreshing}
           startIcon={
             isRefreshing ? (
