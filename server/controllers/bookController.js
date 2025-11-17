@@ -20,7 +20,7 @@ export const createBook = catchAsync(async (req, res, next) => {
     throw new AppError("Missing required fields: title or description", 400);
   }
   try {
-    let summary="";
+    let summary = "";
     try {
       summary = await generateBookSummary(
         bookData.title,
@@ -29,32 +29,36 @@ export const createBook = catchAsync(async (req, res, next) => {
       );
 
     } catch (error) {
-      if (error.message.includes("AI service error") || error.code === 503) {
+      const errorCode = error.code || error.status;
+      if (errorCode === 503 || String(error.message).toLowerCase().includes("overloaded") || String(error.message).toLowerCase().includes("unavailable")) {
+        console.log("Gemini service unavailable (503 or overload). Using default summary.");
         summary = "AI summary is not available at the moment.";
       }
-      else 
+      else {
+        console.error("Unrecoverable Gemini Error:", error);
         throw error;
-    }
-
-      const newBook = await bookModel.create({
-        ...bookData,
-        ai_summary: summary,
-        user_id: req.user._id,
-      });
-
-      res.status(201).json(newBook);
-    } catch (error) {
-      if (error.message.includes("AI service error") || error.code === 503) {
-        return res.status(503).json({ error: "AI service is currently unavailable. Please try again later." });
-      } else if (error.message.includes("duplicate") || error.code === 23505) {
-        console.log(error);
-        return res.status(409).json({ error: "A book with the same title already exists." });
       }
-      console.error("Error creating book:", error);
-      return res.status(500).json({ error: "Internal Server Error" });
     }
 
-  });
+    const newBook = await bookModel.create({
+      ...bookData,
+      ai_summary: summary,
+      user_id: req.user._id,
+    });
+
+    res.status(201).json(newBook);
+  } catch (error) {
+    if (error.message.includes("AI service error") || error.code === 503) {
+      return res.status(503).json({ error: "AI service is currently unavailable. Please try again later." });
+    } else if (error.message.includes("duplicate") || error.code === 23505) {
+      console.log(error);
+      return res.status(409).json({ error: "A book with the same title already exists." });
+    }
+    console.error("Error creating book:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+
+});
 
 export const getAllBooks = catchAsync(async (req, res) => {
   try {
