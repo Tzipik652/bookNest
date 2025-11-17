@@ -6,10 +6,16 @@ import {
   getBookRecommendations,
 } from "../services/aiService.js";
 import redisClient from "../config/redisClient.js";
+import { createBookSchema, updateBookSchema } from "../validations/bookValidator.js";
 
 export const createBook = catchAsync(async (req, res, next) => {
+    const { error, value } = createBookSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+      const messages = error.details.map((detail) => detail.message);
+      throw new AppError(messages.join(", "), 400);
+    }
   const userId = req.user._id;
-  const bookData = req.body;
+  const bookData = value;
   if (!userId) {
     return res.status(403).json({ error: "Forbidden" });
   }
@@ -135,8 +141,13 @@ export const updateBook = catchAsync(async (req, res, next) => {
   const book = await bookModel.findById(id);
   if (!book) throw new AppError("Book not found", 404);
   if (book.user_id !== userId) throw new AppError("Forbidden", 403);
+  const { error, value } = updateBookSchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    const messages = error.details.map(d => d.message);
+    return next(new AppError(messages.join(", "), 400));
+  }
 
-  const updatedBook = await bookModel.update(id, updates);
+  const updatedBook = await bookModel.update(id, value);
   res.status(200).json(updatedBook);
 });
 
