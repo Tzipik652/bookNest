@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { BookCard } from "../components/BookCard";
 import { getBooks, getBooksByCategory } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
@@ -32,13 +32,20 @@ export function HomePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  
+
+  const [firstLoad, setFirstLoad] = useState(true);
+  const discoverRef = useRef<HTMLHeadingElement | null>(null);
+
   useEffect(() => {
     if (!loading) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (firstLoad) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setFirstLoad(false);
+      } else if (discoverRef.current) {
+        discoverRef.current.scrollIntoView({ behavior: "smooth" });
+      }
     }
   }, [loading]);
-
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -109,10 +116,15 @@ export function HomePage() {
     <Box sx={{ minHeight: "100vh", paddingBottom: 8 }}>
       {!user ? <LandingComponent /> : <></>}
       <Container maxWidth="lg">
-        <Typography variant="h4" fontWeight="bold" mb={2} py={2}>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          mb={2}
+          py={2}
+          ref={discoverRef}
+        >
           Discover Books
         </Typography>
-
         {/* Filters */}
         <Box sx={{ display: "flex", gap: 2, mb: 6, flexWrap: "wrap" }}>
           <TextField

@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useRef } from "react";
 import { BookCard } from "../components/BookCard";
 import { useNavigate } from "react-router-dom";
 import { Heart, Search } from "lucide-react";
@@ -24,9 +24,24 @@ export function FavoritesPage() {
 
   const { favoriteBooksQuery } = useFavoriteBooks();
   const favoriteBooks = favoriteBooksQuery.data || [];
+    const [firstLoad, setFirstLoad] = useState(true);
+  const discoverRef = useRef<HTMLHeadingElement | null>(null);
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (firstLoad) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setFirstLoad(false);
+      } else if (discoverRef.current) {
+        discoverRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [isLoading]);
+
   useEffect(() => {
     setIsLoading(favoriteBooksQuery.isLoading);
   }, [favoriteBooksQuery.isLoading]);
+  
   useEffect(() => {
     setError(favoriteBooksQuery.error as string | null);
   }, [favoriteBooksQuery.error]);
