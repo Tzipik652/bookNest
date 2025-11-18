@@ -38,7 +38,7 @@ export function EditBookPage() {
     register,
     handleSubmit,
     setValue,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting, isDirty }
   } = useForm<BookFormValues>({
     resolver: zodResolver(bookSchema),
   });
@@ -85,7 +85,11 @@ export function EditBookPage() {
 
   const onSubmit = async (data: BookFormValues) => {
     setSubmitError("");
-
+    if (!isDirty) {
+      console.log("No changes — skipping update");
+      navigate(`/book/${id}`);
+      return;
+    }
     try {
       await updateBook(id!, {
         ...data,
@@ -186,8 +190,7 @@ export function EditBookPage() {
                 type="submit"
                 variant="contained"
                 fullWidth
-                disabled={isSubmitting}
-              >
+                disabled={!isDirty || isSubmitting}              >
                 {isSubmitting ? "Saving..." : "Save Changes"}
               </Button>
 
