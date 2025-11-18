@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-// import { getBookById, updateBook } from '../lib/storage';
-import { Book, Category } from '../types';
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { bookSchema, BookFormValues } from "../schemas/book.schema";
 import { getBookById, updateBook } from '../services/bookService';
 import { getCategories } from "../services/categoryService";
+
 import {
   Box,
   Button,
@@ -12,56 +16,62 @@ import {
   CardHeader,
   CardActions,
   Container,
-  Typography,
   TextField,
   MenuItem,
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { ArrowBack, AutoAwesome } from '@mui/icons-material';
+import { ArrowBack } from '@mui/icons-material';
 import { useUserStore } from '../store/useUserStore';
 
 export function EditBookPage() {
   const { id } = useParams<{ id: string }>();
-
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
 
-
-  const [book, setBook] = useState<Book | null>(null);
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [img_url, setImg_url] = useState('');
-  const [price, setPrice] = useState('');
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitError, setSubmitError] = useState("");
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  // 🎯 RHF + Zod
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting, isDirty }
+  } = useForm<BookFormValues>({
+    resolver: zodResolver(bookSchema),
+  });
 
   useEffect(() => {
-    console.log(`id: ${id}`);
     if (!id) return;
-    const fetchBook = async () => {
+
+    const fetchData = async () => {
       try {
-        const data = await getBookById(id);
-        if (!data) {
+        const [book, cats] = await Promise.all([
+          getBookById(id),
+          getCategories(),
+        ]);
+
+        setCategories(cats);
+
+        if (!book) {
           navigate('/home');
           return;
         }
-        if (data.user_id !== currentUser?._id) {
+
+        if (book.user_id !== currentUser?._id) {
           navigate(`/book/${id}`);
           return;
         }
-        setBook(data);
-        setTitle(data.title);
-        setAuthor(data.author);
-        setDescription(data.description);
-        setCategory(data.category);
-        setImg_url(data.img_url);
-        setPrice(data.price?.toString() || '');
+
+        // ✔ מילוי נתוני הספר לתוך הטופס
+        Object.entries(book).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            setValue(key as keyof BookFormValues, String(value));
+          }
+        });
+
       } catch (err) {
         console.error(err);
         navigate('/home');
@@ -69,47 +79,27 @@ export function EditBookPage() {
         setLoading(false);
       }
     };
-    const fetchCategories = async () => {
-      try {
-        const data = await getCategories();
-        setCategories(data);
-      } catch (err) {
-        console.error(err);
-      }
 
-    };
-
-    fetchCategories();
-    fetchBook();
+    fetchData();
   }, [id]);
 
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!title || !author || !description || !category || !id) {
-      setError('Please fill in all required fields');
+  const onSubmit = async (data: BookFormValues) => {
+    setSubmitError("");
+    if (!isDirty) {
+      console.log("No changes — skipping update");
+      navigate(`/book/${id}`);
       return;
     }
-
-    setIsSubmitting(true);
-
     try {
-      await updateBook(id, {
-        title,
-        author,
-        description,
-        category,
-        img_url,
-        price: price ? parseFloat(price) : undefined,
+      await updateBook(id!, {
+        ...data,
+        price: data.price ? parseFloat(data.price) : undefined,
       });
 
       navigate(`/book/${id}`);
     } catch (err) {
       console.error(err);
-      setError('Failed to update book. Please try again.');
-      setIsSubmitting(false);
+      setSubmitError("Failed to update book. Please try again.");
     }
   };
 
@@ -127,54 +117,50 @@ export function EditBookPage() {
         <Button
           onClick={() => navigate(-1)}
           startIcon={<ArrowBack />}
-          color="primary"
-          variant="text"
-          sx={{ mb: 3, textTransform: 'none' }}
+          sx={{ mb: 3 }}
         >
           Back
         </Button>
 
         <Card sx={{ p: 2 }}>
-          <CardHeader
-            title="Edit Book"
-            subheader="Update book information."
-          />
+          <CardHeader title="Edit Book" />
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              {error && <Alert severity="error">{error}</Alert>}
+
+              {submitError && <Alert severity="error">{submitError}</Alert>}
 
               <TextField
                 label="Title *"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
+                {...register("title")}
+                error={!!errors.title}
+                helperText={errors.title?.message}
               />
 
               <TextField
                 label="Author *"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                required
+                {...register("author")}
+                error={!!errors.author}
+                helperText={errors.author?.message}
               />
 
               <TextField
                 label="Description *"
                 multiline
                 rows={5}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
+                {...register("description")}
+                error={!!errors.description}
+                helperText={errors.description?.message}
               />
 
               <TextField
                 select
                 label="Category *"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
+                {...register("category")}
+                error={!!errors.category}
+                helperText={errors.category?.message}
               >
-                {categories.map((cat) => (
+                {categories.map((cat: any) => (
                   <MenuItem key={cat.id} value={cat.name}>
                     {cat.name}
                   </MenuItem>
@@ -183,39 +169,32 @@ export function EditBookPage() {
 
               <TextField
                 label="Image URL"
-                type="url"
-                value={img_url}
-                onChange={(e) => setImg_url(e.target.value)}
-                placeholder="https://example.com/image.jpg"
+                {...register("img_url")}
+                error={!!errors.img_url}
+                helperText={errors.img_url?.message}
               />
 
               <TextField
                 label="Price (Optional)"
                 type="number"
-                inputProps={{ step: '0.01', min: '0' }}
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                inputProps={{ step: "0.01", min: "0" }}
+                {...register("price")}
+                error={!!errors.price}
+                helperText={errors.price?.message}
               />
+
             </CardContent>
 
             <CardActions sx={{ gap: 2, px: 3, pb: 3 }}>
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
                 fullWidth
-                disabled={isSubmitting}
-                startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
-              >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                disabled={!isDirty || isSubmitting}              >
+                {isSubmitting ? "Saving..." : "Save Changes"}
               </Button>
-              <Button
-                type="button"
-                variant="outlined"
-                fullWidth
-                onClick={() => navigate(-1)}
-                disabled={isSubmitting}
-              >
+
+              <Button variant="outlined" fullWidth onClick={() => navigate(-1)}>
                 Cancel
               </Button>
             </CardActions>
