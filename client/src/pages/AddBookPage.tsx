@@ -25,12 +25,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 export function AddBookPage() {
   const navigate = useNavigate();
-  const { user: currentUser } = useUserStore();
 
-  const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
