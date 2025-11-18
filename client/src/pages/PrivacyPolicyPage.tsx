@@ -1,3 +1,4 @@
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
@@ -5,6 +6,20 @@ import { ArrowLeft, Shield } from 'lucide-react';
 
 export function PrivacyPolicyPage() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
+  const discoverRef = useRef<HTMLHeadingElement | null>(null);
+
+  useEffect(() => {
+    if (!loading) {
+      if (firstLoad) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setFirstLoad(false);
+      } else if (discoverRef.current) {
+        discoverRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [loading]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -33,8 +48,8 @@ export function PrivacyPolicyPage() {
             <section>
               <h2 className="mb-3">Introduction</h2>
               <p className="text-gray-700 leading-relaxed">
-                Welcome to BookNest. We respect your privacy and are committed to protecting your personal data. 
-                This privacy policy will inform you about how we handle your personal data when you use our book 
+                Welcome to BookNest. We respect your privacy and are committed to protecting your personal data.
+                This privacy policy will inform you about how we handle your personal data when you use our book
                 management platform.
               </p>
             </section>
@@ -70,8 +85,8 @@ export function PrivacyPolicyPage() {
             <section>
               <h2 className="mb-3">Data Storage</h2>
               <p className="text-gray-700 leading-relaxed">
-                Currently, BookNest operates as a frontend-only application with data stored locally in your browser's 
-                localStorage. This means your data is stored on your device and is not transmitted to our servers. 
+                Currently, BookNest operates as a frontend-only application with data stored locally in your browser's
+                localStorage. This means your data is stored on your device and is not transmitted to our servers.
                 Please note that clearing your browser data will remove all your BookNest information.
               </p>
             </section>
@@ -79,7 +94,7 @@ export function PrivacyPolicyPage() {
             <section>
               <h2 className="mb-3">Data Sharing</h2>
               <p className="text-gray-700 leading-relaxed">
-                We do not sell, trade, or otherwise transfer your personal information to third parties. Your data 
+                We do not sell, trade, or otherwise transfer your personal information to third parties. Your data
                 remains private and is only used to provide you with the BookNest service.
               </p>
             </section>
@@ -101,7 +116,7 @@ export function PrivacyPolicyPage() {
             <section>
               <h2 className="mb-3">Cookies and Tracking</h2>
               <p className="text-gray-700 leading-relaxed">
-                BookNest uses localStorage to maintain your session and store your preferences. We do not use 
+                BookNest uses localStorage to maintain your session and store your preferences. We do not use
                 third-party tracking cookies or analytics tools.
               </p>
             </section>
@@ -109,7 +124,7 @@ export function PrivacyPolicyPage() {
             <section>
               <h2 className="mb-3">Children's Privacy</h2>
               <p className="text-gray-700 leading-relaxed">
-                BookNest is not intended for children under 13 years of age. We do not knowingly collect personal 
+                BookNest is not intended for children under 13 years of age. We do not knowingly collect personal
                 information from children under 13.
               </p>
             </section>
@@ -117,7 +132,7 @@ export function PrivacyPolicyPage() {
             <section>
               <h2 className="mb-3">Changes to This Policy</h2>
               <p className="text-gray-700 leading-relaxed">
-                We may update our privacy policy from time to time. We will notify you of any changes by posting 
+                We may update our privacy policy from time to time. We will notify you of any changes by posting
                 the new privacy policy on this page and updating the "Last updated" date.
               </p>
             </section>
