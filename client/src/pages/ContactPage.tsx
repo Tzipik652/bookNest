@@ -18,23 +18,36 @@ export function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-      toast.error('Please fill in all fields');
-      return;
-    }
+const handleSubmit = async (e:any) => {
+  e.preventDefault();
 
-    setIsSubmitting(true);
+  if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+    toast.error('Please fill in all fields');
+    return;
+  }
 
-    // Simulate form submission
-    setTimeout(() => {
-      toast.success('Message sent successfully! We\'ll get back to you soon.');
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      setIsSubmitting(false);
-    }, 1000);
-  };
+  setIsSubmitting(true);
+
+  try {
+    const res = await fetch("http://localhost:5000/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
+    });
+
+    if (!res.ok) throw new Error();
+
+    toast.success("Message sent successfully!");
+
+    setFormData({ name: "", email: "", subject: "", message: "" });
+  } catch (err) {
+    toast.error("Failed to send message");
+  }
+
+  setIsSubmitting(false);
+};
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -145,17 +158,7 @@ export function ContactPage() {
                   </div>
                   <div>
                     <h3 className="mb-1">Email</h3>
-                    <p className="text-sm text-gray-600">support@booknest.com</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="bg-purple-100 p-2 rounded-lg">
-                    <MessageSquare className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="mb-1">Live Chat</h3>
-                    <p className="text-sm text-gray-600">Available Mon-Fri, 9am-5pm EST</p>
+                    <p className="text-sm text-gray-600">booknestwebsite@gmail.com</p>
                   </div>
                 </div>
 
