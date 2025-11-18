@@ -57,7 +57,9 @@ const LazyAIRecommendationsPage = React.lazy(() =>
     default: module.AIRecommendationsPage,
   }))
 );
-
+const LazyResetPasswordPage = React.lazy(() =>
+  import("./pages/ResetPassword").then((module) => ({ default: module.ResetPassword }))
+);
 const LazyNotFoundPage = React.lazy(() =>
   import("./pages/NotFoundPage").then((module) => ({
     default: module.NotFoundPage,
@@ -74,6 +76,10 @@ const LazyPrivacyPolicyPage = React.lazy(() =>
   import("./pages/PrivacyPolicyPage").then((module) => ({
     default: module.PrivacyPolicyPage,
   }))
+);
+const LazyForgotPasswordPage = React.lazy(() =>
+  import("./pages/ForgotPassword").then((module) => ({ 
+    default: module.ForgotPassword }))
 );
 
 const LazyTermsOfServicePage = React.lazy(() =>
@@ -158,6 +164,9 @@ function App() {
             <Route path="/" element={<LazyHomePage />} />
             <Route path="/login" element={<LazyLoginPage />} />
             <Route path="/register" element={<LazyRegisterPage />} />
+             <Route path="/forgot-password" element={<LazyForgotPasswordPage />} />
+             <Route path="/reset-password/:token" element={<LazyResetPasswordPage />} />
+
             <Route path="/home" element={<LazyHomePage />} />
 
             <Route path="/book/:id" element={<LazyBookDetailsPage />} />

@@ -157,6 +157,15 @@ export function LoginPage() {
                   Register here
                 </Link>
               </Typography>
+              <Typography variant="body2" color="text.secondary" textAlign="center">
+                <Link
+                  to="/forgot-password"
+                  style={{ color: "#16A34A", textDecoration: "none" }}
+                >
+                  Forgot Password?
+                </Link>
+              </Typography>
+
             </CardActions>
           </form>
         </Card>

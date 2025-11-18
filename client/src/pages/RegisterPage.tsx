@@ -11,6 +11,8 @@ import {
   Button,
   Typography,
   Alert,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 
 import { useUserStore } from "../store/useUserStore";
@@ -19,12 +21,16 @@ import { register } from "../services/userService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, RegisterFormValues } from "../schemas/register.schema";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 export function RegisterPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useUserStore();
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   const getRedirectPath = () => {
     const params = new URLSearchParams(location.search);
@@ -112,21 +118,40 @@ export function RegisterPage() {
 
             <TextField
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               fullWidth
               {...formRegister("password")}
               error={!!errors.password}
               helperText={errors.password?.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             <TextField
               label="Confirm Password"
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               fullWidth
               {...formRegister("confirmPassword")}
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword?.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
+
           </CardContent>
 
           <CardActions
