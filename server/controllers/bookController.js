@@ -148,7 +148,6 @@ export const getBookById = catchAsync(async (req, res, next) => {
 
 export const updateBook = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const updates = req.body;
   const userId = req.user._id;
 
   const book = await bookModel.findById(id);
@@ -159,9 +158,9 @@ export const updateBook = catchAsync(async (req, res, next) => {
     const messages = error.details.map(d => d.message);
     return next(new AppError(messages.join(", "), 400));
   }
+const updates = value;
 
-  // אם נשלחו שדות שמאפשרים ליצור סיכום חדש
-  if (updates.title || updates.description || updates.author) {
+if (updates.title || updates.description || updates.author) {
     try {
       let summary = "";
       try {
