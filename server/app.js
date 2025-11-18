@@ -7,6 +7,7 @@ import favoritesRouter from './routes/favoritesRouter.js';
 import commentRouter from "./routes/commentRouter.js";
 import commentReactionRouter from "./routes/commentReactionRouter.js";
 import { errorHandler } from './middleware/errorHandler.js';
+import authRouter from "./routes/authRouter.js";
 dotenv.config();
 
 
@@ -26,6 +27,8 @@ app.use('/favorites', favoritesRouter);
 app.use('/categories', categoryRouter);
 app.use("/comments", commentRouter);
 app.use("/comment-reactions", commentReactionRouter);
+app.use("/api/auth", authRouter);
+
 
 
 // Error handling
