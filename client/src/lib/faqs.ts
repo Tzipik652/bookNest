@@ -1,0 +1,164 @@
+const faqs = [
+    {
+        category: 'General',
+        questions: [
+            {
+                question: 'What is BookNest?',
+                answer: 'BookNest is a comprehensive book management web application that allows users to discover, manage, and get AI-powered recommendations for books. You can create your personal library, save favorites, add books, and engage with the community through comments and reactions.'
+            },
+            {
+                question: 'Is BookNest free to use?',
+                answer: 'Yes, BookNest is completely free to use. You can create an account, add books, manage your favorites, and access all features without any cost.'
+            },
+            {
+                question: 'Do I need an account to browse books?',
+                answer: 'You can view book details without an account, but you need to register to add books, save favorites, comment, get AI recommendations, and access your personal book collection.'
+            }
+        ]
+    },
+    {
+        category: 'Account & Authentication',
+        questions: [
+            {
+                question: 'How do I create an account?',
+                answer: 'Click on the "Register" button in the navigation bar and fill out the registration form with your name, email, and password. After registration, you\'ll be automatically logged in.'
+            },
+            {
+                question: 'I forgot my password. What should I do?',
+                answer: 'Currently, BookNest is a demo application with mock authentication. Please use the demo credentials provided on the login page, or create a new account if needed.'
+            },
+            {
+                question: 'Can I change my account information?',
+                answer: 'Account information management is currently not available in this demo version, but this feature is planned for future updates.'
+            }
+        ]
+    },
+    {
+        category: 'Books Management',
+        questions: [
+            {
+                question: 'How do I add a new book?',
+                answer: 'Click the "Add Book" button in the navigation bar. Fill out the form with the book\'s title, author, description, category, image URL, and optional price. The system will automatically generate an AI summary for your book.'
+            },
+            {
+                question: 'Can I edit or delete my books?',
+                answer: 'Yes! In the "My Books" section, you\'ll find Edit and Delete buttons for each book you\'ve added. You can only edit or delete books that you uploaded.'
+            },
+            {
+                question: 'What categories are available?',
+                answer: 'BookNest supports multiple categories including Fiction, Non-Fiction, Science Fiction, Mystery, Romance, Biography, Self-Help, Technology, History, and more.'
+            },
+            {
+                question: 'Where do I get image URLs for books?',
+                answer: 'You can use book cover images from sources like Unsplash, or copy image URLs from online bookstores. Make sure you have the right to use the images you upload.'
+            }
+        ]
+    },
+    {
+        category: 'Favorites & Collections',
+        questions: [
+            {
+                question: 'How do I save books to my favorites?',
+                answer: 'Click the heart icon on any book card or on the book detail page to add it to your favorites. Click again to remove it from favorites.'
+            },
+            {
+                question: 'Where can I see my favorite books?',
+                answer: 'Click on "Favorites" in the navigation bar to view all your saved favorite books in one place.'
+            },
+            {
+                question: 'Is there a limit to how many books I can favorite?',
+                answer: 'No, there\'s no limit! You can add as many books as you like to your favorites.'
+            }
+        ]
+    },
+    {
+        category: 'AI Features',
+        questions: [
+            {
+                question: 'What are AI recommendations?',
+                answer: 'BookNest uses AI to analyze your favorite books and suggest similar titles you might enjoy. The recommendations are based on categories and themes from your favorite books.'
+            },
+            {
+                question: 'How does the AI summary work?',
+                answer: 'When you add a book, BookNest automatically generates an AI-powered summary based on the title, description, and category. This provides quick insights about the book\'s content and themes.'
+            },
+            {
+                question: 'Can I get recommendations without favorites?',
+                answer: 'Yes! If you haven\'t added any favorites yet, the AI Recommendations page will show you a curated selection of popular books to help you get started.'
+            }
+        ]
+    },
+    {
+        category: 'Comments & Reactions',
+        questions: [
+            {
+                question: 'How do I comment on a book?',
+                answer: 'Go to any book\'s detail page and scroll to the comments section. Type your comment in the text box and click "Add Comment" to share your thoughts.'
+            },
+            {
+                question: 'Can I delete comments?',
+                answer: 'Book owners can delete any comments on their books to moderate inappropriate content. You cannot delete comments from other users\' books unless you\'re an admin.'
+            },
+            {
+                question: 'What reactions are available?',
+                answer: 'You can react to comments with four different emojis: Like (👍), Dislike (👎), Happy (😊), and Angry (😠). Click a reaction again to remove it.'
+            },
+            {
+                question: 'Can I change my reaction?',
+                answer: 'Yes! You can change your reaction by clicking a different emoji. You can only have one reaction per comment at a time.'
+            }
+        ]
+    },
+    {
+        category: 'Admin & Moderation',
+        questions: [
+            {
+                question: 'What is the Admin Dashboard?',
+                answer: 'The Admin Dashboard is a special section available only to administrators where they can manage all books, users, and comments across the platform. It provides statistics and moderation tools.'
+            },
+            {
+                question: 'How do I access admin features?',
+                answer: 'Admin access requires special credentials. If you need admin access for testing, use: admin@booknest.com / admin123.'
+            },
+            {
+                question: 'What can admins do?',
+                answer: 'Admins can view all users, edit or delete any book, moderate comments, and access platform-wide statistics including total books, users, comments, and engagement metrics.'
+            }
+        ]
+    },
+    {
+        category: 'Privacy & Data',
+        questions: [
+            {
+                question: 'How is my data stored?',
+                answer: 'BookNest currently uses browser localStorage for data persistence. This means your data is stored locally on your device and is not sent to any external servers.'
+            },
+            {
+                question: 'Is my personal information safe?',
+                answer: 'BookNest is a demo application and should not be used for storing sensitive personal information. For production use, proper backend security measures would be implemented.'
+            },
+            {
+                question: 'Can others see my information?',
+                answer: 'Other users can see your name on books you upload and comments you make. Your email address is private and not visible to other users.'
+            }
+        ]
+    },
+    {
+        category: 'Technical Support',
+        questions: [
+            {
+                question: 'Which browsers are supported?',
+                answer: 'BookNest works best on modern browsers including Chrome, Firefox, Safari, and Edge. Make sure JavaScript and localStorage are enabled.'
+            },
+            {
+                question: 'Why are my books/favorites not saving?',
+                answer: 'This usually happens if your browser has localStorage disabled or if you\'re using private/incognito mode. Try using a regular browser window with localStorage enabled.'
+            },
+            {
+                question: 'I found a bug. How do I report it?',
+                answer: 'Please use the Contact page to report any bugs or issues you encounter. Provide as much detail as possible about what happened and how to reproduce the issue.'
+            }
+        ]
+    }
+];
+export { faqs };
