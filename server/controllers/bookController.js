@@ -133,19 +133,6 @@ export const getBookById = catchAsync(async (req, res, next) => {
   res.status(200).json(book);
 });
 
-// export const updateBook = catchAsync(async (req, res, next) => {
-//   const { id } = req.params;
-//   const updates = req.body;
-//   const userId = req.user._id;
-
-//   const book = await bookModel.findById(id);
-//   if (!book) throw new AppError("Book not found", 404);
-//   if (book.user_id !== userId) throw new AppError("Forbidden", 403);
-
-//   const updatedBook = await bookModel.update(id, updates);
-//   res.status(200).json(updatedBook);
-// });
-
 export const updateBook = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const userId = req.user._id;
