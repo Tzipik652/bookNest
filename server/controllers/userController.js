@@ -8,6 +8,7 @@ import crypto from "crypto";
 import AppError from "../utils/AppError.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { registerSchema } from "../validations/userValidation.js";
+import { getUsers } from "../models/userModel.js";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ const generateJWT = (user) => {
       email: user.email,
       name: user.name,
       auth_provider: user.auth_provider,
+      role: user.role,
     },
     JWT_SECRET,
     { expiresIn: "24h" }
@@ -102,6 +104,7 @@ export const login = catchAsync(async (req, res, next) => {
       email: user.email,
       name: user.name,
       auth_provider: user.auth_provider,
+      role: user.role,
     },
   });
 });
@@ -136,6 +139,7 @@ export const googleLogin = catchAsync(async (req, res, next) => {
           password,
           auth_provider: "google",
           profile_picture: profile.picture,
+          role: "user",
         },
       ])
       .select()
@@ -164,6 +168,18 @@ export const googleLogin = catchAsync(async (req, res, next) => {
       name: user.name,
       auth_provider: user.auth_provider,
       profile_picture: user.profile_picture,
+      role: user.role,
     },
   });
 });
+export const getAllUsers = catchAsync(async (req, res, next) => {
+  const user=req.user;
+  if( !user ||user.role!=="admin" ){
+    throw new AppError("Forbidden",403);
+  }
+ const users= await getUsers();
+ res.json({
+  success:true,
+  users
+ });
+})

@@ -99,3 +99,20 @@ export async function getCommentById(commentId: string): Promise<Comment> {
     throw error;
   }
 }
+export async function getAllComments(): Promise<Comment[]> {
+  const user = useUserStore.getState().user;
+  const token = useUserStore.getState().token;
+
+  if (!token) throw new Error("Must be logged in to add books");
+  if (user?.role !== "admin") throw new Error("Admin access required");
+  try {
+    const res = await axios.get(`${API_BASE_URL}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    handleAxiosError(error);
+  }
+}

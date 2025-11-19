@@ -5,6 +5,7 @@ export interface User {
   auth_provider: string;
   favorites: string[];
   profile_picture?: string;
+  role: "user" | "admin";
 }
 
 export interface Book {
