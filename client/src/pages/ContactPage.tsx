@@ -5,7 +5,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
-import { ArrowLeft, Mail, Send, MessageSquare, MapPin, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Mail, Send, HelpCircle, MapPin, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUserStore } from '../store/useUserStore';
 
@@ -145,31 +145,6 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
               <Card>
                 <CardContent className="pt-6">
                   <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          placeholder="Your name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          disabled={isSubmitting}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          placeholder="your.email@example.com"
-                          value={formData.email}
-                          onChange={handleChange}
-                          disabled={isSubmitting}
-                        />
-                      </div>
-                    </div> */}
 
                     <div className="space-y-2">
                       <Label htmlFor="subject">Subject</Label>
@@ -241,11 +216,23 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
 
             <Card>
               <CardContent className="pt-6">
-                <h3 className="mb-3">Frequently Asked Questions</h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  Before reaching out, you might find answers to common questions in our FAQ section.
-                </p>
-                <Button variant="outline" className="w-full">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="bg-yellow-100 p-2 rounded-lg">
+                    <HelpCircle className="h-5 w-5 text-yellow-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="mb-1">Frequently Asked Questions</h3>
+                    <p className="text-sm text-gray-600">
+                      Before reaching out, you might find answers to common questions in our FAQ section.
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  variant="outline" 
+                  className="w-full gap-2"
+                  onClick={() => navigate('/faq')}
+                >
+                  <HelpCircle className="h-4 w-4" />
                   View FAQs
                 </Button>
               </CardContent>

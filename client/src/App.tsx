@@ -4,7 +4,6 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import { CircularProgress, Box, GlobalStyles } from "@mui/material";
 
@@ -85,6 +84,12 @@ const LazyForgotPasswordPage = React.lazy(() =>
 const LazyTermsOfServicePage = React.lazy(() =>
   import("./pages/TermsOfServicePage").then((module) => ({
     default: module.TermsOfServicePage,
+  }))
+);
+
+const LazyFAQPage = React.lazy(() =>
+  import("./pages/FAQPage").then((module) => ({
+    default: module.FAQPage,
   }))
 );
 
@@ -220,6 +225,7 @@ function App() {
             <Route path="/contact" element={<LazyContactPage />} />
             <Route path="/privacy-policy" element={<LazyPrivacyPolicyPage />} />
             <Route path="/terms-of-service" element={<LazyTermsOfServicePage />} />
+            <Route path="/faq" element={<LazyFAQPage />} />
           </Routes>
         </Suspense>
 
