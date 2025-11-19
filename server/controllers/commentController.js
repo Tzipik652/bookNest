@@ -74,8 +74,7 @@ export const deleteComment = catchAsync(async (req, res, next) => {
     throw new AppError("Book not found", 404);
   }
 
-  // רק בעל הספר או כותב התגובה יכולים למחוק
-  if (comment.user_id !== user._id || book.user_id !== user._id || user.role !== 'admin') {
+  if (comment.user_id !== user._id && book.user_id !== user._id && user.role !== 'admin') {
     throw new AppError("Unauthorized to delete this comment", 403);
   }
 

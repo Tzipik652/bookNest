@@ -9,13 +9,13 @@ import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { 
-  BookOpen, 
-  Users, 
-  MessageSquare, 
-  Heart, 
-  Trash2, 
-  Edit, 
+import {
+  BookOpen,
+  Users,
+  MessageSquare,
+  Heart,
+  Trash2,
+  Edit,
   Shield,
   TrendingUp,
   AlertCircle
@@ -27,9 +27,11 @@ import { deleteBook, getBookById, getBooks, updateBook } from '../services/bookS
 import { getAllUsers } from '../services/userService';
 import { deleteComment, getAllComments } from '../services/commentService';
 import { getFavoritesCount } from '../services/favoriteService';
+import { getCommentReactionCounts } from '../services/commentReactionService';
 
 export function AdminDashboardPage() {
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
+  const [userMap, setUserMap] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
   const [books, setBooks] = useState<Book[]>([]);
@@ -37,6 +39,7 @@ export function AdminDashboardPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [favorites, setFavorites] = useState<number>(0);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
+  const [reactionCounts, setReactionCounts] = useState<Record<string, any>>({});
   const [editFormData, setEditFormData] = useState({
     title: '',
     author: '',
@@ -58,30 +61,48 @@ export function AdminDashboardPage() {
     loadData();
   }, []);
 
-const loadData = async () => {
-  try {
-    const allBooks = await getBooks();
-    const allUsers = await getAllUsers();
-    const allComments = await getAllComments();
-    const allFavorites = await getFavoritesCount();
-    console.log(allBooks.books);
-    console.log(allUsers)
-console.log(allComments)
-console.log(allFavorites)    
-    const map: Record<string, Book> = {};
-    allBooks.books.forEach((book: Book) => {
-      map[book._id] = book;
-    });
-    
-    setBooks(allBooks.books);   
-    setFavorites(allFavorites);
-    setUsers(allUsers);
-    setComments(allComments);
-    setBooksMap(map); 
-  } catch (error) {
-    toast.error('Failed to load admin data');
+  const loadData = async () => {
+    try {
+      const allBooks = await getBooks();
+      const allUsers = await getAllUsers();
+      const allComments = await getAllComments();
+      const allFavorites = await getFavoritesCount();
+
+      const map: Record<string, Book> = {};
+      allBooks.books.forEach((book: Book) => {
+        map[book._id] = book;
+      });
+
+      const userMap: Record<string, string> = {};
+      allUsers.forEach((u: User) => {
+        userMap[u._id] = u.name;
+      });
+      setUserMap(userMap);
+
+      setBooks(allBooks.books);
+      setFavorites(allFavorites);
+      setUsers(allUsers);
+      setComments(allComments);
+      setBooksMap(map);
+
+      await loadReactions(allComments);
+
+    } catch (error) {
+      toast.error("Failed to load admin data");
+    }
+  };
+
+
+  async function loadReactions(comments: Comment[]) {
+    const countsMap: Record<string, any> = {};
+
+    for (const comment of comments) {
+      const counts = await getCommentReactionCounts(comment);
+      countsMap[comment.id] = counts;
+    }
+
+    setReactionCounts(countsMap);
   }
-};
 
 
   const handleDeleteBook = (bookId: string) => {
@@ -142,10 +163,10 @@ console.log(allFavorites)
 
   // Calculate statistics
   const totalReactions = comments.reduce((sum, comment) => sum + comment.reactions?.length, 0);
-  const recentBooks = books.slice().sort((a, b) => 
+  const recentBooks = books.slice().sort((a, b) =>
     new Date(b.date_created).getTime() - new Date(a.date_created).getTime()
   ).slice(0, 5);
-  const recentComments = comments.slice().sort((a, b) => 
+  const recentComments = comments.slice().sort((a, b) =>
     new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   ).slice(0, 10);
 
@@ -291,7 +312,7 @@ console.log(allFavorites)
                           {book.category}
                         </span>
                       </td>
-                      <td className="py-3 px-4">{book.user_id}</td>
+                      <td className="py-3 px-4">{userMap[book.user_id]}</td>
                       <td className="py-3 px-4 text-sm text-gray-500">
                         {new Date(book.date_created).toLocaleDateString()}
                       </td>
@@ -341,7 +362,7 @@ console.log(allFavorites)
                     <p className="font-medium">{user.name}</p>
                     <p className="text-sm text-gray-600">{user.email}</p>
                   </div>
-                  {user.role=== 'admin'&& (
+                  {user.role === 'admin' && (
                     <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
                       Admin
                     </span>
@@ -354,52 +375,59 @@ console.log(allFavorites)
 
         {/* Recent Comments */}
         <Card>
-  <CardHeader>
-    <CardTitle>Recent Comments</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="space-y-4">
-      {recentComments.map((comment) => {
-        const book = booksMap[comment.book_id];
+          <CardHeader>
+            <CardTitle>Recent Comments</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentComments.map((comment) => {
+                const book = booksMap[comment.book_id];
 
-        return (
-          <div key={comment.id} className="p-4 bg-gray-50 rounded-lg">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-                <p className="text-sm">
-                  <span className="font-medium">{comment.user_id}</span> on{' '}
-                  <span
-                    className="text-blue-600 hover:underline cursor-pointer"
-                    onClick={() => navigate(`/book/${comment.book_id}`)}
-                  >
-                    {book?.title || "Unknown Book"}
-                  </span>
-                </p>
-                <p className="text-xs text-gray-500">
-                  {new Date(comment.created_at).toLocaleString()}
-                </p>
-              </div>
+                return (
+                  <div key={comment.id} className="p-4 bg-gray-50 rounded-lg">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="text-sm">
+                          <span className="font-medium">
+                            {userMap[comment.user_id] + ' ' || "Unknown User"}
+                          </span>
+                          on{' '}
+                          <span
+                            className="text-blue-600 hover:underline cursor-pointer"
+                            onClick={() => navigate(`/book/${comment.book_id}`)}
+                          >
+                            {book?.title || "Unknown Book"}
+                          </span>
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(comment.created_at).toLocaleString()}
+                        </p>
+                      </div>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDeleteComment(comment.id)}
-              >
-                <Trash2 className="h-4 w-4 text-red-600" />
-              </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteComment(comment.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-600" />
+                      </Button>
+                    </div>
+
+                    <p className="text-sm text-gray-700">{comment.text}</p>
+
+                    <div className="flex gap-3 text-xs text-slate-500 mt-1">
+                      <span>👍 {reactionCounts[comment.id]?.like ?? 0}</span>
+                      <span>👎 {reactionCounts[comment.id]?.dislike ?? 0}</span>
+                      <span>😊 {reactionCounts[comment.id]?.happy ?? 0}</span>
+                      <span>😡 {reactionCounts[comment.id]?.angry ?? 0}</span>
+                    </div>
+                    
+                  </div>
+                );
+              })}
             </div>
-
-            <p className="text-sm text-gray-700">{comment.text}</p>
-
-            <div className="mt-2 flex gap-4 text-xs text-gray-500">
-              <span>{comment.reactions?.length || 0} reactions</span>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  </CardContent>
-</Card>
+          </CardContent>
+        </Card>
 
       </div>
 
