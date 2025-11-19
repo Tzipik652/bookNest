@@ -152,7 +152,7 @@ export const updateBook = catchAsync(async (req, res, next) => {
 
   const book = await bookModel.findById(id);
   if (!book) throw new AppError("Book not found", 404);
-  if (book.user_id !== userId) throw new AppError("Forbidden", 403);
+  if (book.user_id !== userId || req.user.role !== "admin") throw new AppError("Forbidden", 403);
   const { error, value } = updateBookSchema.validate(req.body, { abortEarly: false });
   if (error) {
     const messages = error.details.map(d => d.message);
@@ -204,7 +204,7 @@ export const deleteBook = catchAsync(async (req, res, next) => {
 
   const book = await bookModel.findById(id);
   if (!book) throw new AppError("Book not found", 404);
-  if (book.user_id !== userId) throw new AppError("Forbidden", 403);
+  if (book.user_id !== userId || req.user.role !== "admin") throw new AppError("Forbidden", 403);
 
   await bookModel.remove(id);
   res.status(200).json({ message: "Book deleted successfully" });

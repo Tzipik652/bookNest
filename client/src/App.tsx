@@ -14,6 +14,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useUserStore } from "./store/useUserStore";
 import { useAccessibilityStore } from "./store/accessibilityStore";
 import AccessibilityMenu from "./components/AccessibilityMenu";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 
 // Lazy-loaded pages
 const LazyLoginPage = React.lazy(() =>
@@ -78,8 +79,9 @@ const LazyPrivacyPolicyPage = React.lazy(() =>
   }))
 );
 const LazyForgotPasswordPage = React.lazy(() =>
-  import("./pages/ForgotPassword").then((module) => ({ 
-    default: module.ForgotPassword }))
+  import("./pages/ForgotPassword").then((module) => ({
+    default: module.ForgotPassword
+  }))
 );
 
 const LazyTermsOfServicePage = React.lazy(() =>
@@ -164,8 +166,8 @@ function App() {
             <Route path="/" element={<LazyHomePage />} />
             <Route path="/login" element={<LazyLoginPage />} />
             <Route path="/register" element={<LazyRegisterPage />} />
-             <Route path="/forgot-password" element={<LazyForgotPasswordPage />} />
-             <Route path="/reset-password/:token" element={<LazyResetPasswordPage />} />
+            <Route path="/forgot-password" element={<LazyForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<LazyResetPasswordPage />} />
 
             <Route path="/home" element={<LazyHomePage />} />
 
@@ -179,7 +181,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            <Route
+              path="/admin-dashboard"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboardPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/edit-book/:id"
               element={

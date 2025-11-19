@@ -199,6 +199,20 @@ export const getBooksByCategory = async (category) => {
   
   return cleanedBooks;
 }
+export const getFavoritesCount = async () => {
+  const { count, error } = await supabase
+    .from('user_favorites')
+    .select('*', { count: 'exact', head: true });
+
+  if (error) {
+    console.error("Error fetching favorites count:", error);
+    throw new Error(error.message);
+  }
+
+  return count || 0;
+};
+
+
 
 
 export default {
@@ -207,5 +221,6 @@ export default {
   isFavorite,
   getFavoriteBooksList,
   getFavoriteBooks,
-  countBookFavorites
+  countBookFavorites,
+  getFavoritesCount
 };
