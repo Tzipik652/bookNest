@@ -54,7 +54,7 @@ export async function addBook(bookData: {
   author: string;
   description: string;
   category: string;
-  imgUrl?: string;
+  img_url?: string;
   price?: number;
 }): Promise<Book> {
   try {

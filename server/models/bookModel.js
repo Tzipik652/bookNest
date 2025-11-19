@@ -52,7 +52,7 @@ export async function create(bookData) {
       author: bookData.author,
       description: bookData.description,
       category: categoryId,
-      img_url: bookData.imgUrl,
+      img_url: bookData.img_url,
       price: bookData.price,
       ai_summary: bookData.ai_summary,
       user_id: bookData.user_id,
@@ -234,7 +234,7 @@ export async function getFavoriteBooks(userId) {
 const findBooksByIds = async (ids) => {
   if (!ids || ids.length === 0) return [];
 
-  const { data: books, error } = await supabase
+  const { data, error } = await supabase
     .from("books")
     .select(bookSelectQuery)
     .in("_id", ids)

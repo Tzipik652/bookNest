@@ -36,7 +36,7 @@ export function FavoritesPage() {
         (existing) => ({
           ...book,
           ...existing,
-          isFavorited: true,
+          isFavorited: existing?.isFavorited ?? true,
           favorites_count:
             existing?.favorites_count ?? book.favorites_count ?? 1,
         })

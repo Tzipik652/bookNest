@@ -1,7 +1,248 @@
+// import { useState } from "react";
+// import { useParams, useNavigate, useLocation } from "react-router-dom";
+// import { CommentSection } from "../components/CommentSection";
+// import { deleteBook } from "../services/bookService";
+// import {
+//   Box,
+//   Button,
+//   Card,
+//   CardContent,
+//   CardMedia,
+//   Typography,
+//   Chip,
+//   Dialog,
+//   DialogTitle,
+//   DialogContent,
+//   DialogActions,
+// } from "@mui/material";
+// import {
+//   Favorite,
+//   FavoriteBorder,
+//   ArrowBack,
+//   Edit,
+//   Delete,
+//   AutoAwesome,
+// } from "@mui/icons-material";
+// import { useUserStore } from "../store/useUserStore";
+// import { useFavoriteBooks } from "../hooks/useFavorites";
+// import { useQueryClient, useQuery } from "@tanstack/react-query";
+// import { useDynamicTheme } from "../theme";
+// import { BookWithFavorite } from "../types";
+
+// export function BookDetailsPage() {
+//   const theme = useDynamicTheme();
+//   const { id } = useParams<{ id: string }>();
+//   const navigate = useNavigate();
+//   const location = useLocation();
+
+//   const { user: currentUser } = useUserStore();
+//   const queryClient = useQueryClient();
+
+//   const { toggleMutation } = useFavoriteBooks();
+//   const bookFromCache = queryClient.getQueryData<BookWithFavorite>([
+//     "book",
+//     id,
+//   ]);
+
+//   const loading = toggleMutation.isPending;
+
+//   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+//   if (!bookFromCache) {
+//     return (
+//       <Box
+//         minHeight="100vh"
+//         display="flex"
+//         alignItems="center"
+//         justifyContent="center"
+//       >
+//         <Box
+//           textAlign="center"
+//           style={{
+//             backgroundColor: theme.palette.background.paper,
+//             color: theme.palette.text.primary,
+//           }}
+//         >
+//           <Typography variant="h5" mb={2}>
+//             Book Not Found
+//           </Typography>
+//           <Button variant="contained" onClick={() => navigate(-1)}>
+//             Go Back
+//           </Button>
+//         </Box>
+//       </Box>
+//     );
+//   }
+
+//   const isOwner = currentUser?._id === bookFromCache.user_id;
+
+//   const handleFavoriteToggle = () => {
+//     if (!currentUser) {
+//       const encodedPath = encodeURIComponent(location.pathname);
+//       navigate(`/login?redirect=${encodedPath}`);
+//       return;
+//     }
+
+//     toggleMutation.mutate(bookFromCache._id);
+//   };
+
+//   const handleDelete = () => {
+//     deleteBook(bookFromCache._id);
+//     navigate("/my-books");
+//   };
+
+//   return (
+//     <Box
+//       style={{
+//         backgroundColor: theme.palette.background.paper,
+//         color: theme.palette.text.primary,
+//       }}
+//       minHeight="100vh"
+//       bgcolor="#f9fafb"
+//       py={6}
+//     >
+//       <Box maxWidth="md" mx="auto" px={2}>
+//         <Button
+//           startIcon={<ArrowBack />}
+//           onClick={() => navigate(-1)}
+//           variant="text"
+//           sx={{ mb: 3 }}
+//         >
+//           Back
+//         </Button>
+
+//         <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={4}>
+//           <Box flex={1}>
+//             <Card sx={{ overflow: "hidden" }}>
+//               <CardMedia
+//                 component="img"
+//                 image={bookFromCache.img_url}
+//                 alt={bookFromCache.title}
+//                 sx={{ aspectRatio: "3 / 4", objectFit: "cover" }}
+//               />
+//             </Card>
+//           </Box>
+
+//           <Box flex={1}>
+//             <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+//               <CardContent>
+//                 <Typography variant="h4" gutterBottom>
+//                   {bookFromCache.title}
+//                 </Typography>
+//                 <Typography variant="h6" color="text.secondary" gutterBottom>
+//                   by {bookFromCache.author}
+//                 </Typography>
+
+//                 <Box display="flex" alignItems="center" gap={2} mb={2}>
+//                   <Chip
+//                     label={bookFromCache.category}
+//                     color="default"
+//                     variant="outlined"
+//                   />
+//                   {bookFromCache.price && (
+//                     <Typography variant="h6">
+//                       ${bookFromCache.price.toFixed(2)}
+//                     </Typography>
+//                   )}
+//                 </Box>
+
+//                 <Box display="flex" gap={2} mb={3} flexWrap="wrap">
+//                   <Button
+//                     variant={bookFromCache.isFavorited ? "contained" : "outlined"}
+//                     color="primary"
+//                     startIcon={bookFromCache.isFavorited ? <Favorite /> : <FavoriteBorder />}
+//                     onClick={handleFavoriteToggle}
+//                     disabled={toggleMutation.isPending}
+//                   >
+//                     {bookFromCache.isFavorited ? "Remove from Favorites" : "Add to Favorites"}
+//                   </Button>
+
+//                   {isOwner && (
+//                     <>
+//                       <Button
+//                         variant="outlined"
+//                         startIcon={<Edit />}
+//                         onClick={() => navigate(`/edit-book/${bookFromCache._id}`)}
+//                       >
+//                         Edit
+//                       </Button>
+//                       <Button
+//                         variant="contained"
+//                         color="error"
+//                         startIcon={<Delete />}
+//                         onClick={() => setShowDeleteDialog(true)}
+//                       >
+//                         Delete
+//                       </Button>
+//                     </>
+//                   )}
+//                 </Box>
+
+//                 <Box mb={4}>
+//                   <Typography variant="body1" color="text.secondary">
+//                     {bookFromCache.favorites_count} users liked this book
+//                   </Typography>
+//                 </Box>
+
+//                 <Box mb={4}>
+//                   <Typography variant="h6" gutterBottom>
+//                     Description
+//                   </Typography>
+//                   <Typography variant="body1" color="text.secondary">
+//                     {bookFromCache.description}
+//                   </Typography>
+//                 </Box>
+
+//                 <Box p={3} borderRadius={2} border="1px solid #e0e0e0" mb={3}>
+//                   <Box display="flex" alignItems="center" gap={1} mb={1}>
+//                     <AutoAwesome color="primary" />
+//                     <Typography variant="h6">AI Summary</Typography>
+//                   </Box>
+//                   <Typography variant="body1" color="text.secondary">
+//                     {bookFromCache.ai_summary}
+//                   </Typography>
+//                 </Box>
+
+//                 <Typography variant="body2" color="text.secondary">
+//                   Uploaded by {bookFromCache.user.name}
+//                   <br />
+//                   {new Date(bookFromCache.date_created).toLocaleDateString()}
+//                 </Typography>
+//               </CardContent>
+//             </Card>
+//           </Box>
+//         </Box>
+//       </Box>
+
+//       <Box className="mt-12">
+//         <CommentSection bookId={bookFromCache._id} bookOwnerId={bookFromCache.user_id} />
+//       </Box>
+
+//       <Dialog
+//         open={showDeleteDialog}
+//         onClose={() => setShowDeleteDialog(false)}
+//       >
+//         <DialogTitle>Are you sure?</DialogTitle>
+//         <DialogContent>
+//           <Typography>
+//             This will permanently delete "{bookFromCache.title}" from your library. This
+//             action cannot be undone.
+//           </Typography>
+//         </DialogContent>
+//         <DialogActions>
+//           <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+//           <Button onClick={handleDelete} color="error" variant="contained">
+//             Delete
+//           </Button>
+//         </DialogActions>
+//       </Dialog>
+//     </Box>
+//   );
+// }
 import { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { CommentSection } from "../components/CommentSection";
-import { deleteBook } from "../services/bookService";
+import { deleteBook, getBookById } from "../services/bookService";
 import {
   Box,
   Button,
@@ -14,6 +255,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Skeleton,
 } from "@mui/material";
 import {
   Favorite,
@@ -27,29 +269,48 @@ import { useUserStore } from "../store/useUserStore";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useDynamicTheme } from "../theme";
-import { BookWithFavorite } from "../types";
+import { Book, BookWithFavorite } from "../types";
 
 export function BookDetailsPage() {
   const theme = useDynamicTheme();
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const { user: currentUser } = useUserStore();
   const queryClient = useQueryClient();
 
-  const { toggleMutation } = useFavoriteBooks();
-  const bookFromCache = queryClient.getQueryData<BookWithFavorite>([
-    "book",
-    id,
-  ]);
-
-  const loading = toggleMutation.isPending;
+  const { user: currentUser } = useUserStore();
+  const { toggleMutation, isFavorited } = useFavoriteBooks();
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+  const {
+    data: fetchedBook,
+    isLoading,
+    error,
+  } = useQuery<Book>({
+    queryKey: ["book", id],
+    queryFn: () => getBookById(id || ""),
+    enabled: !!id,
+  });
 
-  if (!bookFromCache) {
+  const cachedBook = queryClient.getQueryData<BookWithFavorite>(["book", id]);
+
+  const book: BookWithFavorite | undefined = fetchedBook
+    ? { ...fetchedBook, isFavorited: isFavorited(fetchedBook._id) }
+    : cachedBook;
+
+  if (isLoading) {
+    return (
+      <Box p={4}>
+        <Skeleton variant="rectangular" width="100%" height={400} />
+        <Skeleton width="60%" height={50} sx={{ mt: 2 }} />
+        <Skeleton width="40%" height={40} />
+        <Skeleton width="80%" height={30} sx={{ mt: 2 }} />
+      </Box>
+    );
+  }
+
+  if (!book) {
     return (
       <Box
         minHeight="100vh"
@@ -57,38 +318,25 @@ export function BookDetailsPage() {
         alignItems="center"
         justifyContent="center"
       >
-        <Box
-          textAlign="center"
-          style={{
-            backgroundColor: theme.palette.background.paper,
-            color: theme.palette.text.primary,
-          }}
-        >
-          <Typography variant="h5" mb={2}>
-            Book Not Found
-          </Typography>
-          <Button variant="contained" onClick={() => navigate(-1)}>
-            Go Back
-          </Button>
-        </Box>
+        <Typography variant="h5">Book Not Found</Typography>
       </Box>
     );
   }
 
-  const isOwner = currentUser?._id === bookFromCache.user_id;
+  const isOwner = currentUser?._id === book.user_id;
 
   const handleFavoriteToggle = () => {
     if (!currentUser) {
-      const encodedPath = encodeURIComponent(location.pathname);
-      navigate(`/login?redirect=${encodedPath}`);
+      const encoded = encodeURIComponent(location.pathname);
+      navigate(`/login?redirect=${encoded}`);
       return;
     }
-
-    toggleMutation.mutate(bookFromCache._id);
+    toggleMutation.mutate(book._id);
   };
 
-  const handleDelete = () => {
-    deleteBook(bookFromCache._id);
+  const handleDelete = async () => {
+    await deleteBook(book._id);
+    queryClient.invalidateQueries({ queryKey: ["book", book._id] });
     navigate("/my-books");
   };
 
@@ -99,7 +347,6 @@ export function BookDetailsPage() {
         color: theme.palette.text.primary,
       }}
       minHeight="100vh"
-      bgcolor="#f9fafb"
       py={6}
     >
       <Box maxWidth="md" mx="auto" px={2}>
@@ -114,12 +361,12 @@ export function BookDetailsPage() {
 
         <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={4}>
           <Box flex={1}>
-            <Card sx={{ overflow: "hidden" }}>
+            <Card>
               <CardMedia
                 component="img"
-                image={bookFromCache.img_url}
-                alt={bookFromCache.title}
-                sx={{ aspectRatio: "3 / 4", objectFit: "cover" }}
+                image={book.img_url}
+                alt={book.title}
+                sx={{ aspectRatio: "3/4", objectFit: "cover" }}
               />
             </Card>
           </Box>
@@ -128,34 +375,36 @@ export function BookDetailsPage() {
             <Card elevation={0} sx={{ bgcolor: "transparent" }}>
               <CardContent>
                 <Typography variant="h4" gutterBottom>
-                  {bookFromCache.title}
+                  {book.title}
                 </Typography>
+
                 <Typography variant="h6" color="text.secondary" gutterBottom>
-                  by {bookFromCache.author}
+                  by {book.author}
                 </Typography>
 
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
-                  <Chip
-                    label={bookFromCache.category}
-                    color="default"
-                    variant="outlined"
-                  />
-                  {bookFromCache.price && (
+                  <Chip label={book.category} variant="outlined" />
+
+                  {book.price && (
                     <Typography variant="h6">
-                      ${bookFromCache.price.toFixed(2)}
+                      ${book.price.toFixed(2)}
                     </Typography>
                   )}
                 </Box>
 
                 <Box display="flex" gap={2} mb={3} flexWrap="wrap">
                   <Button
-                    variant={bookFromCache.isFavorited ? "contained" : "outlined"}
+                    variant={book.isFavorited ? "contained" : "outlined"}
                     color="primary"
-                    startIcon={bookFromCache.isFavorited ? <Favorite /> : <FavoriteBorder />}
+                    startIcon={
+                      book.isFavorited ? <Favorite /> : <FavoriteBorder />
+                    }
                     onClick={handleFavoriteToggle}
                     disabled={toggleMutation.isPending}
                   >
-                    {bookFromCache.isFavorited ? "Remove from Favorites" : "Add to Favorites"}
+                    {book.isFavorited
+                      ? "Remove from Favorites"
+                      : "Add to Favorites"}
                   </Button>
 
                   {isOwner && (
@@ -163,10 +412,11 @@ export function BookDetailsPage() {
                       <Button
                         variant="outlined"
                         startIcon={<Edit />}
-                        onClick={() => navigate(`/edit-book/${bookFromCache._id}`)}
+                        onClick={() => navigate(`/edit-book/${book._id}`)}
                       >
                         Edit
                       </Button>
+
                       <Button
                         variant="contained"
                         color="error"
@@ -179,20 +429,16 @@ export function BookDetailsPage() {
                   )}
                 </Box>
 
-                <Box mb={4}>
-                  <Typography variant="body1" color="text.secondary">
-                    {bookFromCache.favorites_count} users liked this book
-                  </Typography>
-                </Box>
+                <Typography variant="body1" sx={{ mb: 2 }}>
+                  {book.favorites_count} users liked this book
+                </Typography>
 
-                <Box mb={4}>
-                  <Typography variant="h6" gutterBottom>
-                    Description
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    {bookFromCache.description}
-                  </Typography>
-                </Box>
+                <Typography variant="h6" gutterBottom>
+                  Description
+                </Typography>
+                <Typography variant="body1" color="text.secondary" mb={3}>
+                  {book.description}
+                </Typography>
 
                 <Box p={3} borderRadius={2} border="1px solid #e0e0e0" mb={3}>
                   <Box display="flex" alignItems="center" gap={1} mb={1}>
@@ -200,14 +446,14 @@ export function BookDetailsPage() {
                     <Typography variant="h6">AI Summary</Typography>
                   </Box>
                   <Typography variant="body1" color="text.secondary">
-                    {bookFromCache.ai_summary}
+                    {book.ai_summary}
                   </Typography>
                 </Box>
 
                 <Typography variant="body2" color="text.secondary">
-                  Uploaded by {bookFromCache.user.name}
+                  Uploaded by {book.user?.name}
                   <br />
-                  {new Date(bookFromCache.date_created).toLocaleDateString()}
+                  {new Date(book.date_created).toLocaleDateString()}
                 </Typography>
               </CardContent>
             </Card>
@@ -215,8 +461,8 @@ export function BookDetailsPage() {
         </Box>
       </Box>
 
-      <Box className="mt-12">
-        <CommentSection bookId={bookFromCache._id} bookOwnerId={bookFromCache.user_id} />
+      <Box mt={8}>
+        <CommentSection bookId={book._id} bookOwnerId={book.user_id} />
       </Box>
 
       <Dialog
@@ -226,8 +472,8 @@ export function BookDetailsPage() {
         <DialogTitle>Are you sure?</DialogTitle>
         <DialogContent>
           <Typography>
-            This will permanently delete "{bookFromCache.title}" from your library. This
-            action cannot be undone.
+            This will permanently delete "{book.title}". This action cannot be
+            undone.
           </Typography>
         </DialogContent>
         <DialogActions>

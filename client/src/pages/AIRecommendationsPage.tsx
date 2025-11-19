@@ -38,9 +38,9 @@ export function AIRecommendationsPage() {
         (existing) => ({
           ...book,
           ...existing,
-          isFavorited: true,
+          isFavorited: existing?.isFavorited ?? false,
           favorites_count:
-            existing?.favorites_count ?? book.favorites_count ?? 1,
+            existing?.favorites_count ?? book.favorites_count ?? 0,
         })
       );
     });
