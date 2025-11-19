@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Heart } from "lucide-react";
 import { Book } from "../types";
 import { Card, CardContent, CardFooter } from "./ui/card";
@@ -8,22 +8,33 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useUserStore } from "../store/useUserStore";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import { useDynamicTheme } from "../theme";
-
+import { useQueryClient } from "@tanstack/react-query";
+import { BookWithFavorite } from "../types/index";
 interface BookCardProps {
   book: Book;
 }
 
 export function BookCard({ book }: BookCardProps) {
-  const { toggleMutation, isFavorited } = useFavoriteBooks();
-  const [favorited, setFavorited] = useState(isFavorited(book._id));
-  const [likesCount, setLikesCount] = useState<number>(
-    book.favorites_count ?? 0
-  );
   const theme = useDynamicTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const { user: currentUser } = useUserStore();
-  
+
+    const queryClient = useQueryClient();
+  const { toggleMutation } = useFavoriteBooks();
+
+  const bookFromCache = queryClient.getQueryData<BookWithFavorite>([
+    "book",
+    book._id,
+  ]);
+
+  const displayedBook: BookWithFavorite = bookFromCache || {
+    ...book,
+    isFavorited: false,
+    favorites_count: book.favorites_count ?? 0,
+  };
+  const isLoading = toggleMutation.isPending;
+
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
@@ -34,8 +45,6 @@ export function BookCard({ book }: BookCardProps) {
     }
 
     toggleMutation.mutate(book._id);
-    setFavorited(!favorited);
-    setLikesCount((prev) => (favorited ? prev - 1 : prev + 1));
   };
 
   return (
@@ -58,17 +67,21 @@ export function BookCard({ book }: BookCardProps) {
           <div className="flex items-start justify-between gap-2 mb-2">
             <h3 className="line-clamp-2">{book.title}</h3>
             <div className="flex items-center gap-1">
-              <span className="text-sm text-gray-600">{likesCount ?? 0}</span>
+              <span className="text-sm text-gray-600">
+                {displayedBook.favorites_count}
+              </span>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleFavoriteClick}
                 className="shrink-0"
+                disabled={isLoading}
               >
                 <Heart
-                  className={`h-5 w-5 ${
-                    favorited ? "fill-red-500 text-red-500" : "text-gray-400"
-                  }`}
+                  className={`h-5 w-5 transition-colors ${
+                    displayedBook.isFavorited ? "fill-red-500 text-red-500" : "text-gray-400"
+                  } ${isLoading ? "opacity-50" : ""}`}
+                  style={{ cursor: isLoading ? "not-allowed" : "pointer" }}
                 />
               </Button>
             </div>

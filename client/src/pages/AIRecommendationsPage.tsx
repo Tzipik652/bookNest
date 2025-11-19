@@ -11,19 +11,37 @@ import {
 import { AutoAwesome, Info, Refresh } from "@mui/icons-material";
 import { useAIRecommendations } from "../hooks/useAIRecommendations";
 import { useFavoriteBooks } from "../hooks/useFavorites";
-import { Book } from "../types";
+import { Book, BookWithFavorite } from "../types";
 import BookGridSkeleton from "../components/BookGridSkeleton";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function AIRecommendationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const queryClient = useQueryClient();
 
   const { countFavoritesForUser } = useFavoriteBooks();
   const favoriteBooksNumber = countFavoritesForUser();
 
   const { AIRecommendationsQuery } = useAIRecommendations();
   const AIRecommendations = AIRecommendationsQuery.data || [];
+  useEffect(() => {
+    if (!AIRecommendations) return;
+
+    AIRecommendations.forEach((book) => {
+      queryClient.setQueryData<BookWithFavorite>(
+        ["book", book._id],
+        (existing) => ({
+          ...book,
+          ...existing,
+          isFavorited: true,
+          favorites_count:
+            existing?.favorites_count ?? book.favorites_count ?? 1,
+        })
+      );
+    });
+  }, [AIRecommendations, queryClient]);
 
   useEffect(() => {
     setIsLoading(AIRecommendationsQuery.isLoading);

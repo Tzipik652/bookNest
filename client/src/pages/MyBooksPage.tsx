@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Book } from "../types/index";
+import { Book, BookWithFavorite } from "../types/index";
 import { getBooksByUserId } from "../services/bookService";
 import { BookCard } from "../components/BookCard";
 import { Search, BookPlus } from "lucide-react";
@@ -14,12 +14,16 @@ import {
   Grid,
 } from "@mui/material";
 import BookGridSkeleton from "../components/BookGridSkeleton";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFavoriteBooks } from "../hooks/useFavorites";
 
 export function MyBooksPage() {
   const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { isFavorited } = useFavoriteBooks();
 
   useEffect(() => {
     async function fetchBooks() {
@@ -27,6 +31,18 @@ export function MyBooksPage() {
       try {
         const data = await getBooksByUserId();
         setBooks(Array.isArray(data) ? data : []);
+
+        data?.forEach((book: Book) => {
+         queryClient.setQueryData<BookWithFavorite>(
+                 ["book", book._id],
+                 (existing) => ({
+                   ...existing,
+                   ...book,
+                   favorites_count: existing?.favorites_count ?? book.favorites_count ?? 0,
+                   isFavorited: existing?.isFavorited ?? isFavorited(book._id) ?? false,
+                 })
+               );
+        });
       } catch (error) {
         console.error("Failed to fetch user's books:", error);
       } finally {

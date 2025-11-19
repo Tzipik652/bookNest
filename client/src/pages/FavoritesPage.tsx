@@ -1,4 +1,5 @@
 import { use, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { BookCard } from "../components/BookCard";
 import { useNavigate } from "react-router-dom";
 import { Heart, Search } from "lucide-react";
@@ -10,9 +11,8 @@ import {
   TextField,
   InputAdornment,
   Button,
-  CircularProgress,
 } from "@mui/material";
-import { Book } from "../types";
+import { Book, BookWithFavorite } from "../types";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import BookGridSkeleton from "../components/BookGridSkeleton";
 
@@ -21,9 +21,25 @@ export function FavoritesPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-
+  const queryClient = useQueryClient();
   const { favoriteBooksQuery } = useFavoriteBooks();
   const favoriteBooks = favoriteBooksQuery.data || [];
+   useEffect(() => {
+    if (!favoriteBooks) return;
+
+    favoriteBooks.forEach((book) => {
+      queryClient.setQueryData<BookWithFavorite>(
+        ["book", book._id],
+        (existing) => ({
+          ...book,
+          ...existing,
+          isFavorited: true,
+          favorites_count:
+            existing?.favorites_count ?? book.favorites_count ?? 1,
+        })
+      );
+    });
+  }, [favoriteBooks, queryClient]);
   useEffect(() => {
     setIsLoading(favoriteBooksQuery.isLoading);
   }, [favoriteBooksQuery.isLoading]);

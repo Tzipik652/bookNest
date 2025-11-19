@@ -1,10 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { CommentSection } from "../components/CommentSection";
-
-import { Book } from "../types";
-
-import { getBookById, deleteBook } from "../services/bookService";
+import { deleteBook } from "../services/bookService";
 import {
   Box,
   Button,
@@ -18,7 +15,6 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-
 import {
   Favorite,
   FavoriteBorder,
@@ -27,62 +23,33 @@ import {
   Delete,
   AutoAwesome,
 } from "@mui/icons-material";
-
 import { useUserStore } from "../store/useUserStore";
 import { useFavoriteBooks } from "../hooks/useFavorites";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useDynamicTheme } from "../theme";
+import { BookWithFavorite } from "../types";
 
 export function BookDetailsPage() {
   const theme = useDynamicTheme();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+
   const { user: currentUser } = useUserStore();
+  const queryClient = useQueryClient();
 
-  const [book, setBook] = useState<Book | null>(null);
+  const { toggleMutation } = useFavoriteBooks();
+  const bookFromCache = queryClient.getQueryData<BookWithFavorite>([
+    "book",
+    id,
+  ]);
+
+  const loading = toggleMutation.isPending;
+
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const { toggleMutation, isFavorited } = useFavoriteBooks();
-  const [favorited, setFavorited] = useState(isFavorited(id || ""));
-  const [likesCount, setLikesCount] = useState<number>(0);
 
-  useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      return;
-    }
 
-    const fetchBook = async () => {
-      try {
-        const data = await getBookById(id);
-        setBook(data);
-        setLikesCount(data.favorites_count || 0);
-      } catch (err) {
-        console.error(err);
-        setBook(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBook();
-  }, [id]);
-
-  if (loading) {
-    return (
-      <Box
-        minHeight="100vh"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <Typography>Loading...</Typography>
-      </Box>
-    );
-  }
-
-  if (!book) {
+  if (!bookFromCache) {
     return (
       <Box
         minHeight="100vh"
@@ -108,7 +75,7 @@ export function BookDetailsPage() {
     );
   }
 
-  const isOwner = currentUser?._id === book.user_id;
+  const isOwner = currentUser?._id === bookFromCache.user_id;
 
   const handleFavoriteToggle = () => {
     if (!currentUser) {
@@ -116,13 +83,12 @@ export function BookDetailsPage() {
       navigate(`/login?redirect=${encodedPath}`);
       return;
     }
-    toggleMutation.mutate(book._id);
-    setFavorited(!favorited);
-    setLikesCount((prev) => (favorited ? prev - 1 : prev + 1));
+
+    toggleMutation.mutate(bookFromCache._id);
   };
 
   const handleDelete = () => {
-    deleteBook(book._id);
+    deleteBook(bookFromCache._id);
     navigate("/my-books");
   };
 
@@ -147,51 +113,49 @@ export function BookDetailsPage() {
         </Button>
 
         <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={4}>
-          {/* Book Cover */}
           <Box flex={1}>
             <Card sx={{ overflow: "hidden" }}>
               <CardMedia
                 component="img"
-                image={book.img_url}
-                alt={book.title}
+                image={bookFromCache.img_url}
+                alt={bookFromCache.title}
                 sx={{ aspectRatio: "3 / 4", objectFit: "cover" }}
               />
             </Card>
           </Box>
 
-          {/* Book Details */}
           <Box flex={1}>
             <Card elevation={0} sx={{ bgcolor: "transparent" }}>
               <CardContent>
                 <Typography variant="h4" gutterBottom>
-                  {book.title}
+                  {bookFromCache.title}
                 </Typography>
                 <Typography variant="h6" color="text.secondary" gutterBottom>
-                  by {book.author}
+                  by {bookFromCache.author}
                 </Typography>
 
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
                   <Chip
-                    label={book.category}
+                    label={bookFromCache.category}
                     color="default"
                     variant="outlined"
                   />
-                  {book.price && (
+                  {bookFromCache.price && (
                     <Typography variant="h6">
-                      ${book.price.toFixed(2)}
+                      ${bookFromCache.price.toFixed(2)}
                     </Typography>
                   )}
                 </Box>
 
-                {/* Action Buttons */}
                 <Box display="flex" gap={2} mb={3} flexWrap="wrap">
                   <Button
-                    variant={favorited ? "contained" : "outlined"}
+                    variant={bookFromCache.isFavorited ? "contained" : "outlined"}
                     color="primary"
-                    startIcon={favorited ? <Favorite /> : <FavoriteBorder />}
+                    startIcon={bookFromCache.isFavorited ? <Favorite /> : <FavoriteBorder />}
                     onClick={handleFavoriteToggle}
+                    disabled={toggleMutation.isPending}
                   >
-                    {favorited ? "Remove from Favorites" : "Add to Favorites"}
+                    {bookFromCache.isFavorited ? "Remove from Favorites" : "Add to Favorites"}
                   </Button>
 
                   {isOwner && (
@@ -199,7 +163,7 @@ export function BookDetailsPage() {
                       <Button
                         variant="outlined"
                         startIcon={<Edit />}
-                        onClick={() => navigate(`/edit-book/${book._id}`)}
+                        onClick={() => navigate(`/edit-book/${bookFromCache._id}`)}
                       >
                         Edit
                       </Button>
@@ -214,47 +178,36 @@ export function BookDetailsPage() {
                     </>
                   )}
                 </Box>
+
                 <Box mb={4}>
                   <Typography variant="body1" color="text.secondary">
-                    {likesCount} other users liked this book
+                    {bookFromCache.favorites_count} users liked this book
                   </Typography>
                 </Box>
-                {/* Description */}
+
                 <Box mb={4}>
                   <Typography variant="h6" gutterBottom>
                     Description
                   </Typography>
                   <Typography variant="body1" color="text.secondary">
-                    {book.description}
+                    {bookFromCache.description}
                   </Typography>
                 </Box>
 
-                {/* AI Summary */}
-                <Box
-                  p={3}
-                  borderRadius={2}
-                  border="1px solid #e0e0e0"
-                  sx={
-                    {
-                      // background: "linear-gradient(135deg, #eef2ff, #f3e8ff)",
-                    }
-                  }
-                  mb={3}
-                >
+                <Box p={3} borderRadius={2} border="1px solid #e0e0e0" mb={3}>
                   <Box display="flex" alignItems="center" gap={1} mb={1}>
                     <AutoAwesome color="primary" />
                     <Typography variant="h6">AI Summary</Typography>
                   </Box>
                   <Typography variant="body1" color="text.secondary">
-                    {book.ai_summary}
+                    {bookFromCache.ai_summary}
                   </Typography>
                 </Box>
 
-                {/* Uploader Info */}
                 <Typography variant="body2" color="text.secondary">
-                  Uploaded by {book.user.name}
+                  Uploaded by {bookFromCache.user.name}
                   <br />
-                  {new Date(book.date_created).toLocaleDateString()}
+                  {new Date(bookFromCache.date_created).toLocaleDateString()}
                 </Typography>
               </CardContent>
             </Card>
@@ -262,12 +215,10 @@ export function BookDetailsPage() {
         </Box>
       </Box>
 
-      {/* Comment Section */}
       <Box className="mt-12">
-        <CommentSection bookId={book._id} bookOwnerId={book.user_id} />
+        <CommentSection bookId={bookFromCache._id} bookOwnerId={bookFromCache.user_id} />
       </Box>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
@@ -275,7 +226,7 @@ export function BookDetailsPage() {
         <DialogTitle>Are you sure?</DialogTitle>
         <DialogContent>
           <Typography>
-            This will permanently delete "{book.title}" from your library. This
+            This will permanently delete "{bookFromCache.title}" from your library. This
             action cannot be undone.
           </Typography>
         </DialogContent>
