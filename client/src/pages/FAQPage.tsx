@@ -55,12 +55,12 @@ export function FAQPage() {
 
                 {/* FAQ Sections */}
                 <div className="space-y-6">
-                    {faqs.map((section, idx) => (
+                    {faqs.map((section:any, idx:any) => (
                         <Card key={idx}>
                             <CardContent className="pt-6">
                                 <h2 className="mb-4 text-blue-600">{section.category}</h2>
                                 <Accordion type="single" collapsible className="w-full">
-                                    {section.questions.map((faq, faqIdx) => (
+                                    {section.questions.map((faq:any, faqIdx:any) => (
                                         <AccordionItem key={faqIdx} value={`item-${idx}-${faqIdx}`}>
                                             <AccordionTrigger>{faq.question}</AccordionTrigger>
                                             <AccordionContent className="text-gray-700">
