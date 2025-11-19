@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BookCard } from "../components/BookCard";
 import {
   Box,
@@ -19,6 +19,9 @@ export function AIRecommendationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
+  const discoverRef = useRef<HTMLHeadingElement | null>(null);
+
   const queryClient = useQueryClient();
 
   const { countFavoritesForUser } = useFavoriteBooks();
@@ -42,10 +45,22 @@ export function AIRecommendationsPage() {
       );
     });
   }, [AIRecommendations, queryClient]);
+  
+  useEffect(() => {
+    if (!isLoading) {
+      if (firstLoad) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setFirstLoad(false);
+      } else if (discoverRef.current) {
+        discoverRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     setIsLoading(AIRecommendationsQuery.isLoading);
   }, [AIRecommendationsQuery.isLoading]);
+  
   useEffect(() => {
     setError(AIRecommendationsQuery.error as string | null);
   }, [AIRecommendationsQuery.error]);
@@ -80,7 +95,6 @@ export function AIRecommendationsPage() {
           severity="info"
           icon={false}
           sx={{
-            // background: "linear-gradient(to right, #dffdd7ff, #dbf3bcff)",
             border: "1px solid #d1febfff",
             display: "flex",
             alignItems: "center",
@@ -93,9 +107,8 @@ export function AIRecommendationsPage() {
           </AlertTitle>
           <Typography variant="body2">
             {favoriteBooksNumber > 0
-              ? `Based on your ${favoriteBooksNumber} favorite ${
-                  favoriteBooksNumber === 1 ? "book" : "books"
-                }, we've found these recommendations for you.`
+              ? `Based on your ${favoriteBooksNumber} favorite ${favoriteBooksNumber === 1 ? "book" : "books"
+              }, we've found these recommendations for you.`
               : "Add some books to your favorites to get personalized recommendations."}
           </Typography>
         </Alert>

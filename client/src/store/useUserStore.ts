@@ -1,14 +1,8 @@
 // src/store/useUserStore.ts
 import { create } from "zustand";
 import { QueryClient } from "@tanstack/react-query";
+import { User } from "../types";
 
-interface User {
-  _id: string;
-  email: string;
-  name: string;
-  auth_provider: string;
-  profile_picture?: string;
-}
 
 interface UserStore {
   user: User | null;

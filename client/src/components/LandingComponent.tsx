@@ -1,58 +1,134 @@
+// import { Box, Button, Container, Typography } from '@mui/material'
+// import React from 'react'
+// import { useNavigate } from 'react-router-dom';
+
+// const LandingComponent = () => {
+//       const navigate = useNavigate();
+    
+//   return (
+//     <Box
+//         sx={{
+//           bgcolor: "primary.main",
+//           color: "primary.contrastText",
+//           py: 12,
+//           textAlign: "center",
+//         }}
+//       >
+//         <Container maxWidth="md">
+//           <Typography variant="h3" component="h1" gutterBottom>
+//             Welcome to BookNest
+//           </Typography>
+//           <Typography variant="h6" mb={4}>
+//             Discover, organize, and share your favorite books with AI-powered
+//             recommendations
+//           </Typography>
+//           <Box
+//             sx={{
+//               display: "flex",
+//               justifyContent: "center",
+//               gap: 2,
+//               flexWrap: "wrap",
+//             }}
+//           >
+//             <Button
+//               variant="contained"
+//               color="primary"
+//               onClick={() => navigate("/login")}
+//             >
+//               Login
+//             </Button>
+//             <Button
+//               variant="outlined"
+//               color="inherit"
+//               onClick={() => navigate("/register")}
+//               sx={{
+//                 borderColor: "white",
+//                 color: "main.contrastText",
+//                 "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
+//               }}
+//             >
+//               Register
+//             </Button>
+//           </Box>
+//         </Container>
+//       </Box>
+//   )
+// }
+
+// export default LandingComponent;
 import { Box, Button, Container, Typography } from '@mui/material'
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
 
 const LandingComponent = () => {
-      const navigate = useNavigate();
-    
+  const navigate = useNavigate();
+
   return (
     <Box
-        sx={{
-          bgcolor: "primary.main",
-          color: "primary.contrastText",
-          py: 12,
-          textAlign: "center",
-        }}
+      sx={{
+        backgroundImage: `url("https://images.unsplash.com/photo-1662582631700-676a217d511f?auto=format&fit=crop&w=1600&q=80")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+
+        color: "white",
+        py: 35,
+        textAlign: "center",
+
+        // שכבת כהות קלה לקריאה טובה יותר
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          inset: 0,
+          backgroundColor: "rgba(0,0,0,0.5)",
+        }
+      }}
+    >
+      {/* התוכן – שיהיה מעל האוברליי */}
+      <Container
+        maxWidth="md"
+        sx={{ position: "relative", zIndex: 1 }}
       >
-        <Container maxWidth="md">
-          <Typography variant="h3" component="h1" gutterBottom>
-            Welcome to BookNest
-          </Typography>
-          <Typography variant="h6" mb={4}>
-            Discover, organize, and share your favorite books with AI-powered
-            recommendations
-          </Typography>
-          <Box
+        <Typography variant="h3" component="h1" gutterBottom>
+          Welcome to BookNest
+        </Typography>
+
+        <Typography variant="h6" mb={4}>
+          Discover, organize, and share your favorite books with AI-powered recommendations
+        </Typography>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate("/login")}
+          >
+            Login
+          </Button>
+
+          <Button
+            variant="outlined"
+            color="inherit"
+            onClick={() => navigate("/register")}
             sx={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 2,
-              flexWrap: "wrap",
+              borderColor: "white",
+              "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
             }}
           >
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </Button>
-            <Button
-              variant="outlined"
-              color="inherit"
-              onClick={() => navigate("/register")}
-              sx={{
-                borderColor: "white",
-                color: "main.contrastText",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
-              }}
-            >
-              Register
-            </Button>
-          </Box>
-        </Container>
-      </Box>
-  )
+            Register
+          </Button>
+        </Box>
+      </Container>
+    </Box>
+  );
 }
 
 export default LandingComponent;

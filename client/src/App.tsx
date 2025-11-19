@@ -4,17 +4,16 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import { CircularProgress, Box, GlobalStyles } from "@mui/material";
 
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { NotFoundPage } from './pages/NotFoundPage';
 import { useUserStore } from "./store/useUserStore";
 import { useAccessibilityStore } from "./store/accessibilityStore";
 import AccessibilityMenu from "./components/AccessibilityMenu";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 
 // Lazy-loaded pages
 const LazyLoginPage = React.lazy(() =>
@@ -58,10 +57,41 @@ const LazyAIRecommendationsPage = React.lazy(() =>
     default: module.AIRecommendationsPage,
   }))
 );
-
+const LazyResetPasswordPage = React.lazy(() =>
+  import("./pages/ResetPassword").then((module) => ({ default: module.ResetPassword }))
+);
 const LazyNotFoundPage = React.lazy(() =>
   import("./pages/NotFoundPage").then((module) => ({
     default: module.NotFoundPage,
+  }))
+);
+
+const LazyContactPage = React.lazy(() =>
+  import("./pages/ContactPage").then((module) => ({
+    default: module.ContactPage,
+  }))
+);
+
+const LazyPrivacyPolicyPage = React.lazy(() =>
+  import("./pages/PrivacyPolicyPage").then((module) => ({
+    default: module.PrivacyPolicyPage,
+  }))
+);
+const LazyForgotPasswordPage = React.lazy(() =>
+  import("./pages/ForgotPassword").then((module) => ({
+    default: module.ForgotPassword
+  }))
+);
+
+const LazyTermsOfServicePage = React.lazy(() =>
+  import("./pages/TermsOfServicePage").then((module) => ({
+    default: module.TermsOfServicePage,
+  }))
+);
+
+const LazyFAQPage = React.lazy(() =>
+  import("./pages/FAQPage").then((module) => ({
+    default: module.FAQPage,
   }))
 );
 
@@ -91,12 +121,12 @@ function App() {
   } = useAccessibilityStore();
 
   // Auto ARIA-label for icon-only buttons
-document.querySelectorAll("button, [role='button'], a").forEach((el) => {
-  const text = el.textContent;
-  if (!el.getAttribute("aria-label") && text && text.trim() === "") {
-    el.setAttribute("aria-label", "button");
-  }
-});
+  document.querySelectorAll("button, [role='button'], a").forEach((el) => {
+    const text = el.textContent;
+    if (!el.getAttribute("aria-label") && text && text.trim() === "") {
+      el.setAttribute("aria-label", "button");
+    }
+  });
 
 
   return (
@@ -121,8 +151,8 @@ document.querySelectorAll("button, [role='button'], a").forEach((el) => {
               backgroundColor: darkMode
                 ? "#121212"
                 : highContrast
-                ? "#000"
-                : "#fff",
+                  ? "#000"
+                  : "#fff",
 
               color: darkMode || highContrast ? "#fff" : "#000",
               fontSize: largeText ? "1.2rem" : "1rem",
@@ -141,6 +171,9 @@ document.querySelectorAll("button, [role='button'], a").forEach((el) => {
             <Route path="/" element={<LazyHomePage />} />
             <Route path="/login" element={<LazyLoginPage />} />
             <Route path="/register" element={<LazyRegisterPage />} />
+            <Route path="/forgot-password" element={<LazyForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<LazyResetPasswordPage />} />
+
             <Route path="/home" element={<LazyHomePage />} />
 
             <Route path="/book/:id" element={<LazyBookDetailsPage />} />
@@ -153,7 +186,14 @@ document.querySelectorAll("button, [role='button'], a").forEach((el) => {
                 </ProtectedRoute>
               }
             />
-
+            <Route
+              path="/admin-dashboard"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboardPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/edit-book/:id"
               element={
@@ -191,6 +231,10 @@ document.querySelectorAll("button, [role='button'], a").forEach((el) => {
             />
 
             <Route path="*" element={<LazyNotFoundPage />} />
+            <Route path="/contact" element={<LazyContactPage />} />
+            <Route path="/privacy-policy" element={<LazyPrivacyPolicyPage />} />
+            <Route path="/terms-of-service" element={<LazyTermsOfServicePage />} />
+            <Route path="/faq" element={<LazyFAQPage />} />
           </Routes>
         </Suspense>
 

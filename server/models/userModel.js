@@ -48,3 +48,11 @@ export async function getFavoriteBooksList(id) {
   // Returning a clean array of book UUID strings: ['uuid1', 'uuid2', ...]
   return data.map(item => item.book_id);
 }
+export async function getUsers() {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*');
+
+  if (error) throw error;
+  return data;
+}

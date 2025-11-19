@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { BookCard } from "../components/BookCard";
 import { getBooks, getBooksByCategory } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
@@ -28,6 +28,10 @@ export function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+   
+  const [firstLoad, setFirstLoad] = useState(true);
+  const discoverRef = useRef<HTMLHeadingElement | null>(null);
+
   const { user } = useUserStore();
   const queryClient = useQueryClient();
   const { favoriteBooksQuery } = useFavoriteBooks();
@@ -75,11 +79,20 @@ export function HomePage() {
 
   useEffect(() => {
     if (!loading) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (firstLoad) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setFirstLoad(false);
+      } else if (discoverRef.current) {
+        discoverRef.current.scrollIntoView({ behavior: "smooth" });
+      }
     }
   }, [loading]);
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
     if (value !== currentPage) {
       setCurrentPage(value);
     }
@@ -97,10 +110,15 @@ export function HomePage() {
       {!user && <LandingComponent />}
       
       <Container maxWidth="lg">
-        <Typography variant="h4" fontWeight="bold" mb={2} py={2}>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          mb={2}
+          py={2}
+          ref={discoverRef}
+        >
           Discover Books
         </Typography>
-
         {/* Filters */}
         <Box sx={{ display: "flex", gap: 2, mb: 6, flexWrap: "wrap" }}>
           <TextField

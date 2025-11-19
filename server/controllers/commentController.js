@@ -74,11 +74,19 @@ export const deleteComment = catchAsync(async (req, res, next) => {
     throw new AppError("Book not found", 404);
   }
 
-  // רק בעל הספר או כותב התגובה יכולים למחוק
-  if (comment.user_id !== user._id && book.user_id !== user._id) {
+  if (comment.user_id !== user._id && book.user_id !== user._id && user.role !== 'admin') {
     throw new AppError("Unauthorized to delete this comment", 403);
   }
 
   const success = await CommentModel.remove(commentId);
   res.status(200).json({ success });
+});
+export const getAllComments = catchAsync(async (req, res, next) => {
+  const user= req.user;
+
+  if (!user || user.role !== 'admin') {
+    throw new AppError("Unauthorized: Admin access required", 403);
+  }
+  const comments = await CommentModel.findAll();
+  res.status(200).json(comments);
 });

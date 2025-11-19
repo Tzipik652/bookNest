@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { BookCard } from "../components/BookCard";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +21,9 @@ export function FavoritesPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+      const [firstLoad, setFirstLoad] = useState(true);
+  const discoverRef = useRef<HTMLHeadingElement | null>(null);
+
   const queryClient = useQueryClient();
   const { favoriteBooksQuery } = useFavoriteBooks();
   const favoriteBooks = favoriteBooksQuery.data || [];
@@ -40,9 +43,22 @@ export function FavoritesPage() {
       );
     });
   }, [favoriteBooks, queryClient]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (firstLoad) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setFirstLoad(false);
+      } else if (discoverRef.current) {
+        discoverRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [isLoading]);
+
   useEffect(() => {
     setIsLoading(favoriteBooksQuery.isLoading);
   }, [favoriteBooksQuery.isLoading]);
+  
   useEffect(() => {
     setError(favoriteBooksQuery.error as string | null);
   }, [favoriteBooksQuery.error]);

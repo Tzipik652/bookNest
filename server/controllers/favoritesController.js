@@ -63,3 +63,7 @@ export const getBookLikes = catchAsync(async (req, res, next) => {
   const count = await favoritesModel.countBookFavorites(bookId);
   res.status(200).json({ bookId, favoritesCount: count });
 });
+export const getFavoritesCount = catchAsync(async (req, res, next) => {
+  const count = await favoritesModel.getFavoritesCount();
+  res.status(200).json({ count });
+});

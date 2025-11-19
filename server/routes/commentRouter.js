@@ -4,7 +4,8 @@ import {
   getComments,
   addComment,
   deleteComment,
-  getCommentById
+  getCommentById,
+  getAllComments
 } from "../controllers/commentController.js";
 import { verifyJWT } from "../middleware/auth.js";
 
@@ -14,5 +15,6 @@ router.get("/:bookId", getComments);
 router.post("/", verifyJWT, addComment);
 router.delete("/:commentId", verifyJWT, deleteComment);
 router.get('/single/:commentId', getCommentById);
+router.get('/', verifyJWT, getAllComments);
 
 export default router;

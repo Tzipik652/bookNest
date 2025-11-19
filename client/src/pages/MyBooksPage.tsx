@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Book, BookWithFavorite } from "../types/index";
 import { getBooksByUserId } from "../services/bookService";
@@ -22,8 +22,22 @@ export function MyBooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [firstLoad, setFirstLoad] = useState(true);
+  const discoverRef = useRef<HTMLHeadingElement | null>(null);
+
   const queryClient = useQueryClient();
   const { isFavorited } = useFavoriteBooks();
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (firstLoad) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setFirstLoad(false);
+      } else if (discoverRef.current) {
+        discoverRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     async function fetchBooks() {
@@ -33,15 +47,17 @@ export function MyBooksPage() {
         setBooks(Array.isArray(data) ? data : []);
 
         data?.forEach((book: Book) => {
-         queryClient.setQueryData<BookWithFavorite>(
-                 ["book", book._id],
-                 (existing) => ({
-                   ...existing,
-                   ...book,
-                   favorites_count: existing?.favorites_count ?? book.favorites_count ?? 0,
-                   isFavorited: existing?.isFavorited ?? isFavorited(book._id) ?? false,
-                 })
-               );
+          queryClient.setQueryData<BookWithFavorite>(
+            ["book", book._id],
+            (existing) => ({
+              ...existing,
+              ...book,
+              favorites_count:
+                existing?.favorites_count ?? book.favorites_count ?? 0,
+              isFavorited:
+                existing?.isFavorited ?? isFavorited(book._id) ?? false,
+            })
+          );
         });
       } catch (error) {
         console.error("Failed to fetch user's books:", error);

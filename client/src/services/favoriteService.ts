@@ -88,3 +88,20 @@ function generateMockai_summary(
 
   return summaries[Math.floor(Math.random() * summaries.length)];
 }
+export async function getFavoritesCount(): Promise<number> {
+  const user = useUserStore.getState().user;
+  const token = useUserStore.getState().token;
+
+  if (!token) throw new Error("Must be logged in to add books");
+  if (user?.role !== "admin") throw new Error("Admin access required");
+  try {
+    const res = await axios.get(`${API_BASE_URL}/all/count`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data.count;
+  } catch (error) {
+    handleAxiosError(error);
+  }
+}

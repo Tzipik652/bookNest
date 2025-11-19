@@ -1,5 +1,6 @@
 import axios from "axios";
 import { User } from "../types";
+import { useUserStore } from "../store/useUserStore";
 const API_BASE_URL =
   `${process.env.REACT_APP_SERVER_URL}/user` || "http://localhost:5000/user";
 
@@ -68,3 +69,18 @@ export const loginWithGoogle = async (credentialResponse: any): Promise<{ user: 
   }
 };
 
+export const getAllUsers = async (): Promise<User[]> => {
+      const token = useUserStore.getState().token;
+  
+      if (!token) throw new Error("Must be logged in to add books");
+  try {
+    const res = await axios.get(`${API_BASE_URL}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data.users;
+  } catch (error) {
+    handleAxiosError(error);
+  }
+}
