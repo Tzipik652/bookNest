@@ -48,7 +48,6 @@ export const addComment = catchAsync(async (req, res, next) => {
     userId: user._id,
     text: text,
   });
-
   res.status(201).json(newComment);
 });
 

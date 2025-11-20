@@ -44,6 +44,7 @@ export async function addComment(bookId: string, text: string): Promise<Comment>
       book_id: serverComment.book_id,
       user_id: serverComment.user_id,
       user_name: serverComment.user_name,
+      profile_picture: serverComment.profile_picture,
       text: serverComment.text,
       created_at: serverComment.created_at || new Date().toISOString(),
       updated_at: serverComment.updated_at || new Date().toISOString(),
@@ -55,9 +56,7 @@ export async function addComment(bookId: string, text: string): Promise<Comment>
   }
 }
 
-/**
- * מחיקת תגובה
- */
+
 export async function deleteComment(commentId: string): Promise<{ success: boolean }> {
   const user = useUserStore.getState().user;
   const token = useUserStore.getState().token;
@@ -75,9 +74,6 @@ export async function deleteComment(commentId: string): Promise<{ success: boole
   }
 }
 
-/**
- * קבלת תגובה בודדת לפי ID
- */
 export async function getCommentById(commentId: string): Promise<Comment> {
   try {
     const res = await axios.get(`${API_BASE_URL}/single/${commentId}`);
@@ -87,6 +83,7 @@ export async function getCommentById(commentId: string): Promise<Comment> {
       book_id: serverComment.book_id,
       user_id: serverComment.user_id,
       user_name: serverComment.user_name,
+      profile_picture: serverComment.profile_picture,
       text: serverComment.text,
       created_at: serverComment.created_at || new Date().toISOString(),
       updated_at: serverComment.updated_at || new Date().toISOString(),

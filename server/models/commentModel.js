@@ -1,10 +1,5 @@
-
-// models/commentModel.js (מעודכן - בלי reactions)
 import supabase from "../config/supabaseClient.js";
 
-/**
- * יצירת תגובה חדשה
- */
 export async function create({ bookId, userId, text }) {
   const { data, error } = await supabase
     .from("comments")
@@ -16,52 +11,82 @@ export async function create({ bookId, userId, text }) {
         created_at: new Date().toISOString(),
       },
     ])
-    .select()
+    .select(
+      `
+       id,
+      book_id,
+      user_id,
+      text,
+      created_at,
+      updated_at,
+      users(name, auth_provider, profile_picture)
+    `
+    )
     .single();
 
   if (error) throw error;
-  return data;
+  return {
+    ...data,
+    user_name: data.users?.name || "Unknown",
+    profile_picture:
+      data.users?.auth_provider == "google" ? data.users?.profile_picture : null,
+  };
 }
-
 
 export async function findByBookId(bookId) {
   const { data, error } = await supabase
-    .from('comments')
-    .select(`
+    .from("comments")
+    .select(
+      `
       id,
       book_id,
       user_id,
       text,
       created_at,
       updated_at,
-      users(name)
-    `)
-    .eq('book_id', bookId)
-    .order('created_at', { ascending: false });
+      users(name, auth_provider, profile_picture)
+    `
+    )
+    .eq("book_id", bookId)
+    .order("created_at", { ascending: false });
 
   if (error) throw error;
 
   // Map the joined name to userName
-  return data.map(c => ({
+  return data.map((c) => ({
     ...c,
-    user_name: c.users?.name || 'Unknown',
+    user_name: c.users?.name || "Unknown",
+    profile_picture:
+      c.users?.auth_provider == "google" ? c.users?.profile_picture : null,
   }));
 }
 
 export async function findById(commentId) {
   const { data, error } = await supabase
-    .from('comments')
-    .select('*')
-    .eq('id', commentId)
+    .from("comments")
+    .select(
+      `
+      id,
+      book_id,
+      user_id,
+      text,
+      created_at,
+      updated_at,
+      users(name, auth_provider, profile_picture)
+    `
+    )
+    .eq("id", commentId)
     .single();
 
   if (error && error.code !== "PGRST116") throw error;
-  return data;
+  return {
+    ...data,
+    user_name: data.users?.name || "Unknown",
+    profile_picture:
+      data.users?.auth_provider == "google" ? data.users?.profile_picture : null,
+  };
 }
 
-/**
- * מחיקת תגובה
- */
 export async function remove(commentId) {
   const { data, error } = await supabase
     .from("comments")
@@ -75,10 +100,25 @@ export async function remove(commentId) {
 }
 export async function findAll() {
   const { data, error } = await supabase
-    .from('comments') 
-    .select(`*`)
-    .order('created_at', { ascending: false });
+    .from("comments")
+    .select(
+      `
+      id,
+      book_id,
+      user_id,
+      text,
+      created_at,
+      updated_at,
+      users(name, auth_provider, profile_picture)
+    `
+    )
+    .order("created_at", { ascending: false });
 
   if (error) throw error;
-  return data;
+  return data.map((c) => ({
+    ...c,
+    user_name: c.users?.name || "Unknown",
+    profile_picture:
+      c.users?.auth_provider == "google" ? c.users?.profile_picture : null,
+  }));
 }
