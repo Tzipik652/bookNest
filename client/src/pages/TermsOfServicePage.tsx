@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { ArrowLeft, FileText } from 'lucide-react';
@@ -34,8 +34,8 @@ export function TermsOfServicePage() {
         </Button>
 
         <div className="mb-8 flex items-center gap-3">
-          <div className="bg-purple-100 p-3 rounded-lg">
-            <FileText className="h-8 w-8 text-purple-600" />
+          <div className="bg-green-100 p-3 rounded-lg">
+            <FileText className="h-8 w-8 text-green-600" />
           </div>
           <div>
             <h1 className="mb-1">Terms of Service</h1>
@@ -48,8 +48,8 @@ export function TermsOfServicePage() {
             <section>
               <h2 className="mb-3">Agreement to Terms</h2>
               <p className="text-gray-700 leading-relaxed">
-                By accessing and using BookNest, you agree to be bound by these Terms of Service and all applicable 
-                laws and regulations. If you do not agree with any of these terms, you are prohibited from using 
+                By accessing and using BookNest, you agree to be bound by these Terms of Service and all applicable
+                laws and regulations. If you do not agree with any of these terms, you are prohibited from using
                 this service.
               </p>
             </section>
@@ -57,8 +57,8 @@ export function TermsOfServicePage() {
             <section>
               <h2 className="mb-3">Description of Service</h2>
               <p className="text-gray-700 leading-relaxed">
-                BookNest is a web-based book management platform that allows users to discover, manage, and get 
-                AI-powered recommendations for books. Users can create accounts, upload book information, manage 
+                BookNest is a web-based book management platform that allows users to discover, manage, and get
+                AI-powered recommendations for books. Users can create accounts, upload book information, manage
                 personal libraries, add favorites, and interact with the community through comments and reactions.
               </p>
             </section>
@@ -94,8 +94,8 @@ export function TermsOfServicePage() {
             <section>
               <h2 className="mb-3">Intellectual Property</h2>
               <p className="text-gray-700 leading-relaxed">
-                The BookNest platform, including its design, features, and functionality, is owned by BookNest and 
-                is protected by copyright and other intellectual property laws. You may not reproduce, distribute, 
+                The BookNest platform, including its design, features, and functionality, is owned by BookNest and
+                is protected by copyright and other intellectual property laws. You may not reproduce, distribute,
                 modify, or create derivative works without our express written permission.
               </p>
             </section>
@@ -119,8 +119,8 @@ export function TermsOfServicePage() {
             <section>
               <h2 className="mb-3">AI-Generated Content</h2>
               <p className="text-gray-700 leading-relaxed">
-                BookNest uses AI to generate book summaries and recommendations. While we strive for accuracy, 
-                AI-generated content may contain errors or inaccuracies. This content is provided for informational 
+                BookNest uses AI to generate book summaries and recommendations. While we strive for accuracy,
+                AI-generated content may contain errors or inaccuracies. This content is provided for informational
                 purposes only and should not be considered professional advice.
               </p>
             </section>
@@ -142,8 +142,8 @@ export function TermsOfServicePage() {
             <section>
               <h2 className="mb-3">Disclaimer of Warranties</h2>
               <p className="text-gray-700 leading-relaxed">
-                BookNest is provided "as is" without warranties of any kind, either express or implied. We do not 
-                guarantee that the service will be uninterrupted, secure, or error-free. Your use of the service 
+                BookNest is provided "as is" without warranties of any kind, either express or implied. We do not
+                guarantee that the service will be uninterrupted, secure, or error-free. Your use of the service
                 is at your own risk.
               </p>
             </section>
@@ -151,7 +151,7 @@ export function TermsOfServicePage() {
             <section>
               <h2 className="mb-3">Limitation of Liability</h2>
               <p className="text-gray-700 leading-relaxed">
-                To the maximum extent permitted by law, BookNest shall not be liable for any indirect, incidental, 
+                To the maximum extent permitted by law, BookNest shall not be liable for any indirect, incidental,
                 special, consequential, or punitive damages resulting from your use or inability to use the service.
               </p>
             </section>
@@ -159,8 +159,8 @@ export function TermsOfServicePage() {
             <section>
               <h2 className="mb-3">Termination</h2>
               <p className="text-gray-700 leading-relaxed">
-                We reserve the right to terminate or suspend your account and access to the service at our sole 
-                discretion, without notice, for conduct that we believe violates these Terms of Service or is 
+                We reserve the right to terminate or suspend your account and access to the service at our sole
+                discretion, without notice, for conduct that we believe violates these Terms of Service or is
                 harmful to other users, us, or third parties.
               </p>
             </section>
@@ -168,8 +168,8 @@ export function TermsOfServicePage() {
             <section>
               <h2 className="mb-3">Changes to Terms</h2>
               <p className="text-gray-700 leading-relaxed">
-                We reserve the right to modify these terms at any time. We will notify users of any material changes 
-                by updating the "Last updated" date. Your continued use of BookNest after changes constitutes 
+                We reserve the right to modify these terms at any time. We will notify users of any material changes
+                by updating the "Last updated" date. Your continued use of BookNest after changes constitutes
                 acceptance of the new terms.
               </p>
             </section>
@@ -178,10 +178,9 @@ export function TermsOfServicePage() {
               <h2 className="mb-3">Contact Information</h2>
               <p className="text-gray-700 leading-relaxed">
                 If you have any questions about these Terms of Service, please contact us at{' '}
-                <a href="/contact" className="text-blue-600 hover:underline">
+                <Link to="/contact" className="text-green-600 hover:underline">
                   our contact page
-                </a>
-                .
+                </Link>
               </p>
             </section>
           </CardContent>

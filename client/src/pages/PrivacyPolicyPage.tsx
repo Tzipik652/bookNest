@@ -34,8 +34,8 @@ export function PrivacyPolicyPage() {
         </Button>
 
         <div className="mb-8 flex items-center gap-3">
-          <div className="bg-blue-100 p-3 rounded-lg">
-            <Shield className="h-8 w-8 text-blue-600" />
+          <div className="bg-green-100 p-3 rounded-lg">
+            <Shield className="h-8 w-8 text-green-600" />
           </div>
           <div>
             <h1 className="mb-1">Privacy Policy</h1>
@@ -141,7 +141,7 @@ export function PrivacyPolicyPage() {
               <h2 className="mb-3">Contact Us</h2>
               <p className="text-gray-700 leading-relaxed">
                 If you have any questions about this privacy policy, please contact us at{' '}
-                <a href="/contact" className="text-blue-600 hover:underline">
+                <a href="/contact" className="text-green-600 hover:underline">
                   our contact page
                 </a>
                 .

@@ -114,11 +114,18 @@ export function AdminDashboardPage() {
     navigate(`/edit-book/${bookId}`, { state: { from: '/admin-dashboard' } });
   };
 
-  // Calculate statistics
-  const totalReactions = comments.reduce((sum, comment) => sum + comment.reactions?.length, 0);
+  // --- Calculate statistics ---
+  
+  // ✅ תיקון 1: חישוב סך כל הריאקציות בצורה נכונה
+  const calculatedTotalReactions = Object.values(reactionCounts).reduce((acc: number, curr: any) => {
+    const perCommentTotal = (curr.like || 0) + (curr.dislike || 0) + (curr.happy || 0) + (curr.angry || 0);
+    return acc + perCommentTotal;
+  }, 0);
+
   const recentBooks = books.slice().sort((a, b) =>
     new Date(b.date_created).getTime() - new Date(a.date_created).getTime()
   ).slice(0, 5);
+  
   const recentComments = comments.slice().sort((a, b) =>
     new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   ).slice(0, 10);
@@ -207,14 +214,16 @@ export function AdminDashboardPage() {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Engagement</p>
-                  <p className="text-2xl">{totalReactions} Reactions</p>
+                  {/* ✅ תיקון 2: שימוש במשתנה המחושב */}
+                  <p className="text-2xl">{calculatedTotalReactions} Reactions</p>
                 </div>
                 <div className="bg-orange-100 p-3 rounded-lg">
                   <TrendingUp className="h-6 w-6 text-orange-600" />
                 </div>
               </div>
               <p className="text-sm text-gray-500">
-                Average: {(totalReactions / Math.max(comments.length, 1)).toFixed(1)} reactions per comment
+                {/* ✅ תיקון 3: עדכון הממוצע */}
+                Average: {(calculatedTotalReactions / Math.max(comments.length, 1)).toFixed(1)} reactions per comment
               </p>
             </CardContent>
           </Card>
@@ -278,7 +287,6 @@ export function AdminDashboardPage() {
                           >
                             View
                           </Button>
-                          {/* כפתור העריכה המעודכן */}
                           <Button
                             variant="outline"
                             size="sm"
@@ -375,7 +383,7 @@ export function AdminDashboardPage() {
                       <span>😊 {reactionCounts[comment.id]?.happy ?? 0}</span>
                       <span>😡 {reactionCounts[comment.id]?.angry ?? 0}</span>
                     </div>
-
+                    
                   </div>
                 );
               })}
