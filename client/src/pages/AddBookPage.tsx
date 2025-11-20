@@ -94,7 +94,7 @@ export function AddBookPage() {
         author: data.author,
         description: data.description,
         category: data.category,
-        imgUrl:
+        img_url:
           data.img_url ||
           "https://images.unsplash.com/photo-1560362415-c88a4c066155?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
         price: data.price ? parseFloat(data.price) : undefined,

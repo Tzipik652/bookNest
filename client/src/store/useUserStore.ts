@@ -1,5 +1,6 @@
 // src/store/useUserStore.ts
 import { create } from "zustand";
+import { QueryClient } from "@tanstack/react-query";
 import { User } from "../types";
 
 
@@ -7,9 +8,8 @@ interface UserStore {
   user: User | null;
   token: string | null;
   login: (user: User, token: string) => void;
-  logout: () => void;
+  logout: (queryClient?: QueryClient) => void;
 }
-
 const storedToken = localStorage.getItem("token");
 const storedUser = localStorage.getItem("user");
 let initialUser: User | null = null;
@@ -32,9 +32,13 @@ export const useUserStore = create<UserStore>((set) => ({
     set({ user, token });
   },
 
-  logout: () => {
+  logout: (queryClient?: QueryClient) => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     set({ user: null, token: null });
+    if (queryClient)
+    {
+      queryClient.clear();
+    }
   },
 }));

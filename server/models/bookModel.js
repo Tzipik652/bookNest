@@ -2,33 +2,36 @@
 import supabase from "../config/supabaseClient.js";
 import { getFavoriteBooksList } from "./userModel.js";
 
-/**
- * Create a new book
- */
-// export async function create(bookData) {
-//   const { data, error } = await supabase
-//     .from("books")
-//     .insert({
-//       title: bookData.title,
-//       author: bookData.author,
-//       description: bookData.description,
-//       category: bookData.category,
-//       img_url: bookData.imgUrl,
-//       price: bookData.price,
-//       ai_summary: bookData.ai_summary,
-//       user_id: bookData.user_id,
-//     })
-//     .select()
-//     .single();
+const bookSelectQuery = `
+  _id,
+  title,
+  author,
+  description,
+  img_url,
+  price,
+  ai_summary,
+  user_id,
+  date_created,
+  user: user_id ( name, email ),
+  category_details: category ( name ),
+  user_favorites: user_favorites_book_id_fkey(count)
+`;
 
-//   if (error) throw error;
-//   return data;
-// }
-/**
- * Create a new book
- */
+function normalizeBook(book) {
+  if (!book) return null;
+
+  const { category_details, user_favorites, ...rest } = book;
+  const favorites_count =
+    Array.isArray(user_favorites) && user_favorites.length > 0
+      ? user_favorites[0].count
+      : 0;
+  return {
+    ...rest,
+    category: category_details?.name ?? null,
+    favorites_count: favorites_count,
+  };
+}
 export async function create(bookData) {
-  // 1. איתור מזהה הקטגוריה (UUID) לפי השם שסופק ב-bookData.category
   const { data: categoryData, error: categoryError } = await supabase
     .from("categories")
     .select("id")
@@ -37,22 +40,19 @@ export async function create(bookData) {
 
   if (categoryError) {
     console.error("Error fetching category ID:", categoryError);
-    // אם לא נמצא מזהה, זרוק שגיאה
     throw new Error(`Category not found: ${bookData.category}`);
   }
 
   const categoryId = categoryData.id;
 
-  // 2. הכנסת הספר עם מזהה הקטגוריה שנמצא
   const { data, error } = await supabase
     .from("books")
     .insert({
       title: bookData.title,
       author: bookData.author,
       description: bookData.description,
-      // שימוש ב-categoryId שאותחל
-      category: categoryId, 
-      img_url: bookData.imgUrl,
+      category: categoryId,
+      img_url: bookData.img_url,
       price: bookData.price,
       ai_summary: bookData.ai_summary,
       user_id: bookData.user_id,
@@ -60,59 +60,32 @@ export async function create(bookData) {
     .select()
     .single();
 
-     if (error && error.code === "23505") {
-      console.warn(`duplication,Category name '${bookData.category}' already exists.`);  
-      throw error;
-    }
-    else if (error) {
-      console.error("Error creating book:", error);
-      throw error;
-    }
+  if (error && error.code === "23505") {
+    console.warn(
+      `duplication,Category name '${bookData.category}' already exists.`
+    );
+    throw error;
+  } else if (error) {
+    console.error("Error creating book:", error);
+    throw error;
+  }
   return data;
 }
 /**
  * Get all books
  */
 export async function findAll() {
-  try {
-    //join with users to get uploader name
-    const { data, error } = await supabase
-      .from("books")
-.select(`
-        *,
-        user: user_id (
-          name,
-          email
-        ),
-        category: category (
-          name
-        )
-      `)
-      .order("title", { ascending: true });
+  //join with users to get uploader name
+  const { data, error } = await supabase
+    .from("books")
+    .select(bookSelectQuery)
+    .order("title", { ascending: true });
 
-    if (error) {
-      throw error;
-    }
-const cleanedData = data.map(book => ({
-        _id: book._id,
-        title: book.title,
-        author: book.author,
-        description: book.description,
-        img_url: book.img_url,
-        price: book.price,
-        ai_summary: book.ai_summary,
-        user_id: book.user_id,
-        date_created: book.date_created,
-        user: book.user,
-        // החלפת ה-UUID בשם הקטגוריה
-        category: book.category ? book.category.name : null 
-    }));
-    return cleanedData;
-    // return data;
-  } catch (err) {
-    console.error("Failed to fetch books:", err);
-    throw err;
+  if (error) {
+    throw error;
   }
+
+  return data.map(normalizeBook);
 }
 
 /**
@@ -137,61 +110,25 @@ export async function findPaginated(page = 1, limit = 10, category = null) {
         .select("id")
         .eq("name", category)
         .single();
-      
-      if (error) {
-         console.warn(`Category name '${category}' not found, skipping filter.`);
-      } else {
-        categoryId = data.id;
-      }
+
+      categoryId = data?.id ?? null;
     }
 
     let query = supabase
       .from("books")
-      .select(
-        `
-          _id,
-          title,
-          author,
-          description,
-          img_url,
-          price,
-          ai_summary,
-          user_id,
-          date_created,
-          user: user_id (
-            name,
-            email
-          ),
-          category_details: category ( 
-            name
-          )
-        `,
-        { count: 'exact' }
-      )
+      .select(bookSelectQuery, { count: "exact" })
       .order("title", { ascending: true })
+      .range(start, end);
 
     if (categoryId) {
-      query = query.eq('category', categoryId);
+      query = query.eq("category", categoryId);
     }
 
-    query = query.range(start, end);
-    const { data, count } = await query;
-    
-    const cleanedData = data.map(book => ({
-        _id: book._id,
-        title: book.title,
-        author: book.author,
-        description: book.description,
-        img_url: book.img_url,
-        price: book.price,
-        ai_summary: book.ai_summary,
-        user_id: book.user_id,
-        date_created: book.date_created,
-        user: book.user,
-        category: book.category_details ? book.category_details.name : null 
-    }));
+    const { data, count, error } = await query;
 
-    return { data: cleanedData, count };
+    if (error) throw error;
+
+    return { data: data.map(normalizeBook), count };
   } catch (err) {
     console.error("Failed to fetch books in findPaginated model:", err);
     throw err;
@@ -203,42 +140,15 @@ export async function findPaginated(page = 1, limit = 10, category = null) {
 export async function findById(id) {
   const { data, error } = await supabase
     .from("books")
-    .select(`
-      _id,
-      title,
-      author,
-      description,
-      img_url,
-      price,
-      ai_summary,
-      user_id,
-      date_created,
-      user: user_id ( name, email ),
-      category_details: category ( name ) // צירוף שם הקטגוריה לשדה זמני
-    `)
+    .select(bookSelectQuery)
     .eq("_id", id)
     .single();
 
   if (error && error.code !== "PGRST116") throw error; // not found case
 
-  if (data) {
-    const { category_details, ...rest } = data;
-
-    return {
-      ...rest,
-      category: category_details?.name || null 
-    };
-  }
-
-  return null;
+  return normalizeBook(data);
 }
 
-/**
- * Update book by ID
- */
-/**
- * Update book by ID
- */
 export async function update(id, updates) {
   const validKeys = [
     "title",
@@ -250,9 +160,8 @@ export async function update(id, updates) {
     "ai_summary",
   ];
 
-  let updatesToDb = { ...updates }; // עותק ניתן לשינוי של הנתונים לעדכון
+  let updatesToDb = { ...updates };
 
-  // **1. טיפול בקטגוריה: המרת שם ל-UUID לפני העדכון**
   if (updates.category) {
     const { data: categoryData, error: categoryError } = await supabase
       .from("categories")
@@ -261,15 +170,12 @@ export async function update(id, updates) {
       .single();
 
     if (categoryError) {
-      // אם שם הקטגוריה לא נמצא, זורק שגיאה
       throw new Error(`Category not found: ${updates.category}`);
     }
 
-    // החלפת שם הקטגוריה ב-UUID שלו עבור עדכון טבלת books
     updatesToDb.category = categoryData.id;
   }
 
-  // 2. סינון העדכונים לוודא שהם כוללים רק מפתחות תקפים
   const filteredUpdates = Object.fromEntries(
     Object.entries(updatesToDb).filter(
       ([key, value]) => validKeys.includes(key) && value !== undefined
@@ -278,39 +184,16 @@ export async function update(id, updates) {
 
   if (Object.keys(filteredUpdates).length === 0) return null;
 
-  // 3. ביצוע העדכון ושליפת הנתונים עם שם הקטגוריה
   const { data, error } = await supabase
     .from("books")
     .update(filteredUpdates)
     .eq("_id", id)
-    // בחירה מפורשת לשיטוח הנתונים המוחזרים
-    .select(`
-      _id,
-      title,
-      author,
-      description,
-      img_url,
-      price,
-      ai_summary,
-      user_id,
-      date_created,
-      user: user_id ( name, email ),
-      category_details: category ( name )
-    `)
+    .select(bookSelectQuery)
     .single();
 
   if (error) throw error;
-  
-  // 4. שיטוח הנתונים המוחזרים (הפיכת category_details.name לשדה category)
-  if (data) {
-    const { category_details, ...rest } = data;
-    return {
-      ...rest,
-      category: category_details?.name || null 
-    };
-  }
-  
-  return data;
+
+  return normalizeBook(data);
 }
 
 /**
@@ -327,44 +210,21 @@ export async function remove(id) {
   if (error && error.code !== "PGRST116") throw error; // not found
   return !!data;
 }
+
 export async function getFavoriteBooks(userId) {
-  try {
-    const favoriteBooksList = await getFavoriteBooksList(userId);
-
-    const { data, error } = await supabase
-      .from("books")
-      .select(`
-        _id,
-        title,
-        author,
-        description,
-        img_url,
-        price,
-        ai_summary,
-        user_id,
-        date_created,
-        user: user_id ( name, email ),
-        category_details: category ( name ) 
-      `)
-      .in("_id", favoriteBooksList) 
-      .order("title", { ascending: true });
-
-    if (error) throw error;
-    
-    const cleanedData = data.map(book => {
-        const { category_details, ...rest } = book;
-        return {
-            ...rest,
-            category: category_details?.name || null
-        };
-    });
-
-    return cleanedData;
-  } catch (error) {
-    console.log(`in getFavoriteBooks`);
-    console.log(error);
+  const favoriteBooksList = await getFavoriteBooksList(userId);
+  if (!favoriteBooksList || favoriteBooksList.length === 0) {
     return [];
   }
+  const { data, error } = await supabase
+    .from("books")
+    .select(bookSelectQuery)
+    .in("_id", favoriteBooksList)
+    .order("title", { ascending: true });
+
+  if (error) throw error;
+
+  return data.map(normalizeBook);
 }
 /**
  * Fetch a list of complete books by an array of UUID identifiers.
@@ -372,23 +232,12 @@ export async function getFavoriteBooks(userId) {
  * @returns {Promise<Object[]>} - List of complete book objects.
  */
 const findBooksByIds = async (ids) => {
-  // Supabase (Postgres) uses `.in()` to execute SQL query with WHERE id IN (...)
-  const { data: books, error } = await supabase
-    .from('books')
-    .select(`
-      _id,
-      title,
-      author,
-      description,
-      img_url,
-      price,
-      ai_summary,
-      user_id,
-      date_created,
-      user: user_id ( name, email ),
-      category_details: category ( name ) // צירוף שם הקטגוריה
-    `) // fetch all columns of the book and join user/category
-    .in('_id', ids) // where the '_id' field is in the ids array we received
+  if (!ids || ids.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("books")
+    .select(bookSelectQuery)
+    .in("_id", ids)
     .order("title", { ascending: true });
 
   if (error) {
@@ -396,62 +245,40 @@ const findBooksByIds = async (ids) => {
     throw new Error(error.message);
   }
 
-  const cleanedBooks = (books || []).map(book => {
-      const { category_details, ...rest } = book;
-      return {
-          ...rest,
-          category: category_details?.name || null
-      };
-  });
-
-  return cleanedBooks;
+  return data.map(normalizeBook);
 };
+
 export const getBooksByCategory = async (category) => {
-    
-  let categoryId = null;
-  const { data: categoryData, error: categoryError } = await supabase
+  const { data: categoryData } = await supabase
     .from("categories")
     .select("id")
     .eq("name", category)
     .single();
 
-  if (categoryError) {
-     console.warn(`Category name '${category}' not found, returning empty array.`);
-     return [];
-  }
-  categoryId = categoryData.id;
+  if (!categoryData) return [];
 
   const { data: books, error } = await supabase
-    .from('books')
-    .select(`
-      _id,
-      title,
-      author,
-      description,
-      img_url,
-      price,
-      ai_summary,
-      user_id,
-      date_created,
-      user: user_id ( name, email ),
-      category_details: category ( name ) 
-    `)
-    .eq('category', categoryId) 
+    .from("books")
+    .select(bookSelectQuery)
+    .eq("category", categoryData.id)
     .order("title", { ascending: true });
 
   if (error) {
     console.error("Error fetching books by category:", error);
     throw new Error(error.message);
   }
-  
-  const cleanedBooks = (books || []).map(book => {
-      const { category_details, ...rest } = book;
-      return {
-          ...rest,
-          category: category_details?.name || null
-      };
-  });
-  
-  return cleanedBooks;
-}
-export default { create, findAll, findById, update, remove, findBooksByIds,getFavoriteBooks, findPaginated, getBooksByCategory };
+
+  return data.map(normalizeBook);
+};
+
+export default {
+  create,
+  findAll,
+  findById,
+  update,
+  remove,
+  findBooksByIds,
+  getFavoriteBooks,
+  findPaginated,
+  getBooksByCategory,
+};

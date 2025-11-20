@@ -11,22 +11,41 @@ import {
 import { AutoAwesome, Info, Refresh } from "@mui/icons-material";
 import { useAIRecommendations } from "../hooks/useAIRecommendations";
 import { useFavoriteBooks } from "../hooks/useFavorites";
-import { Book } from "../types";
+import { Book, BookWithFavorite } from "../types";
 import BookGridSkeleton from "../components/BookGridSkeleton";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function AIRecommendationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const { countFavorites } = useFavoriteBooks();
-  const favoriteBooksNumber = countFavorites();
-
-  const { AIRecommendationsQuery } = useAIRecommendations();
-  const AIRecommendations = AIRecommendationsQuery.data || [];
   const [firstLoad, setFirstLoad] = useState(true);
   const discoverRef = useRef<HTMLHeadingElement | null>(null);
 
+  const queryClient = useQueryClient();
+
+  const { countFavoritesForUser } = useFavoriteBooks();
+  const favoriteBooksNumber = countFavoritesForUser();
+
+  const { AIRecommendationsQuery } = useAIRecommendations();
+  const AIRecommendations = AIRecommendationsQuery.data || [];
+  useEffect(() => {
+    if (!AIRecommendations) return;
+
+    AIRecommendations.forEach((book) => {
+      queryClient.setQueryData<BookWithFavorite>(
+        ["book", book._id],
+        (existing) => ({
+          ...book,
+          ...existing,
+          isFavorited: existing?.isFavorited ?? false,
+          favorites_count:
+            existing?.favorites_count ?? book.favorites_count ?? 0,
+        })
+      );
+    });
+  }, [AIRecommendations, queryClient]);
+  
   useEffect(() => {
     if (!isLoading) {
       if (firstLoad) {
@@ -76,7 +95,6 @@ export function AIRecommendationsPage() {
           severity="info"
           icon={false}
           sx={{
-            // background: "linear-gradient(to right, #dffdd7ff, #dbf3bcff)",
             border: "1px solid #d1febfff",
             display: "flex",
             alignItems: "center",

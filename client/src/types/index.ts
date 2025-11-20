@@ -23,6 +23,7 @@ export interface Book {
     email: string;
   };
   date_created: string;
+  favorites_count?: number;
 }
 
 export interface Favorite {
@@ -66,4 +67,8 @@ export interface Comment {
 export type CommentWithReactions = Comment & {
   userReaction?: ReactionType;
   reactionCounts: ReactionCounts;
+};
+
+export type BookWithFavorite = Book & {
+  isFavorited: boolean;
 };

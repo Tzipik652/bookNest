@@ -18,8 +18,7 @@ export function Navbar() {
   const { darkMode, highContrast } = useAccessibilityStore();
 
   const handleLogout = () => {
-    queryClient.removeQueries({ queryKey: ['favoriteBooks'] });
-    logout();
+    logout(queryClient);
     navigate('/');
   };
 

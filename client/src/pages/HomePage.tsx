@@ -1,3 +1,4 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { BookCard } from "../components/BookCard";
 import { getBooks, getBooksByCategory } from "../services/bookService";
@@ -13,28 +14,68 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  CircularProgress,
   Pagination,
 } from "@mui/material";
-import { Book, Category } from "../types";
+import { Book, Category, BookWithFavorite } from "../types";
 import { useUserStore } from "../store/useUserStore";
 import LandingComponent from "../components/LandingComponent";
 import BookGridSkeleton from "../components/BookGridSkeleton";
+import { useFavoriteBooks } from "../hooks/useFavorites";
+
 const BOOKS_PER_PAGE = 20;
 
 export function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [books, setBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const { user } = useUserStore();
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-
+   
   const [firstLoad, setFirstLoad] = useState(true);
   const discoverRef = useRef<HTMLHeadingElement | null>(null);
+
+  const { user } = useUserStore();
+  const queryClient = useQueryClient();
+  const { favoriteBooksQuery } = useFavoriteBooks();
+
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const { data: booksData, isLoading: loading } = useQuery({
+    queryKey: ["books", selectedCategory, currentPage],
+    queryFn: async () => {
+      if (selectedCategory === "All") {
+        return await getBooks({ page: currentPage, limit: BOOKS_PER_PAGE });
+      } else {
+        return await getBooksByCategory(selectedCategory, currentPage, BOOKS_PER_PAGE);
+      }
+    },
+    staleTime: 2 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
+  });
+
+  const books = booksData?.books || [];
+  const totalPages = booksData?.totalPages || 1;
+  const totalItems = booksData?.totalItems || 0;
+
+  useEffect(() => {
+    if (!books.length || !favoriteBooksQuery.data) return;
+
+    const favoriteIds = new Set(favoriteBooksQuery.data.map(b => b._id));
+
+    books.forEach((book: Book) => {
+      queryClient.setQueryData<BookWithFavorite>(
+        ["book", book._id],
+        (existing) => ({
+          ...existing,
+          ...book,
+          favorites_count: existing?.favorites_count ?? book.favorites_count ?? 0,
+          isFavorited: existing?.isFavorited ?? favoriteIds.has(book._id),
+        })
+      );
+    });
+  }, [books, favoriteBooksQuery.data, queryClient]);
 
   useEffect(() => {
     if (!loading) {
@@ -47,6 +88,7 @@ export function HomePage() {
     }
   }, [loading]);
 
+
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     value: number
@@ -55,66 +97,18 @@ export function HomePage() {
       setCurrentPage(value);
     }
   };
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const data = await getCategories();
-        setCategories(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
 
-    fetchCategories();
-  }, []);
-  const fetchBooks = useCallback(
-    async (page: number, limit: number) => {
-      setLoading(true);
-      try {
-        let response;
-        if (selectedCategory && selectedCategory === "All") {
-          response = await getBooks({ page, limit });
-        } else {
-          response = await getBooksByCategory(selectedCategory, page, limit);
-        }
-        const {
-          books: fetchedBooks,
-          totalPages: fetchedTotalPages,
-          totalItems: fetchedTotalItems,
-        } = response;
-        setBooks(fetchedBooks || []);
-        setTotalPages(fetchedTotalPages || 1);
-        setTotalItems(fetchedTotalItems || 0);
-        if (page > fetchedTotalPages && fetchedTotalPages > 0) {
-          setCurrentPage(fetchedTotalPages);
-        }
-      } catch (error) {
-        console.error("Failed to fetch books:", error);
-        setBooks([]);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [selectedCategory]
-  );
-
-  useEffect(() => {
-    fetchBooks(currentPage, BOOKS_PER_PAGE);
-  }, [currentPage, fetchBooks]);
-
-  const filteredBooks = books.filter((book) => {
+  const filteredBooks = books.filter((book: Book) => {
     const matchesSearch =
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || book.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    return matchesSearch;
   });
-
 
   return (
     <Box sx={{ minHeight: "100vh", paddingBottom: 8 }}>
-      {!user ? <LandingComponent /> : <></>}
+      {!user && <LandingComponent />}
+      
       <Container maxWidth="lg">
         <Typography
           variant="h4"
@@ -160,7 +154,7 @@ export function HomePage() {
           </FormControl>
         </Box>
 
-        {/* Books Flexbox */}
+        {/* Books Grid */}
         {loading ? (
           <BookGridSkeleton count={20} />
         ) : filteredBooks.length > 0 ? (
@@ -170,7 +164,7 @@ export function HomePage() {
             gap={3}
             justifyContent="flex-start"
           >
-            {filteredBooks.map((book) => (
+            {filteredBooks.map((book: Book) => (
               <Box
                 key={book._id}
                 flex="1 1 calc(25% - 24px)"
@@ -188,7 +182,8 @@ export function HomePage() {
             </Typography>
           </Box>
         )}
-        {/* PAGINATION UI */}
+
+        {/* Pagination */}
         {totalPages > 1 && (
           <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
             <Pagination
@@ -198,7 +193,6 @@ export function HomePage() {
               variant="outlined"
               shape="rounded"
               size="large"
-              // Disable the pagination control during loading state
               disabled={loading}
             />
           </Box>

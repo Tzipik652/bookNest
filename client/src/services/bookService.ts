@@ -17,14 +17,6 @@ function handleAxiosError(error: any): never {
   }
 }
 
-// export async function getBooks(): Promise<Book[]> {
-//   try {
-//     const res = await axios.get(API_BASE_URL);
-//     return res.data;
-//   } catch (error) {
-//     handleAxiosError(error);
-//   }
-// }
 /**
  * Fetches books with optional pagination parameters.
  * @param {object} params - The request parameters.
@@ -40,7 +32,6 @@ export async function getBooks(params = { page: 1, limit: 20 }) {
         });
 
         const response = await axios.get(`${API_BASE_URL}?${query.toString()}`);
-        
         // The backend should return the structured data (books, currentPage, totalPages, etc.)
         return response.data; 
 
@@ -63,7 +54,7 @@ export async function addBook(bookData: {
   author: string;
   description: string;
   category: string;
-  imgUrl?: string;
+  img_url?: string;
   price?: number;
 }): Promise<Book> {
   try {
@@ -157,7 +148,6 @@ export async function getBooksByCategory(
   }
 }
 
-// שירות לקליינט
 export async function getBooksByUserId() {
   try {
     const res = await axios.get(`${API_BASE_URL}/user`, {

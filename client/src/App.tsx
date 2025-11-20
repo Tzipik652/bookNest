@@ -238,6 +238,7 @@ function App() {
           </Routes>
         </Suspense>
 
+
         {/* Screen reader ARIA announcements */}
         {screenReader && (
           <div
