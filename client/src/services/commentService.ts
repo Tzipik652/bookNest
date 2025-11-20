@@ -18,18 +18,14 @@ function handleAxiosError(error: any): never {
   }
 }
 
-/**
- * קבלת כל התגובות של ספר
- */
+
 export async function getComments(bookId: string): Promise<Comment[]> {
   const res = await fetch(`${API_BASE_URL}/${bookId}`);
   if (!res.ok) throw new Error("Failed to fetch comments");
   return res.json();
 }
 
-/**
- * הוספת תגובה חדשה
- */
+
 export async function addComment(bookId: string, text: string): Promise<Comment> {
   const user = useUserStore.getState().user;
   const token = useUserStore.getState().token;
@@ -47,10 +43,11 @@ export async function addComment(bookId: string, text: string): Promise<Comment>
       id: serverComment.id || serverComment._id,
       book_id: serverComment.book_id,
       user_id: serverComment.user_id,
+      user_name: serverComment.user_name,
       text: serverComment.text,
       created_at: serverComment.created_at || new Date().toISOString(),
       updated_at: serverComment.updated_at || new Date().toISOString(),
-      reactions: serverComment.reactions || [], // עדיין אפשר להשאיר למבנה אחיד
+      reactions: serverComment.reactions || [], 
     };
   } catch (error) {
     handleAxiosError(error);
@@ -89,6 +86,7 @@ export async function getCommentById(commentId: string): Promise<Comment> {
       id: serverComment.id || serverComment._id,
       book_id: serverComment.book_id,
       user_id: serverComment.user_id,
+      user_name: serverComment.user_name,
       text: serverComment.text,
       created_at: serverComment.created_at || new Date().toISOString(),
       updated_at: serverComment.updated_at || new Date().toISOString(),

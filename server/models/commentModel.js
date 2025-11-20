@@ -23,9 +23,7 @@ export async function create({ bookId, userId, text }) {
   return data;
 }
 
-/**
- * שליפת תגובות לספר
- */
+
 export async function findByBookId(bookId) {
   const { data, error } = await supabase
     .from('comments')
@@ -46,13 +44,10 @@ export async function findByBookId(bookId) {
   // Map the joined name to userName
   return data.map(c => ({
     ...c,
-    userName: c.users?.name || 'Unknown',
+    user_name: c.users?.name || 'Unknown',
   }));
 }
 
-/**
- * שליפת תגובה לפי ID
- */
 export async function findById(commentId) {
   const { data, error } = await supabase
     .from('comments')

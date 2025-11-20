@@ -1,4 +1,4 @@
-import { CommentWithReactions, ReactionType } from '../types';
+import { CommentWithReactions, ReactionType, User } from '../types';
 import { Trash2 } from 'lucide-react';
 import {
     Card,
@@ -35,11 +35,11 @@ function CommentItem({ comment, isBookOwner, currentUserId, onDelete, onReaction
                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                         <Stack direction="row" spacing={2} alignItems="center">
                             <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
-                                {comment.user_id.charAt(0).toUpperCase()}
+                                {comment.user_name.charAt(0).toUpperCase()}
                             </Avatar>
                             <Stack spacing={0.5}>
                                 <Typography variant="subtitle1" fontWeight={600}>
-                                    {comment.user_id}
+                                    {comment.user_name}
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary">
                                     {new Date(comment.created_at).toLocaleDateString('en-US', {

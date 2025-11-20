@@ -34,6 +34,7 @@ export async function toggleReaction(commentId: string, reactionType: string): P
       id: serverComment.id || serverComment._id,
       book_id: serverComment.book_id,
       user_id: serverComment.user_id,
+      user_name: serverComment.user_name,
       text: serverComment.text,
       created_at: serverComment.created_at || new Date().toISOString(),
       updated_at: serverComment.updated_at || new Date().toISOString(),
