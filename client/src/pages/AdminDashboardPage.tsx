@@ -1,14 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { Book, Comment, User } from '../types';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Textarea } from '../components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import {
   BookOpen,
   Users,
@@ -21,9 +15,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { categories } from '../lib/mockData';
 import { useUserStore } from '../store/useUserStore';
-import { deleteBook, getBookById, getBooks, updateBook } from '../services/bookService';
+import { deleteBook, getBooks } from '../services/bookService';
 import { getAllUsers } from '../services/userService';
 import { deleteComment, getAllComments } from '../services/commentService';
 import { getFavoritesCount } from '../services/favoriteService';
@@ -34,20 +27,12 @@ export function AdminDashboardPage() {
   const [userMap, setUserMap] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
+
   const [books, setBooks] = useState<Book[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [favorites, setFavorites] = useState<number>(0);
-  const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [reactionCounts, setReactionCounts] = useState<Record<string, any>>({});
-  const [editFormData, setEditFormData] = useState({
-    title: '',
-    author: '',
-    description: '',
-    category: '',
-    imageUrl: '',
-    price: ''
-  });
 
   // Redirect if not admin
   useEffect(() => {
@@ -92,18 +77,14 @@ export function AdminDashboardPage() {
     }
   };
 
-
   async function loadReactions(comments: Comment[]) {
     const countsMap: Record<string, any> = {};
-
     for (const comment of comments) {
       const counts = await getCommentReactionCounts(comment);
       countsMap[comment.id] = counts;
     }
-
     setReactionCounts(countsMap);
   }
-
 
   const handleDeleteBook = (bookId: string) => {
     if (window.confirm('Are you sure you want to delete this book? This will also remove all associated comments and favorites.')) {
@@ -129,36 +110,8 @@ export function AdminDashboardPage() {
     }
   };
 
-  const handleEditBook = (book: Book) => {
-    setEditingBook(book);
-    setEditFormData({
-      title: book.title,
-      author: book.author,
-      description: book.description,
-      category: book.category,
-      imageUrl: book.img_url,
-      price: book.price?.toString() || ''
-    });
-  };
-
-  const handleUpdateBook = () => {
-    if (!editingBook) return;
-
-    try {
-      updateBook(editingBook._id, {
-        title: editFormData.title,
-        author: editFormData.author,
-        description: editFormData.description,
-        category: editFormData.category,
-        img_url: editFormData?.imageUrl,
-        price: editFormData.price ? parseFloat(editFormData.price) : undefined
-      });
-      toast.success('Book updated successfully');
-      setEditingBook(null);
-      loadData();
-    } catch (error) {
-      toast.error('Failed to update book');
-    }
+  const handleEditBook = (bookId: string) => {
+    navigate(`/edit-book/${bookId}`, { state: { from: '/admin-dashboard' } });
   };
 
   // Calculate statistics
@@ -325,10 +278,11 @@ export function AdminDashboardPage() {
                           >
                             View
                           </Button>
+                          {/* כפתור העריכה המעודכן */}
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleEditBook(book)}
+                            onClick={() => handleEditBook(book._id)}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -421,7 +375,7 @@ export function AdminDashboardPage() {
                       <span>😊 {reactionCounts[comment.id]?.happy ?? 0}</span>
                       <span>😡 {reactionCounts[comment.id]?.angry ?? 0}</span>
                     </div>
-                    
+
                   </div>
                 );
               })}
@@ -430,86 +384,6 @@ export function AdminDashboardPage() {
         </Card>
 
       </div>
-
-      {/* Edit Book Dialog */}
-      <Dialog open={!!editingBook} onOpenChange={(open) => !open && setEditingBook(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Book</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-title">Title</Label>
-              <Input
-                id="edit-title"
-                value={editFormData.title}
-                onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-author">Author</Label>
-              <Input
-                id="edit-author"
-                value={editFormData.author}
-                onChange={(e) => setEditFormData({ ...editFormData, author: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-category">Category</Label>
-              <Select
-                value={editFormData.category}
-                onValueChange={(value) => setEditFormData({ ...editFormData, category: value })}
-              >
-                <SelectTrigger id="edit-category">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.filter(c => c !== 'All').map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-description">Description</Label>
-              <Textarea
-                id="edit-description"
-                value={editFormData.description}
-                onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                className="min-h-[100px]"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-imageUrl">Image URL</Label>
-              <Input
-                id="edit-imageUrl"
-                value={editFormData.imageUrl}
-                onChange={(e) => setEditFormData({ ...editFormData, imageUrl: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-price">Price (optional)</Label>
-              <Input
-                id="edit-price"
-                type="number"
-                step="0.01"
-                value={editFormData.price}
-                onChange={(e) => setEditFormData({ ...editFormData, price: e.target.value })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingBook(null)}>
-              Cancel
-            </Button>
-            <Button onClick={handleUpdateBook}>
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
