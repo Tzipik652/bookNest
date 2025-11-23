@@ -184,26 +184,32 @@ export const getAllUsers = catchAsync(async (req, res, next) => {
  });
 })
 export const update = catchAsync(async (req, res, next) => {
-  const user=req.user;
-  const bookId=req.params.id;
-  if( !user && user.role!=="admin" && user._id!==bookId){
-    throw new AppError("Forbidden",403);
-  }
-  const updatedUser=await updateUser(bookId,req.body);
-  res.json({
-    success:true,
-    updatedUser
-  })
-})
+    const user = req.user;
+    const targetUserId = req.params.id; 
+    const isAllowed = user.role === "admin" || user._id === targetUserId;
+    if (!isAllowed) {
+        throw new AppError("Forbidden: You can only modify your own account or be an Admin.", 403);
+    }
+    const updatedUser = await updateUser(targetUserId, req.body);
+    
+    res.json({
+        success: true,
+        updatedUser
+    });
+});
+
 export const deleteUser = catchAsync(async (req, res, next) => {
-  const user=req.user;
-  const bookId=req.params.id;
-  if( !user && user.role!=="admin" && user._id!==bookId){
-    throw new AppError("Forbidden",403);
-  }
-  const deletedUser=await deleteUserRecord(bookId,req.body);
-  res.json({
-    success:true,
-    deletedUser
-  })
-})
+    const user = req.user;
+    const targetUserId = req.params.id;
+    const isAllowed = user.role === "admin" || user._id === targetUserId;
+    if (!isAllowed) {
+        throw new AppError("Forbidden: You can only modify your own account or be an Admin.", 403);
+    }
+    
+    const deletedUser = await deleteUserRecord(targetUserId); 
+        
+    res.json({
+        success: true,
+        deletedUser
+    });
+});
