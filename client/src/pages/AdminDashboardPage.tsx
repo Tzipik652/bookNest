@@ -12,7 +12,9 @@ import {
   Edit,
   Shield,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUserStore } from '../store/useUserStore';
@@ -33,9 +35,16 @@ export function AdminDashboardPage() {
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
 
-  // --- מצבי טעינה ---
-  const [isLoading, setIsLoading] = useState(true); // כל הדף
-  const [isReactionsLoading, setIsReactionsLoading] = useState(true); // רק הכרטיס של ה-Engagement
+  // --- loading state  ---
+  const [isInitialLoading, setIsInitialLoading] = useState(true); // לטעינה הראשונית של הדף
+  const [isBooksLoading, setIsBooksLoading] = useState(true);     // ספציפית לטבלה בעת דפדוף
+  const [isReactionsLoading, setIsReactionsLoading] = useState(true);
+
+  // --- Pagination States ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalBooksCount, setTotalBooksCount] = useState(0);
+  const ITEMS_PER_PAGE = 20;
 
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [books, setBooks] = useState<Book[]>([]);
@@ -57,51 +66,83 @@ export function AdminDashboardPage() {
     }
   }, [currentUser, navigate]);
 
+  // --- Effect 1: טעינה ראשונית בלבד (סטטיסטיקות, יוזרים, תגובות) ---
   useEffect(() => {
-    loadData();
+    loadInitialData();
   }, []);
 
-  const loadData = async () => {
-    setIsLoading(true);
-    
+  // --- Effect 2: טעינת ספרים בעת שינוי עמוד ---
+  useEffect(() => {
+    fetchBooksOnly();
+  }, [currentPage]);
+
+  // פונקציה 1: טעינת מידע כללי (רץ פעם אחת)
+  const loadInitialData = async () => {
+    setIsInitialLoading(true);
     try {
-      // טעינת הנתונים הבסיסיים במקביל
-      const [allBooksData, allUsers, allComments, allFavorites] = await Promise.all([
-        getBooks(),
+      const [allUsers, allComments, allFavorites] = await Promise.all([
         getAllUsers(),
         getAllComments(),
         getFavoritesCount()
       ]);
 
-      const map: Record<string, Book> = {};
-      allBooksData.books.forEach((book: Book) => {
-        map[book._id] = book;
-      });
-
-      const userMap: Record<string, string> = {};
+      // מיפוי יוזרים
+      const uMap: Record<string, string> = {};
       allUsers.forEach((u: User) => {
-        userMap[u._id] = u.name;
+        uMap[u._id] = u.name;
       });
-      setUserMap(userMap);
+      setUserMap(uMap);
 
-      setBooks(allBooksData.books);
-      setFavorites(allFavorites);
       setUsers(allUsers);
       setComments(allComments);
-      setBooksMap(map);
+      setFavorites(allFavorites);
+      
+      // אין צורך לחכות לריאקציות כדי להציג את הדף
+      setIsInitialLoading(false);
 
-      // שחרור ה-UI הראשי
-      setIsLoading(false); 
-
-      // טעינת ריאקציות (כבד יותר) ברקע
+      // טעינת ריאקציות ברקע
       setIsReactionsLoading(true);
       await loadReactions(allComments);
       
     } catch (error) {
-      toast.error("Failed to load admin data");
-      setIsLoading(false);
+      console.error(error);
+      toast.error("Failed to load dashboard data");
+      setIsInitialLoading(false);
     } finally {
       setIsReactionsLoading(false);
+    }
+  };
+
+  // פונקציה 2: טעינת ספרים בלבד (רץ בדפדוף)
+  const fetchBooksOnly = async () => {
+    setIsBooksLoading(true);
+    try {
+      const response = await getBooks({ page: currentPage, limit: ITEMS_PER_PAGE });
+      
+      const booksArray = response.books || [];
+      const serverTotalItems = response.totalItems || booksArray.length;
+      const serverTotalPages = response.totalPages || 1;
+
+      // עדכון Map לספרים (עבור קומפוננטת התגובות) - אופציונלי, תלוי אם התגובות למטה צריכות את זה
+      // אם התגובות למטה מציגות ספרים שלא נמצאים בעמוד הנוכחי, נצטרך לוגיקה אחרת,
+      // אבל לבינתיים זה יעדכן את הספרים הנוכחיים.
+      setBooksMap(prev => {
+        const newMap = { ...prev };
+        booksArray.forEach((book: Book) => {
+          newMap[book._id] = book;
+        });
+        return newMap;
+      });
+
+      setBooks(booksArray);
+      setTotalBooksCount(serverTotalItems);
+      setTotalPages(serverTotalPages);
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load books page");
+    } finally {
+      setIsBooksLoading(false);
     }
   };
 
@@ -114,6 +155,8 @@ export function AdminDashboardPage() {
     setReactionCounts(countsMap);
   }
 
+  // ... (שאר הפונקציות: handleEditUser, handleDeleteBook וכו' נשארות זהות) ...
+  
   const handleEditUser = (user: User) => {
     setEditingUser(user);
     setUserEditFormData({
@@ -125,7 +168,6 @@ export function AdminDashboardPage() {
 
   const handleUpdateUser = async () => {
     if (!editingUser) return;
-
     try {
       await updateUser({
         ...editingUser,
@@ -135,24 +177,23 @@ export function AdminDashboardPage() {
       });
       toast.success('User updated successfully');
       setEditingUser(null);
-      
       setUsers(prevUsers => prevUsers.map(u => 
         u._id === editingUser._id 
           ? { ...u, name: userEditFormData.name, email: userEditFormData.email, role: userEditFormData.isAdmin ? 'admin' : 'user' }
           : u
       ));
-      
     } catch (error) {
       toast.error('Failed to update user');
     }
   };
 
   const handleDeleteBook = async (bookId: string) => {
-    if (window.confirm('Are you sure you want to delete this book? This will also remove all associated comments and favorites.')) {
+    if (window.confirm('Delete book?')) {
       try {
         await deleteBook(bookId);
         setBooks(prevBooks => prevBooks.filter(book => book._id !== bookId));
-        toast.success('Book deleted successfully');
+        setTotalBooksCount(prev => Math.max(0, prev - 1));
+        toast.success('Book deleted');
       } catch (error) {
         toast.error('Failed to delete book');
       }
@@ -160,11 +201,11 @@ export function AdminDashboardPage() {
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    if (window.confirm('Are you sure you want to delete this comment?')) {
+    if (window.confirm('Delete comment?')) {
       try {
         await deleteComment(commentId);
         setComments(prev => prev.filter(c => c.id !== commentId));
-        toast.success('Comment deleted successfully');
+        toast.success('Comment deleted');
       } catch (error) {
         toast.error('Failed to delete comment');
       }
@@ -179,10 +220,6 @@ export function AdminDashboardPage() {
     const perCommentTotal = (curr.like || 0) + (curr.dislike || 0) + (curr.happy || 0) + (curr.angry || 0);
     return acc + perCommentTotal;
   }, 0);
-
-  const recentBooks = books.slice().sort((a, b) =>
-    new Date(b.date_created).getTime() - new Date(a.date_created).getTime()
-  ).slice(0, 5);
 
   const recentComments = comments.slice().sort((a, b) =>
     new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -206,9 +243,10 @@ export function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* --- Top Stats Skeletons --- */}
+        {/* --- Top Stats --- */}
+        {/* כאן משתמשים ב-isInitialLoading כי זה מידע כללי */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {isLoading ? (
+          {isInitialLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
               <Card key={i} className="border-0 shadow-sm">
                 <CardContent className="pt-6">
@@ -229,7 +267,8 @@ export function AdminDashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Total Books</p>
-                      <p className="text-3xl font-bold text-gray-900">{books.length}</p>
+                      {/* מציג את הנתון מהטעינה של הספרים, אבל המסגרת נטענת ב-init */}
+                      <p className="text-3xl font-bold text-gray-900">{totalBooksCount || 0}</p>
                     </div>
                     <div className="bg-green-100 p-3 rounded-lg">
                       <BookOpen className="h-6 w-6 text-green-600" />
@@ -283,9 +322,9 @@ export function AdminDashboardPage() {
           )}
         </div>
 
-        {/* --- Middle Stats Skeletons --- */}
+        {/* --- Middle Stats --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Engagement Card (Dependent on isReactionsLoading) */}
+          {/* Engagement Card */}
           {isReactionsLoading ? (
              <Card>
                <CardContent className="pt-6">
@@ -318,8 +357,8 @@ export function AdminDashboardPage() {
             </Card>
           )}
 
-          {/* Activity Card (Dependent on basic isLoading) */}
-          {isLoading ? (
+          {/* Activity Card - תלוי בספרים, אז נשתמש ב-isBooksLoading */}
+          {isBooksLoading ? (
              <Card>
                <CardContent className="pt-6">
                  <div className="flex items-center justify-between mb-4">
@@ -337,23 +376,23 @@ export function AdminDashboardPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Activity</p>
-                    <p className="text-2xl font-bold text-gray-900">{recentBooks.length} Recent Books</p>
+                    <p className="text-sm text-gray-600 mb-1">Activity (Page {currentPage})</p>
+                    <p className="text-2xl font-bold text-gray-900">{books.length} Books on Page</p>
                   </div>
                   <div className="bg-indigo-100 p-3 rounded-lg">
                     <AlertCircle className="h-6 w-6 text-indigo-600" />
                   </div>
                 </div>
                 <p className="text-sm text-gray-500">
-                  Books added in the last update cycle
+                   Showing books {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, totalBooksCount)} of {totalBooksCount}
                 </p>
               </CardContent>
             </Card>
           )}
         </div>
 
-        {/* --- Books Table Skeleton --- */}
-        <Card className="mb-8 shadow-sm border-0">
+        {/* --- Books Table --- */}
+        <Card className="mb-4 shadow-sm border-0">
           <CardHeader>
             <CardTitle>All Books Management</CardTitle>
             <CardDescription>View and manage all books in the library</CardDescription>
@@ -372,7 +411,8 @@ export function AdminDashboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {isLoading ? (
+                  {/* שימוש ב-isBooksLoading בלבד עבור הטבלה */}
+                  {isBooksLoading ? (
                     Array.from({ length: 5 }).map((_, i) => (
                       <tr key={i} className="border-b last:border-0">
                         <td className="py-3 px-4"><Skeleton className="h-4 w-32" /></td>
@@ -393,7 +433,7 @@ export function AdminDashboardPage() {
                             {book.category}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-gray-600">{userMap[book.user_id]}</td>
+                        <td className="py-3 px-4 text-gray-600">{userMap[book.user_id] || "Loading..."}</td>
                         <td className="py-3 px-4 text-gray-500">
                           {new Date(book.date_created).toLocaleDateString()}
                         </td>
@@ -419,7 +459,34 @@ export function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* --- Users List Skeleton --- */}
+        {/* --- Pagination Controls --- */}
+        <div className="flex items-center justify-between mb-8 px-2">
+          <div className="text-sm text-gray-500">
+            Showing page {currentPage} of {Math.max(totalPages, 1)} ({totalBooksCount} total books)
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1 || isBooksLoading}
+            >
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage >= totalPages || isBooksLoading}
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </div>
+
+        {/* --- Users List --- */}
         <Card className="mb-8 shadow-sm border-0">
           <CardHeader>
             <CardTitle>Registered Users</CardTitle>
@@ -427,22 +494,12 @@ export function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {isLoading ? (
-                //6 demo book card
+              {/* שימוש ב-isInitialLoading כי זה מידע סטטי */}
+              {isInitialLoading ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="flex flex-col justify-between p-5 bg-white border rounded-xl shadow-sm">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3 w-full">
-                        <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
-                        <div className="space-y-2 w-full">
-                          <Skeleton className="h-4 w-3/4" />
-                          <Skeleton className="h-3 w-1/2" />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex justify-end border-t pt-4 mt-2">
-                       <Skeleton className="h-8 w-16" />
-                    </div>
+                    {/* Skeleton content... */}
+                    <Skeleton className="h-24 w-full" />
                   </div>
                 ))
               ) : (
@@ -451,6 +508,7 @@ export function AdminDashboardPage() {
                     key={user._id} 
                     className="flex flex-col justify-between p-5 bg-white border rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group"
                   >
+                     {/* ... User Card Content ... */}
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-50 to-indigo-100 border border-green-100 flex items-center justify-center text-green-600 text-lg">
@@ -508,30 +566,26 @@ export function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        {/* --- Recent Comments Skeleton --- */}
+        {/* --- Recent Comments --- */}
         <Card>
           <CardHeader>
             <CardTitle>Recent Comments</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {isLoading ? (
-                 // 3 תגובות מדומות
+              {/* שימוש ב-isInitialLoading */}
+              {isInitialLoading ? (
                  Array.from({ length: 3 }).map((_, i) => (
                    <div key={i} className="p-4 bg-gray-50 rounded-lg space-y-3">
-                     <div className="flex justify-between">
-                       <Skeleton className="h-4 w-48" />
-                       <Skeleton className="h-8 w-8" />
-                     </div>
-                     <Skeleton className="h-4 w-full" />
-                     <div className="flex gap-3">
-                       <Skeleton className="h-4 w-12" />
-                       <Skeleton className="h-4 w-12" />
-                     </div>
+                     <Skeleton className="h-20 w-full" />
                    </div>
                  ))
               ) : (
                 recentComments.map((comment) => {
+                  // הערה: ייתכן ויהיו תגובות לספרים שלא נמצאים כרגע בעמוד הזה בטבלה.
+                  // זה בסדר, אבל אם את רוצה להציג שם ספר, צריך לוודא ש-booksMap מכיל אותו.
+                  // בפתרון הנוכחי booksMap מתעדכן לפי העמוד.
+                  // אם הספר לא ב-Map, נציג Unknown Book או שניצור קריאה נפרדת עבורו (מורכב יותר).
                   const book = booksMap[comment.book_id];
                   return (
                     <div key={comment.id} className="p-4 bg-gray-50 rounded-lg">
@@ -546,7 +600,7 @@ export function AdminDashboardPage() {
                               className="text-green-600 hover:underline cursor-pointer"
                               onClick={() => navigate(`/book/${comment.book_id}`)}
                             >
-                              {book?.title || "Unknown Book"}
+                              {book?.title || "Book"}
                             </span>
                           </p>
                           <p className="text-xs text-gray-500">
@@ -577,8 +631,10 @@ export function AdminDashboardPage() {
         </Card>
       </div>
 
+      {/* Dialog remains the same... */}
       <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
-        <DialogContent className="bg-white sm:max-w-[425px] border-gray-200 shadow-xl z-50 rounded-xl">
+          {/* ... Dialog content same as before ... */}
+           <DialogContent className="bg-white sm:max-w-[425px] border-gray-200 shadow-xl z-50 rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold text-gray-900">Edit User Details</DialogTitle>
             <DialogDescription className="text-gray-500">
