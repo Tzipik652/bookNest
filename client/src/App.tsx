@@ -1,11 +1,8 @@
 // client/src/App.tsx
 import React, { Suspense } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CircularProgress, Box, GlobalStyles } from "@mui/material";
+import { Toaster } from "sonner";
 
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
@@ -58,7 +55,9 @@ const LazyAIRecommendationsPage = React.lazy(() =>
   }))
 );
 const LazyResetPasswordPage = React.lazy(() =>
-  import("./pages/ResetPassword").then((module) => ({ default: module.ResetPassword }))
+  import("./pages/ResetPassword").then((module) => ({
+    default: module.ResetPassword,
+  }))
 );
 const LazyNotFoundPage = React.lazy(() =>
   import("./pages/NotFoundPage").then((module) => ({
@@ -79,7 +78,7 @@ const LazyPrivacyPolicyPage = React.lazy(() =>
 );
 const LazyForgotPasswordPage = React.lazy(() =>
   import("./pages/ForgotPassword").then((module) => ({
-    default: module.ForgotPassword
+    default: module.ForgotPassword,
   }))
 );
 
@@ -128,11 +127,9 @@ function App() {
     }
   });
 
-
   return (
     <Router>
       <div className="min-h-screen">
-
         {/* Skip link */}
         <a
           href="#main-content"
@@ -151,8 +148,8 @@ function App() {
               backgroundColor: darkMode
                 ? "#121212"
                 : highContrast
-                  ? "#000"
-                  : "#fff",
+                ? "#000"
+                : "#fff",
 
               color: darkMode || highContrast ? "#fff" : "#000",
               fontSize: largeText ? "1.2rem" : "1rem",
@@ -167,12 +164,19 @@ function App() {
         />
 
         <Suspense fallback={<RouteFallback />}>
+          <Toaster position="top-right" richColors />
           <Routes>
             <Route path="/" element={<LazyHomePage />} />
             <Route path="/login" element={<LazyLoginPage />} />
             <Route path="/register" element={<LazyRegisterPage />} />
-            <Route path="/forgot-password" element={<LazyForgotPasswordPage />} />
-            <Route path="/reset-password/:token" element={<LazyResetPasswordPage />} />
+            <Route
+              path="/forgot-password"
+              element={<LazyForgotPasswordPage />}
+            />
+            <Route
+              path="/reset-password/:token"
+              element={<LazyResetPasswordPage />}
+            />
 
             <Route path="/home" element={<LazyHomePage />} />
 
@@ -233,11 +237,13 @@ function App() {
             <Route path="*" element={<LazyNotFoundPage />} />
             <Route path="/contact" element={<LazyContactPage />} />
             <Route path="/privacy-policy" element={<LazyPrivacyPolicyPage />} />
-            <Route path="/terms-of-service" element={<LazyTermsOfServicePage />} />
+            <Route
+              path="/terms-of-service"
+              element={<LazyTermsOfServicePage />}
+            />
             <Route path="/faq" element={<LazyFAQPage />} />
           </Routes>
         </Suspense>
-
 
         {/* Screen reader ARIA announcements */}
         {screenReader && (

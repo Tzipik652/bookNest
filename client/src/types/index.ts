@@ -58,6 +58,8 @@ export interface Comment {
   id: string;
   book_id: string;
   user_id: string;
+  user_name:string; 
+  profile_picture?:string;
   text: string;
   created_at: string;
   updated_at: string;
