@@ -8,7 +8,11 @@ import crypto from "crypto";
 import AppError from "../utils/AppError.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { registerSchema } from "../validations/userValidation.js";
-import { getUsers, updateUser ,deleteUser as deleteUserRecord} from "../models/userModel.js";
+import {
+  getUsers,
+  updateUser,
+  deleteUser as deleteUserRecord,
+} from "../models/userModel.js";
 
 dotenv.config();
 
@@ -37,13 +41,16 @@ const generateJWT = (user) => {
 // Register (Email/Password)
 // -------------------------
 export const register = catchAsync(async (req, res, next) => {
-  const { error, value } = registerSchema.validate(req.body, { abortEarly: false });
+  const { error, value } = registerSchema.validate(req.body, {
+    abortEarly: false,
+  });
   if (error) {
     const messages = error.details.map((detail) => detail.message);
     throw new AppError(messages.join(", "), 400);
   }
   const { email, password, name } = value;
-  if (!email || !password || !name) throw new AppError("All fields are required", 400);
+  if (!email || !password || !name)
+    throw new AppError("All fields are required", 400);
 
   const { data: existing } = await supabase
     .from("users")
@@ -81,7 +88,8 @@ export const register = catchAsync(async (req, res, next) => {
 // -------------------------
 export const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-  if (!email || !password) throw new AppError("Email and password required", 400);
+  if (!email || !password)
+    throw new AppError("Email and password required", 400);
 
   const { data: user } = await supabase
     .from("users")
@@ -90,7 +98,8 @@ export const login = catchAsync(async (req, res, next) => {
     .single();
 
   if (!user) throw new AppError("Invalid credentials", 401);
-  if (user.auth_provider !== "local") throw new AppError("Please login with Google", 401);
+  if (user.auth_provider !== "local")
+    throw new AppError("Please login with Google", 401);
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new AppError("Invalid credentials", 401);
@@ -116,7 +125,9 @@ export const googleLogin = catchAsync(async (req, res, next) => {
   const { id_token } = req.body;
   if (!id_token) throw new AppError("Google ID token required", 400);
 
-  const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${id_token}`);
+  const response = await fetch(
+    `https://oauth2.googleapis.com/tokeninfo?id_token=${id_token}`
+  );
   const profile = await response.json();
 
   if (!profile.email) throw new AppError("Invalid Google token", 401);
@@ -129,7 +140,10 @@ export const googleLogin = catchAsync(async (req, res, next) => {
 
   if (!user) {
     // Create new user
-    const password = crypto.randomBytes(Math.ceil(12 / 2)).toString("hex").slice(0, 12);
+    const password = crypto
+      .randomBytes(Math.ceil(12 / 2))
+      .toString("hex")
+      .slice(0, 12);
     const { data: newUser, error: insertError } = await supabase
       .from("users")
       .insert([
@@ -173,43 +187,49 @@ export const googleLogin = catchAsync(async (req, res, next) => {
   });
 });
 export const getAllUsers = catchAsync(async (req, res, next) => {
-  const user=req.user;
-  if( !user ||user.role!=="admin" ){
-    throw new AppError("Forbidden",403);
+  const user = req.user;
+  if (!user || user.role !== "admin") {
+    throw new AppError("Forbidden", 403);
   }
- const users= await getUsers();
- res.json({
-  success:true,
-  users
- });
-})
+  const users = await getUsers();
+  res.json({
+    success: true,
+    users,
+  });
+});
 export const update = catchAsync(async (req, res, next) => {
-    const user = req.user;
-    const targetUserId = req.params.id; 
-    const isAllowed = user.role === "admin" || user._id === targetUserId;
-    if (!isAllowed) {
-        throw new AppError("Forbidden: You can only modify your own account or be an Admin.", 403);
-    }
-    const updatedUser = await updateUser(targetUserId, req.body);
-    
-    res.json({
-        success: true,
-        updatedUser
-    });
+  const user = req.user;
+  const targetUserId = req.params.id;
+  const isAllowed = user.role === "admin" || user._id === targetUserId;
+  if (!isAllowed) {
+    throw new AppError(
+      "Forbidden: You can only modify your own account or be an Admin.",
+      403
+    );
+  }
+  const updatedUser = await updateUser(targetUserId, req.body);
+
+  res.json({
+    success: true,
+    updatedUser,
+  });
 });
 
 export const deleteUser = catchAsync(async (req, res, next) => {
-    const user = req.user;
-    const targetUserId = req.params.id;
-    const isAllowed = user.role === "admin" || user._id === targetUserId;
-    if (!isAllowed) {
-        throw new AppError("Forbidden: You can only modify your own account or be an Admin.", 403);
-    }
-    
-    const deletedUser = await deleteUserRecord(targetUserId); 
-        
-    res.json({
-        success: true,
-        deletedUser
-    });
+  const user = req.user;
+  const targetUserId = req.params.id;
+  const isAllowed = user.role === "admin" || user._id === targetUserId;
+  if (!isAllowed) {
+    throw new AppError(
+      "Forbidden: You can only modify your own account or be an Admin.",
+      403
+    );
+  }
+
+  const deletedUser = await deleteUserRecord(targetUserId);
+
+  res.json({
+    success: true,
+    deletedUser,
+  });
 });
