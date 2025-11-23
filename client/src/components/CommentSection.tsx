@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { CommentWithReactions, ReactionType } from "../types";
 import {
@@ -49,6 +49,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
   const [loadingComments, setLoadingComments] = useState<Set<string>>(
     new Set()
   );
+  const commentRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     loadComments();
@@ -112,6 +113,12 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
 
       setNewComment("");
       toast.success("Comment added successfully");
+      setTimeout(() => {
+        commentRefs.current[commentWithReactions.id]?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 100);
     } catch (error) {
       console.error(error);
       toast.error("Failed to add comment");
@@ -142,60 +149,59 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
 
     setLoadingComments((prev) => new Set(prev).add(commentId));
 
-    try {
-      setComments((prevComments) =>
-        prevComments.map((comment) => {
-          if (comment.id !== commentId) return comment;
+    setComments((prevComments) =>
+      prevComments.map((comment) => {
+        if (comment.id !== commentId) return comment;
 
-          const wasActive = comment.userReaction === reactionType;
-          const newReactionCounts = { ...comment.reactionCounts };
+        const wasActive = comment.userReaction === reactionType;
+        const newReactionCounts = { ...comment.reactionCounts };
 
-          if (wasActive) {
-            newReactionCounts[reactionType] = Math.max(
-              0,
-              (newReactionCounts[reactionType] || 0) - 1
-            );
-            return {
-              ...comment,
-              reactionCounts: newReactionCounts,
-              userReaction: undefined,
-            };
-          }
-
-          if (comment.userReaction) {
-            newReactionCounts[comment.userReaction] = Math.max(
-              0,
-              (newReactionCounts[comment.userReaction] || 0) - 1
-            );
-          }
-
-          newReactionCounts[reactionType] =
-            (newReactionCounts[reactionType] || 0) + 1;
-
+        if (wasActive) {
+          newReactionCounts[reactionType] = Math.max(
+            0,
+            (newReactionCounts[reactionType] || 0) - 1
+          );
           return {
             ...comment,
             reactionCounts: newReactionCounts,
-            userReaction: reactionType,
+            userReaction: undefined,
           };
-        })
-      );
+        }
 
+        if (comment.userReaction) {
+          newReactionCounts[comment.userReaction] = Math.max(
+            0,
+            (newReactionCounts[comment.userReaction] || 0) - 1
+          );
+        }
+
+        newReactionCounts[reactionType] =
+          (newReactionCounts[reactionType] || 0) + 1;
+
+        return {
+          ...comment,
+          reactionCounts: newReactionCounts,
+          userReaction: reactionType,
+        };
+      })
+    );
+    try {
       await toggleReaction(commentId, reactionType);
+        // const updatedComment = await getCommentById(commentId);
+        // const reactionCounts = await getCommentReactionCounts(updatedComment);
+        // const userReaction = await getUserReactionOnComment(
+        //   commentId,
+        //   currentUser._id
+        // );
 
-      const updatedComment = await getCommentById(commentId);
-      const reactionCounts = await getCommentReactionCounts(updatedComment);
-      const userReaction = await getUserReactionOnComment(
-        commentId,
-        currentUser._id
-      );
-
-      setComments((prevComments) =>
-        prevComments.map((comment) =>
-          comment.id === commentId
-            ? { ...updatedComment, reactionCounts, userReaction }
-            : comment
-        )
-      );
+        // setComments((prevComments) =>
+        //   prevComments.map((comment) =>
+        //     comment.id === commentId
+        //       ? { ...updatedComment, reactionCounts, userReaction }
+        //       : comment
+        //   )
+        // );
+    
     } catch (error) {
       console.error(error);
       toast.error("Failed to add reaction");
@@ -295,6 +301,9 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
               <CommentItemSkeleton key={comment.id} />
             ) : (
               <CommentItem
+                ref={(el) => {
+                  if (el) commentRefs.current[comment.id] = el;
+                }}
                 key={comment.id}
                 comment={comment}
                 isBookOwner={isBookOwner || isAdmin}

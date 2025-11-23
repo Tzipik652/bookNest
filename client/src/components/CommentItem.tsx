@@ -1,3 +1,4 @@
+import React, { forwardRef } from "react";
 import { CommentWithReactions, ReactionType, User } from "../types";
 import { Trash2 } from "lucide-react";
 import {
@@ -19,13 +20,13 @@ interface CommentItemProps {
   onReaction: (commentId: string, reactionType: ReactionType) => void;
 }
 
-function CommentItem({
+const CommentItem=forwardRef<HTMLDivElement, CommentItemProps>(({
   comment,
   isBookOwner,
   currentUserId,
   onDelete,
   onReaction,
-}: CommentItemProps) {
+},ref) =>{
   const reactions: Array<{ type: ReactionType; emoji: string; color: string }> =
     [
       { type: "like", emoji: "👍", color: "#3b82f6" },
@@ -44,6 +45,7 @@ function CommentItem({
         transition: "all 0.2s",
         "&:hover": { boxShadow: "0 4px 12px rgba(0,0,0,0.08)" },
       }}
+      ref={ref}
     >
       <CardContent sx={{ p: 3 }}>
         <Stack spacing={2}>
@@ -141,6 +143,6 @@ function CommentItem({
       </CardContent>
     </Card>
   );
-}
+});
 
 export default CommentItem;
