@@ -8,7 +8,7 @@ import crypto from "crypto";
 import AppError from "../utils/AppError.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { registerSchema } from "../validations/userValidation.js";
-import { getUsers } from "../models/userModel.js";
+import { getUsers, updateUser ,deleteUser as deleteUserRecord} from "../models/userModel.js";
 
 dotenv.config();
 
@@ -182,4 +182,28 @@ export const getAllUsers = catchAsync(async (req, res, next) => {
   success:true,
   users
  });
+})
+export const update = catchAsync(async (req, res, next) => {
+  const user=req.user;
+  const bookId=req.params.id;
+  if( !user && user.role!=="admin" && user._id!==bookId){
+    throw new AppError("Forbidden",403);
+  }
+  const updatedUser=await updateUser(bookId,req.body);
+  res.json({
+    success:true,
+    updatedUser
+  })
+})
+export const deleteUser = catchAsync(async (req, res, next) => {
+  const user=req.user;
+  const bookId=req.params.id;
+  if( !user && user.role!=="admin" && user._id!==bookId){
+    throw new AppError("Forbidden",403);
+  }
+  const deletedUser=await deleteUserRecord(bookId,req.body);
+  res.json({
+    success:true,
+    deletedUser
+  })
 })

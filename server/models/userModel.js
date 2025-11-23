@@ -56,3 +56,14 @@ export async function getUsers() {
   if (error) throw error;
   return data;
 }
+export async function deleteUser(id) {
+  const { data, error } = await supabase
+    .from('users')
+    .delete()
+    .eq('_id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}

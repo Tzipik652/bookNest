@@ -83,6 +83,8 @@ export function BookDetailsPage() {
   }
 
   const isOwner = currentUser?._id === book.user_id;
+  const isAdmin= currentUser?.role === 'admin';
+
 
   const handleFavoriteToggle = () => {
     if (!currentUser) {
@@ -166,7 +168,7 @@ export function BookDetailsPage() {
                       : "Add to Favorites"}
                   </Button>
 
-                  {isOwner && (
+                  {(isOwner || isAdmin) && (
                     <>
                       <Button
                         variant="outlined"

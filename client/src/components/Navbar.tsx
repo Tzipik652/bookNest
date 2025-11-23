@@ -2,11 +2,12 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { Button } from './ui/button';
 import { 
-  BookOpen, Heart, PlusCircle, LogOut, User, Home, Library, Sparkles, Menu, X 
+  BookOpen, Heart, PlusCircle, LogOut, User, Home, Library, Sparkles,Shield, Menu, X 
 } from "lucide-react";
 import { useUserStore } from '../store/useUserStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAccessibilityStore } from '../store/accessibilityStore';
+
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -92,11 +93,20 @@ export function Navbar() {
                   <PlusCircle className="h-4 w-4" /> Add Book
                 </Button>
               </Link>
+
               <Link to="/recommendations">
                 <Button variant="ghost" className={getButtonClasses("/recommendations")}>
                   <Sparkles className="h-4 w-4" /> AI Recommendations
                 </Button>
               </Link>
+               {user.role==="admin" && (
+                  <Link to="/admin-dashboard">
+                    <Button variant="ghost" className={getButtonClasses("/admin-dashboard")}>
+                      <Shield className="h-4 w-4"  />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
               <div className="flex items-center gap-3 ml-4 pl-4 border-l">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />
@@ -171,6 +181,14 @@ export function Navbar() {
                   <Sparkles className="h-4 w-4" /> AI Recommendations
                 </Button>
               </Link>
+              {user.role==="admin" && (
+                  <Link to="/admin-dashboard">
+                    <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/admin-dashboard")}`}>
+                      <Shield className="h-4 w-4"  />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
               <Button variant="outline" onClick={handleLogout} className="w-full justify-start gap-2 mt-4">
                 <LogOut className="h-4 w-4" /> Logout
               </Button>

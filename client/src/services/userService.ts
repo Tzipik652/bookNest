@@ -84,3 +84,31 @@ export const getAllUsers = async (): Promise<User[]> => {
     handleAxiosError(error);
   }
 }
+export const updateUser = async (user: User): Promise<User> => {
+  const token = useUserStore.getState().token;
+    if (!token) throw new Error("Must be logged in to update user");
+    try {
+      const res = await axios.put(`${API_BASE_URL}/${user._id}`, user, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch (error) { 
+      handleAxiosError(error);
+    }
+}
+export const deleteUser = async (userId: string): Promise<void> => {
+  const token = useUserStore.getState().token;
+    if (!token) throw new Error("Must be logged in to delete user");
+    try {
+      await axios.delete(`${API_BASE_URL}/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      handleAxiosError(error);
+    }
+}
+

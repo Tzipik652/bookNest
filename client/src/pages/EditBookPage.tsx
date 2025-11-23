@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom'; // 1. הוספת useLocation
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { bookSchema, BookFormValues } from "../schemas/book.schema";
@@ -23,21 +23,34 @@ import {
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { useUserStore } from '../store/useUserStore';
+import { Category } from '../types';
 
 export function EditBookPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation(); // 2. שימוש ב-hook כדי לקבל את ה-State
   const { user: currentUser } = useUserStore();
 
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitError, setSubmitError] = useState("");
+
+  // 🎯 פונקציית עזר לניווט חכם
+  // אם הגענו מהאדמין - נחזור לאדמין. אחרת - נחזור לדף הספר.
+  const handleNavigateBack = () => {
+    if (location.state?.from) {
+      navigate(location.state.from);
+    } else {
+      navigate(`/book/${id}`);
+    }
+  };
 
   // 🎯 RHF + Zod
   const {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors, isSubmitting, isDirty }
   } = useForm<BookFormValues>({
     resolver: zodResolver(bookSchema),
@@ -60,8 +73,13 @@ export function EditBookPage() {
           return;
         }
 
-        if (book.user_id !== currentUser?._id) {
-          navigate(`/book/${id}`);
+        // 3. שינוי לוגיקת הרשאות:
+        // מאפשרים גישה אם המשתמש הוא בעל הספר OR המשתמש הוא אדמין
+        const isOwner = book.user_id === currentUser?._id;
+        const isAdmin = currentUser?.role === 'admin';
+
+        if (!isOwner && !isAdmin) {
+          navigate(`/book/${id}`); // אם אין הרשאה, מעיפים לדף הצפייה
           return;
         }
 
@@ -81,22 +99,27 @@ export function EditBookPage() {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, currentUser, navigate, setValue]);
 
   const onSubmit = async (data: BookFormValues) => {
     setSubmitError("");
+
+    // גם אם לא היו שינויים, אנחנו רוצים לחזור למקום הנכון
     if (!isDirty) {
       console.log("No changes — skipping update");
-      navigate(`/book/${id}`);
+      handleNavigateBack();
       return;
     }
+
     try {
       await updateBook(id!, {
         ...data,
         price: data.price ? parseFloat(data.price) : undefined,
       });
 
-      navigate(`/book/${id}`);
+      // הצלחה - חוזרים למקום ממנו באנו (אדמין או דף ספר)
+      handleNavigateBack();
+
     } catch (err) {
       console.error(err);
       setSubmitError("Failed to update book. Please try again.");
@@ -115,7 +138,7 @@ export function EditBookPage() {
     <Box sx={{ minHeight: '100vh', py: 6 }}>
       <Container maxWidth="sm">
         <Button
-          onClick={() => navigate(-1)}
+          onClick={handleNavigateBack} // שימוש בפונקציה החדשה
           startIcon={<ArrowBack />}
           sx={{ mb: 3 }}
         >
@@ -153,19 +176,26 @@ export function EditBookPage() {
                 helperText={errors.description?.message}
               />
 
-              <TextField
-                select
-                label="Category *"
-                {...register("category")}
-                error={!!errors.category}
-                helperText={errors.category?.message}
-              >
-                {categories.map((cat: any) => (
-                  <MenuItem key={cat.id} value={cat.name}>
-                    {cat.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+              <Controller
+                name="category"
+                control={control}
+                defaultValue="" 
+                render={({ field }) => (
+                  <TextField
+                    {...field} 
+                    select
+                    label="Category *"
+                    error={!!errors.category}
+                    helperText={errors.category?.message}
+                  >
+                    {categories.map((cat: any) => (
+                      <MenuItem key={cat.id || cat._id || cat.name} value={cat.name}>
+                        {cat.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              />
 
               <TextField
                 label="Image URL"
@@ -190,11 +220,13 @@ export function EditBookPage() {
                 type="submit"
                 variant="contained"
                 fullWidth
-                disabled={!isDirty || isSubmitting}              >
+                disabled={!isDirty || isSubmitting}
+              >
                 {isSubmitting ? "Saving..." : "Save Changes"}
               </Button>
 
-              <Button variant="outlined" fullWidth onClick={() => navigate(-1)}>
+              {/* כפתור ביטול שמשתמש גם הוא בניווט החכם */}
+              <Button variant="outlined" fullWidth onClick={handleNavigateBack}>
                 Cancel
               </Button>
             </CardActions>
