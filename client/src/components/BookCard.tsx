@@ -20,7 +20,7 @@ export function BookCard({ book }: BookCardProps) {
   const location = useLocation();
   const { user: currentUser } = useUserStore();
 
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   const { toggleMutation } = useFavoriteBooks();
 
   const bookFromCache = queryClient.getQueryData<BookWithFavorite>([
@@ -56,16 +56,19 @@ export function BookCard({ book }: BookCardProps) {
       }}
     >
       <div onClick={() => navigate(`/book/${book._id}`)}>
-        <div className="aspect-[3/4] overflow-hidden bg-gray-100">
+        <div
+          className="w-full h-72 sm:h-56 xs:h-40 overflow-hidden bg-gray-100"
+        >
           <ImageWithFallback
             src={book.img_url}
             alt={book.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         </div>
-        <CardContent className="p-4">
+
+        <CardContent className="p-4 pb-0">
           <div className="flex items-start justify-between gap-2 mb-2">
-            <h3 className="line-clamp-2">{book.title}</h3>
+            <h3 className="line-clamp-2 leading-tight">{book.title}</h3>
             <div className="flex items-center gap-1">
               <span className="text-sm text-gray-600">
                 {displayedBook.favorites_count}
@@ -79,7 +82,9 @@ export function BookCard({ book }: BookCardProps) {
               >
                 <Heart
                   className={`h-5 w-5 transition-colors ${
-                    displayedBook.isFavorited ? "fill-red-500 text-red-500" : "text-gray-400"
+                    displayedBook.isFavorited
+                      ? "fill-red-500 text-red-500"
+                      : "text-gray-400"
                   } ${isLoading ? "opacity-50" : ""}`}
                   style={{ cursor: isLoading ? "not-allowed" : "pointer" }}
                 />
@@ -96,8 +101,12 @@ export function BookCard({ book }: BookCardProps) {
             {book.category}
           </span>
           <p
-            className="text-sm text-gray-700 line-clamp-3"
-            style={{ color: theme.palette.text.secondary }}
+            className="text-sm text-gray-700 line-clamp-3 overflow-hidden"
+            style={{
+              color: theme.palette.text.secondary,
+              lineHeight: "1.2rem",
+              height: "3.6rem",
+            }}
           >
             {book.ai_summary}
           </p>
