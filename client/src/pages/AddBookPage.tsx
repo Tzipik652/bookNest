@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { addBook } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
@@ -32,22 +32,8 @@ export function AddBookPage() {
   const [showAlert, setShowAlert] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const { user: currentUser } = useUserStore();
-  const [isLoading, setIsLoading] = useState(false);
 
   const [categories, setCategories] = useState<Category[]>([]);
-  const [firstLoad, setFirstLoad] = useState(true);
-  const discoverRef = useRef<HTMLHeadingElement | null>(null);
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (firstLoad) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setFirstLoad(false);
-      } else if (discoverRef.current) {
-        discoverRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  }, [isLoading]);
 
   // --------------------
   // RHF + ZOD

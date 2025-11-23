@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { BookCard } from "../components/BookCard";
 import {
   Box,
@@ -19,8 +19,6 @@ export function AIRecommendationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true);
-  const discoverRef = useRef<HTMLHeadingElement | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -45,18 +43,7 @@ export function AIRecommendationsPage() {
       );
     });
   }, [AIRecommendations, queryClient]);
-  
-  useEffect(() => {
-    if (!isLoading) {
-      if (firstLoad) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setFirstLoad(false);
-      } else if (discoverRef.current) {
-        discoverRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  }, [isLoading]);
-
+ 
   useEffect(() => {
     setIsLoading(AIRecommendationsQuery.isLoading);
   }, [AIRecommendationsQuery.isLoading]);
