@@ -1,14 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Book, Comment, User } from "../types";
-import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import { Trash2, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
 import { toast } from "sonner";
 import { useUserStore } from "../store/useUserStore";
 import { deleteBook, getBooks } from "../services/bookService";
@@ -16,11 +9,10 @@ import { getAllUsers } from "../services/userService";
 import { deleteComment, getAllComments } from "../services/commentService";
 import { getFavoritesCount } from "../services/favoriteService";
 import { getCommentReactionCounts } from "../services/commentReactionService";
-
-import { Skeleton } from "@mui/material";
 import { StatsCards } from "../components/adminDashboard/StatsCards";
 import { AdminBooksTable } from "../components/adminDashboard/AdminBooksTable";
 import { UserList } from "../components/adminDashboard/UserList";
+import { RecentComments } from "../components/adminDashboard/RecentComments";
 
 export function AdminDashboardPage() {
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
@@ -118,18 +110,6 @@ export function AdminDashboardPage() {
     }
   };
 
-  const handleDeleteComment = async (commentId: string) => {
-    if (window.confirm("Are you sure you want to delete this comment?")) {
-      try {
-        await deleteComment(commentId);
-        setComments((prev) => prev.filter((c) => c.id !== commentId));
-        toast.success("Comment deleted successfully");
-      } catch (error) {
-        toast.error("Failed to delete comment");
-      }
-    }
-  };
-
   const handleEditBook = (bookId: string) => {
     navigate(`/edit-book/${bookId}`, { state: { from: "/admin-dashboard" } });
   };
@@ -181,6 +161,7 @@ export function AdminDashboardPage() {
             <p className="text-gray-600">Manage BookNest platform</p>
           </div>
         </div>
+
         <StatsCards
           favoritesCount={favoritesCount}
           totalBooksCount={books.length}
@@ -205,87 +186,13 @@ export function AdminDashboardPage() {
           isLoading={isLoading}
         />
 
-        {/* --- Recent Comments Skeleton --- */}
-        <Card id="total-comments-section">
-          <CardHeader>
-            <CardTitle>Recent Comments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {isLoading
-                ? Array.from({ length: 3 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="p-4 bg-gray-50 rounded-lg space-y-3"
-                    >
-                      <div className="flex justify-between">
-                        <Skeleton className="h-4 w-48" />
-                        <Skeleton className="h-8 w-8" />
-                      </div>
-                      <Skeleton className="h-4 w-full" />
-                      <div className="flex gap-3">
-                        <Skeleton className="h-4 w-12" />
-                        <Skeleton className="h-4 w-12" />
-                      </div>
-                    </div>
-                  ))
-                : recentComments.map((comment) => {
-                    const book = booksMap[comment.book_id];
-                    return (
-                      <div
-                        key={comment.id}
-                        className="p-4 bg-gray-50 rounded-lg"
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <p className="text-sm">
-                              <span className="font-medium">
-                                {userMap[comment.user_id] + " " ||
-                                  "Unknown User"}
-                              </span>
-                              on{" "}
-                              <span
-                                className="text-green-600 hover:underline cursor-pointer"
-                                onClick={() =>
-                                  navigate(`/book/${comment.book_id}`)
-                                }
-                              >
-                                {book?.title || "Unknown Book"}
-                              </span>
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {new Date(comment.created_at).toLocaleString()}
-                            </p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteComment(comment.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-red-600" />
-                          </Button>
-                        </div>
-                        <p className="text-sm text-gray-700">{comment.text}</p>
-                        <div className="flex gap-3 text-xs text-slate-500 mt-1">
-                          <span>
-                            👍 {reactionCounts[comment.id]?.like ?? 0}
-                          </span>
-                          <span>
-                            👎 {reactionCounts[comment.id]?.dislike ?? 0}
-                          </span>
-                          <span>
-                            😊 {reactionCounts[comment.id]?.happy ?? 0}
-                          </span>
-                          <span>
-                            😡 {reactionCounts[comment.id]?.angry ?? 0}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-            </div>
-          </CardContent>
-        </Card>
+        <RecentComments
+          recentComments={recentComments}
+          booksMap={booksMap}
+          userMap={userMap}
+          reactionCounts={reactionCounts}
+          isLoading={isLoading}
+        />
       </div>
     </div>
   );

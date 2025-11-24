@@ -1,4 +1,4 @@
-// controllers/commentController.js (מעודכן - בלי reactions)
+// controllers/commentController.js
 import * as CommentModel from "../models/commentModel.js";
 import * as BookModel from "../models/bookModel.js";
 import AppError from "../utils/AppError.js";
@@ -80,6 +80,38 @@ export const deleteComment = catchAsync(async (req, res, next) => {
   const success = await CommentModel.remove(commentId);
   res.status(200).json({ success });
 });
+
+export const updateComment = catchAsync(async (req, res, next) => {
+  const { commentId } = req.params;
+  const { text } = req.body;
+  const user = req.user;
+
+  if (!user) {
+    throw new AppError("Must be logged in to update comment", 401);
+  }
+
+  if (!commentId) {
+    throw new AppError("Comment ID is required", 400);
+  }
+
+  const comment = await CommentModel.findById(commentId);
+  if (!comment) {
+    throw new AppError("Comment not found", 404);
+  }
+
+  const book = await BookModel.findById(comment.book_id);
+  if (!book) {
+    throw new AppError("Book not found", 404);
+  }
+
+  if (comment.user_id !== user._id && book.user_id !== user._id && user.role !== 'admin') {
+    throw new AppError("Unauthorized to delete this comment", 403);
+  }
+
+  const success = await CommentModel.update(commentId, text);
+  res.status(200).json({ success });
+});
+
 export const getAllComments = catchAsync(async (req, res, next) => {
   const user= req.user;
 
