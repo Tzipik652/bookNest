@@ -4,9 +4,9 @@ import { Book, Comment, User } from "../types";
 import { Shield } from "lucide-react";
 import { toast } from "sonner";
 import { useUserStore } from "../store/useUserStore";
-import { deleteBook, getBooks } from "../services/bookService";
+import { getBooks } from "../services/bookService";
 import { getAllUsers } from "../services/userService";
-import { deleteComment, getAllComments } from "../services/commentService";
+import { getAllComments } from "../services/commentService";
 import { getFavoritesCount } from "../services/favoriteService";
 import { getCommentReactionCounts } from "../services/commentReactionService";
 import { StatsCards } from "../components/adminDashboard/StatsCards";
@@ -92,28 +92,6 @@ export function AdminDashboardPage() {
     setReactionCounts(countsMap);
   }
 
-  const handleDeleteBook = async (bookId: string) => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete this book? This will also remove all associated comments and favorites."
-      )
-    ) {
-      try {
-        await deleteBook(bookId);
-        setBooks((prevBooks) =>
-          prevBooks.filter((book) => book._id !== bookId)
-        );
-        toast.success("Book deleted successfully");
-      } catch (error) {
-        toast.error("Failed to delete book");
-      }
-    }
-  };
-
-  const handleEditBook = (bookId: string) => {
-    navigate(`/edit-book/${bookId}`, { state: { from: "/admin-dashboard" } });
-  };
-
   const calculatedTotalReactions = Object.values(reactionCounts).reduce(
     (acc: number, curr: any) => {
       const perCommentTotal =
@@ -162,6 +140,10 @@ export function AdminDashboardPage() {
           </div>
         </div>
 
+        {/* Stats */}
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          Platform Overview
+        </h2>
         <StatsCards
           favoritesCount={favoritesCount}
           totalBooksCount={books.length}
@@ -173,19 +155,30 @@ export function AdminDashboardPage() {
           isReactionsLoading={isReactionsLoading}
         />
 
+        {/* Books */}
+        <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
+          Books Management
+        </h2>
         <AdminBooksTable
           books={books}
           userMap={userMap}
-          handleEditBook={handleEditBook}
-          handleDeleteBook={handleDeleteBook}
+          isLoading={isLoading}
         />
 
+        {/* Users */}
+        <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
+          Users
+        </h2>
         <UserList
           users={users}
           currentUser={currentUser}
           isLoading={isLoading}
         />
 
+        {/* Recent Comments */}
+        <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
+          Recent Activity
+        </h2>
         <RecentComments
           recentComments={recentComments}
           booksMap={booksMap}

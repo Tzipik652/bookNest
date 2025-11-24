@@ -1,25 +1,51 @@
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, Skeleton } from "@mui/material";
 import { BookOpen, Edit, Trash2 } from "lucide-react";
 import { CardTitle, CardDescription } from "../ui/card";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 import { Book } from "../../types";
+import { deleteBook } from "../../services/bookService";
+import { toast } from "sonner";
 
 interface AdminBooksTableProps {
   books: Book[];
   isLoading?: boolean;
   userMap: Record<string, string>;
-  handleEditBook: (bookId: string) => void;
-  handleDeleteBook: (bookId: string) => void;
 }
 export const AdminBooksTable = ({
   books,
   isLoading,
   userMap,
-  handleEditBook,
-  handleDeleteBook,
+
 }: AdminBooksTableProps) => {
+  const [,setBooks] = useState<Book[]>(books);
   const navigate = useNavigate();
+  useEffect(() => {
+    setBooks(books);
+  }, [books]);
+
+    const handleDeleteBook = async (bookId: string) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this book? This will also remove all associated comments and favorites."
+      )
+    ) {
+      try {
+        await deleteBook(bookId);
+        setBooks((prevBooks) =>
+          prevBooks.filter((book) => book._id !== bookId)
+        );
+        toast.success("Book deleted successfully");
+      } catch (error) {
+        toast.error("Failed to delete book");
+      }
+    }
+  };
+
+  const handleEditBook = (bookId: string) => {
+    navigate(`/edit-book/${bookId}`, { state: { from: "/admin-dashboard" } });
+  };
   return (
     <div>
       {/* --- Books Table Skeleton --- */}
