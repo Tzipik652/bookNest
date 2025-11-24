@@ -10,14 +10,13 @@ function handleAxiosError(error: any): never {
   if (axios.isAxiosError(error)) {
     throw new Error(
       error.response?.data?.message ||
-      error.message ||
-      "Something went wrong with the API request"
+        error.message ||
+        "Something went wrong with the API request"
     );
   } else {
     throw new Error("Unexpected error: " + error);
   }
 }
-
 
 export async function getComments(bookId: string): Promise<Comment[]> {
   const res = await fetch(`${API_BASE_URL}/${bookId}`);
@@ -25,8 +24,10 @@ export async function getComments(bookId: string): Promise<Comment[]> {
   return res.json();
 }
 
-
-export async function addComment(bookId: string, text: string): Promise<Comment> {
+export async function addComment(
+  bookId: string,
+  text: string
+): Promise<Comment> {
   const user = useUserStore.getState().user;
   const token = useUserStore.getState().token;
 
@@ -48,7 +49,7 @@ export async function addComment(bookId: string, text: string): Promise<Comment>
       text: serverComment.text,
       created_at: serverComment.created_at || new Date().toISOString(),
       updated_at: serverComment.updated_at || new Date().toISOString(),
-      reactions: serverComment.reactions || [], 
+      reactions: serverComment.reactions || [],
     };
   } catch (error) {
     handleAxiosError(error);
@@ -56,8 +57,9 @@ export async function addComment(bookId: string, text: string): Promise<Comment>
   }
 }
 
-
-export async function deleteComment(commentId: string): Promise<{ success: boolean }> {
+export async function deleteComment(
+  commentId: string
+): Promise<{ success: boolean }> {
   const user = useUserStore.getState().user;
   const token = useUserStore.getState().token;
 
@@ -67,6 +69,30 @@ export async function deleteComment(commentId: string): Promise<{ success: boole
     const res = await axios.delete(`${API_BASE_URL}/${commentId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    return res.data;
+  } catch (error) {
+    handleAxiosError(error);
+    throw error;
+  }
+}
+
+export async function editComment(
+  commentId: string,
+  text: string
+): Promise<{ success: boolean }> {
+  const user = useUserStore.getState().user;
+  const token = useUserStore.getState().token;
+
+  if (!user || !token) throw new Error("Must be logged in to delete comment");
+
+  try {
+    const res = await axios.put(
+      `${API_BASE_URL}/${commentId}`,
+      { text },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     return res.data;
   } catch (error) {
     handleAxiosError(error);
