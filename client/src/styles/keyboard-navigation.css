@@ -1,0 +1,164 @@
+/* Keyboard Navigation Styles */
+
+/* הסרת outline ברירת מחדל רק כשמשתמשים בעכבר */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* במצב עכבר - הסרת פוקוס ויזואלי */
+body.mouse-mode *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+body.mouse-mode *:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* סגנון פוקוס ברור וידידותי למקלדת */
+:focus-visible {
+  outline: 3px solid #16A34A;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* סגנון מיוחד לכפתורים */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #16A34A;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+}
+
+/* סגנון לשדות קלט */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #16A34A;
+  outline-offset: 0;
+  border-color: #16A34A;
+}
+
+/* אנימציה חלקה למעבר פוקוס */
+*:focus-visible {
+  transition: outline 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* סגנון מיוחד לכרטיסי ספרים */
+[data-book-card]:focus-visible {
+  transform: scale(1.02);
+  box-shadow: 0 0 0 3px #16A34A, 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* הבטחת scroll חלק כשמנווטים עם מקלדת */
+html {
+  scroll-behavior: smooth;
+}
+
+/* סגנון להדגשת אלמנט פעיל בניווט grid */
+[data-grid-item]:focus {
+  position: relative;
+}
+
+[data-grid-item]:focus::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 3px solid #16A34A;
+  border-radius: 8px;
+  pointer-events: none;
+  animation: focusPulse 2s infinite;
+}
+
+@keyframes focusPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* סגנון למצב hover כשיש גם פוקוס */
+[data-grid-item]:focus:hover {
+  transform: scale(1.04);
+}
+
+/* accessibility - הבטחת ניגודיות גבוהה */
+@media (prefers-contrast: high) {
+  :focus-visible {
+    outline-width: 4px;
+    outline-color: #000;
+  }
+}
+
+/* reduced motion למי שמעדיף */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* סגנון לתפריטים נפתחים */
+[role="menu"]:focus-within,
+[role="listbox"]:focus-within {
+  outline: 2px solid #16A34A;
+  outline-offset: -2px;
+}
+
+/* סגנון לפריטים בתפריט */
+[role="menuitem"]:focus,
+[role="option"]:focus {
+  background-color: rgba(22, 163, 74, 0.1);
+  outline: 2px solid #16A34A;
+}
+
+/* Skip to content link (נגישות) */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #16A34A;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+  z-index: 9999;
+  font-weight: bold;
+}
+
+.skip-to-content:focus {
+  top: 0;
+  outline: 3px solid #fff;
+}
+
+/* סגנון למודלים ודיאלוגים */
+[role="dialog"]:focus-visible {
+  outline: none;
+}
+
+[role="dialog"] *:focus-visible {
+  outline: 2px solid #16A34A;
+}
+
+/* הבטחת visibility של פוקוס בתוך containers עם overflow */
+[data-grid-container] {
+  scroll-padding: 20px;
+}
+
+/* סגנון לאינדיקטור דף נוכחי בפגינציה */
+.MuiPaginationItem-root.Mui-selected:focus-visible {
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.3);
+}

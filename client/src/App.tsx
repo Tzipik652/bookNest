@@ -3,7 +3,8 @@ import React, { Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CircularProgress, Box, GlobalStyles } from "@mui/material";
 import { Toaster } from "sonner";
-
+import { KeyboardShortcutsHelp } from './components/KeyboardShortcutsHelp';
+import { KeyboardWelcomeToast } from './components/KeyboardWelcomeToast';
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -244,6 +245,9 @@ function App() {
             <Route path="/faq" element={<LazyFAQPage />} />
           </Routes>
         </Suspense>
+
+<KeyboardShortcutsHelp />
+        <KeyboardWelcomeToast />
 
         {/* Screen reader ARIA announcements */}
         {screenReader && (

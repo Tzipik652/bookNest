@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { ArrowLeft, FileText } from 'lucide-react';
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function TermsOfServicePage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);

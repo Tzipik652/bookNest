@@ -26,8 +26,10 @@ import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Skeleton } from '@mui/material';
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function AdminDashboardPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
   const [userMap, setUserMap] = useState<Record<string, string>>({});
   const navigate = useNavigate();

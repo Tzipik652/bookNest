@@ -29,8 +29,10 @@ import { useFavoriteBooks } from "../hooks/useFavorites";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useDynamicTheme } from "../theme";
 import { Book, BookWithFavorite } from "../types";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function BookDetailsPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const theme = useDynamicTheme();
   const { id } = useParams();
   const navigate = useNavigate();

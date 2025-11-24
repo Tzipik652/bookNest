@@ -8,8 +8,10 @@ import { Textarea } from '../components/ui/textarea';
 import { ArrowLeft, Mail, Send, HelpCircle, MapPin, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUserStore } from '../store/useUserStore';
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function ContactPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     subject: '',

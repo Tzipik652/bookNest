@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Home, ArrowLeft, BookOpen } from 'lucide-react';
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function NotFoundPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
 
   return (

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { BookOpen } from "lucide-react";
-
 import {
   Box,
   Card,
@@ -17,15 +16,15 @@ import {
   Divider,
   CircularProgress,
 } from "@mui/material";
-
 import { useUserStore } from "../store/useUserStore";
 import { loginLocal, loginWithGoogle } from "../services/userService";
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginFormValues } from "../schemas/login.schema";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function LoginPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useUserStore();

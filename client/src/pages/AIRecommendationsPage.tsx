@@ -14,8 +14,10 @@ import { useFavoriteBooks } from "../hooks/useFavorites";
 import { Book, BookWithFavorite } from "../types";
 import BookGridSkeleton from "../components/BookGridSkeleton";
 import { useQueryClient } from "@tanstack/react-query";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function AIRecommendationsPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);

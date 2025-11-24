@@ -18,14 +18,14 @@ import {
 import { ArrowBack, AutoAwesome, CheckCircle } from "@mui/icons-material";
 import { useUserStore } from "../store/useUserStore";
 import { Category } from "../types";
-
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 import { useForm } from "react-hook-form";
 import { BookFormValues, bookSchema } from "../schemas/book.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export function AddBookPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
-
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
