@@ -249,6 +249,7 @@ export function AdminDashboardPage() {
           reactionsCount={reactionCounts ? calculatedTotalReactions : 0}
           recentUploads={recentBooks.length}
           isLoading={isLoading}
+          isReactionsLoading={isReactionsLoading}
         />
         <AdminBooksTable
           books={books}

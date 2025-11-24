@@ -10,65 +10,48 @@ import {
 } from "lucide-react";
 
 // Custom hook for smooth animated numbers with intersection observer
-function useAnimatedNumber(targetValue: number, duration: number = 2000) {
+function useAnimatedNumber(
+  targetValue: number,
+  duration: number = 2000,
+  isLoading: boolean = false
+) {
   const [displayValue, setDisplayValue] = useState(0);
-  
   const elementRef = useRef<HTMLDivElement>(null);
-  const hasAnimatedRef = useRef(false);
+  const startTimeRef = useRef(0);
   const lastTargetRef = useRef(targetValue);
 
-  const startValueRef = useRef(0);
-  const startTimeRef = useRef(0);
-
-  // Detect change in target value
   useEffect(() => {
-    if (targetValue !== lastTargetRef.current) {
-      lastTargetRef.current = targetValue;
-      hasAnimatedRef.current = false;     // Force animation re-enable
-      startValueRef.current = 0;
-      setDisplayValue(0);                 // Single rerender
-    }
-  }, [targetValue]);
+    if (!isLoading) return;
+
+    const interval = setInterval(() => {
+      setDisplayValue(Math.floor(Math.random() * Math.max(targetValue, 10)));
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [isLoading, targetValue]);
 
   useEffect(() => {
-    const el = elementRef.current;
-    if (!el) return;
+    if (isLoading) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0].isIntersecting) return;
-        if (hasAnimatedRef.current) return;
+    lastTargetRef.current = targetValue;
+    startTimeRef.current = Date.now();
 
-        hasAnimatedRef.current = true;
-        startTimeRef.current = Date.now();
+    const animate = () => {
+      const elapsed = Date.now() - startTimeRef.current;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const newValue = Math.round(targetValue * eased);
 
-        const animate = () => {
-          const elapsed = Date.now() - startTimeRef.current;
-          const progress = Math.min(elapsed / duration, 1);
+      setDisplayValue((prev) => (prev !== newValue ? newValue : prev));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
 
-          const eased = 1 - Math.pow(1 - progress, 3);
-          const newValue = Math.round(startValueRef.current + targetValue * eased);
-
-          // Only rerender if display REALLY changes → prevents wasted renders
-          setDisplayValue((prev) => (prev !== newValue ? newValue : prev));
-
-          if (progress < 1) {
-            requestAnimationFrame(animate);
-          }
-        };
-
-        requestAnimationFrame(animate);
-      },
-      { threshold: 0.3 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-
-  }, [duration, targetValue]); // no rerender needed from other states
+    requestAnimationFrame(animate);
+  }, [targetValue, duration, isLoading]);
 
   return { value: displayValue, ref: elementRef };
 }
+
 
 interface StatsCardsProps {
   favoritesCount: number;
@@ -78,6 +61,7 @@ interface StatsCardsProps {
   reactionsCount: number;
   recentUploads: number;
   isLoading?: boolean;
+  isReactionsLoading?: boolean;
 }
 
 // Shimmer loading component
@@ -104,12 +88,13 @@ export function StatsCards({
   reactionsCount,
   recentUploads,
   isLoading = false,
+  isReactionsLoading = false,
 }: StatsCardsProps) {
   const booksAnim = useAnimatedNumber(totalBooksCount, 2000);
   const usersAnim = useAnimatedNumber(totalUsersCount, 2200);
   const commentsAnim = useAnimatedNumber(commentsCount, 2400);
   const favoritesAnim = useAnimatedNumber(favoritesCount, 2600);
-  const reactionsAnim = useAnimatedNumber(reactionsCount, 2800);
+  const reactionsAnim = useAnimatedNumber(reactionsCount, 2800, isReactionsLoading);
   const recentAnim = useAnimatedNumber(recentUploads, 2000);
 
   const handleCardClick = (scrollTo?: string) => {
