@@ -9,17 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import {
-  BookOpen,
-  Users,
-  MessageSquare,
-  Heart,
-  Trash2,
-  Edit,
-  Shield,
-  TrendingUp,
-  AlertCircle,
-} from "lucide-react";
+import { BookOpen, Users, Trash2, Edit, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { useUserStore } from "../store/useUserStore";
 import { deleteBook, getBooks } from "../services/bookService";
@@ -45,6 +35,8 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Avatar, Skeleton } from "@mui/material";
+import { StatsCards } from "../components/StatsCards";
+
 
 export function AdminDashboardPage() {
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
@@ -52,14 +44,14 @@ export function AdminDashboardPage() {
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
 
-  const [isLoading, setIsLoading] = useState(true);
   const [isReactionsLoading, setIsReactionsLoading] = useState(true);
 
+  const [favoritesCount, setFavoritesCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [books, setBooks] = useState<Book[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [favorites, setFavorites] = useState<number>(0);
   const [reactionCounts, setReactionCounts] = useState<Record<string, any>>({});
   const [userEditFormData, setUserEditFormData] = useState({
     name: "",
@@ -103,7 +95,7 @@ export function AdminDashboardPage() {
       setUserMap(userMap);
 
       setBooks(allBooksData.books);
-      setFavorites(allFavorites);
+      setFavoritesCount(allFavorites);
       setUsers(allUsers);
       setComments(allComments);
       setBooksMap(map);
@@ -249,203 +241,15 @@ export function AdminDashboardPage() {
             <p className="text-gray-600">Manage BookNest platform</p>
           </div>
         </div>
-
-        {/* --- Top Stats Skeletons --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {isLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i} className="border-0 shadow-sm">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-8 w-16" />
-                    </div>
-                    <Skeleton className="h-12 w-12 rounded-lg" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <>
-              <Card>
-                <CardContent
-                  className="pt-6"
-                  onClick={() => {
-                    const el = document.getElementById("total-books-section");
-                    el?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Total Books</p>
-                      <p className="text-3xl font-bold text-gray-900">
-                        {books.length}
-                      </p>
-                    </div>
-                    <div className="bg-green-100 p-3 rounded-lg">
-                      <BookOpen className="h-6 w-6 text-green-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent
-                  className="pt-6"
-                  onClick={() => {
-                    const el = document.getElementById("users-list-section");
-                    el?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Total Users</p>
-                      <p className="text-3xl font-bold text-gray-900">
-                        {users.length}
-                      </p>
-                    </div>
-                    <div className="bg-blue-100 p-3 rounded-lg">
-                      <Users className="h-6 w-6 text-blue-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent
-                  className="pt-6"
-                  onClick={() => {
-                    const el = document.getElementById(
-                      "total-comments-section"
-                    );
-                    el?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">
-                        Total Comments
-                      </p>
-                      <p className="text-3xl font-bold text-gray-900">
-                        {comments.length}
-                      </p>
-                    </div>
-                    <div className="bg-purple-100 p-3 rounded-lg">
-                      <MessageSquare className="h-6 w-6 text-purple-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">
-                        Total Favorites
-                      </p>
-                      <p className="text-3xl font-bold text-gray-900">
-                        {favorites}
-                      </p>
-                    </div>
-                    <div className="bg-red-100 p-3 rounded-lg">
-                      <Heart className="h-6 w-6 text-red-600" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {isReactionsLoading ? (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-8 w-40" />
-                  </div>
-                  <Skeleton className="h-12 w-12 rounded-lg" />
-                </div>
-                <Skeleton className="h-4 w-64 mt-2" />
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardContent
-                className="pt-6"
-                onClick={() => {
-                  const el = document.getElementById("total-comments-section");
-                  el?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Engagement</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {calculatedTotalReactions} Reactions
-                    </p>
-                  </div>
-                  <div className="bg-orange-100 p-3 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-orange-600" />
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500">
-                  Average:{" "}
-                  {(
-                    calculatedTotalReactions / Math.max(comments.length, 1)
-                  ).toFixed(1)}{" "}
-                  reactions per comment
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Activity Card (Dependent on basic isLoading) */}
-          {isLoading ? (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-8 w-40" />
-                  </div>
-                  <Skeleton className="h-12 w-12 rounded-lg" />
-                </div>
-                <Skeleton className="h-4 w-64 mt-2" />
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardContent
-                className="pt-6"
-                onClick={() => {
-                  const el = document.getElementById("total-books-section");
-                  el?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Activity</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {recentBooks.length} Recent Books
-                    </p>
-                  </div>
-                  <div className="bg-indigo-100 p-3 rounded-lg">
-                    <AlertCircle className="h-6 w-6 text-indigo-600" />
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500">
-                  Books added in the last update cycle
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
+        <StatsCards
+          favoritesCount={favoritesCount}
+          totalBooksCount={books.length}
+          totalUsersCount={users.length}
+          commentsCount={comments.length}
+          reactionsCount={reactionCounts ? calculatedTotalReactions : 0}
+          recentUploads={recentBooks.length}
+          isLoading={isLoading}
+        />
         {/* --- Books Table Skeleton --- */}
         <Card id="total-books-section" className="mb-8 shadow-sm border-0">
           <CardHeader>
