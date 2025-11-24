@@ -1,9 +1,9 @@
 import { Card, CardHeader, CardContent, Skeleton } from "@mui/material";
 import { BookOpen, Edit, Trash2 } from "lucide-react";
-import { CardTitle, CardDescription } from "./ui/card";
-import { Button } from "../components/ui/button";
+import { CardTitle, CardDescription } from "../ui/card";
+import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
-import { Book } from "../types";
+import { Book } from "../../types";
 
 interface AdminBooksTableProps {
   books: Book[];
@@ -12,8 +12,14 @@ interface AdminBooksTableProps {
   handleEditBook: (bookId: string) => void;
   handleDeleteBook: (bookId: string) => void;
 }
-export const AdminBooksTable = ({books, isLoading, userMap,handleEditBook,handleDeleteBook}:AdminBooksTableProps) => {
-    const navigate = useNavigate();
+export const AdminBooksTable = ({
+  books,
+  isLoading,
+  userMap,
+  handleEditBook,
+  handleDeleteBook,
+}: AdminBooksTableProps) => {
+  const navigate = useNavigate();
   return (
     <div>
       {/* --- Books Table Skeleton --- */}
