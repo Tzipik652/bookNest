@@ -44,7 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
-import { Skeleton } from "@mui/material";
+import { Avatar, Skeleton } from "@mui/material";
 
 export function AdminDashboardPage() {
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
@@ -313,10 +313,15 @@ export function AdminDashboardPage() {
               </Card>
 
               <Card>
-                <CardContent className="pt-6"  onClick={() => {
-                    const el = document.getElementById("total-comments-section");
+                <CardContent
+                  className="pt-6"
+                  onClick={() => {
+                    const el = document.getElementById(
+                      "total-comments-section"
+                    );
                     el?.scrollIntoView({ behavior: "smooth" });
-                  }}>
+                  }}
+                >
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">
@@ -370,10 +375,13 @@ export function AdminDashboardPage() {
             </Card>
           ) : (
             <Card>
-              <CardContent className="pt-6" onClick={() => {
-                    const el = document.getElementById("total-comments-section");
-                    el?.scrollIntoView({ behavior: "smooth" });
-                  }}>
+              <CardContent
+                className="pt-6"
+                onClick={() => {
+                  const el = document.getElementById("total-comments-section");
+                  el?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Engagement</p>
@@ -412,10 +420,13 @@ export function AdminDashboardPage() {
             </Card>
           ) : (
             <Card>
-              <CardContent className="pt-6" onClick={() => {
-                    const el = document.getElementById("total-books-section");
-                    el?.scrollIntoView({ behavior: "smooth" });
-                  }}>
+              <CardContent
+                className="pt-6"
+                onClick={() => {
+                  const el = document.getElementById("total-books-section");
+                  el?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Activity</p>
@@ -443,8 +454,9 @@ export function AdminDashboardPage() {
               View and manage all books in the library
             </CardDescription>
           </CardHeader>
+
           <CardContent>
-            <div className="rounded-md border">
+            <div className="hidden md:block rounded-md border">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-gray-50/50">
@@ -547,6 +559,74 @@ export function AdminDashboardPage() {
                 </tbody>
               </table>
             </div>
+
+            <div className="md:hidden space-y-4">
+              <div className="md:hidden space-y-3">
+                {isLoading
+                  ? Array.from({ length: 5 }).map((_, i) => (
+                      <div key={i} className="border rounded-lg p-3">
+                        <Skeleton className="h-4 w-3/4 mb-2" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                    ))
+                  : books.map((book) => (
+                      <div
+                        key={book._id}
+                        className="border rounded-lg p-3 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex justify-between items-start gap-3 mb-2">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-sm truncate">
+                              {book.title}
+                            </h3>
+                            <p className="text-xs text-gray-600 truncate">
+                              {book.author}
+                            </p>
+                          </div>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100 shrink-0">
+                            {book.category}
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between items-center text-xs text-gray-500 mb-2">
+                          <span>{userMap[book.user_id]}</span>
+                          <span>
+                            {new Date(book.date_created).toLocaleDateString(
+                              "he-IL"
+                            )}
+                          </span>
+                        </div>
+
+                        <div className="flex gap-1.5">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 h-8 text-xs"
+                            onClick={() => navigate(`/book/${book._id}`)}
+                          >
+                            <BookOpen className="h-3.5 w-3.5 ml-1" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-2"
+                            onClick={() => handleEditBook(book._id)}
+                          >
+                            <Edit className="h-3.5 w-3.5 text-green-600" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-2"
+                            onClick={() => handleDeleteBook(book._id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5 text-red-600" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -587,7 +667,17 @@ export function AdminDashboardPage() {
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-50 to-indigo-100 border border-green-100 flex items-center justify-center text-green-600 text-lg">
-                            {user.name.charAt(0).toUpperCase()}
+                            <Avatar
+                              sx={{
+                                width: 40,
+                                height: 40,
+                                bgcolor: "primary.main",
+                              }}
+                              src={user.profile_picture || undefined}
+                            >
+                              {!user.profile_picture &&
+                                user.name?.charAt(0).toUpperCase()}
+                            </Avatar>
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
