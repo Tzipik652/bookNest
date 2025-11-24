@@ -1,5 +1,5 @@
 // client/src/App.tsx
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CircularProgress, Box, GlobalStyles } from "@mui/material";
 import { Toaster } from "sonner";
@@ -11,6 +11,7 @@ import { useUserStore } from "./store/useUserStore";
 import { useAccessibilityStore } from "./store/accessibilityStore";
 import AccessibilityMenu from "./components/AccessibilityMenu";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
+import { useTranslation } from "react-i18next";
 
 // Lazy-loaded pages
 const LazyLoginPage = React.lazy(() =>
@@ -107,6 +108,7 @@ const RouteFallback = () => (
 );
 
 function App() {
+  const { t, i18n } = useTranslation('common');
   const { user: currentUser } = useUserStore();
 
   const {
@@ -126,9 +128,17 @@ function App() {
       el.setAttribute("aria-label", "button");
     }
   });
+useEffect(() => {
+    document.documentElement.dir = i18n.dir(i18n.language);
+    
+    document.documentElement.lang = i18n.language;
 
+  }, [i18n.language]);
   return (
     <Router>
+      <h1 className="notranslate">{t('welcome')}</h1>
+      <button onClick={() => i18n.changeLanguage('en')}>English</button>
+      <button onClick={() => i18n.changeLanguage('he')}>עברית</button>
       <div className="min-h-screen">
         {/* Skip link */}
         <a

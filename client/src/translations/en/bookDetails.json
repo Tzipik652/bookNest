@@ -1,0 +1,11 @@
+{
+  "bookNotFound": "Book Not Found",
+  "authorPrefix": "by {{author}}",
+  "buttonRemoveFavorite": "Remove from Favorites",
+  "buttonAddFavorite": "Add to Favorites",
+  "favoritesCount_one": "1 user liked this book",
+  "favoritesCount_plural": "{{count}} users liked this book",
+  "headerDescription": "Description",
+  "headerAISummary": "AI Summary",
+  "uploadedByPrefix": "Uploaded by {{userName}}"
+}

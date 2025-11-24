@@ -98,8 +98,8 @@ export function Navbar() {
                   <Sparkles className="h-4 w-4" /> AI Recommendations
                 </Button>
               </Link>
+              <GoogleTranslate />
               <div className="self-center">
-                <GoogleTranslate />
               </div>
               {user.role === "admin" && (
                 <Link to="/admin-dashboard">

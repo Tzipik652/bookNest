@@ -4,8 +4,25 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 // ייבוא קובצי התרגום
-import enTranslation from './translations/en.json';
-import heTranslation from './translations/he.json';
+import enCommon from './translations/en/common.json';
+import heCommon from './translations/he/common.json';
+
+// ייבוא קובצי הבית
+import enHome from './translations/en/home.json';
+import heHome from './translations/he/home.json';
+
+import enAddBook from './translations/en/addBook.json'
+import heAddBook from './translations/he/addBook.json'
+
+import enAdminDashboard from './translations/en/adminDashboard.json'
+import heAdminDashboard from './translations/he/adminDashboard.json'
+
+import enAIRecommendations from './translations/en/AIRecommendations.json'
+import heAIRecommendations from './translations/he/AIRecommendations.json'
+
+import enBookDetails from './translations/en/bookDetails.json'
+import heBookDetails from './translations/he/bookDetails.json'
+// הגדרת השפה
 
 i18n
   .use(LanguageDetector) // מזהה אוטומטית את שפת המשתמש
@@ -13,12 +30,25 @@ i18n
   .init({
     resources: {
       en: {
-        translation: enTranslation
+        common: enCommon,
+        home: enHome,
+        addBook:enAddBook,
+        adminDashboard :enAdminDashboard,
+        AIRecommendations:enAIRecommendations,
+        bookDetails:enBookDetails
       },
       he: {
-        translation: heTranslation
-      }
+        common: heCommon,
+        home: heHome,
+        addBook:heAddBook,
+        adminDashboard:heAdminDashboard,
+        AIRecommendations:heAIRecommendations,
+        bookDetails:heBookDetails
+      },
     },
+    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard'],
+    defaultNS: 'common',
+    supportedLngs: ['en', 'he'],
     fallbackLng: 'en', // אם השפה המבוקשת לא קיימת, השתמש באנגלית
     debug: false,
     interpolation: {

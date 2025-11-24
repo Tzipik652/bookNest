@@ -22,8 +22,12 @@ import { Category } from "../types";
 import { useForm } from "react-hook-form";
 import { BookFormValues, bookSchema } from "../schemas/book.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from 'react-i18next';
 
 export function AddBookPage() {
+  // useTranslation יחפש קודם ב-'addBook' ואז ב-'common'
+  const { t } = useTranslation(['addBook', 'common']);
+
   const navigate = useNavigate();
 
   const [error, setError] = useState("");
@@ -100,7 +104,8 @@ export function AddBookPage() {
         price: data.price ? parseFloat(data.price) : undefined,
       });
 
-      setSuccessMessage(`${newBook.title} was added successfully!`);
+      // שימוש במפתח תרגום (יוצא מ-'addBook') עם אינטרפולציה
+      setSuccessMessage(t('successMessage', { bookTitle: newBook.title }));
       setShowSuccess(true);
 
       reset();
@@ -110,9 +115,11 @@ export function AddBookPage() {
       }, 1500);
     } catch (err: any) {
       if (err.message === "Book already exists.") {
-        setError("This book already exists in the database.");
+        // שימוש במפתח תרגום (יוצא מ-'addBook')
+        setError(t('errorBookExists'));
       } else {
-        setError("Failed to add book. Please try again.");
+        // שימוש במפתח תרגום (יוצא מ-'addBook')
+        setError(t('errorGeneral'));
       }
 
       setShowAlert(true);
@@ -128,14 +135,19 @@ export function AddBookPage() {
           variant="text"
           onClick={() => navigate(-1)}
           sx={{ mb: 3 }}
+          className='notranslate'
         >
-          Back
+          {/* שימוש במפתח 'back' מה-namespace 'common' (אם הוא שם) */}
+          {t('common:back')}
         </Button>
 
         <Card elevation={3}>
           <CardHeader
-            title="Add New Book"
-            subheader="Share a book with the BookNest community. AI will generate a summary automatically."
+                    className='notranslate'
+            // שימוש במפתח תרגום (יוצא מ-'addBook')
+            title={t('pageTitle')}
+            // שימוש במפתח תרגום (יוצא מ-'addBook')
+            subheader={t('pageSubheader')}
           />
 
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -144,14 +156,15 @@ export function AddBookPage() {
                 icon={<AutoAwesome fontSize="small" sx={{ color: "#16A34A" }} />}
                 severity="info"
                 sx={{ mb: 3 }}
+                          className='notranslate'
               >
-                AI will automatically generate a summary based on your title,
-                description, and category.
+                {t('aiAlert')}
               </Alert>
 
               <TextField
                 fullWidth
-                label="Title *"
+          className='notranslate'
+                label={t('titleLabel')}
                 margin="normal"
                 {...register("title")}
                 error={!!errors.title}
@@ -160,7 +173,8 @@ export function AddBookPage() {
 
               <TextField
                 fullWidth
-                label="Author *"
+          className='notranslate'
+                label={t('authorLabel')}
                 margin="normal"
                 {...register("author")}
                 error={!!errors.author}
@@ -169,7 +183,8 @@ export function AddBookPage() {
 
               <TextField
                 fullWidth
-                label="Description *"
+          className='notranslate'
+                label={t('descriptionLabel')}
                 margin="normal"
                 multiline
                 rows={5}
@@ -181,7 +196,8 @@ export function AddBookPage() {
               <TextField
                 select
                 fullWidth
-                label="Category *"
+          className='notranslate'
+                label={t('categoryLabel')}
                 margin="normal"
                 {...register("category")}
                 error={!!errors.category}
@@ -196,7 +212,8 @@ export function AddBookPage() {
 
               <TextField
                 fullWidth
-                label="Image URL (Optional)"
+          className='notranslate'
+                label={t('imageURLLabel')}
                 margin="normal"
                 {...register("img_url")}
                 error={!!errors.img_url}
@@ -205,7 +222,8 @@ export function AddBookPage() {
 
               <TextField
                 fullWidth
-                label="Price (Optional)"
+          className='notranslate'
+                label={t('priceLabel')}
                 type="number"
                 margin="normal"
                 {...register("price")}
@@ -226,8 +244,9 @@ export function AddBookPage() {
                     <CircularProgress color="inherit" size={18} />
                   ) : null
                 }
+                          className='notranslate'
               >
-                {isSubmitting ? "Adding Book..." : "Add Book"}
+                {isSubmitting ? t('addingButton') : t('addButton')}
               </Button>
 
               <Button
@@ -236,8 +255,9 @@ export function AddBookPage() {
                 fullWidth
                 onClick={() => navigate(-1)}
                 disabled={isSubmitting}
+          className='notranslate'
               >
-                Cancel
+                {t('cancelButton')}
               </Button>
             </CardActions>
           </form>
