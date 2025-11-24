@@ -3,7 +3,7 @@ import axios from "axios";
 import { Comment } from "../types";
 
 const API_BASE_URL =
-  `${process.env.REACT_APP_SERVER_URL}/comments` ||
+  `${import.meta.env.VITE_SERVER_URL}/comments` ||
   "http://localhost:5000/comments";
 
 function handleAxiosError(error: any): never {

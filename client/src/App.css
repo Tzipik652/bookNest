@@ -36,3 +36,50 @@
     transform: rotate(360deg);
   }
 }
+/* העלמת ה-Top Bar של גוגל */
+.goog-te-banner-frame.skiptranslate {
+    display: none !important;
+} 
+body {
+    top: 0px !important; 
+}
+/* עיצוב בסיסי לכפתור עצמו אם רוצים */
+.goog-te-gadget-simple {
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    padding: 4px;
+    border-radius: 4px;
+}
+/* 1. תיקון צבע ורקע לתיבת הבחירה הראשית */
+.goog-te-gadget-simple {
+    /* חשוב: מבטיח שהרקע שונה מצבע הטקסט */
+    background-color: #f8f8f8 !important; 
+    border: 1px solid #ccc !important; 
+    box-shadow: none !important; 
+    border-radius: 4px;
+    padding: 3px 6px;
+    line-height: 1.2;
+}
+
+/* 2. תיקון צבע הטקסט בתוך התיבה (כדי שייראה על רקע כהה) */
+.goog-te-gadget-simple select {
+    color: #333333 !important; /* צבע טקסט כהה */
+    background-color: transparent !important; /* משתמש ברקע של האלמנט האב (.goog-te-gadget-simple) */
+    border: none !important;
+    outline: none !important;
+}
+
+/* 3. הגדרת גודל (אם עדיין קטן מדי) */
+#google_translate_element {
+    height: 25px; /* הגדלת הגובה המינימלי */
+    overflow: visible !important; /* ודאי שלא נחתך */
+}
+
+/* 4. הסתרת הלוגו של גוגל שמגיע עם הכפתור, כדי שיראה נקי יותר */
+.goog-logo-link {
+    display: none !important;
+} 
+/* כדי להשאיר את המקום נקי יותר */
+.goog-te-gadget {
+    font-size: 0;
+}

@@ -1,9 +1,10 @@
 import axios from "axios";
 import { Book } from "../types";
 import { useUserStore } from "../store/useUserStore";
+// const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID!;
 
 const API_BASE_URL =
-  `${process.env.REACT_APP_SERVER_URL}/books` || "http://localhost:5000/books";
+  `${import.meta.env.VITE_SERVER_URL}/books` || "http://localhost:5000/books";
 
 function handleAxiosError(error: any): never {
   if (axios.isAxiosError(error)) {
