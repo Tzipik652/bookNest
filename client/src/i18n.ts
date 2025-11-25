@@ -29,6 +29,14 @@ import heContact from './translations/he/contact.json'
 import enEditBook from './translations/en/editBook.json'
 import heEditBook from './translations/he/editBook.json'
 
+import enFAQ from './translations/en/faq.json'
+import heFAQ from './translations/he/faq.json'
+
+import enFavorites from './translations/en/favorites.json'
+import heFavorites from './translations/he/favorites.json'
+
+import enAuth from './translations/en/auth.json'
+import heAuth from './translations/he/auth.json'
 
 // הגדרת השפה
 
@@ -45,7 +53,10 @@ i18n
         AIRecommendations:enAIRecommendations,
         bookDetails:enBookDetails,
         contact:enContact,
-        editBook:enEditBook
+        editBook:enEditBook,
+        faq:enFAQ,
+        favorites:enFavorites,
+        auth:enAuth
       },
       he: {
         common: heCommon,
@@ -55,10 +66,13 @@ i18n
         AIRecommendations:heAIRecommendations,
         bookDetails:heBookDetails,
         contact:heContact,
-        editBook:heEditBook
+        editBook:heEditBook,
+        faq:heFAQ,
+        favorites:heFavorites,
+        auth:heAuth
       },
     },
-    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook'],
+    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth'],
     defaultNS: 'common',
     supportedLngs: ['en', 'he'],
     fallbackLng: 'en', // אם השפה המבוקשת לא קיימת, השתמש באנגלית
