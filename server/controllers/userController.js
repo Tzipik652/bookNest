@@ -29,8 +29,7 @@ const generateJWT = (user) => {
       role: user.role,
     },
     JWT_SECRET,
-    // { expiresIn: "24h" }
-    { expiresIn: "5s" }
+    { expiresIn: "24h" }
   );
 };
 
