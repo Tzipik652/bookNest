@@ -28,8 +28,8 @@ export function FAQPage() {
                     </Button>
 
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="bg-blue-100 p-3 rounded-lg">
-                            <HelpCircle className="h-8 w-8 text-blue-600" />
+                        <div className="bg-green-100 p-3 rounded-lg">
+                            <HelpCircle className="h-8 w-8 text-green-600" />
                         </div>
                         <h1>Frequently Asked Questions</h1>
                     </div>
@@ -43,7 +43,7 @@ export function FAQPage() {
                     {faqs.map((section:any, idx:any) => (
                         <Card key={idx}>
                             <CardContent className="pt-6">
-                                <h2 className="mb-4 text-blue-600">{section.category}</h2>
+                                <h2 className="mb-4 text-green-600">{section.category}</h2>
                                 <Accordion type="single" collapsible className="w-full">
                                     {section.questions.map((faq:any, faqIdx:any) => (
                                         <AccordionItem key={faqIdx} value={`item-${idx}-${faqIdx}`}>
@@ -60,11 +60,11 @@ export function FAQPage() {
                 </div>
 
                 {/* Still Need Help */}
-                <Card className="mt-8 bg-blue-50 border-blue-200">
+                <Card className="mt-8 bg-green-50 border-green-200">
                     <CardContent className="pt-6">
                         <div className="flex items-start gap-4">
-                            <div className="bg-blue-100 p-3 rounded-lg">
-                                <MessageCircle className="h-6 w-6 text-blue-600" />
+                            <div className="bg-green-100 p-3 rounded-lg">
+                                <MessageCircle className="h-6 w-6 text-green-600" />
                             </div>
                             <div className="flex-1">
                                 <h3 className="mb-2">Still have questions?</h3>
