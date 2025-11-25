@@ -13,14 +13,14 @@ import {
   Container,
   CircularProgress,
 } from "@mui/material";
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ForgotPasswordFormValues, forgotPasswordSchema } from "../schemas/auth.register";
 import { forgotPassword } from "../services/authService";
-
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function ForgotPassword() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 

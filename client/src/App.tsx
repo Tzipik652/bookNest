@@ -3,7 +3,8 @@ import React, { Suspense, useEffect } from "react";
 import { Routes, Route, useLocation, Router } from "react-router-dom";
 import { CircularProgress, Box, GlobalStyles } from "@mui/material";
 import { Toaster } from "sonner";
-
+import { KeyboardShortcutsHelp } from './components/KeyboardShortcutsHelp';
+import { KeyboardWelcomeToast } from './components/KeyboardWelcomeToast';
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -258,24 +259,27 @@ useEffect(() => {
         </Routes>
       </Suspense>
 
-      {/* Screen reader ARIA announcements */}
-      {screenReader && (
-        <div
-          aria-live="assertive"
-          style={{
-            position: "absolute",
-            width: "1px",
-            height: "1px",
-            margin: "-1px",
-            padding: "0",
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            border: "0",
-          }}
-        >
-          Screen reader mode enabled
-        </div>
-      )}
+<KeyboardShortcutsHelp />
+        <KeyboardWelcomeToast />
+
+        {/* Screen reader ARIA announcements */}
+        {screenReader && (
+          <div
+            aria-live="assertive"
+            style={{
+              position: "absolute",
+              width: "1px",
+              height: "1px",
+              margin: "-1px",
+              padding: "0",
+              overflow: "hidden",
+              clip: "rect(0 0 0 0)",
+              border: "0",
+            }}
+          >
+            Screen reader mode enabled
+          </div>
+        )}
 
       <Footer />
     </div>

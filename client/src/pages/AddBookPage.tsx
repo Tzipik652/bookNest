@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import { addBook } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
@@ -18,18 +18,18 @@ import {
 import { ArrowBack, AutoAwesome, CheckCircle } from "@mui/icons-material";
 import { useUserStore } from "../store/useUserStore";
 import { Category } from "../types";
-
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 import { useForm } from "react-hook-form";
 import { BookFormValues, bookSchema } from "../schemas/book.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from 'react-i18next';
 
 export function AddBookPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   // useTranslation יחפש קודם ב-'addBook' ואז ב-'common'
   const { t } = useTranslation(['addBook', 'common']);
 
   const navigate = useNavigate();
-
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,6 +38,20 @@ export function AddBookPage() {
   const { user: currentUser } = useUserStore();
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [firstLoad, setFirstLoad] = useState(true);
+  const discoverRef = useRef<HTMLHeadingElement | null>(null);
+  const actionsRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (firstLoad) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setFirstLoad(false);
+      } else if (discoverRef.current) {
+        discoverRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [isLoading]);
 
   // --------------------
   // RHF + ZOD
@@ -77,7 +91,7 @@ export function AddBookPage() {
     setError("");
     setSuccessMessage("");
     setIsSubmitting(true);
-
+    actionsRef.current?.scrollIntoView({ behavior: "smooth" });
     try {
       const newBook = await addBook({
         title: data.title,
@@ -155,6 +169,13 @@ export function AddBookPage() {
                 {...register("title")}
                 error={!!errors.title}
                 helperText={errors.title?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
+
               />
 
               <TextField
@@ -165,6 +186,13 @@ export function AddBookPage() {
                 {...register("author")}
                 error={!!errors.author}
                 helperText={errors.author?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
+
               />
 
               <TextField
@@ -177,6 +205,13 @@ export function AddBookPage() {
                 {...register("description")}
                 error={!!errors.description}
                 helperText={errors.description?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
+
               />
 
               <TextField
@@ -188,6 +223,13 @@ export function AddBookPage() {
                 {...register("category")}
                 error={!!errors.category}
                 helperText={errors.category?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
+
               >
                 {categories.map((cat) => (
                   <MenuItem key={cat.id} value={cat.name}>
@@ -215,10 +257,16 @@ export function AddBookPage() {
                 {...register("price")}
                 error={!!errors.price}
                 helperText={errors.price?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               />
             </CardContent>
 
-            <CardActions sx={{ p: 3, pt: 0, gap: 2 }}>
+            <CardActions ref={actionsRef} sx={{ p: 3, pt: 0, gap: 2 }}>
               <Button
                 type="submit"
                 variant="contained"
