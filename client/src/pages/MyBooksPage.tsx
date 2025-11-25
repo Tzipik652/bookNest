@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Book, BookWithFavorite } from "../types/index";
 import { getBooksByUserId } from "../services/bookService";
@@ -22,22 +22,9 @@ export function MyBooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [firstLoad, setFirstLoad] = useState(true);
-  const discoverRef = useRef<HTMLHeadingElement | null>(null);
 
   const queryClient = useQueryClient();
   const { isFavorited } = useFavoriteBooks();
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (firstLoad) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setFirstLoad(false);
-      } else if (discoverRef.current) {
-        discoverRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  }, [isLoading]);
 
   useEffect(() => {
     async function fetchBooks() {

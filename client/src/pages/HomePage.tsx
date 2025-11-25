@@ -78,18 +78,6 @@ export function HomePage() {
     });
   }, [books, favoriteBooksQuery.data, queryClient]);
 
-  useEffect(() => {
-    if (!loading) {
-      if (firstLoad) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setFirstLoad(false);
-      } else if (discoverRef.current) {
-        discoverRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  }, [loading]);
-
-
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     value: number

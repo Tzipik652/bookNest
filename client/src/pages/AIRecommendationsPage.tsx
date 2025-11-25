@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { BookCard } from "../components/BookCard";
 import {
   Box,
@@ -21,8 +21,6 @@ export function AIRecommendationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true);
-  const discoverRef = useRef<HTMLHeadingElement | null>(null);
 
   const queryClient = useQueryClient();
 

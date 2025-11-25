@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
@@ -20,21 +20,8 @@ export function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true);
-  const { user: currentUser } = useUserStore();
-  const discoverRef = useRef<HTMLHeadingElement | null>(null);
 
-  useEffect(() => {
-    if (!loading) {
-      if (firstLoad) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setFirstLoad(false);
-      } else if (discoverRef.current) {
-        discoverRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  }, [loading]);
+  const { user: currentUser } = useUserStore();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
