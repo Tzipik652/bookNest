@@ -4,7 +4,7 @@
   "buttonRemoveFavorite": "הסר מהמועדפים",
   "buttonAddFavorite": "הוסף למועדפים",
   "favoritesCount_one": "משתמש אחד אהב את הספר",
-  "favoritesCount_plural": "{{count}} משתמשים אהבו את הספר",
+  "favoritesCount": "{{count}} משתמשים אהבו את הספר",
   "headerDescription": "תיאור",
   "headerAISummary": "סיכום AI",
   "uploadedByPrefix": "הועלה על ידי {{userName}}"

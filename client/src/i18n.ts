@@ -22,6 +22,14 @@ import heAIRecommendations from './translations/he/AIRecommendations.json'
 
 import enBookDetails from './translations/en/bookDetails.json'
 import heBookDetails from './translations/he/bookDetails.json'
+
+import enContact from './translations/en/contact.json'
+import heContact from './translations/he/contact.json'
+
+import enEditBook from './translations/en/editBook.json'
+import heEditBook from './translations/he/editBook.json'
+
+
 // הגדרת השפה
 
 i18n
@@ -35,7 +43,9 @@ i18n
         addBook:enAddBook,
         adminDashboard :enAdminDashboard,
         AIRecommendations:enAIRecommendations,
-        bookDetails:enBookDetails
+        bookDetails:enBookDetails,
+        contact:enContact,
+        editBook:enEditBook
       },
       he: {
         common: heCommon,
@@ -43,10 +53,12 @@ i18n
         addBook:heAddBook,
         adminDashboard:heAdminDashboard,
         AIRecommendations:heAIRecommendations,
-        bookDetails:heBookDetails
+        bookDetails:heBookDetails,
+        contact:heContact,
+        editBook:heEditBook
       },
     },
-    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard'],
+    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook'],
     defaultNS: 'common',
     supportedLngs: ['en', 'he'],
     fallbackLng: 'en', // אם השפה המבוקשת לא קיימת, השתמש באנגלית

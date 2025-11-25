@@ -1,0 +1,37 @@
+{
+  "title": "צור קשר",
+  "subtitle": "נשמח לשמוע ממך",
+  "auth": {
+    "login_required": "עליך להתחבר",
+    "login_description": "יש צורך בחשבון פעיל עם שם ואימייל כדי לשלוח הודעה.",
+    "go_to_login": "עבור להתחברות"
+  },
+  "form": {
+    "subject_label": "נושא",
+    "subject_placeholder": "במה מדובר?",
+    "message_label": "הודעה",
+    "message_placeholder": "ספר לנו עוד...",
+    "submit_button": "שלח הודעה"
+  },
+  "success": {
+    "title": "ההודעה נשלחה בהצלחה!",
+    "description": "תודה שפנית אלינו. קיבלנו את הודעתך ונחזור אליך בהקדם האפשרי.",
+    "button_another": "שלח הודעה נוספת"
+  },
+  "info": {
+    "location_label": "כתובת",
+    "address_line1": "רחוב הספרים 123",
+    "address_line2": "עיר הקריאה, 12345",
+    "address_country": "ישראל"
+  },
+  "faq": {
+    "title": "שאלות נפוצות",
+    "description": "לפני שאתם פונים אלינו, ייתכן שתמצאו תשובות לשאלות נפוצות בעמוד ה-FAQ שלנו.",
+    "button": "צפה בשאלות נפוצות"
+  },
+  "toasts": {
+    "fill_all": "נא למלא את כל השדות",
+    "success": "ההודעה נשלחה בהצלחה!",
+    "error": "שליחת ההודעה נכשלה"
+  }
+}
