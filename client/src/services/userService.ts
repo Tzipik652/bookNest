@@ -3,7 +3,7 @@ import { User } from "../types";
 import { useUserStore } from "../store/useUserStore";
 import api from "../lib/axiosInstance";
 const API_BASE_URL =
-  `${process.env.REACT_APP_SERVER_URL}/user` || "http://localhost:5000/user";
+  `${import.meta.env.VITE_SERVER_URL}/user` || "http://localhost:5000/user";
 
 function handleAxiosError(error: any): never {
   if (axios.isAxiosError(error)) {

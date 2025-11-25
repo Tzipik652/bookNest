@@ -61,7 +61,7 @@ export const createBook = catchAsync(async (req, res, next) => {
       return res.status(409).json({ error: "A book with the same title already exists." });
     }
     console.error("Error creating book:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({ error: error, message: error.message});
   }
 
 });
@@ -84,7 +84,7 @@ export const getAllBooks = catchAsync(async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching paginated books:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: error, message: error.message});
   }
 });
 
@@ -102,7 +102,7 @@ export const getBooksByCategory = catchAsync(async (req, res) => {
       res.status(200).json(books);
     } catch (error) {
       console.error("Error fetching books by category:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: error, message: error.message});
     }
   } else {
     try {
@@ -121,7 +121,7 @@ export const getBooksByCategory = catchAsync(async (req, res) => {
 
     } catch (error) {
       console.error("Error fetching paginated books:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: error, message: error.message});
     }
   }
 });

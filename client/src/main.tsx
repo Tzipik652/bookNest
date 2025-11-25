@@ -1,18 +1,18 @@
-// src/index.tsx
+// src/main.tsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
-import reportWebVitals from "./reportWebVitals";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import AccessibilityMenu from "./components/AccessibilityMenu";
 import { useDynamicTheme } from "./theme";
 import { BrowserRouter } from "react-router-dom";
-import { queryClient } from "./lib/globalQueryClient";
+import './i18n'
 
-const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID!;
+const queryClient = new QueryClient();
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID!;
 
 function Root() {
   const theme = useDynamicTheme();
@@ -40,5 +40,3 @@ root.render(
     </GoogleOAuthProvider>
   </React.StrictMode>
 );
-
-reportWebVitals();

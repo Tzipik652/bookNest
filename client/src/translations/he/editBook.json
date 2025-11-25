@@ -1,0 +1,14 @@
+{
+  "pageTitle": "עריכת ספר",
+  "form": {
+    "title": "כותרת",
+    "author": "מחבר",
+    "description": "תיאור",
+    "category": "קטגוריה",
+    "imageUrl": "קישור לתמונה",
+    "price": "מחיר (אופציונלי)"
+  },
+  "errors": {
+    "updateFailed": "עדכון הספר נכשל. נא לנסות שוב."
+  }
+}

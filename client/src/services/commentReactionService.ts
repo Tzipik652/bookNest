@@ -4,7 +4,7 @@ import { useUserStore } from "../store/useUserStore";
 import { Comment } from "../types";
 
 const API_BASE_URL =
-  `${process.env.REACT_APP_SERVER_URL}/comment-reactions` ||
+  `${import.meta.env.VITE_SERVER_URL}/comment-reactions` ||
   "http://localhost:5000/comment-reactions";
 
 function handleAxiosError(error: any): never {

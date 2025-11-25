@@ -1,0 +1,43 @@
+{
+  "welcome": "ברוכים הבאים לאפליקציה שלנו!",
+  "greeting": "שלום",
+  "back":"חזור",
+  "confirmDelete": "האם אתה בטוח שברצונך למחוק פריט זה?",
+  "toastDeleteFailed": "מחיקת {{item}} נכשלה",
+  "toastUpdateFailed": "עדכון נכשל",
+  "loading": "טוען...",
+  "saving": "שומר...",
+  "sending": "שולח...",
+  "unknown": "לא ידוע",
+  "search": "חיפוש...",
+  "actions": "פעולות",
+  "or": "או",
+  
+  "email": "אימייל",
+  "password": "סיסמה",
+  "login": "התחברות",
+  "register": "הרשמה",
+  
+  "buttonCancel": "ביטול",
+  "buttonDelete": "מחק",
+  "buttonEdit": "ערוך",
+  "buttonSaveChanges": "שמור שינויים",
+  "buttonGoBack": "חזור אחורה",
+  "buttonBackToHome": "חזרה לעמוד הבית",
+  
+  "dialogTitleConfirm": "האם אתה בטוח?",
+  "confirmDeleteGeneric": "האם אתה בטוח שברצונך למחוק פריט זה? פעולה זו אינה ניתנת לביטול.",
+  "confirmDeleteWithName": "פעולה זו תמחק לצמיתות את \"{{name}}\". פעולה זו אינה ניתנת לביטול.",
+  
+  "toastUpdateSuccess": "עודכן בהצלחה",
+  "toastDeleteSuccess": "נמחק בהצלחה",
+  "toastFailedToLoad": "טעינת הנתונים נכשלה. אנא נסה שוב.",
+  "errorGeneric": "משהו השתבש. אנא נסה שוב.",
+  "noSearchResults": "לא נמצאו תוצאות התואמות לחיפוש שלך.",
+  
+  "pageNotFoundTitle": "הדף לא נמצא",
+  "pageNotFoundMessage": "אופס! הדף שחיפשת כנראה נדד הרחק. בוא/י נחזיר אותך לאוסף הספרים שלנו.",
+  
+  "linkLoginHere": "התחבר/י כאן",
+  "linkRegisterHere": "הירשם/י כאן"
+}

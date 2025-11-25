@@ -3,7 +3,7 @@ import { useUserStore } from "../store/useUserStore";
 import api from "../lib/axiosInstance";
 import axios from "axios";
 const API_BASE_URL =
-  `${process.env.REACT_APP_SERVER_URL}/books` || "http://localhost:5000/books";
+  `${import.meta.env.VITE_SERVER_URL}/books` || "http://localhost:5000/books";
 
 function handleAxiosError(error: any): never {
   if (axios.isAxiosError(error)) {
