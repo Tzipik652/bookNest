@@ -19,7 +19,6 @@ function handleAxiosError(error: any): never {
   }
 }
 
-/** toggle reaction */
 export async function toggleReaction(commentId: string, reactionType: string): Promise<Comment> {
   const user = useUserStore.getState().user;
   const token = useUserStore.getState().token;
@@ -45,7 +44,6 @@ export async function toggleReaction(commentId: string, reactionType: string): P
   }
 }
 
-/** fetch all reactions for a comment and return counts */
 export async function getCommentReactionCounts(comment: Comment) {
   try {
     const res = await api.get(`${API_BASE_URL}/${comment.id}`);
@@ -56,7 +54,6 @@ export async function getCommentReactionCounts(comment: Comment) {
   }
 }
 
-/** fetch user's reaction for a comment */
 export async function getUserReactionOnComment(commentId: string, userId: string) {
   try {
     const res = await api.get(`${API_BASE_URL}/user/${commentId}/${userId}`);

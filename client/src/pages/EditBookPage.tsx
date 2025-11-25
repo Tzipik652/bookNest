@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom'; // 1. הוספת useLocation
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,15 +32,13 @@ export function EditBookPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const location = useLocation(); // 2. שימוש ב-hook כדי לקבל את ה-State
+  const location = useLocation();
   const { user: currentUser } = useUserStore();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitError, setSubmitError] = useState("");
 
-  // 🎯 פונקציית עזר לניווט חכם
-  // אם הגענו מהאדמין - נחזור לאדמין. אחרת - נחזור לדף הספר.
   const handleNavigateBack = () => {
     if (location.state?.from) {
       navigate(location.state.from);
@@ -49,7 +47,6 @@ export function EditBookPage() {
     }
   };
 
-  // 🎯 RHF + Zod
   const {
     register,
     handleSubmit,
@@ -77,17 +74,14 @@ export function EditBookPage() {
           return;
         }
 
-        // 3. שינוי לוגיקת הרשאות:
-        // מאפשרים גישה אם המשתמש הוא בעל הספר OR המשתמש הוא אדמין
         const isOwner = book.user_id === currentUser?._id;
         const isAdmin = currentUser?.role === 'admin';
 
         if (!isOwner && !isAdmin) {
-          navigate(`/book/${id}`); // אם אין הרשאה, מעיפים לדף הצפייה
+          navigate(`/book/${id}`);
           return;
         }
 
-        // ✔ מילוי נתוני הספר לתוך הטופס
         Object.entries(book).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
             setValue(key as keyof BookFormValues, String(value));
@@ -108,7 +102,6 @@ export function EditBookPage() {
   const onSubmit = async (data: BookFormValues) => {
     setSubmitError("");
 
-    // גם אם לא היו שינויים, אנחנו רוצים לחזור למקום הנכון
     if (!isDirty) {
       console.log("No changes — skipping update");
       handleNavigateBack();
@@ -121,7 +114,6 @@ export function EditBookPage() {
         price: data.price ? parseFloat(data.price) : undefined,
       });
 
-      // הצלחה - חוזרים למקום ממנו באנו (אדמין או דף ספר)
       handleNavigateBack();
 
     } catch (err) {
@@ -142,7 +134,7 @@ export function EditBookPage() {
     <Box sx={{ minHeight: '100vh', py: 6 }}>
       <Container maxWidth="sm">
         <Button
-          onClick={handleNavigateBack} // שימוש בפונקציה החדשה
+          onClick={handleNavigateBack}
           startIcon={<ArrowBack />}
           sx={{ mb: 3 }}
         >

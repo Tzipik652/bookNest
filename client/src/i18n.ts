@@ -3,11 +3,9 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-// ייבוא קובצי התרגום
 import enCommon from './translations/en/common.json';
 import heCommon from './translations/he/common.json';
 
-// ייבוא קובצי הבית
 import enHome from './translations/en/home.json';
 import heHome from './translations/he/home.json';
 
@@ -30,10 +28,9 @@ import enEditBook from './translations/en/editBook.json'
 import heEditBook from './translations/he/editBook.json'
 
 
-// הגדרת השפה
 
 i18n
-  .use(LanguageDetector) // מזהה אוטומטית את שפת המשתמש
+  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
@@ -61,10 +58,10 @@ i18n
     ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook'],
     defaultNS: 'common',
     supportedLngs: ['en', 'he'],
-    fallbackLng: 'en', // אם השפה המבוקשת לא קיימת, השתמש באנגלית
+    fallbackLng: 'en',
     debug: false,
     interpolation: {
-      escapeValue: false, // לא צריך לברוח מ-React
+      escapeValue: false,
     },
     detection: {
       order: ['cookie', 'localStorage', 'navigator'],
