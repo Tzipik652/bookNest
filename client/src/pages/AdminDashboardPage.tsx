@@ -15,9 +15,6 @@ import { UserList } from "../components/adminDashboard/UserList";
 import { RecentComments } from "../components/adminDashboard/RecentComments";
 
 export function AdminDashboardPage() {
-  // שימוש ב-adminDashboard
-  const { t } = useTranslation(['adminDashboard', 'common']);
-  
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
   const [userMap, setUserMap] = useState<Record<string, string>>({});
   const navigate = useNavigate();
@@ -36,15 +33,13 @@ export function AdminDashboardPage() {
   // Redirect if not admin
   useEffect(() => {
     if (currentUser?.role !== "admin") {
-      // שימוש במפתח תרגום
-      toast.error(t('toastAuthError'));
-      navigate('/home');
+      toast.error("Unauthorized: Admin access required");
+      navigate("/home");
     }
-  }, [currentUser, navigate, t]);
+  }, [currentUser, navigate]);
 
-  // --- Effect 1: טעינה ראשונית בלבד (סטטיסטיקות, יוזרים, תגובות) ---
   useEffect(() => {
-    loadInitialData();
+    loadData();
   }, []);
 
   const loadData = async () => {
@@ -59,12 +54,16 @@ export function AdminDashboardPage() {
           getFavoritesCount(),
         ]);
 
-      // מיפוי יוזרים
-      const uMap: Record<string, string> = {};
-      allUsers.forEach((u: User) => {
-        uMap[u._id] = u.name;
+      const map: Record<string, Book> = {};
+      allBooksData.books.forEach((book: Book) => {
+        map[book._id] = book;
       });
-      setUserMap(uMap);
+
+      const userMap: Record<string, string> = {};
+      allUsers.forEach((u: User) => {
+        userMap[u._id] = u.name;
+      });
+      setUserMap(userMap);
 
       setBooks(allBooksData.books);
       setFavoritesCount(allFavorites);
@@ -77,43 +76,10 @@ export function AdminDashboardPage() {
       setIsReactionsLoading(true);
       await loadReactions(allComments);
     } catch (error) {
-      console.error(error);
-      // שימוש במפתח תרגום
-      toast.error(t('toastLoadError'));
-      setIsInitialLoading(false);
+      toast.error("Failed to load admin data");
+      setIsLoading(false);
     } finally {
       setIsReactionsLoading(false);
-    }
-  };
-
-  // פונקציה 2: טעינת ספרים בלבד (רץ בדפדוף)
-  const fetchBooksOnly = async () => {
-    setIsBooksLoading(true);
-    try {
-      const response = await getBooks({ page: currentPage, limit: ITEMS_PER_PAGE });
-      
-      const booksArray = response.books || [];
-      const serverTotalItems = response.totalItems || booksArray.length;
-      const serverTotalPages = response.totalPages || 1;
-
-      setBooksMap(prev => {
-        const newMap = { ...prev };
-        booksArray.forEach((book: Book) => {
-          newMap[book._id] = book;
-        });
-        return newMap;
-      });
-
-      setBooks(booksArray);
-      setTotalBooksCount(serverTotalItems);
-      setTotalPages(serverTotalPages);
-
-    } catch (error) {
-      console.error(error);
-      // שימוש במפתח תרגום
-      toast.error(t('toastBooksError'));
-    } finally {
-      setIsBooksLoading(false);
     }
   };
 
@@ -167,10 +133,10 @@ export function AdminDashboardPage() {
             <Shield className="h-8 w-8 text-green-600" />
           </div>
           <div>
-            {/* שימוש במפתח תרגום */}
-            <h1 className="mb-1 text-2xl font-bold text-gray-900">{t('headerTitle')}</h1>
-            {/* שימוש במפתח תרגום */}
-            <p className="text-gray-600">{t('headerSubtitle')}</p>
+            <h1 className="mb-1 text-2xl font-bold text-gray-900">
+              Admin Dashboard
+            </h1>
+            <p className="text-gray-600">Manage BookNest platform</p>
           </div>
         </div>
 

@@ -9,7 +9,6 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import AccessibilityMenu from "./components/AccessibilityMenu";
 import { useDynamicTheme } from "./theme";
 import { BrowserRouter } from "react-router-dom";
-import { queryClient } from "./lib/globalQueryClient";
 import './i18n'
 
 const queryClient = new QueryClient();

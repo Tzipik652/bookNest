@@ -1,6 +1,6 @@
 // client/src/App.tsx
 import React, { Suspense, useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Router } from "react-router-dom";
 import { CircularProgress, Box, GlobalStyles } from "@mui/material";
 import { Toaster } from "sonner";
 
@@ -143,10 +143,6 @@ useEffect(() => {
 
   }, [i18n.language]);
   return (
-    <Router>
-      <h1 className="notranslate">{t('welcome')}</h1>
-      <button onClick={() => i18n.changeLanguage('en')}>English</button>
-      <button onClick={() => i18n.changeLanguage('he')}>עברית</button>
     <div className="min-h-screen">
       {/* Skip link */}
       <a
@@ -281,7 +277,6 @@ useEffect(() => {
 
       <Footer />
     </div>
-    </Router>
   );
 }
 

@@ -47,17 +47,6 @@ export function AIRecommendationsPage() {
   }, [AIRecommendations, queryClient]);
 
   useEffect(() => {
-    if (!isLoading) {
-      if (firstLoad) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setFirstLoad(false);
-      } else if (discoverRef.current) {
-        discoverRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  }, [isLoading]);
-
-  useEffect(() => {
     setIsLoading(AIRecommendationsQuery.isLoading);
   }, [AIRecommendationsQuery.isLoading]);
 

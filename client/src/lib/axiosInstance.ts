@@ -6,7 +6,7 @@ import { queryClient } from "./globalQueryClient";
 import { set } from "zod";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_SERVER_URL || "http://localhost:5000",
+  baseURL: import.meta.env.VITE_SERVER_URL || "http://localhost:5000",
 });
 api.interceptors.request.use((config) => {
   const token = useUserStore.getState().token;

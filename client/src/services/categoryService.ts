@@ -2,7 +2,7 @@ import api from "../lib/axiosInstance";
 
 // categoryService.ts
 const API_BASE_URL =
-  `${process.env.VITE_SERVER_URL}/categories` || "http://localhost:5000/categories";
+  `${import.meta.env.VITE_SERVER_URL}/categories` || "http://localhost:5000/categories";
 
 export async function getCategories() {
   try {
