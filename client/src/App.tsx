@@ -11,6 +11,7 @@ import { useUserStore } from "./store/useUserStore";
 import { useAccessibilityStore } from "./store/accessibilityStore";
 import AccessibilityMenu from "./components/AccessibilityMenu";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
+import ScrollButton from "./components/ScrollButton";
 
 // Lazy-loaded pages
 const LazyLoginPage = React.lazy(() =>
@@ -169,6 +170,7 @@ function App() {
           },
         }}
       />
+      <ScrollButton />
 
       <Suspense fallback={<RouteFallback />}>
         <Toaster position="top-right" richColors />
