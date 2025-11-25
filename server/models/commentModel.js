@@ -122,3 +122,35 @@ export async function findAll() {
       c.users?.auth_provider == "google" ? c.users?.profile_picture : null,
   }));
 }
+
+export async function update(commentId, text){
+    const { data, error } = await supabase
+    .from("comments")
+    .update(
+       {
+        text: text,
+        updated_at: new Date().toISOString(),
+      },
+    )
+    .select(
+      `
+      id,
+      book_id,
+      user_id,
+      text,
+      created_at,
+      updated_at,
+      users(name, auth_provider, profile_picture)
+    `
+    )
+    .eq("id", commentId)
+    .single();
+
+  if (error && error.code !== "PGRST116") throw error;
+  return {
+    ...data,
+    user_name: data.users?.name || "Unknown",
+    profile_picture:
+      data.users?.auth_provider == "google" ? data.users?.profile_picture : null,
+  };
+}

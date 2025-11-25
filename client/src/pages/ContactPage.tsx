@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
@@ -8,71 +8,61 @@ import { Textarea } from '../components/ui/textarea';
 import { ArrowLeft, Mail, Send, HelpCircle, MapPin, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUserStore } from '../store/useUserStore';
+import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function ContactPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation(['contact', 'common']);
+  const isRTL = i18n.dir() === 'rtl';
   const [formData, setFormData] = useState({
     subject: '',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true);
+
   const { user: currentUser } = useUserStore();
-  const discoverRef = useRef<HTMLHeadingElement | null>(null);
 
-  useEffect(() => {
-    if (!loading) {
-      if (firstLoad) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setFirstLoad(false);
-      } else if (discoverRef.current) {
-        discoverRef.current.scrollIntoView({ behavior: "smooth" });
-      }
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    if (!formData.subject || !formData.message) {
+      toast.error(t('contact:toasts.fill_all'));
+      return;
     }
-  }, [loading]);
 
-const handleSubmit = async (e: any) => {
-  e.preventDefault();
+    setIsSubmitting(true);
 
-  if (!formData.subject || !formData.message) {
-    toast.error('Please fill in all fields');
-    return;
-  }
+    try {
+      const res = await fetch("http://localhost:5000/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: currentUser?.name,
+          email: currentUser?.email,
+          subject: formData.subject,
+          message: formData.message
+        })
+      });
 
-  setIsSubmitting(true);
+      if (!res.ok) throw new Error();
 
-  try {
-    const res = await fetch("http://localhost:5000/contact", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        name: currentUser?.name,
-        email: currentUser?.email,
-        subject: formData.subject,
-        message: formData.message
-      })
-    });
+      toast.success(t('contact:toasts.success'));
+      setMessageSent(true);
+      setFormData({ subject: "", message: "" });
 
-    if (!res.ok) throw new Error();
+    } catch (err) {
+      toast.error(t('contact:toasts.error'));
+    }
 
-    toast.success("Message sent successfully!");
-    setMessageSent(true);
-    setFormData({ subject: "", message: "" });
+    setIsSubmitting(false);
+  };
 
-  } catch (err) {
-    toast.error("Failed to send message");
-  }
-
-  setIsSubmitting(false);
-};
-
-const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -83,12 +73,12 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Card className="max-w-md mx-auto">
           <CardContent className="pt-6 text-center space-y-4">
-            <h2 className="text-red-600">You must be logged in</h2>
+            <h2 className="text-red-600">{t('contact:auth.login_required')}</h2>
             <p className="text-gray-600">
-              You need a valid account with name and email to send a message.
+              {t('contact:auth.login_description')}
             </p>
             <Button onClick={() => navigate("/login")} className="w-full">
-              Go to Login
+              {t('contact:auth.go_to_login')}
             </Button>
           </CardContent>
         </Card>
@@ -104,7 +94,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
           className="mb-6 gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back
+          {t('common:back')}
         </Button>
 
         <div className="mb-8 flex items-center gap-3">
@@ -112,8 +102,8 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
             <Mail className="h-8 w-8 text-green-600" />
           </div>
           <div>
-            <h1 className="mb-1">Contact Us</h1>
-            <p className="text-gray-600">We'd love to hear from you</p>
+            <h1 className="mb-1">{t('contact:title')}</h1>
+            <p className="text-gray-600">{t('contact:subtitle')}</p>
           </div>
         </div>
 
@@ -128,16 +118,16 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
                       <CheckCircle2 className="h-12 w-12 text-green-600" />
                     </div>
                   </div>
-                  <h2 className="mb-3 text-green-800">Message Sent Successfully!</h2>
+                  <h2 className="mb-3 text-green-800">{t('contact:success.title')}</h2>
                   <p className="text-green-700 mb-6 max-w-md mx-auto">
-                    Thank you for reaching out to us. We've received your message and will get back to you as soon as possible.
+                    {t('contact:success.description')}
                   </p>
                   <Button
                     onClick={() => setMessageSent(false)}
                     variant="outline"
                     className="border-green-600 text-green-700 hover:bg-green-100"
                   >
-                    Send Another Message
+                    {t('contact:success.button_another')}
                   </Button>
                 </div>
               </CardContent>
@@ -149,11 +139,11 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
                   <form onSubmit={handleSubmit} className="space-y-6">
 
                     <div className="space-y-2">
-                      <Label htmlFor="subject">Subject</Label>
+                      <Label htmlFor="subject">{t('contact:form.subject_label')}</Label>
                       <Input
                         id="subject"
                         name="subject"
-                        placeholder="What is this about?"
+                        placeholder={t('contact:form.subject_placeholder')}
                         value={formData.subject}
                         onChange={handleChange}
                         disabled={isSubmitting}
@@ -161,11 +151,11 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="message">Message</Label>
+                      <Label htmlFor="message">{t('contact:form.message_label')}</Label>
                       <Textarea
                         id="message"
                         name="message"
-                        placeholder="Tell us more..."
+                        placeholder={t('contact:form.message_placeholder')}
                         className="min-h-[200px]"
                         value={formData.message}
                         onChange={handleChange}
@@ -178,8 +168,8 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
                       className="w-full gap-2"
                       disabled={isSubmitting}
                     >
-                      <Send className="h-4 w-4" />
-                      {isSubmitting ? 'Sending...' : 'Send Message'}
+                      <Send className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
+                      {isSubmitting ? t('common:sending') : t('contact:form.submit_button')}                     {isSubmitting ? 'Sending...' : 'Send Message'}
                     </Button>
                   </form>
                 </CardContent>
@@ -195,7 +185,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
                     <Mail className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="mb-1">Email</h3>
+                    <h3 className="mb-1">{t('common:email')}</h3>
                     <p className="text-sm text-gray-600">booknestwebsite@gmail.com</p>
                   </div>
                 </div>
@@ -205,11 +195,11 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
                     <MapPin className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="mb-1">Location</h3>
+                    <h3 className="mb-1">{t('contact:info.location_label')}</h3>
                     <p className="text-sm text-gray-600">
-                      123 Book Street<br />
-                      Reading City, RC 12345<br />
-                      United States
+                      {t('contact:info.address_line1')}<br />
+                      {t('contact:info.address_line2')}<br />
+                      {t('contact:info.address_country')}
                     </p>
                   </div>
                 </div>
@@ -223,19 +213,19 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElemen
                     <HelpCircle className="h-5 w-5 text-yellow-600" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="mb-1">Frequently Asked Questions</h3>
+                    <h3 className="mb-1">{t('contact:faq.title')}</h3>
                     <p className="text-sm text-gray-600">
-                      Before reaching out, you might find answers to common questions in our FAQ section.
+                      {t('contact:faq.description')}
                     </p>
                   </div>
                 </div>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full gap-2"
                   onClick={() => navigate('/faq')}
                 >
                   <HelpCircle className="h-4 w-4" />
-                  View FAQs
+                  {t('contact:faq.button')}
                 </Button>
               </CardContent>
             </Card>

@@ -29,9 +29,11 @@ import { useFavoriteBooks } from "../hooks/useFavorites";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useDynamicTheme } from "../theme";
 import { Book, BookWithFavorite } from "../types";
+import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function BookDetailsPage() {
+  const { t } = useTranslation(["bookDetails", "common"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const theme = useDynamicTheme();
   const { id } = useParams();
@@ -79,13 +81,13 @@ export function BookDetailsPage() {
         alignItems="center"
         justifyContent="center"
       >
-        <Typography variant="h5">Book Not Found</Typography>
+        <Typography variant="h5">{t("bookNotFound")}</Typography>
       </Box>
     );
   }
 
   const isOwner = currentUser?._id === book.user_id;
-  const isAdmin= currentUser?.role === 'admin';
+  const isAdmin = currentUser?.role === 'admin';
 
 
   const handleFavoriteToggle = () => {
@@ -119,7 +121,7 @@ export function BookDetailsPage() {
           variant="text"
           sx={{ mb: 3 }}
         >
-          Back
+          {t("common:buttonGoBack")}
         </Button>
 
         <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={4}>
@@ -142,7 +144,7 @@ export function BookDetailsPage() {
                 </Typography>
 
                 <Typography variant="h6" color="text.secondary" gutterBottom>
-                  by {book.author}
+                  {t("authorPrefix", { author: book.author })}
                 </Typography>
 
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
@@ -166,8 +168,8 @@ export function BookDetailsPage() {
                     disabled={toggleMutation.isPending}
                   >
                     {book.isFavorited
-                      ? "Remove from Favorites"
-                      : "Add to Favorites"}
+                      ? t("buttonRemoveFavorite")
+                      : t("buttonAddFavorite")}
                   </Button>
 
                   {(isOwner || isAdmin) && (
@@ -177,7 +179,7 @@ export function BookDetailsPage() {
                         startIcon={<Edit />}
                         onClick={() => navigate(`/edit-book/${book._id}`)}
                       >
-                        Edit
+                        {t("common:buttonEdit")}
                       </Button>
 
                       <Button
@@ -186,18 +188,18 @@ export function BookDetailsPage() {
                         startIcon={<Delete />}
                         onClick={() => setShowDeleteDialog(true)}
                       >
-                        Delete
+                        {t("common:buttonDelete")}
                       </Button>
                     </>
                   )}
                 </Box>
 
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                  {book.favorites_count} users liked this book
+                 {t("favoritesCount", { count: book.favorites_count })}
                 </Typography>
 
                 <Typography variant="h6" gutterBottom>
-                  Description
+                  {t("headerDescription")}
                 </Typography>
                 <Typography variant="body1" color="text.secondary" mb={3}>
                   {book.description}
@@ -206,7 +208,7 @@ export function BookDetailsPage() {
                 <Box p={3} borderRadius={2} border="1px solid #e0e0e0" mb={3}>
                   <Box display="flex" alignItems="center" gap={1} mb={1}>
                     <AutoAwesome color="primary" />
-                    <Typography variant="h6">AI Summary</Typography>
+                    <Typography variant="h6">{t("headerAISummary")}</Typography>
                   </Box>
                   <Typography variant="body1" color="text.secondary">
                     {book.ai_summary}
@@ -214,7 +216,7 @@ export function BookDetailsPage() {
                 </Box>
 
                 <Typography variant="body2" color="text.secondary">
-                  Uploaded by {book.user?.name}
+                 {t("uploadedByPrefix", { userName: book.user?.name })}
                   <br />
                   {new Date(book.date_created).toLocaleDateString()}
                 </Typography>
@@ -232,17 +234,16 @@ export function BookDetailsPage() {
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
       >
-        <DialogTitle>Are you sure?</DialogTitle>
+        <DialogTitle>{t("common:dialogTitleConfirm")}</DialogTitle>
         <DialogContent>
           <Typography>
-            This will permanently delete "{book.title}". This action cannot be
-            undone.
+           {t("common:confirmDeleteWithName", { name: book.title })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+          <Button onClick={() => setShowDeleteDialog(false)}>{t("common:buttonCancel")}</Button>
           <Button onClick={handleDelete} color="error" variant="contained">
-            Delete
+            {t("common:buttonDelete")}
           </Button>
         </DialogActions>
       </Dialog>

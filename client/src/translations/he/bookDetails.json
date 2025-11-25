@@ -1,0 +1,11 @@
+{
+  "bookNotFound": "הספר לא נמצא",
+  "authorPrefix": "מאת {{author}}",
+  "buttonRemoveFavorite": "הסר מהמועדפים",
+  "buttonAddFavorite": "הוסף למועדפים",
+  "favoritesCount_one": "משתמש אחד אהב את הספר",
+  "favoritesCount": "{{count}} משתמשים אהבו את הספר",
+  "headerDescription": "תיאור",
+  "headerAISummary": "סיכום AI",
+  "uploadedByPrefix": "הועלה על ידי {{userName}}"
+}

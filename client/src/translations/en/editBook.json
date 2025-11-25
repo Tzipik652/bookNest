@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Edit Book",
+  "form": {
+    "title": "Title",
+    "author": "Author",
+    "description": "Description",
+    "category": "Category",
+    "imageUrl": "Image URL",
+    "price": "Price (Optional)"
+  },
+  "errors": {
+    "updateFailed": "Failed to update book. Please try again."
+  }
+}

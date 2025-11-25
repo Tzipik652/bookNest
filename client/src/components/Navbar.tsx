@@ -1,12 +1,13 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from "react";
 import { Button } from './ui/button';
-import { 
-  BookOpen, Heart, PlusCircle, LogOut, User, Home, Library, Sparkles,Shield, Menu, X 
+import {
+  BookOpen, Heart, PlusCircle, LogOut, User, Home, Library, Sparkles, Shield, Menu, X
 } from "lucide-react";
 import { useUserStore } from '../store/useUserStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAccessibilityStore } from '../store/accessibilityStore';
+import GoogleTranslate from './GoogleTranslate';
 
 
 export function Navbar() {
@@ -31,16 +32,14 @@ export function Navbar() {
   const encodedPath = encodeURIComponent(currentPath);
 
   const getButtonClasses = (path: string) =>
-    `gap-2 transition-colors duration-200 ${
-      isActive(path)
-        ? "bg-green-600 text-white hover:bg-green-700"
-        : `${
-            highContrast
-              ? "text-white hover:text-gray-400"
-              : darkMode
-              ? "text-white hover:text-gray-300"
-              : "text-black hover:text-green-700 hover:bg-green-100"
-          }`
+    `gap-2 transition-colors duration-200 ${isActive(path)
+      ? "bg-green-600 text-white hover:bg-green-700"
+      : `${highContrast
+        ? "text-white hover:text-gray-400"
+        : darkMode
+          ? "text-white hover:text-gray-300"
+          : "text-black hover:text-green-700 hover:bg-green-100"
+      }`
     }`;
 
   useEffect(() => {
@@ -50,14 +49,14 @@ export function Navbar() {
   const navBgClass = highContrast
     ? "bg-black text-white"
     : darkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-black";
+      ? "bg-gray-900 text-white"
+      : "bg-white text-black";
 
   const drawerBgClass = highContrast
     ? "bg-black text-white"
     : darkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-black";
+      ? "bg-gray-900 text-white"
+      : "bg-white text-black";
 
   return (
     <nav className={`border-b sticky top-0 z-[100] ${navBgClass}`}>
@@ -99,14 +98,17 @@ export function Navbar() {
                   <Sparkles className="h-4 w-4" /> AI Recommendations
                 </Button>
               </Link>
-               {user.role==="admin" && (
-                  <Link to="/admin-dashboard">
-                    <Button variant="ghost" className={getButtonClasses("/admin-dashboard")}>
-                      <Shield className="h-4 w-4"  />
-                      Admin
-                    </Button>
-                  </Link>
-                )}
+              <GoogleTranslate />
+              <div className="self-center">
+              </div>
+              {user.role === "admin" && (
+                <Link to="/admin-dashboard">
+                  <Button variant="ghost" className={getButtonClasses("/admin-dashboard")}>
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </Button>
+                </Link>
+              )}
               <div className="flex items-center gap-3 ml-4 pl-4 border-l">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />
@@ -145,9 +147,8 @@ export function Navbar() {
 
         {/* Drawer Panel */}
         <div
-          className={`fixed right-0 top-0 h-full w-64 shadow-lg p-6 flex flex-col gap-4 transform transition-transform duration-300 ease-in-out z-[200] ${
-            open ? drawerBgClass + " translate-x-0" : "translate-x-full"
-          }`}
+          className={`fixed right-0 top-0 h-full w-64 shadow-lg p-6 flex flex-col gap-4 transform transition-transform duration-300 ease-in-out z-[200] ${open ? drawerBgClass + " translate-x-0" : "translate-x-full"
+            }`}
           onClick={(e) => e.stopPropagation()}
         >
           <button className="mb-4 self-end" onClick={() => setOpen(false)}>
@@ -181,14 +182,15 @@ export function Navbar() {
                   <Sparkles className="h-4 w-4" /> AI Recommendations
                 </Button>
               </Link>
-              {user.role==="admin" && (
-                  <Link to="/admin-dashboard">
-                    <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/admin-dashboard")}`}>
-                      <Shield className="h-4 w-4"  />
-                      Admin
-                    </Button>
-                  </Link>
-                )}
+              <GoogleTranslate />
+              {user.role === "admin" && (
+                <Link to="/admin-dashboard">
+                  <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/admin-dashboard")}`}>
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </Button>
+                </Link>
+              )}
               <Button variant="outline" onClick={handleLogout} className="w-full justify-start gap-2 mt-4">
                 <LogOut className="h-4 w-4" /> Logout
               </Button>

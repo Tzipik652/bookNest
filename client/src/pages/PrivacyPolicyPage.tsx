@@ -1,4 +1,3 @@
-import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
@@ -8,20 +7,6 @@ import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 export function PrivacyPolicyPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true);
-  const discoverRef = useRef<HTMLHeadingElement | null>(null);
-
-  useEffect(() => {
-    if (!loading) {
-      if (firstLoad) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setFirstLoad(false);
-      } else if (discoverRef.current) {
-        discoverRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  }, [loading]);
 
   return (
     <div className="min-h-screen bg-gray-50">

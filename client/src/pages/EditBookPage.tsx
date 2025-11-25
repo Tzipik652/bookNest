@@ -24,9 +24,11 @@ import {
 import { ArrowBack } from '@mui/icons-material';
 import { useUserStore } from '../store/useUserStore';
 import { Category } from '../types';
+import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function EditBookPage() {
+  const { t } = useTranslation(['editBook', 'common']);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -144,11 +146,11 @@ export function EditBookPage() {
           startIcon={<ArrowBack />}
           sx={{ mb: 3 }}
         >
-          Back
+          {t('common:back')}
         </Button>
 
         <Card sx={{ p: 2 }}>
-          <CardHeader title="Edit Book" />
+          <CardHeader title={t('editBook:pageTitle')} />
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -156,21 +158,24 @@ export function EditBookPage() {
               {submitError && <Alert severity="error">{submitError}</Alert>}
 
               <TextField
-                label="Title *"
+                label={t('editBook:form.title')}
+                required
                 {...register("title")}
                 error={!!errors.title}
                 helperText={errors.title?.message}
               />
 
               <TextField
-                label="Author *"
+                label={t('editBook:form.author')}
+                required
                 {...register("author")}
                 error={!!errors.author}
                 helperText={errors.author?.message}
               />
 
               <TextField
-                label="Description *"
+                label={t('editBook:form.description')}
+                required
                 multiline
                 rows={5}
                 {...register("description")}
@@ -181,12 +186,13 @@ export function EditBookPage() {
               <Controller
                 name="category"
                 control={control}
-                defaultValue="" 
+                defaultValue=""
                 render={({ field }) => (
                   <TextField
-                    {...field} 
+                    {...field}
                     select
-                    label="Category *"
+                    label={t('editBook:form.category')}
+                    required
                     error={!!errors.category}
                     helperText={errors.category?.message}
                   >
@@ -200,14 +206,14 @@ export function EditBookPage() {
               />
 
               <TextField
-                label="Image URL"
+                label={t('editBook:form.imageUrl')}
                 {...register("img_url")}
                 error={!!errors.img_url}
                 helperText={errors.img_url?.message}
               />
 
               <TextField
-                label="Price (Optional)"
+                label={t('editBook:form.price')}
                 type="number"
                 inputProps={{ step: "0.01", min: "0" }}
                 {...register("price")}
@@ -224,12 +230,12 @@ export function EditBookPage() {
                 fullWidth
                 disabled={!isDirty || isSubmitting}
               >
-                {isSubmitting ? "Saving..." : "Save Changes"}
+                {isSubmitting ? t('common:saving') : t('common:buttonSaveChanges')}
               </Button>
 
               {/* כפתור ביטול שמשתמש גם הוא בניווט החכם */}
               <Button variant="outlined" fullWidth onClick={handleNavigateBack}>
-                Cancel
+                {t('common:buttonCancel')}
               </Button>
             </CardActions>
           </form>

@@ -1,9 +1,10 @@
-import { useUserStore } from "../store/useUserStore";
 import axios from "axios";
+import api from "../lib/axiosInstance";
+import { useUserStore } from "../store/useUserStore";
 import { Comment } from "../types";
 
 const API_BASE_URL =
-  `${process.env.REACT_APP_SERVER_URL}/comment-reactions` ||
+  `${import.meta.env.VITE_SERVER_URL}/comment-reactions` ||
   "http://localhost:5000/comment-reactions";
 
 function handleAxiosError(error: any): never {
@@ -25,9 +26,7 @@ export async function toggleReaction(commentId: string, reactionType: string): P
   if (!user || !token) throw new Error("Must be logged in to react");
 
   try {
-    const res = await axios.post(`${API_BASE_URL}/toggle`, { commentId, reactionType }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.post(`${API_BASE_URL}/toggle`, { commentId, reactionType });
 
     const serverComment = res.data;
     return {
@@ -49,7 +48,7 @@ export async function toggleReaction(commentId: string, reactionType: string): P
 /** fetch all reactions for a comment and return counts */
 export async function getCommentReactionCounts(comment: Comment) {
   try {
-    const res = await axios.get(`${API_BASE_URL}/${comment.id}`);
+    const res = await api.get(`${API_BASE_URL}/${comment.id}`);
     return res.data.counts || { like: 0, dislike: 0, happy: 0, angry: 0 };
   } catch (error) {
     handleAxiosError(error);
@@ -60,7 +59,7 @@ export async function getCommentReactionCounts(comment: Comment) {
 /** fetch user's reaction for a comment */
 export async function getUserReactionOnComment(commentId: string, userId: string) {
   try {
-    const res = await axios.get(`${API_BASE_URL}/user/${commentId}/${userId}`);
+    const res = await api.get(`${API_BASE_URL}/user/${commentId}/${userId}`);
     return res.data.reaction || null;
   } catch (error) {
     handleAxiosError(error);

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { BookCard } from "../components/BookCard";
 import {
   Box,
@@ -14,15 +14,15 @@ import { useFavoriteBooks } from "../hooks/useFavorites";
 import { Book, BookWithFavorite } from "../types";
 import BookGridSkeleton from "../components/BookGridSkeleton";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function AIRecommendationsPage() {
+  const { t } = useTranslation(['AIRecommendations', 'common'])
   const isKeyboardMode = useKeyboardModeBodyClass();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true);
-  const discoverRef = useRef<HTMLHeadingElement | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -47,22 +47,11 @@ export function AIRecommendationsPage() {
       );
     });
   }, [AIRecommendations, queryClient]);
-  
-  useEffect(() => {
-    if (!isLoading) {
-      if (firstLoad) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setFirstLoad(false);
-      } else if (discoverRef.current) {
-        discoverRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  }, [isLoading]);
 
   useEffect(() => {
     setIsLoading(AIRecommendationsQuery.isLoading);
   }, [AIRecommendationsQuery.isLoading]);
-  
+
   useEffect(() => {
     setError(AIRecommendationsQuery.error as string | null);
   }, [AIRecommendationsQuery.error]);
@@ -72,7 +61,13 @@ export function AIRecommendationsPage() {
     await AIRecommendationsQuery.refetch();
     setIsRefreshing(false);
   };
-
+  const getAlertMessage = () => {
+    if (favoriteBooksNumber > 0) {
+      // שימוש ב-i18next לטיפול ב-pluralization
+      return t('alertBasedOnFavorites', { count: favoriteBooksNumber });
+    }
+    return t('alertNoFavorites');
+  };
   return (
     <Box minHeight="100vh" py={10} px={3}>
       <Box maxWidth="md" mx="auto" textAlign="center" mb={8}>
@@ -85,12 +80,12 @@ export function AIRecommendationsPage() {
         >
           <AutoAwesome fontSize="large" color="primary" />
           <Typography variant="h4" fontWeight="bold">
-            AI Recommendations
+            {t('title')}
           </Typography>
         </Box>
 
         <Typography variant="body1" color="text.secondary" mb={3}>
-          Our AI analyzes your favorite books to suggest titles you might enjoy
+          {t('subtitle')}
         </Typography>
 
         <Alert
@@ -108,10 +103,7 @@ export function AIRecommendationsPage() {
             <AutoAwesome fontSize="small" color="primary" sx={{ mr: 1 }} />
           </AlertTitle>
           <Typography variant="body2">
-            {favoriteBooksNumber > 0
-              ? `Based on your ${favoriteBooksNumber} favorite ${favoriteBooksNumber === 1 ? "book" : "books"
-              }, we've found these recommendations for you.`
-              : "Add some books to your favorites to get personalized recommendations."}
+            {getAlertMessage()}
           </Typography>
         </Alert>
 
@@ -128,7 +120,7 @@ export function AIRecommendationsPage() {
             )
           }
         >
-          {isRefreshing ? "Generating..." : "Get More Recommendations"}
+          {isRefreshing ? t('buttonGenerating') : t('buttonGetMore')}
         </Button>
       </Box>
 
@@ -158,10 +150,10 @@ export function AIRecommendationsPage() {
         <Box textAlign="center" py={10}>
           <AutoAwesome sx={{ fontSize: 64, color: "#d1d5db", mb: 2 }} />
           <Typography variant="h6" gutterBottom>
-            No Recommendations Available
+           {t('noRecommendationsTitle')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Add some books to your favorites to get started
+            {t('noRecommendationsText')}
           </Typography>
         </Box>
       )}

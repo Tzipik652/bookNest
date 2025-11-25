@@ -8,27 +8,12 @@ import {
     AccordionTrigger
 } from '../components/ui/accordion';
 import { ArrowLeft, HelpCircle, MessageCircle } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
 import { faqs } from '../lib/faqs';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function FAQPage() {
     const isKeyboardMode = useKeyboardModeBodyClass();
     const navigate = useNavigate();
-    const [isLoading] = useState(false);
-    const [firstLoad, setFirstLoad] = useState(true);
-    const discoverRef = useRef<HTMLHeadingElement | null>(null);
-
-    useEffect(() => {
-        if (!isLoading) {
-            if (firstLoad) {
-                window.scrollTo({ top: 0, behavior: "smooth" });
-                setFirstLoad(false);
-            } else if (discoverRef.current) {
-                discoverRef.current.scrollIntoView({ behavior: "smooth" });
-            }
-        }
-    }, [isLoading]);
 
     return (
         <div className="min-h-screen bg-gray-50">

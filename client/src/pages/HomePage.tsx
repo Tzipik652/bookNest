@@ -298,6 +298,7 @@ import BookGridSkeleton from "../components/BookGridSkeleton";
 import { Book, Category, BookWithFavorite } from "../types";
 import { useUserStore } from "../store/useUserStore";
 import { useFavoriteBooks } from "../hooks/useFavorites";
+import { useTranslation } from "react-i18next";
 import { useKeyboardGridNavigation } from "../hooks/useKeyboardGridNavigation";
 
 
@@ -311,6 +312,7 @@ const BOOKS_PER_PAGE = 20;
 // Component
 // ---------------------------
 export function HomePage() {
+  const { t } = useTranslation(['home', 'common']);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useUserStore();
@@ -321,6 +323,7 @@ export function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+
   const [firstLoad, setFirstLoad] = useState(true);
 
   // ---------------------------
@@ -497,6 +500,7 @@ export function HomePage() {
     <Box sx={{ minHeight: "100vh", paddingBottom: 8 }}>
       {!user && <LandingComponent />}
 
+
       <Container maxWidth="lg">
         <Typography
           variant="h4"
@@ -504,16 +508,18 @@ export function HomePage() {
           mb={2}
           py={2}
           ref={discoverRef}
+        className="notranslate"
         >
-          Discover Books
+          {t('home:page_title')}
         </Typography>
 
         {/* Filters */}
         <Box sx={{ display: "flex", gap: 2, mb: 6, flexWrap: "wrap" }}>
           <TextField
+          className="notranslate"
             id="search-books"
             value={searchQuery}
-            placeholder="Search books or authors..."
+            placeholder={t('home:search_placeholder')}
             onChange={e => setSearchQuery(e.target.value)}
             sx={{ flex: 1, minWidth: 250, maxWidth: 400 }}
             InputProps={{
@@ -526,15 +532,15 @@ export function HomePage() {
           />
 
           <FormControl sx={{ minWidth: 150 }}>
-            <InputLabel>Category</InputLabel>
+            <InputLabel className="notranslate">{t('home:category_label')}</InputLabel>
             <Select
               id="category-select"
               value={selectedCategory}
-              label="Category"
               onChange={e => {
                 setSelectedCategory(e.target.value);
                 setCurrentPage(1);
               }}
+              label={t('home:category_label')}
             >
               {categories.map(cat => (
                 <MenuItem key={cat.id} value={cat.name}>
@@ -582,8 +588,8 @@ export function HomePage() {
           </Box>
         ) : (
           <Box textAlign="center" py={12}>
-            <Typography color="text.secondary">
-              No books found matching your criteria.
+            <Typography color="text.secondary" className="notranslate">
+             {t('home:no_books_found')}
             </Typography>
           </Box>
         )}
