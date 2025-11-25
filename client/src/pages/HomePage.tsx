@@ -372,11 +372,14 @@ export function HomePage() {
     gridRef,
     focusedIndex,
     setFocusedIndex,
-    handleItemKeyDown
+    registerItem,
+    handleItemKeyDown,
   } = useKeyboardGridNavigation<Book>({
     items: filteredBooks,
     getId: b => b._id,
-    onEnter: b => navigate(`/books/${b._id}`)
+    onEnter: b => navigate(`/book/${b._id}`),
+    onNextPage: () => setCurrentPage(p => Math.min(p + 1, totalPages)),
+    onPrevPage: () => setCurrentPage(p => Math.max(p - 1, 1)),
   });
 
   // ---------------------------
@@ -402,36 +405,66 @@ export function HomePage() {
     });
   }, [books, favoriteBooksQuery.data, queryClient]);
 
-  // Global keyboard shortcuts
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
 
+      // Ctrl+K -> פוקוס על חיפוש
       if (e.ctrlKey && e.key.toLowerCase() === "k") {
         e.preventDefault();
         document.getElementById("search-books")?.focus();
+        return;
       }
 
+      // C -> פוקוס על קטגוריות
       if (e.key.toLowerCase() === "c") {
+        e.preventDefault();
         document.getElementById("category-select")?.focus();
+        return;
       }
 
-      if (e.key === "ArrowRight") {
-        setCurrentPage(p => Math.min(p + 1, totalPages));
-      }
-
-      if (e.key === "ArrowLeft") {
-        setCurrentPage(p => Math.max(p - 1, 1));
-      }
-
+      // ESC -> נקה חיפוש
       if (e.key === "Escape") {
         setSearchQuery("");
+        return;
+      }
+
+      // Ctrl+N -> עמוד הבא
+      if (e.ctrlKey && e.key.toLowerCase() === "n") {
+        e.preventDefault();
+        setCurrentPage(p => Math.min(p + 1, totalPages));
+        return;
+      }
+
+      // Ctrl+P -> עמוד קודם
+      if (e.ctrlKey && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        setCurrentPage(p => Math.max(p - 1, 1));
+        return;
+      }
+
+      // חיצים בתוך הגריד
+      if (["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Home", "End", "Enter", " "].includes(e.key)) {
+        handleItemKeyDown(e as any, focusedIndex);
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [focusedIndex, handleItemKeyDown, totalPages]);
 
-  }, [totalPages]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Slash -> פוקוס על חיפוש
+      if (e.key === "/" || e.code === "Slash") {
+        e.preventDefault();
+        document.getElementById("search-books")?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, []);
 
   // Auto scroll behavior
   useEffect(() => {
@@ -527,22 +560,25 @@ export function HomePage() {
               <Box
                 key={book._id}
                 tabIndex={0}
+                ref={(el: HTMLElement | null) => registerItem(index, el)}
                 onFocus={() => setFocusedIndex(index)}
-                onKeyDown={e => handleItemKeyDown(e, index)}
+                onKeyDown={(e) => handleItemKeyDown(e, index)}
                 sx={{
                   flex: "1 1 calc(25% - 24px)",
                   minWidth: 250,
                   maxWidth: 300,
                   outline: "none",
                   "&:focus": {
-                    boxShadow: "0 0 0 3px #1976d2",
-                    borderRadius: 2
+                    boxShadow: "0 0 0 3px #16A34A",
+                    borderRadius: 2,
+                    zIndex: 10
                   }
                 }}
               >
                 <BookCard book={book} />
               </Box>
             ))}
+
           </Box>
         ) : (
           <Box textAlign="center" py={12}>
