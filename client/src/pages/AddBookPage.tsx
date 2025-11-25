@@ -26,7 +26,6 @@ import { useTranslation } from 'react-i18next';
 
 export function AddBookPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
-  // useTranslation יחפש קודם ב-'addBook' ואז ב-'common'
   const { t } = useTranslation(['addBook', 'common']);
 
   const navigate = useNavigate();
@@ -41,17 +40,6 @@ export function AddBookPage() {
   const [firstLoad, setFirstLoad] = useState(true);
   const discoverRef = useRef<HTMLHeadingElement | null>(null);
   const actionsRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (firstLoad) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setFirstLoad(false);
-      } else if (discoverRef.current) {
-        discoverRef.current.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  }, [isLoading]);
 
   // --------------------
   // RHF + ZOD
