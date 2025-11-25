@@ -1,5 +1,6 @@
-import { useUserStore } from "../store/useUserStore";
+import api from "../lib/axiosInstance";
 import axios from "axios";
+import { useUserStore } from "../store/useUserStore";
 import { Comment } from "../types";
 
 const API_BASE_URL =
@@ -35,9 +36,7 @@ export async function addComment(
 
   try {
     const payload = { bookId, text };
-    const res = await axios.post(API_BASE_URL, payload, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.post(API_BASE_URL, payload);
 
     const serverComment = res.data;
     return {
@@ -66,9 +65,7 @@ export async function deleteComment(
   if (!user || !token) throw new Error("Must be logged in to delete comment");
 
   try {
-    const res = await axios.delete(`${API_BASE_URL}/${commentId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.delete(`${API_BASE_URL}/${commentId}`);
     return res.data;
   } catch (error) {
     handleAxiosError(error);
@@ -86,12 +83,9 @@ export async function editComment(
   if (!user || !token) throw new Error("Must be logged in to delete comment");
 
   try {
-    const res = await axios.put(
+    const res = await api.put(
       `${API_BASE_URL}/${commentId}`,
-      { text },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+      { text }
     );
     return res.data;
   } catch (error) {
@@ -102,7 +96,7 @@ export async function editComment(
 
 export async function getCommentById(commentId: string): Promise<Comment> {
   try {
-    const res = await axios.get(`${API_BASE_URL}/single/${commentId}`);
+    const res = await api.get(`${API_BASE_URL}/single/${commentId}`);
     const serverComment = res.data;
     return {
       id: serverComment.id || serverComment._id,
@@ -127,11 +121,7 @@ export async function getAllComments(): Promise<Comment[]> {
   if (!token) throw new Error("Must be logged in to add books");
   if (user?.role !== "admin") throw new Error("Admin access required");
   try {
-    const res = await axios.get(`${API_BASE_URL}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await api.get(`${API_BASE_URL}`);
     return res.data;
   } catch (error) {
     handleAxiosError(error);
