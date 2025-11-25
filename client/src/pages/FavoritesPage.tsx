@@ -3,7 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { BookCard } from "../components/BookCard";
 import { useNavigate } from "react-router-dom";
 import { Heart, Search } from "lucide-react";
-
 import {
   Box,
   Container,
@@ -15,8 +14,10 @@ import {
 import { Book, BookWithFavorite } from "../types";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import BookGridSkeleton from "../components/BookGridSkeleton";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function FavoritesPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();

@@ -2,8 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { ArrowLeft, Shield } from 'lucide-react';
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function PrivacyPolicyPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
 
   return (

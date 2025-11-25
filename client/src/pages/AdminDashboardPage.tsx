@@ -13,8 +13,10 @@ import { StatsCards } from "../components/adminDashboard/StatsCards";
 import { AdminBooksTable } from "../components/adminDashboard/AdminBooksTable";
 import { UserList } from "../components/adminDashboard/UserList";
 import { RecentComments } from "../components/adminDashboard/RecentComments";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function AdminDashboardPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
   const [userMap, setUserMap] = useState<Record<string, string>>({});
   const navigate = useNavigate();

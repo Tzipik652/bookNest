@@ -14,16 +14,16 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-
 import { useUserStore } from "../store/useUserStore";
 import { register } from "../services/userService";
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, RegisterFormValues } from "../schemas/register.schema";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function RegisterPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useUserStore();

@@ -30,9 +30,11 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useDynamicTheme } from "../theme";
 import { Book, BookWithFavorite } from "../types";
 import { useTranslation } from "react-i18next";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function BookDetailsPage() {
   const { t } = useTranslation(["bookDetails", "common"]);
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const theme = useDynamicTheme();
   const { id } = useParams();
   const navigate = useNavigate();

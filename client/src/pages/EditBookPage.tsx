@@ -25,9 +25,11 @@ import { ArrowBack } from '@mui/icons-material';
 import { useUserStore } from '../store/useUserStore';
 import { Category } from '../types';
 import { useTranslation } from 'react-i18next';
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function EditBookPage() {
   const { t } = useTranslation(['editBook', 'common']);
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation(); // 2. שימוש ב-hook כדי לקבל את ה-State
