@@ -37,7 +37,15 @@
   
   "pageNotFoundTitle": "Page Not Found",
   "pageNotFoundMessage": "Oops! The page you're looking for seems to have wandered off.",
-  
+  "locale": "en-US",
   "linkLoginHere": "Login here",
-  "linkRegisterHere": "Register here"
+  "linkRegisterHere": "Register here",
+  "dir": "ltr",
+  "notFound": {
+    "title": "Page Not Found",
+    "mainMessage": "Oops! The page you're looking for seems to have wandered off into the literary void. Let's get you back to exploring our book collection.",
+    "backButton": "Go Back",
+    "homeButton": "Back to Home",
+    "footerMessage": "If you believe this is an error, please check the URL or contact support."
+  }
 }

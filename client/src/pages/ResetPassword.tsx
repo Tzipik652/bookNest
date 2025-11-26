@@ -20,10 +20,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ResetPasswordFormValues, resetPasswordSchema } from "../schemas/auth.register";
 import { resetPassword } from "../services/authService";
 import { Book, Visibility, VisibilityOff } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function ResetPassword() {
   const isKeyboardMode = useKeyboardModeBodyClass();
+  const { t } = useTranslation("auth");
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -44,10 +46,10 @@ export function ResetPassword() {
     setMessage("");
     try {
       await resetPassword(token!, data.password);
-      setMessage("Password successfully updated!");
+      setMessage(t("resetPassword.successMessage"));
       setTimeout(() => navigate("/login"), 2000);
     } catch (err: any) {
-      setError("Invalid or expired token.");
+      setError(t("resetPassword.errorToken"));
     }
   };
 
@@ -61,6 +63,7 @@ export function ResetPassword() {
         background: "linear-gradient(to bottom right, #eff6ff, #ede9fe)",
         p: 2,
       }}
+      dir={t("dir")}
     >
       <Card sx={{ width: "100%", maxWidth: 420, boxShadow: 3 }}>
         <CardHeader
@@ -68,10 +71,10 @@ export function ResetPassword() {
             <Box textAlign="center">
               <Book sx={{ fontSize: 48, color: "primary.main", mb: 1 }} />
               <Typography variant="h5" fontWeight="bold">
-                Reset Password
+                {t("resetPassword.title")}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Enter your new password below
+                {t("resetPassword.subtitle")}
               </Typography>
             </Box>
           }
@@ -83,7 +86,7 @@ export function ResetPassword() {
             {message && <Alert severity="success">{message}</Alert>}
 
             <TextField
-              label="New Password"
+              label={t("resetPassword.newPasswordLabel")}
               type={showPassword ? "text" : "password"}
               fullWidth
               {...register("password")}
@@ -104,7 +107,7 @@ export function ResetPassword() {
             />
 
             <TextField
-              label="Confirm Password"
+              label={t("resetPassword.confirmPasswordLabel")}
               type={showConfirmPassword ? "text" : "password"}
               fullWidth
               {...register("confirmPassword")}
@@ -139,13 +142,15 @@ export function ResetPassword() {
               fullWidth
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Updating..." : "Update Password"}
+             {isSubmitting
+                ? t("resetPassword.updatingButton")
+                : t("resetPassword.submitButton")}
             </Button>
 
             <Typography variant="body2" textAlign="center" color="text.secondary">
-              Remembered your password?{" "}
+              {t("resetPassword.loginLinkText")}{" "}
               <Link to="/login" style={{ color: "#16A34A", textDecoration: "none" }}>
-                Login here
+                {t("resetPassword.loginLink")}
               </Link>
             </Typography>
           </CardActions>

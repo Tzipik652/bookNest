@@ -1,23 +1,40 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { ArrowLeft, Shield } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Shield } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function PrivacyPolicyPage() {
+  const { t } = useTranslation(["policy", "common"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
-
+const policy = t('privacyPolicy', { returnObjects: true }) as any;
+  const sections = policy.sections;
+  const renderContent = (key: string | string[]) => {
+    if (Array.isArray(key)) {
+      return (
+        <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+          {key.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      );
+    }
+    return <p className="text-gray-700 leading-relaxed">{key}</p>;
+  };
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir={t('common:dir')}>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-6 gap-2"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t('common:back')} 
+          
         </Button>
 
         <div className="mb-8 flex items-center gap-3">
@@ -25,113 +42,86 @@ export function PrivacyPolicyPage() {
             <Shield className="h-8 w-8 text-green-600" />
           </div>
           <div>
-            <h1 className="mb-1">Privacy Policy</h1>
-            <p className="text-gray-600">Last updated: November 17, 2025</p>
+            <h1 className="mb-1">{policy.pageTitle}</h1>
+            <p className="text-gray-600">{policy.lastUpdated}</p>
           </div>
         </div>
 
         <Card>
           <CardContent className="pt-6 space-y-6">
             <section>
-              <h2 className="mb-3">Introduction</h2>
+              <h2 className="mb-3">{sections.introduction.title}</h2>
               <p className="text-gray-700 leading-relaxed">
-                Welcome to BookNest. We respect your privacy and are committed to protecting your personal data.
-                This privacy policy will inform you about how we handle your personal data when you use our book
-                management platform.
+                {renderContent(sections.introduction.p1)}
               </p>
             </section>
 
+            {/* 2. Information We Collect */}
             <section>
-              <h2 className="mb-3">Information We Collect</h2>
+              <h2 className="mb-3">{sections.informationCollected.title}</h2>
               <p className="text-gray-700 leading-relaxed mb-3">
-                We collect the following types of information:
+                {sections.informationCollected.p1}
               </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Account information (name, email address)</li>
-                <li>Books you upload or add to the platform</li>
-                <li>Your favorite books and reading preferences</li>
-                <li>Comments and reactions you make on books</li>
-                <li>Usage data and interactions with the platform</li>
-              </ul>
+              {renderContent(sections.informationCollected.list)}
             </section>
 
+            {/* 3. How We Use Your Information */}
             <section>
-              <h2 className="mb-3">How We Use Your Information</h2>
+              <h2 className="mb-3">{sections.howWeUse.title}</h2>
               <p className="text-gray-700 leading-relaxed mb-3">
-                We use your information to:
+                {sections.howWeUse.p1}
               </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Provide and maintain our service</li>
-                <li>Generate personalized AI recommendations</li>
-                <li>Enable you to share and discover books</li>
-                <li>Improve and optimize our platform</li>
-                <li>Communicate with you about updates and features</li>
-              </ul>
+              {renderContent(sections.howWeUse.list)}
             </section>
 
+{/* 4. Data Storage */}
+            {/* 4. Data Storage */}
             <section>
-              <h2 className="mb-3">Data Storage</h2>
-              <p className="text-gray-700 leading-relaxed">
-                Currently, BookNest operates as a frontend-only application with data stored locally in your browser's
-                localStorage. This means your data is stored on your device and is not transmitted to our servers.
-                Please note that clearing your browser data will remove all your BookNest information.
-              </p>
+              <h2 className="mb-3">{sections.dataStorage.title}</h2>
+              {renderContent(sections.dataStorage.p1)}
             </section>
 
+            {/* 5. Data Sharing */}
             <section>
-              <h2 className="mb-3">Data Sharing</h2>
-              <p className="text-gray-700 leading-relaxed">
-                We do not sell, trade, or otherwise transfer your personal information to third parties. Your data
-                remains private and is only used to provide you with the BookNest service.
-              </p>
+              <h2 className="mb-3">{sections.dataSharing.title}</h2>
+              {renderContent(sections.dataSharing.p1)}
             </section>
 
+            {/* 6. Your Rights */}
             <section>
-              <h2 className="mb-3">Your Rights</h2>
+              <h2 className="mb-3">{sections.yourRights.title}</h2>
               <p className="text-gray-700 leading-relaxed mb-3">
-                You have the right to:
+                {sections.yourRights.p1}
               </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Access your personal data</li>
-                <li>Correct inaccurate data</li>
-                <li>Delete your account and data</li>
-                <li>Export your data</li>
-                <li>Withdraw consent at any time</li>
-              </ul>
+              {renderContent(sections.yourRights.list)}
+            </section>
+
+            {/* 7. Cookies and Tracking */}
+            <section>
+              <h2 className="mb-3">{sections.cookies.title}</h2>
+              {renderContent(sections.cookies.p1)}
+            </section>
+
+            {/* 8. Children's Privacy */}
+            <section>
+              <h2 className="mb-3">{sections.childrensPrivacy.title}</h2>
+              {renderContent(sections.childrensPrivacy.p1)}
+            </section>
+
+            {/* 9. Changes to This Policy */}
+            <section>
+              <h2 className="mb-3">{sections.changes.title}</h2>
+              {renderContent(sections.changes.p1)}
             </section>
 
             <section>
-              <h2 className="mb-3">Cookies and Tracking</h2>
+              <h2 className="mb-3">{sections.contact.title}</h2>
               <p className="text-gray-700 leading-relaxed">
-                BookNest uses localStorage to maintain your session and store your preferences. We do not use
-                third-party tracking cookies or analytics tools.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="mb-3">Children's Privacy</h2>
-              <p className="text-gray-700 leading-relaxed">
-                BookNest is not intended for children under 13 years of age. We do not knowingly collect personal
-                information from children under 13.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="mb-3">Changes to This Policy</h2>
-              <p className="text-gray-700 leading-relaxed">
-                We may update our privacy policy from time to time. We will notify you of any changes by posting
-                the new privacy policy on this page and updating the "Last updated" date.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="mb-3">Contact Us</h2>
-              <p className="text-gray-700 leading-relaxed">
-                If you have any questions about this privacy policy, please contact us at{' '}
+                {sections.contact.p1_start}{' '}
                 <a href="/contact" className="text-green-600 hover:underline">
-                  our contact page
-                </a>
-                .
+                  {sections.contact.p1_link}
+                </a>{' '}
+                {sections.contact.p1_end}
               </p>
             </section>
           </CardContent>

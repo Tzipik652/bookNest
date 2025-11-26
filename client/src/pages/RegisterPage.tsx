@@ -20,9 +20,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, RegisterFormValues } from "../schemas/register.schema";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function RegisterPage() {
+  const { t } = useTranslation(["auth","common"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const location = useLocation();
@@ -58,12 +60,12 @@ export function RegisterPage() {
         const message = err.response.data?.message || "";
 
         if (status === 400 && message.includes("User already exists")) {
-          setError("This email is already registered.");
+          setError(t("register.errorExists"));
         } else {
-          setError("Registration failed. Please try again.");
+          setError(t("register.errorGeneral"));
         }
       } else {
-        setError("Registration failed. Please try again.");
+        setError(t("register.errorGeneral"));
       }
     }
   };
@@ -78,6 +80,7 @@ export function RegisterPage() {
         justifyContent: "center",
         p: 2,
       }}
+      dir={t("dir")}
     >
       <Card sx={{ width: "100%", maxWidth: 420, boxShadow: 3 }}>
         <CardHeader
@@ -85,10 +88,10 @@ export function RegisterPage() {
             <Box textAlign="center">
               <BookIcon sx={{ fontSize: 48, color: "primary.main", mb: 1 }} />
               <Typography variant="h5" fontWeight="bold">
-                Join BookNest
+                {t("register.title")}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Create an account to start your reading journey
+                {t("register.subtitle")}
               </Typography>
             </Box>
           }
@@ -99,7 +102,7 @@ export function RegisterPage() {
             {error && <Alert severity="error">{error}</Alert>}
 
             <TextField
-              label="Full Name"
+              label={t("register.nameLabel")}
               fullWidth
               {...formRegister("name")}
               error={!!errors.name}
@@ -107,7 +110,7 @@ export function RegisterPage() {
             />
 
             <TextField
-              label="Email"
+              label={t("register.emailLabel")}
               type="email"
               fullWidth
               {...formRegister("email")}
@@ -116,7 +119,7 @@ export function RegisterPage() {
             />
 
             <TextField
-              label="Password"
+              label={t("register.passwordLabel")}
               type={showPassword ? "text" : "password"}
               fullWidth
               {...formRegister("password")}
@@ -134,7 +137,7 @@ export function RegisterPage() {
             />
 
             <TextField
-              label="Confirm Password"
+              label={t("register.confirmPasswordLabel")}
               type={showConfirmPassword ? "text" : "password"}
               fullWidth
               {...formRegister("confirmPassword")}
@@ -171,7 +174,9 @@ export function RegisterPage() {
               }}
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Registering..." : "Register"}
+            {isSubmitting
+                ? t("register.registeringButton")
+                : t("register.submitButton")}
             </Button>
 
             <Typography
@@ -179,12 +184,12 @@ export function RegisterPage() {
               textAlign="center"
               color="text.secondary"
             >
-              Already have an account?{" "}
+              {t("register.hasAccountText")}{" "}
               <Link
                 to="/login"
                 style={{ color: "#16A34A", textDecoration: "none" }}
               >
-                Login here
+                {t("register.loginLink")}
               </Link>
             </Typography>
           </CardActions>

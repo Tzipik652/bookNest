@@ -2,23 +2,39 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function TermsOfServicePage() {
+  const { t } = useTranslation(["terms", "common"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
-
+  const tos = t('termsOfService', { returnObjects: true }) as any;
+  const sections = tos.sections;
+  const renderContent = (key: string | string[]) => {
+    if (Array.isArray(key)) {
+      return (
+        <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+          {key.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      );
+    }
+    return <p className="text-gray-700 leading-relaxed">{key}</p>;
+  };
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir={t('common:dir')}>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-6 gap-2"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t('common:back')}
         </Button>
 
         <div className="mb-8 flex items-center gap-3">
@@ -26,149 +42,107 @@ export function TermsOfServicePage() {
             <FileText className="h-8 w-8 text-green-600" />
           </div>
           <div>
-            <h1 className="mb-1">Terms of Service</h1>
-            <p className="text-gray-600">Last updated: November 17, 2025</p>
+            <h1 className="mb-1">{tos.pageTitle}</h1>
+            <p className="text-gray-600">{tos.lastUpdated}</p>
           </div>
         </div>
 
         <Card>
           <CardContent className="pt-6 space-y-6">
+            {/* 1. Agreement to Terms */}
             <section>
-              <h2 className="mb-3">Agreement to Terms</h2>
-              <p className="text-gray-700 leading-relaxed">
-                By accessing and using BookNest, you agree to be bound by these Terms of Service and all applicable
-                laws and regulations. If you do not agree with any of these terms, you are prohibited from using
-                this service.
-              </p>
+              <h2 className="mb-3">{sections.agreement.title}</h2>
+              {renderContent(sections.agreement.p1)}
             </section>
 
+            {/* 2. Description of Service */}
             <section>
-              <h2 className="mb-3">Description of Service</h2>
-              <p className="text-gray-700 leading-relaxed">
-                BookNest is a web-based book management platform that allows users to discover, manage, and get
-                AI-powered recommendations for books. Users can create accounts, upload book information, manage
-                personal libraries, add favorites, and interact with the community through comments and reactions.
-              </p>
+              <h2 className="mb-3">{sections.description.title}</h2>
+              {renderContent(sections.description.p1)}
             </section>
 
+            {/* 3. User Accounts */}
             <section>
-              <h2 className="mb-3">User Accounts</h2>
+              <h2 className="mb-3">{sections.accounts.title}</h2>
               <p className="text-gray-700 leading-relaxed mb-3">
-                When you create an account with us, you agree to:
+                {sections.accounts.p1}
               </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Provide accurate and complete information</li>
-                <li>Maintain the security of your account credentials</li>
-                <li>Accept responsibility for all activities under your account</li>
-                <li>Notify us immediately of any unauthorized use</li>
-                <li>Not create multiple accounts or share accounts</li>
-              </ul>
+              {renderContent(sections.accounts.list)}
             </section>
 
+            {/* 4. User Content */}
             <section>
-              <h2 className="mb-3">User Content</h2>
+              <h2 className="mb-3">{sections.userContent.title}</h2>
               <p className="text-gray-700 leading-relaxed mb-3">
-                When uploading books, comments, or other content, you agree that:
+                {sections.userContent.p1}
               </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>You own or have the right to share the content</li>
-                <li>Your content does not infringe on intellectual property rights</li>
-                <li>Your content does not violate any laws or regulations</li>
-                <li>You will not upload malicious, offensive, or inappropriate content</li>
-                <li>BookNest reserves the right to remove any content at our discretion</li>
-              </ul>
+              {renderContent(sections.userContent.list)}
             </section>
 
+            {/* 5. Intellectual Property */}
             <section>
-              <h2 className="mb-3">Intellectual Property</h2>
-              <p className="text-gray-700 leading-relaxed">
-                The BookNest platform, including its design, features, and functionality, is owned by BookNest and
-                is protected by copyright and other intellectual property laws. You may not reproduce, distribute,
-                modify, or create derivative works without our express written permission.
-              </p>
+              <h2 className="mb-3">{sections.ip.title}</h2>
+              {renderContent(sections.ip.p1)}
             </section>
 
+            {/* 6. Prohibited Activities */}
             <section>
-              <h2 className="mb-3">Prohibited Activities</h2>
+              <h2 className="mb-3">{sections.prohibited.title}</h2>
               <p className="text-gray-700 leading-relaxed mb-3">
-                You agree not to:
+                {sections.prohibited.p1}
               </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Use the service for any illegal purpose</li>
-                <li>Harass, abuse, or harm other users</li>
-                <li>Attempt to gain unauthorized access to the platform</li>
-                <li>Upload viruses, malware, or malicious code</li>
-                <li>Spam or send unsolicited messages</li>
-                <li>Scrape or copy content without permission</li>
-                <li>Impersonate other users or entities</li>
-              </ul>
+              {renderContent(sections.prohibited.list)}
             </section>
 
+            {/* 7. AI-Generated Content */}
             <section>
-              <h2 className="mb-3">AI-Generated Content</h2>
-              <p className="text-gray-700 leading-relaxed">
-                BookNest uses AI to generate book summaries and recommendations. While we strive for accuracy,
-                AI-generated content may contain errors or inaccuracies. This content is provided for informational
-                purposes only and should not be considered professional advice.
-              </p>
+              <h2 className="mb-3">{sections.aiContent.title}</h2>
+              {renderContent(sections.aiContent.p1)}
             </section>
 
+            {/* 8. Community Guidelines */}
             <section>
-              <h2 className="mb-3">Community Guidelines</h2>
+              <h2 className="mb-3">{sections.community.title}</h2>
               <p className="text-gray-700 leading-relaxed mb-3">
-                When interacting with other users through comments and reactions:
+                {sections.community.p1}
               </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Be respectful and courteous to all users</li>
-                <li>Keep discussions relevant to books and literature</li>
-                <li>Do not post spam, advertisements, or promotional content</li>
-                <li>Respect diverse opinions and perspectives</li>
-                <li>Report inappropriate content to book owners or administrators</li>
-              </ul>
+              {renderContent(sections.community.list)}
             </section>
 
+            {/* 9. Disclaimer of Warranties */}
             <section>
-              <h2 className="mb-3">Disclaimer of Warranties</h2>
-              <p className="text-gray-700 leading-relaxed">
-                BookNest is provided "as is" without warranties of any kind, either express or implied. We do not
-                guarantee that the service will be uninterrupted, secure, or error-free. Your use of the service
-                is at your own risk.
-              </p>
+              <h2 className="mb-3">{sections.disclaimer.title}</h2>
+              {renderContent(sections.disclaimer.p1)}
             </section>
 
+            {/* 10. Limitation of Liability */}
             <section>
-              <h2 className="mb-3">Limitation of Liability</h2>
-              <p className="text-gray-700 leading-relaxed">
-                To the maximum extent permitted by law, BookNest shall not be liable for any indirect, incidental,
-                special, consequential, or punitive damages resulting from your use or inability to use the service.
-              </p>
+              <h2 className="mb-3">{sections.limitation.title}</h2>
+              {renderContent(sections.limitation.p1)}
             </section>
 
+            {/* 11. Termination */}
             <section>
-              <h2 className="mb-3">Termination</h2>
-              <p className="text-gray-700 leading-relaxed">
-                We reserve the right to terminate or suspend your account and access to the service at our sole
-                discretion, without notice, for conduct that we believe violates these Terms of Service or is
-                harmful to other users, us, or third parties.
-              </p>
+              <h2 className="mb-3">{sections.termination.title}</h2>
+              {renderContent(sections.termination.p1)}
             </section>
 
+            {/* 12. Changes to Terms */}
             <section>
-              <h2 className="mb-3">Changes to Terms</h2>
-              <p className="text-gray-700 leading-relaxed">
-                We reserve the right to modify these terms at any time. We will notify users of any material changes
-                by updating the "Last updated" date. Your continued use of BookNest after changes constitutes
-                acceptance of the new terms.
-              </p>
+              <h2 className="mb-3">{sections.changes.title}</h2>
+              {renderContent(sections.changes.p1)}
             </section>
 
+            {/* 13. Contact Information */}
             <section>
-              <h2 className="mb-3">Contact Information</h2>
+              <h2 className="mb-3">{sections.contact.title}</h2>
               <p className="text-gray-700 leading-relaxed">
-                If you have any questions about these Terms of Service, please contact us at{' '}
+                {sections.contact.p1_start}{' '}
                 <Link to="/contact" className="text-green-600 hover:underline">
-                  our contact page
+                  {/* שימוש במפתח הקישור הכללי מתוך common.json */}
+                  {sections.contact.p1_link}
                 </Link>
+                {sections.contact.p1_end}
               </p>
             </section>
           </CardContent>

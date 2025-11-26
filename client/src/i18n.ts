@@ -27,6 +27,24 @@ import heContact from './translations/he/contact.json'
 import enEditBook from './translations/en/editBook.json'
 import heEditBook from './translations/he/editBook.json'
 
+import enFAQ from './translations/en/faq.json'
+import heFAQ from './translations/he/faq.json'
+
+import enFavorites from './translations/en/favorites.json'
+import heFavorites from './translations/he/favorites.json'
+
+import enAuth from './translations/en/auth.json'
+import heAuth from './translations/he/auth.json'
+
+import enMyBooksPage from './translations/en/myBooksPage.json'
+import heMyBooksPage from './translations/he/myBooksPage.json'
+
+import enPolicy from './translations/en/policy.json'
+import hePolicy from './translations/he/policy.json'
+
+import enTerms from './translations/en/terms.json'
+import heTerms from './translations/he/terms.json'
+
 
 
 i18n
@@ -42,7 +60,13 @@ i18n
         AIRecommendations:enAIRecommendations,
         bookDetails:enBookDetails,
         contact:enContact,
-        editBook:enEditBook
+        editBook:enEditBook,
+        faq:enFAQ,
+        favorites:enFavorites,
+        auth:enAuth,
+        myBooksPage:enMyBooksPage,
+        policy:enPolicy,
+        terms:enTerms
       },
       he: {
         common: heCommon,
@@ -52,10 +76,16 @@ i18n
         AIRecommendations:heAIRecommendations,
         bookDetails:heBookDetails,
         contact:heContact,
-        editBook:heEditBook
+        editBook:heEditBook,
+        faq:heFAQ,
+        favorites:heFavorites,
+        auth:heAuth,
+        myBooksPage:heMyBooksPage,
+        policy:hePolicy,
+        terms:heTerms
       },
     },
-    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook'],
+    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms'],
     defaultNS: 'common',
     supportedLngs: ['en', 'he'],
     fallbackLng: 'en',

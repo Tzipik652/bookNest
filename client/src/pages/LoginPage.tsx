@@ -21,9 +21,11 @@ import { loginLocal, loginWithGoogle } from "../services/userService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginFormValues } from "../schemas/login.schema";
+import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function LoginPage() {
+  const { t } = useTranslation(["auth","common"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,7 +57,8 @@ export function LoginPage() {
         navigate(getRedirectPath());
       }
     } catch (err: any) {
-      setError("Invalid email or password || " + err.toString());
+      console.error(err);
+      setError(t("login.errorAuth"));
     }
   };
 
@@ -70,7 +73,7 @@ export function LoginPage() {
       }
     } catch (err) {
       console.error(err);
-      setError("Google login error");
+      setError(t("login.errorGoogle"));
     }
   };
 
@@ -84,6 +87,7 @@ export function LoginPage() {
         py: 4,
         bgcolor: "linear-gradient(to bottom right, #eff6ff, #f3e8ff)",
       }}
+      dir={t("dir")}
     >
       <Container maxWidth="sm">
         <Card sx={{ p: 3, boxShadow: 3, borderRadius: 3 }}>
@@ -96,10 +100,10 @@ export function LoginPage() {
                   style={{ marginBottom: 8 }}
                 />
                 <Typography variant="h5" fontWeight="bold">
-                  Welcome Back to BookNest
+                  {t("login.title")}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Sign in to access your library
+                  {t("login.subtitle")}
                 </Typography>
               </Box>
             }
@@ -110,7 +114,7 @@ export function LoginPage() {
               {error && <Alert severity="error">{error}</Alert>}
 
               <TextField
-                label="Email"
+                label={t("login.emailLabel")}
                 type="email"
                 fullWidth
                 {...register("email")}
@@ -119,7 +123,7 @@ export function LoginPage() {
               />
 
               <TextField
-                label="Password"
+                label={t("login.passwordLabel")}
                 type="password"
                 fullWidth
                 {...register("password")}
@@ -137,23 +141,25 @@ export function LoginPage() {
                 disabled={isSubmitting}
                 startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
               >
-                {isSubmitting ? "Logging in..." : "Login"}
+                {isSubmitting
+                  ? t("login.loggingInButton")
+                  : t("login.submitButton")}
               </Button>
 
-              <Divider sx={{ my: 1 }}>or</Divider>
+              <Divider sx={{ my: 1 }}>{t("common:or")}</Divider>
 
               <GoogleLogin
                 onSuccess={handleGoogleLogin}
-                onError={() => setError("Google login failed")}
+                onError={() => setError(t("login.errorGoogle"))}
               />
 
               <Typography variant="body2" color="text.secondary" textAlign="center">
-                Don’t have an account?{" "}
+                {t("login.noAccountText")}{" "}
                 <Link
                   to="/register"
                   style={{ color: "#16A34A", textDecoration: "none" }}
                 >
-                  Register here
+                  {t("login.registerLink")}
                 </Link>
               </Typography>
               <Typography variant="body2" color="text.secondary" textAlign="center">
@@ -161,7 +167,7 @@ export function LoginPage() {
                   to="/forgot-password"
                   style={{ color: "#16A34A", textDecoration: "none" }}
                 >
-                  Forgot Password?
+                  {t("login.forgotPasswordLink")}
                 </Link>
               </Typography>
 

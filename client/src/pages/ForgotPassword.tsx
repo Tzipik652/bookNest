@@ -17,9 +17,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ForgotPasswordFormValues, forgotPasswordSchema } from "../schemas/auth.register";
 import { forgotPassword } from "../services/authService";
+import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function ForgotPassword() {
+  const { t } = useTranslation("auth");
   const isKeyboardMode = useKeyboardModeBodyClass();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -37,9 +39,9 @@ export function ForgotPassword() {
     setMessage("");
     try {
       await forgotPassword(data.email);
-      setMessage("If the email exists, a reset link was sent.");
+      setMessage(t("forgotPassword.successMessage"));
     } catch (err: any) {
-      setError("Something went wrong. Please try again.");
+      setError(t("forgotPassword.errorMessage"));
     }
   };
 
@@ -53,6 +55,7 @@ export function ForgotPassword() {
         py: 4,
         bgcolor: "linear-gradient(to bottom right, #eff6ff, #f3e8ff)",
       }}
+      dir={t("dir")}
     >
       <Container maxWidth="sm">
         <Card sx={{ p: 3, boxShadow: 3, borderRadius: 3 }}>
@@ -60,10 +63,10 @@ export function ForgotPassword() {
             title={
               <Box textAlign="center">
                 <Typography variant="h5" fontWeight="bold" mb={1}>
-                  Forgot Password
+                  {t("forgotPassword.title")}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Enter your email to reset your password
+                  {t("forgotPassword.subtitle")}
                 </Typography>
               </Box>
             }
@@ -75,7 +78,7 @@ export function ForgotPassword() {
               {message && <Alert severity="success">{message}</Alert>}
 
               <TextField
-                label="Email"
+                label={t("forgotPassword.emailLabel")}
                 type="email"
                 fullWidth
                 {...register("email")}
@@ -93,13 +96,15 @@ export function ForgotPassword() {
                 disabled={isSubmitting}
                 startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
               >
-                {isSubmitting ? "Sending..." : "Send Reset Link"}
+                {isSubmitting
+                  ? t("forgotPassword.sendingButton")
+                  : t("forgotPassword.submitButton")}
               </Button>
 
               <Typography variant="body2" color="text.secondary" textAlign="center">
-                Remembered your password?{" "}
+                {t("forgotPassword.loginLinkText")}{" "}
                 <Link to="/login" style={{ color: "#16A34A", textDecoration: "none" }}>
-                  Login here
+                  {t("forgotPassword.loginLink")}
                 </Link>
               </Typography>
             </CardActions>

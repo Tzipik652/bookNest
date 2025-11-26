@@ -1,0 +1,73 @@
+{
+    "dir": "ltr",
+    "privacyPolicy": {
+        "pageTitle": "Privacy Policy",
+        "backButton": "Back",
+        "lastUpdated": "Last updated: November 17, 2025",
+        "sections": {
+            "introduction": {
+                "title": "Introduction",
+                "p1": "Welcome to BookNest. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we handle your personal data when you use our book management platform."
+            },
+            "informationCollected": {
+                "title": "Information We Collect",
+                "p1": "We collect the following types of information:",
+                "list": [
+                    "Account information (name, email address)",
+                    "Books you upload or add to the platform",
+                    "Your favorite books and reading preferences",
+                    "Comments and reactions you make on books",
+                    "Usage data and interactions with the platform"
+                ]
+            },
+            "howWeUse": {
+                "title": "How We Use Your Information",
+                "p1": "We use your information to:",
+                "list": [
+                    "Provide and maintain our service",
+                    "Generate personalized AI recommendations",
+                    "Enable you to share and discover books",
+                    "Improve and optimize our platform",
+                    "Communicate with you about updates and features"
+                ]
+            },
+            "dataStorage": {
+                "title": "Data Storage",
+                "p1": "Your data is securely stored in a centralized database on our servers. This includes your account details, book library, and activity logs. We use industry-standard security measures to protect this information. Your data will persist even if you clear your browser's local storage."
+            },
+            "dataSharing": {
+                "title": "Data Sharing",
+                "p1": "We do not sell, trade, or otherwise transfer your personal information to third parties. Your data remains private and is only used to provide you with the BookNest service."
+            },
+            "yourRights": {
+                "title": "Your Rights",
+                "p1": "You have the right to:",
+                "list": [
+                    "Access your personal data",
+                    "Correct inaccurate data",
+                    "Delete your account and data",
+                    "Export your data",
+                    "Withdraw consent at any time"
+                ]
+            },
+            "cookies": {
+                "title": "Local Storage and Tracking",
+                "p1": "BookNest uses your browser's **localStorage** to securely store your user authentication token and basic user details, which is essential for maintaining your logged-in state. We do not use third-party tracking cookies or analytics tools."
+            },
+            "childrensPrivacy": {
+                "title": "Children's Privacy",
+                "p1": "BookNest is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13."
+            },
+            "changes": {
+                "title": "Changes to This Policy",
+                "p1": "We may update our privacy policy from time to time. We will notify you of any changes by posting the new privacy policy on this page and updating the \"Last updated\" date."
+            },
+            "contact": {
+                "title": "Contact Us",
+                "p1_start": "If you have any questions about this privacy policy, please contact us at",
+                "p1_link": "our contact page",
+                "p1_end": "."
+            }
+        }
+    }
+}

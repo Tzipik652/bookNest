@@ -37,7 +37,15 @@
   
   "pageNotFoundTitle": "הדף לא נמצא",
   "pageNotFoundMessage": "אופס! הדף שחיפשת כנראה נדד הרחק. בוא/י נחזיר אותך לאוסף הספרים שלנו.",
-  
+  "locale": "he-IL",
   "linkLoginHere": "התחבר/י כאן",
-  "linkRegisterHere": "הירשם/י כאן"
+  "linkRegisterHere": "הירשם/י כאן",
+  "dir": "rtl",
+  "notFound": {
+    "title": "הדף לא נמצא",
+    "mainMessage": "אופס! נראה שהדף שחיפשת תעה אל תוך הריק הספרותי. בוא נחזיר אותך לחקור את אוסף הספרים שלנו.",
+    "backButton": "חזור אחורה",
+    "homeButton": "חזרה לדף הבית",
+    "footerMessage": "אם אתה סבור שזו שגיאה, אנא בדוק את כתובת ה-URL או צור קשר עם התמיכה."
+  }
 }
