@@ -63,7 +63,6 @@ export function AIRecommendationsPage() {
   };
   const getAlertMessage = () => {
     if (favoriteBooksNumber > 0) {
-      // שימוש ב-i18next לטיפול ב-pluralization
       return t('alertBasedOnFavorites', { count: favoriteBooksNumber });
     }
     return t('alertNoFavorites');

@@ -53,7 +53,6 @@ export function RegisterPage() {
       login(user, token);
       navigate(getRedirectPath());
     } catch (err: any) {
-      // טיפול ידידותי בשגיאות מהשרת
       if (err.response) {
         const status = err.response.status;
         const message = err.response.data?.message || "";

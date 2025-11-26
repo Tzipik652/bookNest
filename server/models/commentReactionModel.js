@@ -1,9 +1,6 @@
 // models/commentReactionModel.js
 import supabase from "../config/supabaseClient.js";
 
-/**
- * הוספה או שינוי של reaction (לייק / דיסלייק וכו')
- */
 export async function toggleReaction(commentId, userId, reactionType) {
   const { data: existing, error: selectError } = await supabase
     .from("comment_reactions")
@@ -24,7 +21,6 @@ export async function toggleReaction(commentId, userId, reactionType) {
       if (error) throw error;
       return { removed: true };
     } else {
-      // עדכון סוג reaction
       const { data, error } = await supabase
         .from("comment_reactions")
         .update({ reaction_type: reactionType })
@@ -36,7 +32,6 @@ export async function toggleReaction(commentId, userId, reactionType) {
       return data;
     }
   } else {
-    // הוספת reaction חדש
     const { data, error } = await supabase
       .from("comment_reactions")
       .insert([{ 
@@ -52,9 +47,6 @@ export async function toggleReaction(commentId, userId, reactionType) {
   }
 }
 
-/**
- * קבלת כל ה-reactions לתגובה מסוימת
- */
 export async function findByCommentId(commentId) {
   const { data, error } = await supabase
     .from("comment_reactions")
@@ -65,9 +57,6 @@ export async function findByCommentId(commentId) {
   return data || [];
 }
 
-/**
- * קבלת ה-reaction של משתמש ספציפי על תגובה מסוימת
- */
 export async function findUserReaction(commentId, userId) {
   const { data, error } = await supabase
     .from("comment_reactions")
@@ -80,9 +69,6 @@ export async function findUserReaction(commentId, userId) {
   return data?.reaction_type || null;
 }
 
-/**
- * ספירת reactions לפי סוג לתגובה מסוימת
- */
 export async function getReactionCounts(commentId) {
   const { data, error } = await supabase
     .from("comment_reactions")
@@ -91,7 +77,6 @@ export async function getReactionCounts(commentId) {
 
   if (error) throw error;
 
-  // ספירה לפי סוג
   const counts = {
     like: 0,
     dislike: 0,

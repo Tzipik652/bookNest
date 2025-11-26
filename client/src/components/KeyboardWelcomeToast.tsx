@@ -7,11 +7,9 @@ export function KeyboardWelcomeToast() {
   const STORAGE_KEY = 'keyboard-welcome-shown';
 
   useEffect(() => {
-    // בדיקה אם המשתמש כבר ראה את ההודעה
     const hasSeenWelcome = localStorage.getItem(STORAGE_KEY);
     
     if (!hasSeenWelcome) {
-      // הצגת ההודעה אחרי 2 שניות
       const timer = setTimeout(() => {
         setIsOpen(true);
       }, 2000);

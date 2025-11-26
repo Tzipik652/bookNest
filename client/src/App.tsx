@@ -12,6 +12,7 @@ import { useUserStore } from "./store/useUserStore";
 import { useAccessibilityStore } from "./store/accessibilityStore";
 import AccessibilityMenu from "./components/AccessibilityMenu";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
+import ScrollButton from "./components/ScrollButton";
 import { useTranslation } from "react-i18next";
 
 // Lazy-loaded pages
@@ -177,6 +178,7 @@ useEffect(() => {
           },
         }}
       />
+      <ScrollButton />
 
       <Suspense fallback={<RouteFallback />}>
         <Toaster position="top-right" richColors />
