@@ -38,6 +38,16 @@ import heFavorites from './translations/he/favorites.json'
 import enAuth from './translations/en/auth.json'
 import heAuth from './translations/he/auth.json'
 
+import enMyBooksPage from './translations/en/myBooksPage.json'
+import heMyBooksPage from './translations/he/myBooksPage.json'
+
+import enPolicy from './translations/en/policy.json'
+import hePolicy from './translations/he/policy.json'
+
+import enTerms from './translations/en/terms.json'
+import heTerms from './translations/he/terms.json'
+
+
 // הגדרת השפה
 
 i18n
@@ -56,7 +66,10 @@ i18n
         editBook:enEditBook,
         faq:enFAQ,
         favorites:enFavorites,
-        auth:enAuth
+        auth:enAuth,
+        myBooksPage:enMyBooksPage,
+        policy:enPolicy,
+        terms:enTerms
       },
       he: {
         common: heCommon,
@@ -69,10 +82,13 @@ i18n
         editBook:heEditBook,
         faq:heFAQ,
         favorites:heFavorites,
-        auth:heAuth
+        auth:heAuth,
+        myBooksPage:heMyBooksPage,
+        policy:hePolicy,
+        terms:heTerms
       },
     },
-    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth'],
+    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms'],
     defaultNS: 'common',
     supportedLngs: ['en', 'he'],
     fallbackLng: 'en', // אם השפה המבוקשת לא קיימת, השתמש באנגלית

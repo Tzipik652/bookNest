@@ -1,0 +1,10 @@
+{
+  "pageTitle": "My Books",
+  "addButton": "Add New Book",
+  "searchPlaceholder": "Search your books...",
+  "emptySearchMessage": "No books found matching your search.",
+  "emptyState": {
+    "title": "No Books Yet",
+    "subtitle": "Start building your library by adding your first book"
+  }
+}

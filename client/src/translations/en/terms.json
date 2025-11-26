@@ -1,0 +1,92 @@
+{
+  "termsOfService": {
+    "pageTitle": "Terms of Service",
+    "lastUpdated": "Last updated: November 17, 2025",
+    "sections": {
+      "agreement": {
+        "title": "Agreement to Terms",
+        "p1": "By accessing and using BookNest, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using this service."
+      },
+      "description": {
+        "title": "Description of Service",
+        "p1": "BookNest is a web-based book management platform that allows users to discover, manage, and get AI-powered recommendations for books. Users can create accounts, upload book information, manage personal libraries, add favorites, and interact with the community through comments and reactions."
+      },
+      "accounts": {
+        "title": "User Accounts",
+        "p1": "When you create an account with us, you agree to:",
+        "list": [
+          "Provide accurate and complete information",
+          "Maintain the security of your account credentials",
+          "Accept responsibility for all activities under your account",
+          "Notify us immediately of any unauthorized use",
+          "Not create multiple accounts or share accounts"
+        ]
+      },
+      "userContent": {
+        "title": "User Content",
+        "p1": "When uploading books, comments, or other content, you agree that:",
+        "list": [
+          "You own or have the right to share the content",
+          "Your content does not infringe on intellectual property rights",
+          "Your content does not violate any laws or regulations",
+          "You will not upload malicious, offensive, or inappropriate content",
+          "BookNest reserves the right to remove any content at our discretion"
+        ]
+      },
+      "ip": {
+        "title": "Intellectual Property",
+        "p1": "The BookNest platform, including its design, features, and functionality, is owned by BookNest and is protected by copyright and other intellectual property laws. You may not reproduce, distribute, modify, or create derivative works without our express written permission."
+      },
+      "prohibited": {
+        "title": "Prohibited Activities",
+        "p1": "You agree not to:",
+        "list": [
+          "Use the service for any illegal purpose",
+          "Harass, abuse, or harm other users",
+          "Attempt to gain unauthorized access to the platform",
+          "Upload viruses, malware, or malicious code",
+          "Spam or send unsolicited messages",
+          "Scrape or copy content without permission",
+          "Impersonate other users or entities"
+        ]
+      },
+      "aiContent": {
+        "title": "AI-Generated Content",
+        "p1": "BookNest uses AI to generate book summaries and recommendations. While we strive for accuracy, AI-generated content may contain errors or inaccuracies. This content is provided for informational purposes only and should not be considered professional advice."
+      },
+      "community": {
+        "title": "Community Guidelines",
+        "p1": "When interacting with other users through comments and reactions:",
+        "list": [
+          "Be respectful and courteous to all users",
+          "Keep discussions relevant to books and literature",
+          "Do not post spam, advertisements, or promotional content",
+          "Respect diverse opinions and perspectives",
+          "Report inappropriate content to book owners or administrators"
+        ]
+      },
+      "disclaimer": {
+        "title": "Disclaimer of Warranties",
+        "p1": "BookNest is provided \"as is\" without warranties of any kind, either express or implied. We do not guarantee that the service will be uninterrupted, secure, or error-free. Your use of the service is at your own risk."
+      },
+      "limitation": {
+        "title": "Limitation of Liability",
+        "p1": "To the maximum extent permitted by law, BookNest shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use or inability to use the service."
+      },
+      "termination": {
+        "title": "Termination",
+        "p1": "We reserve the right to terminate or suspend your account and access to the service at our sole discretion, without notice, for conduct that we believe violates these Terms of Service or is harmful to other users, us, or third parties."
+      },
+      "changes": {
+        "title": "Changes to Terms",
+        "p1": "We reserve the right to modify these terms at any time. We will notify users of any material changes by updating the \"Last updated\" date. Your continued use of BookNest after changes constitutes acceptance of the new terms."
+      },
+      "contact": {
+        "title": "Contact Information",
+        "p1_start": "If you have any questions about these Terms of Service, please contact us at",
+        "p1_link": "our contact page",
+        "p1_end": ""
+      }
+    }
+  }
+}
