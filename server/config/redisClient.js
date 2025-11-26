@@ -8,7 +8,7 @@ const redisClient = createClient({
   url: process.env.REDIS_URL,
   socket: {
     tls: true,
-    rejectUnauthorized: false, // מבטל בדיקה של התעודה
+    // rejectUnauthorized: false, // מבטל בדיקה של התעודה
   reconnectStrategy: () => 2000,
   },
 });
