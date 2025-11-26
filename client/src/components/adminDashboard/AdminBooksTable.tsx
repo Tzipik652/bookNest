@@ -51,7 +51,7 @@ export const AdminBooksTable = ({
     navigate(`/edit-book/${bookId}`, { state: { from: "/admin-dashboard" } });
   };
   return (
-    <div>
+    <div dir={t('common:dir')}>
       {/* --- Books Table Skeleton --- */}
       <Card id="total-books-section" className="mb-8 shadow-sm border-0">
         <CardHeader>
@@ -66,19 +66,19 @@ export const AdminBooksTable = ({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-gray-50/50">
-                  <th className="text-left py-3 px-4 font-medium text-gray-500">
+                  <th className="text-start py-3 px-4 font-medium text-gray-500">
                     {booksTableTexts.headerTitle}
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-500">
+                  <th className="text-start py-3 px-4 font-medium text-gray-500">
                     {booksTableTexts.headerAuthor}
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-500">
+                  <th className="text-start py-3 px-4 font-medium text-gray-500">
                     {booksTableTexts.headerCategory}
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-500">
+                  <th className="text-start py-3 px-4 font-medium text-gray-500">
                     {booksTableTexts.headerUploader}
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-500">
+                  <th className="text-start py-3 px-4 font-medium text-gray-500">
                     {booksTableTexts.headerDate}
                   </th>
                   <th className="text-right py-3 px-4 font-medium text-gray-500">
