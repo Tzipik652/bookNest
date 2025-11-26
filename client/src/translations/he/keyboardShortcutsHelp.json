@@ -1,0 +1,20 @@
+{
+  "dialogTitle": "קיצורי מקלדת",
+  "categoryNavigation": "ניווט",
+  "categoryGridNavigation": "ניווט ברשת",
+  "categoryPagination": "חלוקה לעמודים",
+  "categoryHelp": "עזרה",
+  "descriptionFocusSearch": "התמקד בתיבת החיפוש",
+  "descriptionFocusSearchAlt": "התמקד בתיבת החיפוש (חלופי)",
+  "descriptionOpenCategory": "פתח את בורר הקטגוריות",
+  "descriptionClearClose": "נקה חיפוש / סגור דיאלוגים",
+  "descriptionNavigateBooks": "נווט בין ספרים",
+  "descriptionOpenBook": "פתח את הספר הנבחר",
+  "descriptionOpenBookSpace": "פתח את הספר הנבחר",
+  "descriptionGoToFirst": "עבור לספר הראשון",
+  "descriptionGoToLast": "עבור לספר האחרון",
+  "descriptionNextPage": "עמוד הבא",
+  "descriptionPreviousPage": "עמוד קודם",
+  "descriptionShowHelp": "הצג דיאלוג עזרה זה",
+  "closeHint": "לחץ על **ESC** כדי לסגור דיאלוג זה"
+}

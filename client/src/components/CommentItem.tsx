@@ -11,6 +11,7 @@ import {
   Avatar,
   Divider,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 interface CommentItemProps {
   comment: CommentWithReactions;
@@ -20,13 +21,16 @@ interface CommentItemProps {
   onReaction: (commentId: string, reactionType: ReactionType) => void;
 }
 
-const CommentItem=forwardRef<HTMLDivElement, CommentItemProps>(({
+const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({
   comment,
   isBookOwner,
   currentUserId,
   onDelete,
   onReaction,
-},ref) =>{
+}, ref) => {
+  const { t } = useTranslation("common");
+  const currentLocale = t('locale'); // מביא את הלוקאל הדינמי (כגון 'he-IL' או 'en-US')
+  const commonDir = t('dir') as 'rtl' | 'ltr';
   const reactions: Array<{ type: ReactionType; emoji: string; color: string }> =
     [
       { type: "like", emoji: "👍", color: "#3b82f6" },
@@ -46,6 +50,7 @@ const CommentItem=forwardRef<HTMLDivElement, CommentItemProps>(({
         "&:hover": { boxShadow: "0 4px 12px rgba(0,0,0,0.08)" },
       }}
       ref={ref}
+      dir={commonDir}
     >
       <CardContent sx={{ p: 3 }}>
         <Stack spacing={2}>
@@ -68,7 +73,7 @@ const CommentItem=forwardRef<HTMLDivElement, CommentItemProps>(({
                   {comment.user_name}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {new Date(comment.created_at).toLocaleDateString("en-US", {
+                  {new Date(comment.created_at).toLocaleDateString(currentLocale, {
                     year: "numeric",
                     month: "short",
                     day: "numeric",
@@ -84,6 +89,7 @@ const CommentItem=forwardRef<HTMLDivElement, CommentItemProps>(({
                 color="error"
                 size="small"
                 sx={{ "&:hover": { bgcolor: "error.lighter" } }}
+                aria-label={t('delete_comment', { ns: 'book' })}
               >
                 <Trash2 size={18} />
               </IconButton>
@@ -93,8 +99,7 @@ const CommentItem=forwardRef<HTMLDivElement, CommentItemProps>(({
           {/* Text */}
           <Typography
             variant="body1"
-            sx={{ pl: 7, lineHeight: 1.7, color: "text.primary" }}
-          >
+            sx={{ pl: commonDir === 'ltr' ? 7 : 0, pr: commonDir === 'rtl' ? 7 : 0, lineHeight: 1.7, color: "text.primary" }}          >
             {comment.text}
           </Typography>
 
@@ -123,6 +128,8 @@ const CommentItem=forwardRef<HTMLDivElement, CommentItemProps>(({
                     color: isActive ? color : "#6b7280",
                     fontWeight: isActive ? 600 : 400,
                   }}
+                  aria-label={`${emoji} ${t(type, { ns: 'reaction_type' })}: ${count}`}
+
                 >
                   <span
                     style={{

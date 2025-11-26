@@ -45,7 +45,20 @@ import hePolicy from './translations/he/policy.json'
 import enTerms from './translations/en/terms.json'
 import heTerms from './translations/he/terms.json'
 
+import enAccessibility from './translations/en/accessibility.json'
+import heAccessibility from './translations/he/accessibility.json'
 
+import enBookCard from './translations/en/bookCard.json'
+import heBookCard from './translations/he/bookCard.json'
+
+import enComments from './translations/en/comments.json'
+import heComments from './translations/he/comments.json'
+
+import enFooter from './translations/en/footer.json'
+import heFooter from './translations/he/footer.json'
+
+import enKeyboardShortcutsHelp from './translations/en/keyboardShortcutsHelp.json'
+import heKeyboardShortcutsHelp from './translations/he/keyboardShortcutsHelp.json'
 
 i18n
   .use(LanguageDetector)
@@ -66,7 +79,12 @@ i18n
         auth:enAuth,
         myBooksPage:enMyBooksPage,
         policy:enPolicy,
-        terms:enTerms
+        terms:enTerms,
+        accessibility:enAccessibility,
+        bookCard:enBookCard,
+        comments:enComments,
+        footer:enFooter,
+        keyboardShortcutsHelp:enKeyboardShortcutsHelp
       },
       he: {
         common: heCommon,
@@ -82,10 +100,15 @@ i18n
         auth:heAuth,
         myBooksPage:heMyBooksPage,
         policy:hePolicy,
-        terms:heTerms
+        terms:heTerms,
+        accessibility:heAccessibility,
+        bookCard:heBookCard,
+        comments:heComments,
+        footer:heFooter,
+        keyboardShortcutsHelp:heKeyboardShortcutsHelp
       },
     },
-    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms'],
+    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms','accessibility','bookCard','comments','footer','keyboardShortcutsHelp'],
     defaultNS: 'common',
     supportedLngs: ['en', 'he'],
     fallbackLng: 'en',
