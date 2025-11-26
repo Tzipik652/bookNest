@@ -9,7 +9,8 @@ const redisClient = createClient({
   socket: {
     tls: true,
     // rejectUnauthorized: false, // מבטל בדיקה של התעודה
-  reconnectStrategy: () => 2000,
+    reconnectStrategy: () => 2000,
+    rejectUnauthorized: false,
   },
 });
 
