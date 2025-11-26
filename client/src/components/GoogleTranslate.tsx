@@ -12,9 +12,6 @@ const GoogleTranslate = () => {
     { code: 'he', label: 'עברית', flag: '🇮🇱' },
   ];
 
-  // ---------------------------
-  // 1️⃣ טעינת סקריפט Google Translate
-  // ---------------------------
   useEffect(() => {
     if (!document.getElementById("google-translate-script")) {
       const script = document.createElement("script");
@@ -33,9 +30,6 @@ const GoogleTranslate = () => {
     };
   }, []);
 
-  // ---------------------------
-  // 2️⃣ CSS להסתרת האלמנטים המכוערים
-  // ---------------------------
   useEffect(() => {
     const style = document.createElement('style');
     style.innerHTML = `
@@ -51,17 +45,11 @@ const GoogleTranslate = () => {
   };
   }, []);
 
-  // ---------------------------
-  // 3️⃣ החלפת שפה
-  // ---------------------------
   const handleLanguageChange = (langCode: 'en' | 'he') => {
-    // א. שינוי i18n
     i18n.changeLanguage(langCode);
 
-    // ב. כיוון אתר
     document.body.dir = langCode === 'he' ? 'rtl' : 'ltr';
 
-    // ג. שינוי שפה ב-Google Translate (לכל תוכן דינמי)
     const observer = new MutationObserver(() => {
       const combo = document.querySelector<HTMLSelectElement>('.goog-te-combo');
       if (combo) {
@@ -77,10 +65,8 @@ const GoogleTranslate = () => {
 
   return (
     <div className="relative">
-      {/* אלמנט נסתר ש-Google Translate חייב */}
       <div id="google_translate_element" className="hidden"></div>
 
-      {/* כפתור החלפת שפה */}
       <Button
         variant="ghost"
         onClick={() => setIsOpen(!isOpen)}
@@ -92,7 +78,6 @@ const GoogleTranslate = () => {
         <span className="hidden md:inline">{languages.find(l => l.code === i18n.language)?.label || 'Language'}</span>
       </Button>
 
-      {/* תפריט נפתח */}
       {isOpen && (
         <div className="absolute top-full mt-2 right-0 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
           {languages.map(lang => (

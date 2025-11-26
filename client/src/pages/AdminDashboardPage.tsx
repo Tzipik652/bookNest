@@ -13,9 +13,11 @@ import { StatsCards } from "../components/adminDashboard/StatsCards";
 import { AdminBooksTable } from "../components/adminDashboard/AdminBooksTable";
 import { UserList } from "../components/adminDashboard/UserList";
 import { RecentComments } from "../components/adminDashboard/RecentComments";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 import { useTranslation } from "react-i18next";
 
 export function AdminDashboardPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const { t } = useTranslation(["adminDashboard", "common"]);
   const adminTexts = t('dashboard', { returnObjects: true }) as any;
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});

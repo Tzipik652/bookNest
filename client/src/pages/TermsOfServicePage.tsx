@@ -4,9 +4,11 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { ArrowLeft, ArrowRight, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function TermsOfServicePage() {
   const { t } = useTranslation(["terms", "common"]);
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const tos = t('termsOfService', { returnObjects: true }) as any;
   const sections = tos.sections;

@@ -22,7 +22,6 @@ interface AccessibilityState {
 
 
 export const useAccessibilityStore = create<AccessibilityState>((set, get) => {
-  // טוען מלוקאל סטורג'
   const saved =
     typeof window !== "undefined"
       ? localStorage.getItem("accessibility")

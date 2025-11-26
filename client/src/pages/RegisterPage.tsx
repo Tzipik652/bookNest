@@ -14,18 +14,18 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-
 import { useUserStore } from "../store/useUserStore";
 import { register } from "../services/userService";
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, RegisterFormValues } from "../schemas/register.schema";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function RegisterPage() {
   const { t } = useTranslation(["auth","common"]);
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useUserStore();
@@ -55,7 +55,6 @@ export function RegisterPage() {
       login(user, token);
       navigate(getRedirectPath());
     } catch (err: any) {
-      // טיפול ידידותי בשגיאות מהשרת
       if (err.response) {
         const status = err.response.status;
         const message = err.response.data?.message || "";

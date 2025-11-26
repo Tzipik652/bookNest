@@ -15,16 +15,16 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResetPasswordFormValues, resetPasswordSchema } from "../schemas/auth.register";
 import { resetPassword } from "../services/authService";
 import { Book, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
-
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function ResetPassword() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const { t } = useTranslation("auth");
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();

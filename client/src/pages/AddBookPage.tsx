@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { addBook } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
@@ -18,26 +18,22 @@ import {
 import { ArrowBack, AutoAwesome, CheckCircle } from "@mui/icons-material";
 import { useUserStore } from "../store/useUserStore";
 import { Category } from "../types";
-
+import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
 import { useForm } from "react-hook-form";
 import { BookFormValues, bookSchema } from "../schemas/book.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 export function AddBookPage() {
-  // useTranslation יחפש קודם ב-'addBook' ואז ב-'common'
-  const { t } = useTranslation(['addBook', 'common']);
+  const isKeyboardMode = useKeyboardModeBodyClass();
+  const { t } = useTranslation(["addBook", "common"]);
 
   const navigate = useNavigate();
-
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const { user: currentUser } = useUserStore();
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const actionsRef = useRef<HTMLDivElement | null>(null);
 
   // --------------------
   // RHF + ZOD
@@ -74,10 +70,8 @@ export function AddBookPage() {
 
   // Submit handler
   const onSubmit = async (data: BookFormValues) => {
-    setError("");
-    setSuccessMessage("");
     setIsSubmitting(true);
-
+    actionsRef.current?.scrollIntoView({ behavior: "smooth" });
     try {
       const newBook = await addBook({
         title: data.title,
@@ -90,9 +84,7 @@ export function AddBookPage() {
         price: data.price ? parseFloat(data.price) : undefined,
       });
 
-      // שימוש במפתח תרגום (יוצא מ-'addBook') עם אינטרפולציה
-      setSuccessMessage(t('successMessage', { bookTitle: newBook.title }));
-      setShowSuccess(true);
+      toast.success(t('successMessage', { bookTitle: newBook.title }));
 
       reset();
 
@@ -101,14 +93,14 @@ export function AddBookPage() {
       }, 1500);
     } catch (err: any) {
       if (err.message === "Book already exists.") {
-        // שימוש במפתח תרגום (יוצא מ-'addBook')
-        setError(t('errorBookExists'));
+        toast.error(t("errorBookExists"));
+        // setError(t('errorBookExists'));
       } else {
-        // שימוש במפתח תרגום (יוצא מ-'addBook')
-        setError(t('errorGeneral'));
+        toast.error(t("errorGeneral"));
+        // setError(t('errorGeneral'));
       }
 
-      setShowAlert(true);
+      // setShowAlert(true);
       setIsSubmitting(false);
     }
   };
@@ -121,73 +113,96 @@ export function AddBookPage() {
           variant="text"
           onClick={() => navigate(-1)}
           sx={{ mb: 3 }}
-          className='notranslate'
+          className="notranslate"
         >
-          {/* שימוש במפתח 'back' מה-namespace 'common' (אם הוא שם) */}
-          {t('common:back')}
+          {t("common:back")}
         </Button>
 
         <Card elevation={3}>
           <CardHeader
-                    className='notranslate'
-            // שימוש במפתח תרגום (יוצא מ-'addBook')
-            title={t('pageTitle')}
-            // שימוש במפתח תרגום (יוצא מ-'addBook')
-            subheader={t('pageSubheader')}
+            className="notranslate"
+            title={t("pageTitle")}
+            subheader={t("pageSubheader")}
           />
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent>
               <Alert
-                icon={<AutoAwesome fontSize="small" sx={{ color: "#16A34A" }} />}
+                icon={
+                  <AutoAwesome fontSize="small" sx={{ color: "#16A34A" }} />
+                }
                 severity="info"
                 sx={{ mb: 3 }}
-                          className='notranslate'
+                className="notranslate"
               >
-                {t('aiAlert')}
+                {t("aiAlert")}
               </Alert>
 
               <TextField
                 fullWidth
-          className='notranslate'
-                label={t('titleLabel')}
+                className="notranslate"
+                label={t("titleLabel")}
                 margin="normal"
                 {...register("title")}
                 error={!!errors.title}
                 helperText={errors.title?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               />
 
               <TextField
                 fullWidth
-          className='notranslate'
-                label={t('authorLabel')}
+                className="notranslate"
+                label={t("authorLabel")}
                 margin="normal"
                 {...register("author")}
                 error={!!errors.author}
                 helperText={errors.author?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               />
 
               <TextField
                 fullWidth
-          className='notranslate'
-                label={t('descriptionLabel')}
+                className="notranslate"
+                label={t("descriptionLabel")}
                 margin="normal"
                 multiline
                 rows={5}
                 {...register("description")}
                 error={!!errors.description}
                 helperText={errors.description?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               />
 
               <TextField
                 select
                 fullWidth
-          className='notranslate'
-                label={t('categoryLabel')}
+                className="notranslate"
+                label={t("categoryLabel")}
                 margin="normal"
                 {...register("category")}
                 error={!!errors.category}
                 helperText={errors.category?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               >
                 {categories.map((cat) => (
                   <MenuItem key={cat.id} value={cat.name}>
@@ -198,8 +213,8 @@ export function AddBookPage() {
 
               <TextField
                 fullWidth
-          className='notranslate'
-                label={t('imageURLLabel')}
+                className="notranslate"
+                label={t("imageURLLabel")}
                 margin="normal"
                 {...register("img_url")}
                 error={!!errors.img_url}
@@ -208,17 +223,23 @@ export function AddBookPage() {
 
               <TextField
                 fullWidth
-          className='notranslate'
-                label={t('priceLabel')}
+                className="notranslate"
+                label={t("priceLabel")}
                 type="number"
                 margin="normal"
                 {...register("price")}
                 error={!!errors.price}
                 helperText={errors.price?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               />
             </CardContent>
 
-            <CardActions sx={{ p: 3, pt: 0, gap: 2 }}>
+            <CardActions ref={actionsRef} sx={{ p: 3, pt: 0, gap: 2 }}>
               <Button
                 type="submit"
                 variant="contained"
@@ -230,9 +251,9 @@ export function AddBookPage() {
                     <CircularProgress color="inherit" size={18} />
                   ) : null
                 }
-                          className='notranslate'
+                className="notranslate"
               >
-                {isSubmitting ? t('addingButton') : t('addButton')}
+                {isSubmitting ? t("addingButton") : t("addButton")}
               </Button>
 
               <Button
@@ -241,15 +262,15 @@ export function AddBookPage() {
                 fullWidth
                 onClick={() => navigate(-1)}
                 disabled={isSubmitting}
-          className='notranslate'
+                className="notranslate"
               >
-                {t('cancelButton')}
+                {t("cancelButton")}
               </Button>
             </CardActions>
           </form>
         </Card>
       </Box>
-
+{/* 
       <Snackbar
         open={showAlert}
         autoHideDuration={4000}
@@ -275,7 +296,7 @@ export function AddBookPage() {
         >
           {successMessage}
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
     </Box>
   );
 }

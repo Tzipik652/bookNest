@@ -187,21 +187,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     );
     try {
       await toggleReaction(commentId, reactionType);
-        // const updatedComment = await getCommentById(commentId);
-        // const reactionCounts = await getCommentReactionCounts(updatedComment);
-        // const userReaction = await getUserReactionOnComment(
-        //   commentId,
-        //   currentUser._id
-        // );
 
-        // setComments((prevComments) =>
-        //   prevComments.map((comment) =>
-        //     comment.id === commentId
-        //       ? { ...updatedComment, reactionCounts, userReaction }
-        //       : comment
-        //   )
-        // );
-    
     } catch (error) {
       console.error(error);
       toast.error("Failed to add reaction");
@@ -257,6 +243,12 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
               }
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleAddComment();
+                }
+              }}
               disabled={!currentUser || isSubmitting}
             />
             <Box display="flex" justifyContent="flex-end">

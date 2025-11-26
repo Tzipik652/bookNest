@@ -3,9 +3,11 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { ArrowLeft, ArrowRight, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function PrivacyPolicyPage() {
   const { t } = useTranslation(["policy", "common"]);
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
 const policy = t('privacyPolicy', { returnObjects: true }) as any;
   const sections = policy.sections;

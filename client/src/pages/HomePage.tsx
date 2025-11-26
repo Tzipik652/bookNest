@@ -1,9 +1,3 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useState, useRef } from "react";
-import { BookCard } from "../components/BookCard";
-import { getBooks, getBooksByCategory } from "../services/bookService";
-import { getCategories } from "../services/categoryService";
-import { Search } from "lucide-react";
 import {
   Box,
   Container,
@@ -16,25 +10,41 @@ import {
   MenuItem,
   Pagination,
 } from "@mui/material";
-import { Book, Category, BookWithFavorite } from "../types";
-import { useUserStore } from "../store/useUserStore";
+
+import { Search } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { getBooks, getBooksByCategory } from "../services/bookService";
+import { getCategories } from "../services/categoryService";
+
+import { BookCard } from "../components/BookCard";
 import LandingComponent from "../components/LandingComponent";
 import BookGridSkeleton from "../components/BookGridSkeleton";
+
+import { Book, Category, BookWithFavorite } from "../types";
+import { useUserStore } from "../store/useUserStore";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import { useTranslation } from "react-i18next";
+import { useKeyboardGridNavigation } from "../hooks/useKeyboardGridNavigation";
+
 const BOOKS_PER_PAGE = 20;
 
 export function HomePage() {
   const { t } = useTranslation(['home', 'common']);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { user } = useUserStore();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
 
   const [firstLoad, setFirstLoad] = useState(true);
+
   const discoverRef = useRef<HTMLHeadingElement | null>(null);
 
-  const { user } = useUserStore();
-  const queryClient = useQueryClient();
   const { favoriteBooksQuery } = useFavoriteBooks();
 
   const { data: categories = [] } = useQuery<Category[]>({
@@ -43,22 +53,42 @@ export function HomePage() {
     staleTime: 10 * 60 * 1000,
   });
 
-  const { data: booksData, isLoading: loading } = useQuery({
+  const {
+    data: booksData,
+    isLoading: loading
+  } = useQuery({
     queryKey: ["books", selectedCategory, currentPage],
     queryFn: async () => {
       if (selectedCategory === "All") {
         return await getBooks({ page: currentPage, limit: BOOKS_PER_PAGE });
-      } else {
-        return await getBooksByCategory(selectedCategory, currentPage, BOOKS_PER_PAGE);
       }
+      return await getBooksByCategory(selectedCategory, currentPage, BOOKS_PER_PAGE);
     },
     staleTime: 2 * 60 * 1000,
-    placeholderData: (previousData) => previousData,
+    placeholderData: previousData => previousData,
   });
 
   const books = booksData?.books || [];
   const totalPages = booksData?.totalPages || 1;
-  const totalItems = booksData?.totalItems || 0;
+
+  const filteredBooks = books.filter((b: Book) =>
+    b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    b.author.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const {
+    gridRef,
+    focusedIndex,
+    setFocusedIndex,
+    registerItem,
+    handleItemKeyDown,
+  } = useKeyboardGridNavigation<Book>({
+    items: filteredBooks,
+    getId: b => b._id,
+    onEnter: b => navigate(`/book/${b._id}`),
+    onNextPage: () => setCurrentPage(p => Math.min(p + 1, totalPages)),
+    onPrevPage: () => setCurrentPage(p => Math.max(p - 1, 1)),
+  });
 
   useEffect(() => {
     if (!books.length || !favoriteBooksQuery.data) return;
@@ -68,7 +98,7 @@ export function HomePage() {
     books.forEach((book: Book) => {
       queryClient.setQueryData<BookWithFavorite>(
         ["book", book._id],
-        (existing) => ({
+        existing => ({
           ...existing,
           ...book,
           favorites_count: existing?.favorites_count ?? book.favorites_count ?? 0,
@@ -77,6 +107,71 @@ export function HomePage() {
       );
     });
   }, [books, favoriteBooksQuery.data, queryClient]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+
+      if (e.ctrlKey && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        document.getElementById("search-books")?.focus();
+        return;
+      }
+
+      if (e.key.toLowerCase() === "c") {
+        e.preventDefault();
+        document.getElementById("category-select")?.focus();
+        return;
+      }
+
+      if (e.key === "Escape") {
+        setSearchQuery("");
+        return;
+      }
+
+      if (e.ctrlKey && e.key.toLowerCase() === "n") {
+        e.preventDefault();
+        setCurrentPage(p => Math.min(p + 1, totalPages));
+        return;
+      }
+
+      if (e.ctrlKey && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        setCurrentPage(p => Math.max(p - 1, 1));
+        return;
+      }
+
+      if (["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Home", "End", "Enter", " "].includes(e.key)) {
+        handleItemKeyDown(e as any, focusedIndex);
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [focusedIndex, handleItemKeyDown, totalPages]);
+
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "/" || e.code === "Slash") {
+        e.preventDefault();
+        document.getElementById("search-books")?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      if (firstLoad) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setFirstLoad(false);
+      } else if (discoverRef.current) {
+        discoverRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [loading]);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -87,16 +182,10 @@ export function HomePage() {
     }
   };
 
-  const filteredBooks = books.filter((book: Book) => {
-    const matchesSearch =
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
-  });
-
   return (
     <Box sx={{ minHeight: "100vh", paddingBottom: 8 }}>
       {!user && <LandingComponent />}
+
 
       <Container maxWidth="lg">
         <Typography
@@ -109,13 +198,15 @@ export function HomePage() {
         >
           {t('home:page_title')}
         </Typography>
+
         {/* Filters */}
         <Box sx={{ display: "flex", gap: 2, mb: 6, flexWrap: "wrap" }}>
           <TextField
           className="notranslate"
-            placeholder={t('home:search_placeholder')}
+            id="search-books"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t('home:search_placeholder')}
+            onChange={e => setSearchQuery(e.target.value)}
             sx={{ flex: 1, minWidth: 250, maxWidth: 400 }}
             InputProps={{
               startAdornment: (
@@ -129,14 +220,15 @@ export function HomePage() {
           <FormControl sx={{ minWidth: 150 }}>
             <InputLabel className="notranslate">{t('home:category_label')}</InputLabel>
             <Select
+              id="category-select"
               value={selectedCategory}
-              onChange={(e) => {
+              onChange={e => {
                 setSelectedCategory(e.target.value);
                 setCurrentPage(1);
               }}
               label={t('home:category_label')}
             >
-              {categories.map((cat) => (
+              {categories.map(cat => (
                 <MenuItem key={cat.id} value={cat.name}>
                   {cat.name}
                 </MenuItem>
@@ -150,21 +242,35 @@ export function HomePage() {
           <BookGridSkeleton count={20} />
         ) : filteredBooks.length > 0 ? (
           <Box
+            ref={gridRef}
             display="flex"
             flexWrap="wrap"
             gap={3}
             justifyContent="flex-start"
           >
-            {filteredBooks.map((book: Book) => (
+            {filteredBooks.map((book: Book, index: number) => (
               <Box
                 key={book._id}
-                flex="1 1 calc(25% - 24px)"
-                minWidth={250}
-                maxWidth={300}
+                tabIndex={0}
+                ref={(el: HTMLElement | null) => registerItem(index, el)}
+                onFocus={() => setFocusedIndex(index)}
+                onKeyDown={(e) => handleItemKeyDown(e, index)}
+                sx={{
+                  flex: "1 1 calc(25% - 24px)",
+                  minWidth: 250,
+                  maxWidth: 300,
+                  outline: "none",
+                  "&:focus": {
+                    boxShadow: "0 0 0 3px #16A34A",
+                    borderRadius: 2,
+                    zIndex: 10
+                  }
+                }}
               >
                 <BookCard book={book} />
               </Box>
             ))}
+
           </Box>
         ) : (
           <Box textAlign="center" py={12}>

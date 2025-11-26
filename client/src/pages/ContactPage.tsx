@@ -9,8 +9,10 @@ import { ArrowLeft, Mail, Send, HelpCircle, MapPin, CheckCircle2 } from 'lucide-
 import { toast } from 'sonner';
 import { useUserStore } from '../store/useUserStore';
 import { useTranslation } from 'react-i18next';
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function ContactPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(['contact', 'common']);
   const isRTL = i18n.dir() === 'rtl';

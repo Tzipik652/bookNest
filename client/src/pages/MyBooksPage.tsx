@@ -17,9 +17,11 @@ import BookGridSkeleton from "../components/BookGridSkeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import { useTranslation } from "react-i18next";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function MyBooksPage() {
   const { t } = useTranslation("myBooksPage");
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");

@@ -20,7 +20,11 @@ interface FAQSection {
     category: string;
     questions: FAQItem[];
 }
+import { faqs } from '../lib/faqs';
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
+
 export function FAQPage() {
+    const isKeyboardMode = useKeyboardModeBodyClass();
     const { t } = useTranslation(['faq', 'common']);
     const faqSections = t('faq:sections', { returnObjects: true }) as FAQSection[];
     const navigate = useNavigate();

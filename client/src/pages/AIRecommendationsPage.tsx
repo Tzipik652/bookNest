@@ -15,9 +15,11 @@ import { Book, BookWithFavorite } from "../types";
 import BookGridSkeleton from "../components/BookGridSkeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function AIRecommendationsPage() {
   const { t } = useTranslation(['AIRecommendations', 'common'])
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -61,7 +63,6 @@ export function AIRecommendationsPage() {
   };
   const getAlertMessage = () => {
     if (favoriteBooksNumber > 0) {
-      // שימוש ב-i18next לטיפול ב-pluralization
       return t('alertBasedOnFavorites', { count: favoriteBooksNumber });
     }
     return t('alertNoFavorites');
