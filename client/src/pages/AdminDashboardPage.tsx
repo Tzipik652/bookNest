@@ -13,8 +13,11 @@ import { StatsCards } from "../components/adminDashboard/StatsCards";
 import { AdminBooksTable } from "../components/adminDashboard/AdminBooksTable";
 import { UserList } from "../components/adminDashboard/UserList";
 import { RecentComments } from "../components/adminDashboard/RecentComments";
+import { useTranslation } from "react-i18next";
 
 export function AdminDashboardPage() {
+  const { t } = useTranslation(["adminDashboard", "common"]);
+  const adminTexts = t('dashboard', { returnObjects: true }) as any;
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
   const [userMap, setUserMap] = useState<Record<string, string>>({});
   const navigate = useNavigate();
@@ -33,7 +36,7 @@ export function AdminDashboardPage() {
   // Redirect if not admin
   useEffect(() => {
     if (currentUser?.role !== "admin") {
-      toast.error("Unauthorized: Admin access required");
+      toast.error(adminTexts.unauthorizedError);
       navigate("/home");
     }
   }, [currentUser, navigate]);
@@ -76,7 +79,7 @@ export function AdminDashboardPage() {
       setIsReactionsLoading(true);
       await loadReactions(allComments);
     } catch (error) {
-      toast.error("Failed to load admin data");
+      toast.error(adminTexts.loadDataFailed);
       setIsLoading(false);
     } finally {
       setIsReactionsLoading(false);
@@ -125,7 +128,7 @@ export function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir={t('common:dir')}>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8 flex items-center gap-3">
@@ -134,15 +137,15 @@ export function AdminDashboardPage() {
           </div>
           <div>
             <h1 className="mb-1 text-2xl font-bold text-gray-900">
-              Admin Dashboard
+              {adminTexts.pageTitle}
             </h1>
-            <p className="text-gray-600">Manage BookNest platform</p>
+            <p className="text-gray-600">{adminTexts.pageSubtitle}</p>
           </div>
         </div>
 
         {/* Stats */}
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          Platform Overview
+          {adminTexts.overviewTitle}
         </h2>
         <StatsCards
           favoritesCount={favoritesCount}
@@ -153,11 +156,12 @@ export function AdminDashboardPage() {
           recentUploads={recentBooks.length}
           isLoading={isLoading}
           isReactionsLoading={isReactionsLoading}
+          translationKeys={adminTexts.stats}
         />
 
         {/* Books */}
         <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
-          Books Management
+          {adminTexts.booksMgtTitle}
         </h2>
         <AdminBooksTable
           books={books}
@@ -167,7 +171,7 @@ export function AdminDashboardPage() {
 
         {/* Users */}
         <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
-          Users
+          {adminTexts.usersTitle}
         </h2>
         <UserList
           users={users}
@@ -177,7 +181,7 @@ export function AdminDashboardPage() {
 
         {/* Recent Comments */}
         <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
-          Recent Activity
+          {adminTexts.recentActivityTitle}
         </h2>
         <RecentComments
           recentComments={recentComments}

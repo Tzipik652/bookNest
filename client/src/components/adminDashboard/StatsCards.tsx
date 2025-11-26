@@ -9,6 +9,19 @@ import {
   Sparkles,
 } from "lucide-react";
 
+interface StatTranslationKeys {
+    totalBooks: string;
+    totalUsers: string;
+    totalComments: string;
+    totalFavorites: string;
+    engagementTitle: string;
+    reactionsText: string;
+    avgReactions: string;
+    reactionsPerComment: string;
+    activityTitle: string;
+    recentText: string;
+    ofTotalBooksRecent: string;
+}
 // Custom hook for smooth animated numbers with intersection observer
 function useAnimatedNumber(
   targetValue: number,
@@ -62,6 +75,7 @@ interface StatsCardsProps {
   recentUploads: number;
   isLoading?: boolean;
   isReactionsLoading?: boolean;
+  translationKeys: StatTranslationKeys;
 }
 
 // Shimmer loading component
@@ -87,6 +101,7 @@ export function StatsCards({
   commentsCount,
   reactionsCount,
   recentUploads,
+  translationKeys,
   isLoading = false,
   isReactionsLoading = false,
 }: StatsCardsProps) {
@@ -107,7 +122,7 @@ export function StatsCards({
   const stats = [
     {
       id: "books",
-      title: "Total Books",
+      title: translationKeys.totalBooks,
       animation: booksAnim,
       icon: <BookOpen className="h-6 w-6 text-green-600" />,
       iconBg: "bg-gradient-to-br from-green-100 to-green-50",
@@ -116,7 +131,7 @@ export function StatsCards({
     },
     {
       id: "users",
-      title: "Total Users",
+      title: translationKeys.totalUsers,
       animation: usersAnim,
       icon: <Users className="h-6 w-6 text-blue-600" />,
       iconBg: "bg-gradient-to-br from-blue-100 to-blue-50",
@@ -125,7 +140,7 @@ export function StatsCards({
     },
     {
       id: "comments",
-      title: "Total Comments",
+      title: translationKeys.totalComments,
       animation: commentsAnim,
       icon: <MessageSquare className="h-6 w-6 text-purple-600" />,
       iconBg: "bg-gradient-to-br from-purple-100 to-purple-50",
@@ -134,7 +149,7 @@ export function StatsCards({
     },
     {
       id: "favorites",
-      title: "Total Favorites",
+      title: translationKeys.totalFavorites,
       animation: favoritesAnim,
       icon: <Heart className="h-6 w-6 text-red-600" />,
       iconBg: "bg-gradient-to-br from-red-100 to-red-50",
@@ -253,12 +268,12 @@ export function StatsCards({
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p className="text-sm text-gray-600 mb-1 font-medium tracking-wide uppercase">
-                  Engagement
+                  {translationKeys.engagementTitle}
                 </p>
                 <p className="text-3xl font-bold text-gray-900 tabular-nums">
-                  {reactionsAnim.value.toLocaleString()}
+                  {reactionsAnim.value.toLocaleString()}{' '}
                   <span className="text-lg text-gray-600 font-normal ml-2">
-                    Reactions
+                   {translationKeys.reactionsText}
                   </span>
                 </p>
               </div>
@@ -279,10 +294,10 @@ export function StatsCards({
                 ></div>
               </div>
               <span className="text-gray-700 font-semibold tabular-nums whitespace-nowrap">
-                {averageReactionsPerComment} avg
+                {averageReactionsPerComment}{' '}  {translationKeys.avgReactions}
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-2">reactions per comment</p>
+            <p className="text-xs text-gray-500 mt-2">{translationKeys.reactionsPerComment}</p>
           </div>
 
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-orange-500 to-transparent opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
@@ -304,12 +319,12 @@ export function StatsCards({
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p className="text-sm text-gray-600 mb-1 font-medium tracking-wide uppercase">
-                  Activity
+                  {translationKeys.activityTitle}
                 </p>
                 <p className="text-3xl font-bold text-gray-900 tabular-nums">
-                  {recentAnim.value.toLocaleString()}
+                  {recentAnim.value.toLocaleString()}{' '}
                   <span className="text-lg text-gray-600 font-normal ml-2">
-                    Recent
+                    {translationKeys.recentText}
                   </span>
                 </p>
               </div>
@@ -337,7 +352,7 @@ export function StatsCards({
               </span>
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              of total books added recently
+              {translationKeys.ofTotalBooksRecent}
             </p>
           </div>
 

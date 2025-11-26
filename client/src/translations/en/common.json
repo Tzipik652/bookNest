@@ -37,7 +37,7 @@
   
   "pageNotFoundTitle": "Page Not Found",
   "pageNotFoundMessage": "Oops! The page you're looking for seems to have wandered off.",
-  
+  "locale": "en-US",
   "linkLoginHere": "Login here",
   "linkRegisterHere": "Register here",
   "dir": "ltr",
