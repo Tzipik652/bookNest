@@ -1,0 +1,17 @@
+{
+  "pageTitle": "הוספת ספר חדש",
+  "pageSubheader": "שתף ספר עם קהילת BookNest. סיכום יווצר אוטומטית על ידי בינה מלאכותית.",
+  "aiAlert": "בינה מלאכותית תיצור סיכום אוטומטית בהתבסס על הכותרת, התיאור והקטגוריה.",
+  "titleLabel": "כותרת *",
+  "authorLabel": "מחבר *",
+  "descriptionLabel": "תיאור *",
+  "categoryLabel": "קטגוריה *",
+  "imageURLLabel": "קישור לתמונה (אופציונלי)",
+  "priceLabel": "מחיר (אופציונלי)",
+  "addButton": "הוסף ספר",
+  "addingButton": "מוסיף ספר...",
+  "cancelButton": "ביטול",
+  "successMessage": "{{bookTitle}} נוסף בהצלחה!",
+  "errorBookExists": "הספר הזה כבר קיים במאגר הנתונים.",
+  "errorGeneral": "הוספת הספר נכשלה. אנא נסה שוב."
+}

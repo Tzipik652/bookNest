@@ -2,18 +2,57 @@
 import supabase from "../config/supabaseClient.js";
 import { getFavoriteBooksList } from "./userModel.js";
 
-/**
- * Create a new book
- */
+const bookSelectQuery = `
+  _id,
+  title,
+  author,
+  description,
+  img_url,
+  price,
+  ai_summary,
+  user_id,
+  date_created,
+  user: user_id ( name, email ),
+  category_details: category ( name ),
+  user_favorites: user_favorites_book_id_fkey(count)
+`;
+
+function normalizeBook(book) {
+  if (!book) return null;
+
+  const { category_details, user_favorites, ...rest } = book;
+  const favorites_count =
+    Array.isArray(user_favorites) && user_favorites.length > 0
+      ? user_favorites[0].count
+      : 0;
+  return {
+    ...rest,
+    category: category_details?.name ?? null,
+    favorites_count: favorites_count,
+  };
+}
 export async function create(bookData) {
+  const { data: categoryData, error: categoryError } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("name", bookData.category)
+    .single();
+
+  if (categoryError) {
+    console.error("Error fetching category ID:", categoryError);
+    throw new Error(`Category not found: ${bookData.category}`);
+  }
+
+  const categoryId = categoryData.id;
+
   const { data, error } = await supabase
     .from("books")
     .insert({
       title: bookData.title,
       author: bookData.author,
       description: bookData.description,
-      category: bookData.category,
-      img_url: bookData.imgUrl,
+      category: categoryId,
+      img_url: bookData.img_url,
       price: bookData.price,
       ai_summary: bookData.ai_summary,
       user_id: bookData.user_id,
@@ -21,65 +60,95 @@ export async function create(bookData) {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error && error.code === "23505") {
+    console.warn(
+      `duplication,Category name '${bookData.category}' already exists.`
+    );
+    throw error;
+  } else if (error) {
+    console.error("Error creating book:", error);
+    throw error;
+  }
   return data;
 }
-
 /**
  * Get all books
  */
 export async function findAll() {
+  //join with users to get uploader name
+  const { data, error } = await supabase
+    .from("books")
+    .select(bookSelectQuery)
+    .order("title", { ascending: true });
+
+  if (error) {
+    throw error;
+  }
+
+  return data.map(normalizeBook);
+}
+
+/**
+ * Fetch a paginated list of books with pagination support.
+ * @param {number} page - Current page number (starting at 1).
+ * @param {number} limit - Maximum items per page.
+ * @param {string | null} category - The category NAME (e.g., 'Fiction', 'Romance') or null.
+ * @returns {Promise<{data: Object[], count: number}>} - The data and total record count.
+ */
+export async function findPaginated(page = 1, limit = 10, category = null) {
   try {
-    // const { data, error } = await supabase
-    //   .from("books")
-    //   .select("*")
-    //   .order("date_created", { ascending: false });
+    const pageNum = Math.max(1, page);
+    const limitNum = Math.max(1, limit);
+    const start = (pageNum - 1) * limitNum;
+    const end = start + limitNum - 1;
 
-    // if (error) {
-    //   throw error;
-    // }
+    let categoryId = null;
 
-    // return data;
-    //join with users to get uploader name
-    const { data, error } = await supabase
-      .from("books")
-      .select(`
-        *,
-        user: user_id (
-      name,
-      email
-    )
-      `)
-      .order("date_created", { ascending: false });
+    if (category) {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id")
+        .eq("name", category)
+        .single();
 
-    if (error) {
-      throw error;
+      categoryId = data?.id ?? null;
     }
 
-    return data;
+    let query = supabase
+      .from("books")
+      .select(bookSelectQuery, { count: "exact" })
+      .order("title", { ascending: true })
+      .range(start, end);
+
+    if (categoryId) {
+      query = query.eq("category", categoryId);
+    }
+
+    const { data, count, error } = await query;
+
+    if (error) throw error;
+
+    return { data: data.map(normalizeBook), count };
   } catch (err) {
-    console.error("Failed to fetch books:", err);
+    console.error("Failed to fetch books in findPaginated model:", err);
     throw err;
   }
 }
-
 /**
  * Get book by ID
  */
 export async function findById(id) {
   const { data, error } = await supabase
     .from("books")
-    .select("* , user: user_id ( name, email )")
+    .select(bookSelectQuery)
     .eq("_id", id)
     .single();
 
   if (error && error.code !== "PGRST116") throw error; // not found case
-  return data || null;
+
+  return normalizeBook(data);
 }
 
-/**
- * Update book by ID
- */
 export async function update(id, updates) {
   const validKeys = [
     "title",
@@ -91,8 +160,24 @@ export async function update(id, updates) {
     "ai_summary",
   ];
 
+  let updatesToDb = { ...updates };
+
+  if (updates.category) {
+    const { data: categoryData, error: categoryError } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("name", updates.category)
+      .single();
+
+    if (categoryError) {
+      throw new Error(`Category not found: ${updates.category}`);
+    }
+
+    updatesToDb.category = categoryData.id;
+  }
+
   const filteredUpdates = Object.fromEntries(
-    Object.entries(updates).filter(
+    Object.entries(updatesToDb).filter(
       ([key, value]) => validKeys.includes(key) && value !== undefined
     )
   );
@@ -103,11 +188,12 @@ export async function update(id, updates) {
     .from("books")
     .update(filteredUpdates)
     .eq("_id", id)
-    .select()
+    .select(bookSelectQuery)
     .single();
 
   if (error) throw error;
-  return data;
+
+  return normalizeBook(data);
 }
 
 /**
@@ -124,23 +210,75 @@ export async function remove(id) {
   if (error && error.code !== "PGRST116") throw error; // not found
   return !!data;
 }
+
 export async function getFavoriteBooks(userId) {
-  try {
-    const favoriteBooksList=await getFavoriteBooksList(userId);
-    const { data, error } = await supabase
+  const favoriteBooksList = await getFavoriteBooksList(userId);
+  if (!favoriteBooksList || favoriteBooksList.length === 0) {
+    return [];
+  }
+  const { data, error } = await supabase
     .from("books")
-    .select("* , user: user_id ( name, email )")
-    .eq("user_id", userId)
+    .select(bookSelectQuery)
     .in("_id", favoriteBooksList)
-    .order("date_created", { ascending: false });
+    .order("title", { ascending: true });
 
   if (error) throw error;
-  return data;
-  } catch (error) {
-    console.log(error);
-    return [];    
-  }
-  
-}
 
-export default { create, findAll, findById, update, remove ,getFavoriteBooks};
+  return data.map(normalizeBook);
+}
+/**
+ * Fetch a list of complete books by an array of UUID identifiers.
+ * @param {string[]} ids - Array of recommended book identifiers.
+ * @returns {Promise<Object[]>} - List of complete book objects.
+ */
+const findBooksByIds = async (ids) => {
+  if (!ids || ids.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("books")
+    .select(bookSelectQuery)
+    .in("_id", ids)
+    .order("title", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching books by IDs:", error);
+    throw new Error(error.message);
+  }
+
+  return data.map(normalizeBook);
+};
+
+export const getBooksByCategory = async (category) => {
+  const { data: categoryData } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("name", category)
+    .single();
+
+  if (!categoryData) return [];
+
+  const { data: books, error } = await supabase
+    .from("books")
+    .select(bookSelectQuery)
+    .eq("category", categoryData.id)
+    .order("title", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching books by category:", error);
+    throw new Error(error.message);
+  }
+
+  return data.map(normalizeBook);
+};
+
+export default {
+  create,
+  findAll,
+  findById,
+  update,
+  remove,
+  findBooksByIds,
+  getFavoriteBooks,
+  findPaginated,
+  getBooksByCategory,
+};

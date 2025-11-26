@@ -1,0 +1,43 @@
+{
+  "welcome": "Welcome to our application!",
+  "greeting": "Hello",
+  "back":"Back",
+  "confirmDelete": "Are you sure you want to delete this item?",
+  "toastDeleteFailed": "Failed to delete {{item}}",
+  "toastUpdateFailed": "Failed to update",
+  "loading": "Loading...",
+  "saving": "Saving...",
+  "sending": "Sending...",
+  "unknown": "Unknown",
+  "search": "Search...",
+  "actions": "Actions",
+  "or": "or",
+  
+  "email": "Email",
+  "password": "Password",
+  "login": "Login",
+  "register": "Register",
+  
+  "buttonCancel": "Cancel",
+  "buttonDelete": "Delete",
+  "buttonEdit": "Edit",
+  "buttonSaveChanges": "Save Changes",
+  "buttonGoBack": "Go Back",
+  "buttonBackToHome": "Back to Home",
+  
+  "dialogTitleConfirm": "Are you sure?",
+  "confirmDeleteGeneric": "Are you sure you want to delete this item? This action cannot be undone.",
+  "confirmDeleteWithName": "This will permanently delete \"{{name}}\". This action cannot be undone.",
+  
+  "toastUpdateSuccess": "Successfully updated",
+  "toastDeleteSuccess": "Successfully deleted",
+  "toastFailedToLoad": "Failed to load data. Please try again.",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "noSearchResults": "No results found matching your search.",
+  
+  "pageNotFoundTitle": "Page Not Found",
+  "pageNotFoundMessage": "Oops! The page you're looking for seems to have wandered off.",
+  
+  "linkLoginHere": "Login here",
+  "linkRegisterHere": "Register here"
+}

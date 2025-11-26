@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Book } from "../types/index";
+import { Book, BookWithFavorite } from "../types/index";
 import { getBooksByUserId } from "../services/bookService";
 import { BookCard } from "../components/BookCard";
 import { Search, BookPlus } from "lucide-react";
@@ -11,22 +11,51 @@ import {
   TextField,
   InputAdornment,
   Container,
+  Grid,
 } from "@mui/material";
-import { useUserStore } from "../store/useUserStore";
+import BookGridSkeleton from "../components/BookGridSkeleton";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFavoriteBooks } from "../hooks/useFavorites";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function MyBooksPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const queryClient = useQueryClient();
+  const { isFavorited } = useFavoriteBooks();
 
   useEffect(() => {
     async function fetchBooks() {
-      const data = await getBooksByUserId();
-      setBooks(data || []);
+      setIsLoading(true);
+      try {
+        const data = await getBooksByUserId();
+        setBooks(Array.isArray(data) ? data : []);
+
+        data?.forEach((book: Book) => {
+          queryClient.setQueryData<BookWithFavorite>(
+            ["book", book._id],
+            (existing) => ({
+              ...existing,
+              ...book,
+              favorites_count:
+                existing?.favorites_count ?? book.favorites_count ?? 0,
+              isFavorited:
+                existing?.isFavorited ?? isFavorited(book._id) ?? false,
+            })
+          );
+        });
+      } catch (error) {
+        console.error("Failed to fetch user's books:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchBooks();
-  }, [refreshKey]);
+  }, []);
 
   const filteredBooks = books?.filter(
     (book) =>
@@ -34,10 +63,81 @@ export function MyBooksPage() {
       book.author.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const AddBookButton = () => (
+    <Button
+      variant="contained"
+      startIcon={<BookPlus size={18} />}
+      onClick={() => navigate("/add-book")}
+    >
+      Add New Book
+    </Button>
+  );
+
+  const renderContent = () => {
+    if (isLoading) {
+      return <BookGridSkeleton count={8} />;
+    }
+
+    if (books.length === 0) {
+      return (
+        <Box textAlign="center" py={15}>
+          <BookPlus size={64} color="#ccc" />
+          <Typography variant="h5" mt={2} mb={1}>
+            No Books Yet
+          </Typography>
+          <Typography color="text.secondary" mb={3}>
+            Start building your library by adding your first book
+          </Typography>
+          <AddBookButton />
+        </Box>
+      );
+    }
+
+    return (
+      <>
+        <TextField
+          fullWidth
+          placeholder="Search your books..."
+          variant="outlined"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{ maxWidth: 400, mb: 5 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search size={18} />
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        {filteredBooks.length > 0 ? (
+          <Grid container spacing={3}>
+            {filteredBooks.map((book) => (
+              <Box
+                key={`${book._id}`}
+                flex="1 1 calc(25% - 24px)"
+                minWidth={250}
+                maxWidth={300}
+              >
+                <BookCard book={book} />
+              </Box>
+            ))}
+          </Grid>
+        ) : (
+          <Box textAlign="center" py={10}>
+            <Typography color="text.secondary">
+              No books found matching your search.
+            </Typography>
+          </Box>
+        )}
+      </>
+    );
+  };
+
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f9fafb", py: 8 }}>
+    <Box sx={{ minHeight: "100vh", py: 8 }}>
       <Container maxWidth="lg">
-        {/* Header */}
         <Box
           sx={{
             display: "flex",
@@ -49,77 +149,10 @@ export function MyBooksPage() {
           <Typography variant="h4" fontWeight="bold">
             My Books
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<BookPlus size={18} />}
-            onClick={() => navigate("/add-book")}
-          >
-            Add New Book
-          </Button>
+          {books.length > 0 && <AddBookButton />}
         </Box>
 
-        {books?.length > 0 ? (
-          <>
-            {/* Search */}
-            <TextField
-              fullWidth
-              placeholder="Search your books..."
-              variant="outlined"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              sx={{ maxWidth: 400, mb: 5 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search size={18} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            {/* Books Flexbox */}
-            {filteredBooks.length > 0 ? (
-              <Box display="flex" flexWrap="wrap" gap={3}>
-                {filteredBooks.map((book) => (
-                  <Box
-                    key={`${book._id}-${refreshKey}`}
-                    flex="1 1 calc(25% - 24px)"
-                    minWidth={250}
-                    maxWidth={300}
-                  >
-                    <BookCard
-                      book={book}
-                      onFavoriteChange={() => setRefreshKey((k) => k + 1)}
-                    />
-                  </Box>
-                ))}
-              </Box>
-            ) : (
-              <Box textAlign="center" py={10}>
-                <Typography color="text.secondary">
-                  No books found matching your search.
-                </Typography>
-              </Box>
-            )}
-          </>
-        ) : (
-          <Box textAlign="center" py={15}>
-            <BookPlus size={64} color="#ccc" />
-            <Typography variant="h5" mt={2} mb={1}>
-              No Books Yet
-            </Typography>
-            <Typography color="text.secondary" mb={3}>
-              Start building your library by adding your first book
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<BookPlus size={18} />}
-              onClick={() => navigate("/add-book")}
-            >
-              Add Your First Book
-            </Button>
-          </Box>
-        )}
+        {renderContent()}
       </Container>
     </Box>
   );

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { BookOpen } from "lucide-react";
 import {
@@ -14,38 +14,59 @@ import {
   Alert,
   Container,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import { useUserStore } from "../store/useUserStore";
 import { loginLocal, loginWithGoogle } from "../services/userService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, LoginFormValues } from "../schemas/login.schema";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
+
 export function LoginPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const location = useLocation();
   const { login } = useUserStore();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [error, setError] = useState("");
+
+  const getRedirectPath = () => {
+    const params = new URLSearchParams(location.search);
+    const redirect = params.get("redirect");
+    return redirect ? decodeURIComponent(redirect) : "/home";
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
     setError("");
     try {
-      const result = await loginLocal(email, password);
+      const result = await loginLocal(data.email, data.password);
       if (result) {
         const { user, token } = result;
         login(user, token);
-        navigate("/home");
+        navigate(getRedirectPath());
       }
     } catch (err: any) {
-      setError("Invalid email or password  || " + err.toString());
+      setError("Invalid email or password || " + err.toString());
     }
   };
 
   const handleGoogleLogin = async (credentialResponse: any) => {
+    setError("");
     try {
       const result = await loginWithGoogle(credentialResponse);
       if (result) {
         const { user, token } = result;
         login(user, token);
-        navigate("/home");
+        navigate(getRedirectPath());
       }
     } catch (err) {
       console.error(err);
@@ -57,11 +78,11 @@ export function LoginPage() {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "linear-gradient(to bottom right, #eff6ff, #f3e8ff)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         py: 4,
+        bgcolor: "linear-gradient(to bottom right, #eff6ff, #f3e8ff)",
       }}
     >
       <Container maxWidth="sm">
@@ -71,7 +92,7 @@ export function LoginPage() {
               <Box textAlign="center">
                 <BookOpen
                   size={48}
-                  color="#1976d2"
+                  color="#16A34A"
                   style={{ marginBottom: 8 }}
                 />
                 <Typography variant="h5" fontWeight="bold">
@@ -84,44 +105,39 @@ export function LoginPage() {
             }
           />
 
-          <form onSubmit={handleSubmit}>
-            <CardContent
-              sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-            >
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <CardContent sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
               {error && <Alert severity="error">{error}</Alert>}
-
-              <Alert severity="info">
-                <Typography variant="body2">
-                  <strong>Demo Credentials:</strong>
-                  <br />
-                  Email: demo@booknest.com
-                  <br />
-                  Password: demo123
-                </Typography>
-              </Alert>
 
               <TextField
                 label="Email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
                 fullWidth
+                {...register("email")}
+                error={!!errors.email}
+                helperText={errors.email?.message}
               />
 
               <TextField
                 label="Password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
                 fullWidth
+                {...register("password")}
+                error={!!errors.password}
+                helperText={errors.password?.message}
               />
             </CardContent>
 
             <CardActions sx={{ flexDirection: "column", gap: 2, mt: 2 }}>
-              <Button type="submit" variant="contained" fullWidth size="large">
-                Login
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                size="large"
+                disabled={isSubmitting}
+                startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
+              >
+                {isSubmitting ? "Logging in..." : "Login"}
               </Button>
 
               <Divider sx={{ my: 1 }}>or</Divider>
@@ -131,19 +147,24 @@ export function LoginPage() {
                 onError={() => setError("Google login failed")}
               />
 
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                textAlign="center"
-              >
+              <Typography variant="body2" color="text.secondary" textAlign="center">
                 Don’t have an account?{" "}
                 <Link
                   to="/register"
-                  style={{ color: "#1976d2", textDecoration: "none" }}
+                  style={{ color: "#16A34A", textDecoration: "none" }}
                 >
                   Register here
                 </Link>
               </Typography>
+              <Typography variant="body2" color="text.secondary" textAlign="center">
+                <Link
+                  to="/forgot-password"
+                  style={{ color: "#16A34A", textDecoration: "none" }}
+                >
+                  Forgot Password?
+                </Link>
+              </Typography>
+
             </CardActions>
           </form>
         </Card>

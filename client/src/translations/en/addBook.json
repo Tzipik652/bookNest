@@ -1,0 +1,17 @@
+{
+  "pageTitle": "Add New Book",
+  "pageSubheader": "Share a book with the BookNest community. AI will generate a summary automatically.",
+  "aiAlert": "AI will automatically generate a summary based on your title, description, and category.",
+  "titleLabel": "Title *",
+  "authorLabel": "Author *",
+  "descriptionLabel": "Description *",
+  "categoryLabel": "Category *",
+  "imageURLLabel": "Image URL (Optional)",
+  "priceLabel": "Price (Optional)",
+  "addButton": "Add Book",
+  "addingButton": "Adding Book...",
+  "cancelButton": "Cancel",
+  "successMessage": "{{bookTitle}} was added successfully!",
+  "errorBookExists": "This book already exists in the database.",
+  "errorGeneral": "Failed to add book. Please try again."
+}

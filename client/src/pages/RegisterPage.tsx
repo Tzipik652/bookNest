@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import BookIcon from "@mui/icons-material/Book";
 import {
   Box,
   Card,
@@ -10,38 +11,60 @@ import {
   Button,
   Typography,
   Alert,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
-import BookIcon from "@mui/icons-material/Book";
 import { useUserStore } from "../store/useUserStore";
 import { register } from "../services/userService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, RegisterFormValues } from "../schemas/register.schema";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function RegisterPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
+  const location = useLocation();
   const { login } = useUserStore();
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+
+  const getRedirectPath = () => {
+    const params = new URLSearchParams(location.search);
+    const redirect = params.get("redirect");
+    return redirect ? decodeURIComponent(redirect) : "/home";
+  };
+
+  const {
+    register: formRegister,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (data: RegisterFormValues) => {
     setError("");
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
     try {
-      const {user, token} =await register(email, password, name);
+      const { user, token } = await register(data.email, data.password, data.name);
       login(user, token);
-      navigate("/home");
+      navigate(getRedirectPath());
     } catch (err: any) {
-      setError("Registration failed  || " + err.toString());
+      if (err.response) {
+        const status = err.response.status;
+        const message = err.response.data?.message || "";
+
+        if (status === 400 && message.includes("User already exists")) {
+          setError("This email is already registered.");
+        } else {
+          setError("Registration failed. Please try again.");
+        }
+      } else {
+        setError("Registration failed. Please try again.");
+      }
     }
   };
 
@@ -71,47 +94,63 @@ export function RegisterPage() {
           }
         />
 
-        <form onSubmit={handleSubmit}>
-          <CardContent
-            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-          >
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {error && <Alert severity="error">{error}</Alert>}
 
             <TextField
               label="Full Name"
-              variant="outlined"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
               fullWidth
+              {...formRegister("name")}
+              error={!!errors.name}
+              helperText={errors.name?.message}
             />
+
             <TextField
               label="Email"
               type="email"
-              variant="outlined"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
               fullWidth
+              {...formRegister("email")}
+              error={!!errors.email}
+              helperText={errors.email?.message}
             />
+
             <TextField
               label="Password"
-              type="password"
-              variant="outlined"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              type={showPassword ? "text" : "password"}
               fullWidth
+              {...formRegister("password")}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
+
             <TextField
               label="Confirm Password"
-              type="password"
-              variant="outlined"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
+              type={showConfirmPassword ? "text" : "password"}
               fullWidth
+              {...formRegister("confirmPassword")}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword?.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
+
           </CardContent>
 
           <CardActions
@@ -122,9 +161,19 @@ export function RegisterPage() {
               p: 2,
             }}
           >
-            <Button type="submit" variant="contained" fullWidth>
-              Register
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{
+                backgroundColor: "primary.main",
+                color: "primary.contrastText",
+              }}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Registering..." : "Register"}
             </Button>
+
             <Typography
               variant="body2"
               textAlign="center"
@@ -133,7 +182,7 @@ export function RegisterPage() {
               Already have an account?{" "}
               <Link
                 to="/login"
-                style={{ color: "#1976d2", textDecoration: "none" }}
+                style={{ color: "#16A34A", textDecoration: "none" }}
               >
                 Login here
               </Link>
@@ -144,4 +193,3 @@ export function RegisterPage() {
     </Box>
   );
 }
-

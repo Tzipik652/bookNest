@@ -34,12 +34,36 @@ export async function updateUser(id, updates) {
   if (error) throw error;
   return data;
 }
+
 export async function getFavoriteBooksList(id) {
   const { data, error } = await supabase
+    .from('user_favorites')
+    .select('book_id') // Selecting only the book_id (UUID)
+    .eq('user_id', id); 
+
+  if (error) {
+    throw error;
+  }
+  
+  // Returning a clean array of book UUID strings: ['uuid1', 'uuid2', ...]
+  return data.map(item => item.book_id);
+}
+export async function getUsers() {
+  const { data, error } = await supabase
     .from('users')
-    .select('favorites')
-    .eq('_id', id);
+    .select('*');
 
   if (error) throw error;
-  return data.favorites;
+  return data;
+}
+export async function deleteUser(id) {
+  const { data, error } = await supabase
+    .from('users')
+    .delete()
+    .eq('_id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
 }

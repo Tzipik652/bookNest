@@ -1,11 +1,17 @@
-// server.js
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { verifyJWT } from './middleware/auth.js';
-dotenv.config();
 import userRoutes from './routes/userRouter.js';
 import bookRouter from './routes/bookRouter.js';
+import favoritesRouter from './routes/favoritesRouter.js';
+import commentRouter from "./routes/commentRouter.js";
+import commentReactionRouter from "./routes/commentReactionRouter.js";
+import authRouter from "./routes/authRouter.js";
+import contactRouter from "./routes/contactRouter.js";
+import { errorHandler } from './middleware/errorHandler.js';
+dotenv.config();
+
+
 import categoryRouter from './routes/categoryRouter.js';
 const app = express();
 
@@ -18,14 +24,16 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/user', userRoutes);
 app.use('/books', bookRouter);
+app.use('/favorites', favoritesRouter);
 app.use('/categories', categoryRouter);
-
+app.use("/comments", commentRouter);
+app.use("/comment-reactions", commentReactionRouter);
+app.use("/contact", contactRouter);
+app.use("/api/auth", authRouter);
 
 // Error handling
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Server error' });
-});
+app.use(errorHandler);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

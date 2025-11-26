@@ -1,7 +1,9 @@
 import axios from "axios";
 import { User } from "../types";
+import { useUserStore } from "../store/useUserStore";
+import api from "../lib/axiosInstance";
 const API_BASE_URL =
-  `${process.env.REACT_APP_SERVER_URL}/user` || "http://localhost:5000/user";
+  `${import.meta.env.VITE_SERVER_URL}/user` || "http://localhost:5000/user";
 
 function handleAxiosError(error: any): never {
   if (axios.isAxiosError(error)) {
@@ -18,7 +20,7 @@ function handleAxiosError(error: any): never {
 
 export const loginLocal = async (email: string, password: string): Promise<{ user: User; token: string }>  => {
   try {
-    const res = await axios.post(`${API_BASE_URL}/login`, {
+    const res = await api.post(`${API_BASE_URL}/login`, {
       email,
       password,
     });
@@ -36,7 +38,7 @@ export const register = async (
   name: string
 ) : Promise<{ user: User; token: string }>=> {
   try {
-    const res = await axios.post(`${API_BASE_URL}/register`, {
+    const res = await api.post(`${API_BASE_URL}/register`, {
       email,
       password,
       name,
@@ -53,7 +55,7 @@ export const register = async (
 export const loginWithGoogle = async (credentialResponse: any): Promise<{ user: User; token: string }> => {
   try {
     const id_token = credentialResponse.credential;
-    const { data } = await axios.post(`${API_BASE_URL}/google`, {
+    const { data } = await api.post(`${API_BASE_URL}/google`, {
       id_token,
     });
 
@@ -67,4 +69,35 @@ export const loginWithGoogle = async (credentialResponse: any): Promise<{ user: 
     handleAxiosError(error);
   }
 };
+
+export const getAllUsers = async (): Promise<User[]> => {
+      const token = useUserStore.getState().token;
+  
+      if (!token) throw new Error("Must be logged in to add books");
+  try {
+    const res = await api.get(`${API_BASE_URL}`);
+    return res.data.users;
+  } catch (error) {
+    handleAxiosError(error);
+  }
+}
+export const updateUser = async (user: User): Promise<User> => {
+  const token = useUserStore.getState().token;
+    if (!token) throw new Error("Must be logged in to update user");
+    try {
+      const res = await api.put(`${API_BASE_URL}/${user._id}`, user);
+      return res.data;
+    } catch (error) { 
+      handleAxiosError(error);
+    }
+}
+export const deleteUser = async (userId: string): Promise<void> => {
+  const token = useUserStore.getState().token;
+    if (!token) throw new Error("Must be logged in to delete user");
+    try {
+      await api.delete(`${API_BASE_URL}/${userId}`);
+    } catch (error) {
+      handleAxiosError(error);
+    }
+}
 

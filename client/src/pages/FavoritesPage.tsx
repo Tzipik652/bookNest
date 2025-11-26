@@ -1,18 +1,57 @@
-import { useState } from 'react';
-import { BookCard } from '../components/BookCard';
-import { getFavoriteBooks } from '../services/favoriteService';
-import { useNavigate } from 'react-router-dom';
-import { Heart, Search } from 'lucide-react';
-import { Box, Container, Typography, TextField, InputAdornment, Button } from '@mui/material';
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { BookCard } from "../components/BookCard";
+import { useNavigate } from "react-router-dom";
+import { Heart, Search } from "lucide-react";
+import {
+  Box,
+  Container,
+  Typography,
+  TextField,
+  InputAdornment,
+  Button,
+} from "@mui/material";
+import { Book, BookWithFavorite } from "../types";
+import { useFavoriteBooks } from "../hooks/useFavorites";
+import BookGridSkeleton from "../components/BookGridSkeleton";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function FavoritesPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const books = getFavoriteBooks();
+  const queryClient = useQueryClient();
+  const { favoriteBooksQuery } = useFavoriteBooks();
+  const favoriteBooks = favoriteBooksQuery.data || [];
+   useEffect(() => {
+    if (!favoriteBooks) return;
 
-  const filteredBooks = books.filter((book) => {
+    favoriteBooks.forEach((book) => {
+      queryClient.setQueryData<BookWithFavorite>(
+        ["book", book._id],
+        (existing) => ({
+          ...book,
+          ...existing,
+          isFavorited: existing?.isFavorited ?? true,
+          favorites_count:
+            existing?.favorites_count ?? book.favorites_count ?? 1,
+        })
+      );
+    });
+  }, [favoriteBooks, queryClient]);
+
+  useEffect(() => {
+    setIsLoading(favoriteBooksQuery.isLoading);
+  }, [favoriteBooksQuery.isLoading]);
+  
+  useEffect(() => {
+    setError(favoriteBooksQuery.error as string | null);
+  }, [favoriteBooksQuery.error]);
+
+  const filteredBooks = favoriteBooks.filter((book: Book) => {
     const matchesSearch =
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase());
@@ -20,13 +59,13 @@ export function FavoritesPage() {
   });
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f9fafb', py: 8 }}>
+    <Box sx={{ minHeight: "100vh", py: 8 }}>
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight="bold" mb={6}>
           My Favorites
         </Typography>
 
-        {books.length > 0 ? (
+        {favoriteBooks.length > 0 || isLoading ? (
           <>
             {/* Search Field */}
             <Box sx={{ maxWidth: 400, mb: 6 }}>
@@ -45,28 +84,24 @@ export function FavoritesPage() {
               />
             </Box>
 
-            {/* Books Flexbox */}
-            {filteredBooks.length > 0 ? (
+            {isLoading ? (
+              <BookGridSkeleton />
+            ) : filteredBooks.length > 0 ? (
               <Box
                 sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
+                  display: "flex",
+                  flexWrap: "wrap",
                   gap: 3,
-                  justifyContent: 'flex-start',
                 }}
               >
-                {filteredBooks.map((book) => (
+                {filteredBooks.map((book: Book) => (
                   <Box
-                    key={`${book._id}-${refreshKey}`}
-                    sx={{
-                      flex: '1 1 calc(25% - 24px)',
-                      minWidth: 250,
-                    }}
+                    key={`${book._id}`}
+                    flex="1 1 calc(25% - 24px)"
+                    minWidth={250}
+                    maxWidth={300}
                   >
-                    <BookCard
-                      book={book}
-                      onFavoriteChange={() => setRefreshKey((k) => k + 1)}
-                    />
+                    <BookCard book={book} />
                   </Box>
                 ))}
               </Box>
@@ -90,8 +125,8 @@ export function FavoritesPage() {
             <Button
               variant="contained"
               size="large"
-              onClick={() => navigate('/home')}
-              sx={{ textTransform: 'none', borderRadius: 3 }}
+              onClick={() => navigate("/home")}
+              sx={{ textTransform: "none", borderRadius: 3 }}
             >
               Browse Books
             </Button>
