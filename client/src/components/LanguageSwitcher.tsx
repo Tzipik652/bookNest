@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Globe, Check } from "lucide-react";
 import { Button } from './ui/button';
 
-const GoogleTranslate = () => {
+const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -13,42 +13,9 @@ const GoogleTranslate = () => {
     { code: 'he', label: 'עברית', flag: '🇮🇱' },
   ];
 
-  useEffect(() => {
-    if (!document.getElementById("google-translate-script")) {
-      const script = document.createElement("script");
-      script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      script.async = true;
-      script.id = "google-translate-script";
-      document.body.appendChild(script);
-    }
-
-    (window as any).googleTranslateElementInit = () => {
-      new (window as any).google.translate.TranslateElement({
-        pageLanguage: "en",
-        includedLanguages: languages.map(l => l.code).join(','),
-        autoDisplay: false
-      }, "google_translate_element");
-    };
-  }, []);
-
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .goog-te-banner-frame { display: none !important; }
-      body { top: 0 !important; position: relative !important; }
-      .goog-logo-link, .goog-te-gadget { display: none !important; }
-      #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
-      .goog-text-highlight { background: none !important; box-shadow: none !important; }
-    `;
-    document.head.appendChild(style);
-    return () => {
-    document.head.removeChild(style);
-  };
-  }, []);
-
+  // סגירת התפריט בלחיצה בחוץ
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // אם התפריט פתוח והלחיצה לא הייתה בתוך ה-Dropdown עצמו: סגור אותו.
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
@@ -61,27 +28,17 @@ const GoogleTranslate = () => {
   }, [dropdownRef]);
 
   const handleLanguageChange = (langCode: 'en' | 'he') => {
+    // שינוי השפה ב-i18n
     i18n.changeLanguage(langCode);
-
+    
+    // שינוי כיוון הדף
     document.body.dir = langCode === 'he' ? 'rtl' : 'ltr';
-
-    const observer = new MutationObserver(() => {
-      const combo = document.querySelector<HTMLSelectElement>('.goog-te-combo');
-      if (combo) {
-        combo.value = langCode;
-        combo.dispatchEvent(new Event('change'));
-        observer.disconnect();
-      }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-
+    
     setIsOpen(false);
   };
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div id="google_translate_element" className="hidden"></div>
-
       <Button
         variant="ghost"
         onClick={() => setIsOpen(!isOpen)}
@@ -90,7 +47,9 @@ const GoogleTranslate = () => {
         aria-expanded={isOpen}
       >
         <Globe className="h-4 w-4" />
-        <span className="inline-block">{languages.find(l => l.code === i18n.language)?.label || 'Language'}</span>
+        <span className="inline-block">
+          {languages.find(l => l.code === i18n.language)?.label || 'Language'}
+        </span>
       </Button>
 
       {isOpen && (
@@ -98,7 +57,7 @@ const GoogleTranslate = () => {
           {languages.map(lang => (
             <button
               key={lang.code}
-              onClick={() =>handleLanguageChange(lang.code as 'en' | 'he')}
+              onClick={() => handleLanguageChange(lang.code as 'en' | 'he')}
               className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors
                 ${i18n.language === lang.code ? 'text-green-600 font-medium' : 'text-gray-700 dark:text-gray-200'}
               `}
@@ -115,4 +74,4 @@ const GoogleTranslate = () => {
   );
 };
 
-export default GoogleTranslate;
+export default LanguageSwitcher;
