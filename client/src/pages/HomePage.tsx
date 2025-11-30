@@ -291,6 +291,7 @@ export function HomePage() {
               shape="rounded"
               size="large"
               disabled={loading}
+              dir="ltr"
             />
           </Box>
         )}

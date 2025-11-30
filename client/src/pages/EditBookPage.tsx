@@ -20,12 +20,16 @@ import {
   MenuItem,
   Alert,
   CircularProgress,
-} from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
-import { useUserStore } from "../store/useUserStore";
-import { Category } from "../types";
-import { useTranslation } from "react-i18next";
-import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
+
+} from '@mui/material';
+import { ArrowBack } from '@mui/icons-material';
+import { useUserStore } from '../store/useUserStore';
+import { Category } from '../types';
+import { useTranslation } from 'react-i18next';
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { Button as ShadcnButton } from "../components/ui/button";
+
 
 export function EditBookPage() {
   const { t } = useTranslation(["editBook", "common"]);
@@ -136,14 +140,17 @@ export function EditBookPage() {
   return (
     <Box sx={{ minHeight: "100vh", py: 6 }}>
       <Container maxWidth="sm">
-        <Button
-          onClick={handleNavigateBack}
-          startIcon={<ArrowBack />}
-          sx={{ mb: 3 }}
+
+         <ShadcnButton
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-6 gap-2"
           aria-label={t("common:back")}
         >
-          {t("common:back")}
-        </Button>
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t('common:back')}
+        </ShadcnButton>
 
         <Card sx={{ p: 2 }}>
           <CardHeader title={t("editBook:pageTitle")} />

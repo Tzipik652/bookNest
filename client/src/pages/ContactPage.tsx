@@ -5,7 +5,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
-import { ArrowLeft, Mail, Send, HelpCircle, MapPin, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Mail, Send, HelpCircle, MapPin, CheckCircle2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUserStore } from '../store/useUserStore';
 import { useTranslation } from 'react-i18next';
@@ -88,13 +88,14 @@ export function ContactPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8 max-w-5xl">
-        <Button
+         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-6 gap-2"
           aria-label={t('common:back')}
         >
-          <ArrowLeft className="h-4 w-4" />
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
           {t('common:back')}
         </Button>
 

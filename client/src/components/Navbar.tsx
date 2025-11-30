@@ -14,11 +14,13 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { useUserStore } from "../store/useUserStore";
-import { useQueryClient } from "@tanstack/react-query";
-import { useAccessibilityStore } from "../store/accessibilityStore";
-import LanguageSwitcher from "./LanguageSwitcher";
-import { useTranslation } from "react-i18next";
+
+import { useUserStore } from '../store/useUserStore';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAccessibilityStore } from '../store/accessibilityStore';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
+
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -175,6 +177,7 @@ export function Navbar() {
             </>
           )}
           <LanguageSwitcher />
+
         </div>
 
         {/* Mobile Menu Button */}
