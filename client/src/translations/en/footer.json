@@ -1,0 +1,17 @@
+{
+  "tagline": "Your personal book management and discovery platform. Organize your collection, discover new reads, and get AI-powered recommendations.",
+  "quickLinksTitle": "Quick Links",
+  "linkHome": "Home",
+  "linkMyBooks": "My Books",
+  "linkFavorites": "Favorites",
+  "linkRecommendations": "AI Recommendations",
+  "featuresTitle": "Features",
+  "featureDiscovery": "Book Discovery",
+  "featureCollection": "Personal Collection",
+  "featureAI": "AI Recommendations",
+  "featureLists": "Reading Lists",
+  "copyright": "© {{year}} BookNest. All rights reserved.",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  "contact": "Contact"
+}

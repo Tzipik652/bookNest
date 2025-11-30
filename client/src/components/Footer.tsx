@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, Heart, Sparkles, Home } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function Footer() {
+    const { t } = useTranslation(["footer", "common"]); // טעינת Namespaces
     const currentYear = new Date().getFullYear();
+    const commonDir = t('common:dir') as 'rtl' | 'ltr';
 
     return (
         <footer className="bg-slate-900 text-slate-300 mt-auto">
@@ -15,36 +18,36 @@ export function Footer() {
                             <span className="text-white text-2xl">BookNest</span>
                         </div>
                         <p className="text-slate-400 max-w-md">
-                            Your personal book management and discovery platform. Organize your collection, discover new reads, and get AI-powered recommendations.
+                            {t("tagline")}
                         </p>
                     </div>
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className="text-white mb-4">Quick Links</h3>
+                        <h3 className="text-white mb-4">{t("quickLinksTitle")}</h3>
                         <ul className="space-y-2">
                             <li>
                                 <Link to="/home" className="hover:text-green-400 transition-colors flex items-center gap-2">
                                     <Home className="h-4 w-4" />
-                                    Home
+                                    {t("linkHome")}
                                 </Link>
                             </li>
                             <li>
                                 <Link to="/my-books" className="hover:text-green-400 transition-colors flex items-center gap-2">
                                     <BookOpen className="h-4 w-4" />
-                                    My Books
+                                    {t("linkMyBooks")}
                                 </Link>
                             </li>
                             <li>
                                 <Link to="/favorites" className="hover:text-green-400 transition-colors flex items-center gap-2">
                                     <Heart className="h-4 w-4" />
-                                    Favorites
+                                    {t("linkFavorites")}
                                 </Link>
                             </li>
                             <li>
                                 <Link to="/recommendations" className="hover:text-green-400 transition-colors flex items-center gap-2">
                                     <Sparkles className="h-4 w-4" />
-                                    AI Recommendations
+                                    {t("linkRecommendations")}
                                 </Link>
                             </li>
                         </ul>
@@ -52,12 +55,12 @@ export function Footer() {
 
                     {/* Features */}
                     <div>
-                        <h3 className="text-white mb-4">Features</h3>
+                        <h3 className="text-white mb-4">{t("featuresTitle")}</h3>
                         <ul className="space-y-2">
-                            <li className="text-slate-400">Book Discovery</li>
-                            <li className="text-slate-400">Personal Collection</li>
-                            <li className="text-slate-400">AI Recommendations</li>
-                            <li className="text-slate-400">Reading Lists</li>
+                            <li className="text-slate-400">{t("featureDiscovery")}</li>
+                            <li className="text-slate-400">{t("featureCollection")}</li>
+                            <li className="text-slate-400">{t("featureAI")}</li>
+                            <li className="text-slate-400">{t("featureLists")}</li>
                         </ul>
                     </div>
                 </div>
@@ -65,37 +68,27 @@ export function Footer() {
                 {/* Bottom Bar */}
                 <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <p className="text-slate-400 text-sm">
-                        © {currentYear} BookNest. All rights reserved.
+                        {t("copyright", { year: currentYear })}
                     </p>
-                    {/* <div className="flex gap-6 text-sm">
-            <button className="text-slate-400 hover:text-green-400 transition-colors">
-              Privacy Policy
-            </button>
-            <button className="text-slate-400 hover:text-green-400 transition-colors">
-              Terms of Service
-            </button>
-            <button className="text-slate-400 hover:text-green-400 transition-colors">
-              Contact
-            </button>
-          </div> */}
+                    
                     <div className="flex gap-6 text-sm">
                         <Link
                             to="/privacy-policy"
                             className="text-slate-400 hover:text-green-400 transition-colors"
                         >
-                            Privacy Policy
+                            {t("privacyPolicy")}
                         </Link>
                         <Link
                             to="/terms-of-service"
                             className="text-slate-400 hover:text-green-400 transition-colors"
                         >
-                            Terms of Service
+                           {t("termsOfService")}
                         </Link>
                         <Link
                             to="/contact"
                             className="text-slate-400 hover:text-green-400 transition-colors"
                         >
-                            Contact
+                            {t("contact")}
                         </Link>
                     </div>
                 </div>

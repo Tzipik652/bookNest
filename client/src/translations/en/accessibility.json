@@ -1,0 +1,11 @@
+{
+  "menuTitle": "Accessibility Settings",
+  "ariaLabel": "Open Accessibility Menu",
+  "darkMode": "Dark Mode",
+  "highContrast": "High Contrast",
+  "largeText": "Large Text",
+  "reduceMotion": "Reduce Motion",
+  "underlineLinks": "Underline Links",
+  "dyslexicFont": "Dyslexic-Friendly Font",
+  "screenReader": "Screen Reader Mode"
+}

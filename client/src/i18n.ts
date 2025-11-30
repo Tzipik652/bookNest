@@ -45,7 +45,29 @@ import hePolicy from './translations/he/policy.json'
 import enTerms from './translations/en/terms.json'
 import heTerms from './translations/he/terms.json'
 
+import enAccessibility from './translations/en/accessibility.json'
+import heAccessibility from './translations/he/accessibility.json'
 
+import enBookCard from './translations/en/bookCard.json'
+import heBookCard from './translations/he/bookCard.json'
+
+import enComments from './translations/en/comments.json'
+import heComments from './translations/he/comments.json'
+
+import enFooter from './translations/en/footer.json'
+import heFooter from './translations/he/footer.json'
+
+import enKeyboardShortcutsHelp from './translations/en/keyboardShortcutsHelp.json'
+import heKeyboardShortcutsHelp from './translations/he/keyboardShortcutsHelp.json'
+
+import enWelcomeToast from './translations/en/welcomeToast.json'
+import heWelcomeToast from './translations/he/welcomeToast.json'
+
+import enLanding from './translations/en/landing.json'
+import heLanding from './translations/he/landing.json'
+
+import enNavbar from './translations/en/navbar.json'
+import heNavbar from './translations/he/navbar.json'
 
 i18n
   .use(LanguageDetector)
@@ -66,7 +88,15 @@ i18n
         auth:enAuth,
         myBooksPage:enMyBooksPage,
         policy:enPolicy,
-        terms:enTerms
+        terms:enTerms,
+        accessibility:enAccessibility,
+        bookCard:enBookCard,
+        comments:enComments,
+        footer:enFooter,
+        keyboardShortcutsHelp:enKeyboardShortcutsHelp,
+        welcomeToast:enWelcomeToast,
+        landing:enLanding,
+        navbar:enNavbar
       },
       he: {
         common: heCommon,
@@ -82,10 +112,18 @@ i18n
         auth:heAuth,
         myBooksPage:heMyBooksPage,
         policy:hePolicy,
-        terms:heTerms
+        terms:heTerms,
+        accessibility:heAccessibility,
+        bookCard:heBookCard,
+        comments:heComments,
+        footer:heFooter,
+        keyboardShortcutsHelp:heKeyboardShortcutsHelp,
+        welcomeToast:heWelcomeToast,
+        landing:heLanding,
+        navbar:heNavbar
       },
     },
-    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms'],
+    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms','accessibility','bookCard','comments','footer','keyboardShortcutsHelp','welcomeToast','landing','navbar'],
     defaultNS: 'common',
     supportedLngs: ['en', 'he'],
     fallbackLng: 'en',

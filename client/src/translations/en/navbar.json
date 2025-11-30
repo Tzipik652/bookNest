@@ -1,0 +1,11 @@
+{
+  "home": "Home",
+  "myBooks": "My Books",
+  "favorites": "Favorites",
+  "addBook": "Add Book",
+  "aiRecommendations": "AI Recommendations",
+  "admin": "Admin",
+  "login": "Login",
+  "register": "Register",
+  "logout": "Logout"
+}

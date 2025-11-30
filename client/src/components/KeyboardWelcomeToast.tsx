@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Alert, Snackbar, Button, Box, Typography } from '@mui/material';
 import { Keyboard, X } from 'lucide-react';
+import { Trans, useTranslation } from 'react-i18next';
 
 export function KeyboardWelcomeToast() {
+  const { t } = useTranslation(['welcomeToast', 'common']);
+  const commonDir = t('common:dir') as 'rtl' | 'ltr';
+
   const [isOpen, setIsOpen] = useState(false);
   const STORAGE_KEY = 'keyboard-welcome-shown';
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem(STORAGE_KEY);
-    
+
     if (!hasSeenWelcome) {
       const timer = setTimeout(() => {
         setIsOpen(true);
@@ -43,14 +47,19 @@ export function KeyboardWelcomeToast() {
           boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
           '& .MuiAlert-icon': {
             color: '#16A34A'
-          }
+          },
+          direction: commonDir// === 'rtl' ? 'right' : 'left'
         }}
         icon={<Keyboard size={24} />}
         action={
           <Button
             size="small"
             onClick={handleDismiss}
-            sx={{ minWidth: 'auto', p: 1 }}
+            sx={{
+              minWidth: 'auto',
+              p: 1,
+              order: commonDir === 'rtl' ? -1 : 1
+            }}
           >
             <X size={18} />
           </Button>
@@ -58,11 +67,16 @@ export function KeyboardWelcomeToast() {
       >
         <Box>
           <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-            💡 Pro Tip: Navigate with Keyboard!
+            {t('proTipTitle')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Press <strong>?</strong> anytime to see all keyboard shortcuts.
-            Try <strong>/</strong> to search or <strong>arrow keys</strong> to navigate between books!
+            <Trans
+              i18nKey="tipBody"
+              ns="welcomeToast"
+              components={{
+                bold: <strong />
+              }}
+            />
           </Typography>
           <Box mt={1.5}>
             <Button
@@ -79,7 +93,7 @@ export function KeyboardWelcomeToast() {
                 }
               }}
             >
-              Got it!
+              {t('dismissButton')}
             </Button>
           </Box>
         </Box>
