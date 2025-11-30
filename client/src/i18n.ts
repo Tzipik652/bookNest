@@ -60,6 +60,15 @@ import heFooter from './translations/he/footer.json'
 import enKeyboardShortcutsHelp from './translations/en/keyboardShortcutsHelp.json'
 import heKeyboardShortcutsHelp from './translations/he/keyboardShortcutsHelp.json'
 
+import enWelcomeToast from './translations/en/welcomeToast.json'
+import heWelcomeToast from './translations/he/welcomeToast.json'
+
+import enLanding from './translations/en/landing.json'
+import heLanding from './translations/he/landing.json'
+
+import enNavbar from './translations/en/navbar.json'
+import heNavbar from './translations/he/navbar.json'
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -84,7 +93,10 @@ i18n
         bookCard:enBookCard,
         comments:enComments,
         footer:enFooter,
-        keyboardShortcutsHelp:enKeyboardShortcutsHelp
+        keyboardShortcutsHelp:enKeyboardShortcutsHelp,
+        welcomeToast:enWelcomeToast,
+        landing:enLanding,
+        navbar:enNavbar
       },
       he: {
         common: heCommon,
@@ -105,10 +117,13 @@ i18n
         bookCard:heBookCard,
         comments:heComments,
         footer:heFooter,
-        keyboardShortcutsHelp:heKeyboardShortcutsHelp
+        keyboardShortcutsHelp:heKeyboardShortcutsHelp,
+        welcomeToast:heWelcomeToast,
+        landing:heLanding,
+        navbar:heNavbar
       },
     },
-    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms','accessibility','bookCard','comments','footer','keyboardShortcutsHelp'],
+    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms','accessibility','bookCard','comments','footer','keyboardShortcutsHelp','welcomeToast','landing','navbar'],
     defaultNS: 'common',
     supportedLngs: ['en', 'he'],
     fallbackLng: 'en',

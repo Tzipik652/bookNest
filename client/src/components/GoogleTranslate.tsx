@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Globe, Check } from "lucide-react";
 import { Button } from './ui/button';
@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 const GoogleTranslate = () => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const languages = [
     { code: 'en', label: 'English', flag: '🇺🇸' },
@@ -45,6 +46,20 @@ const GoogleTranslate = () => {
   };
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // אם התפריט פתוח והלחיצה לא הייתה בתוך ה-Dropdown עצמו: סגור אותו.
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
+
   const handleLanguageChange = (langCode: 'en' | 'he') => {
     i18n.changeLanguage(langCode);
 
@@ -64,7 +79,7 @@ const GoogleTranslate = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <div id="google_translate_element" className="hidden"></div>
 
       <Button
@@ -75,7 +90,7 @@ const GoogleTranslate = () => {
         aria-expanded={isOpen}
       >
         <Globe className="h-4 w-4" />
-        <span className="hidden md:inline">{languages.find(l => l.code === i18n.language)?.label || 'Language'}</span>
+        <span className="inline-block">{languages.find(l => l.code === i18n.language)?.label || 'Language'}</span>
       </Button>
 
       {isOpen && (
