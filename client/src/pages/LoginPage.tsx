@@ -14,39 +14,56 @@ import {
   Alert,
   Container,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import { useUserStore } from "../store/useUserStore";
 import { loginLocal, loginWithGoogle } from "../services/userService";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, LoginFormValues } from "../schemas/login.schema";
+import { useTranslation } from "react-i18next";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function LoginPage() {
+  const { t } = useTranslation(["auth","common"]);
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
-  const location=useLocation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const location = useLocation();
   const { login } = useUserStore();
-const getRedirectPath=()=>{
-  const params=new URLSearchParams(location.search);
-  const redirect=params.get("redirect");
-return redirect ? decodeURIComponent(redirect) : "/home";
-}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [error, setError] = useState("");
+
+  const getRedirectPath = () => {
+    const params = new URLSearchParams(location.search);
+    const redirect = params.get("redirect");
+    return redirect ? decodeURIComponent(redirect) : "/home";
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
     setError("");
     try {
-      const result = await loginLocal(email, password);
+      const result = await loginLocal(data.email, data.password);
       if (result) {
         const { user, token } = result;
         login(user, token);
         navigate(getRedirectPath());
       }
     } catch (err: any) {
-      setError("Invalid email or password  || " + err.toString());
+      console.error(err);
+      setError(t("login.errorAuth"));
     }
   };
 
   const handleGoogleLogin = async (credentialResponse: any) => {
+    setError("");
     try {
       const result = await loginWithGoogle(credentialResponse);
       if (result) {
@@ -56,7 +73,7 @@ return redirect ? decodeURIComponent(redirect) : "/home";
       }
     } catch (err) {
       console.error(err);
-      setError("Google login error");
+      setError(t("login.errorGoogle"));
     }
   };
 
@@ -64,12 +81,13 @@ return redirect ? decodeURIComponent(redirect) : "/home";
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "linear-gradient(to bottom right, #eff6ff, #f3e8ff)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         py: 4,
+        bgcolor: "linear-gradient(to bottom right, #eff6ff, #f3e8ff)",
       }}
+      dir={t("dir")}
     >
       <Container maxWidth="sm">
         <Card sx={{ p: 3, boxShadow: 3, borderRadius: 3 }}>
@@ -82,66 +100,77 @@ return redirect ? decodeURIComponent(redirect) : "/home";
                   style={{ marginBottom: 8 }}
                 />
                 <Typography variant="h5" fontWeight="bold">
-                  Welcome Back to BookNest
+                  {t("login.title")}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Sign in to access your library
+                  {t("login.subtitle")}
                 </Typography>
               </Box>
             }
           />
 
-          <form onSubmit={handleSubmit}>
-            <CardContent
-              sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-            >
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <CardContent sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
               {error && <Alert severity="error">{error}</Alert>}
 
               <TextField
-                label="Email"
+                label={t("login.emailLabel")}
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
                 fullWidth
+                {...register("email")}
+                error={!!errors.email}
+                helperText={errors.email?.message}
               />
 
               <TextField
-                label="Password"
+                label={t("login.passwordLabel")}
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
                 fullWidth
+                {...register("password")}
+                error={!!errors.password}
+                helperText={errors.password?.message}
               />
             </CardContent>
 
             <CardActions sx={{ flexDirection: "column", gap: 2, mt: 2 }}>
-              <Button type="submit" variant="contained" fullWidth size="large" sx={{ backgroundColor: "primary.main" ,color:"primary.contrastText"
-              }}>
-                Login
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                size="large"
+                disabled={isSubmitting}
+                startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
+              >
+                {isSubmitting
+                  ? t("login.loggingInButton")
+                  : t("login.submitButton")}
               </Button>
 
-              <Divider sx={{ my: 1 }}>or</Divider>
+              <Divider sx={{ my: 1 }}>{t("common:or")}</Divider>
 
               <GoogleLogin
                 onSuccess={handleGoogleLogin}
-                onError={() => setError("Google login failed")}
+                onError={() => setError(t("login.errorGoogle"))}
               />
 
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                textAlign="center"
-              >
-                Don’t have an account?{" "}
+              <Typography variant="body2" color="text.secondary" textAlign="center">
+                {t("login.noAccountText")}{" "}
                 <Link
                   to="/register"
                   style={{ color: "#16A34A", textDecoration: "none" }}
                 >
-                  Register here
+                  {t("login.registerLink")}
                 </Link>
               </Typography>
+              <Typography variant="body2" color="text.secondary" textAlign="center">
+                <Link
+                  to="/forgot-password"
+                  style={{ color: "#16A34A", textDecoration: "none" }}
+                >
+                  {t("login.forgotPasswordLink")}
+                </Link>
+              </Typography>
+
             </CardActions>
           </form>
         </Card>

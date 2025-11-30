@@ -1,8 +1,8 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { BookCard } from "../components/BookCard";
 import { useNavigate } from "react-router-dom";
 import { Heart, Search } from "lucide-react";
-
 import {
   Box,
   Container,
@@ -10,23 +10,45 @@ import {
   TextField,
   InputAdornment,
   Button,
-  CircularProgress,
 } from "@mui/material";
-import { Book } from "../types";
+import { Book, BookWithFavorite } from "../types";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import BookGridSkeleton from "../components/BookGridSkeleton";
+import { useTranslation } from "react-i18next";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function FavoritesPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
+  const { t } = useTranslation(["favorites", "common"]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
+  const queryClient = useQueryClient();
   const { favoriteBooksQuery } = useFavoriteBooks();
   const favoriteBooks = favoriteBooksQuery.data || [];
+   useEffect(() => {
+    if (!favoriteBooks) return;
+
+    favoriteBooks.forEach((book) => {
+      queryClient.setQueryData<BookWithFavorite>(
+        ["book", book._id],
+        (existing) => ({
+          ...book,
+          ...existing,
+          isFavorited: existing?.isFavorited ?? true,
+          favorites_count:
+            existing?.favorites_count ?? book.favorites_count ?? 1,
+        })
+      );
+    });
+  }, [favoriteBooks, queryClient]);
+
   useEffect(() => {
     setIsLoading(favoriteBooksQuery.isLoading);
   }, [favoriteBooksQuery.isLoading]);
+  
   useEffect(() => {
     setError(favoriteBooksQuery.error as string | null);
   }, [favoriteBooksQuery.error]);
@@ -42,7 +64,7 @@ export function FavoritesPage() {
     <Box sx={{ minHeight: "100vh", py: 8 }}>
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight="bold" mb={6}>
-          My Favorites
+          {t('pageTitle')}
         </Typography>
 
         {favoriteBooks.length > 0 || isLoading ? (
@@ -50,7 +72,7 @@ export function FavoritesPage() {
             {/* Search Field */}
             <Box sx={{ maxWidth: 400, mb: 6 }}>
               <TextField
-                placeholder="Search your favorites..."
+                placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 fullWidth
@@ -88,7 +110,7 @@ export function FavoritesPage() {
             ) : (
               <Box textAlign="center" py={10}>
                 <Typography color="text.secondary">
-                  No books found matching your search.
+                  {t('emptySearchMessage')}
                 </Typography>
               </Box>
             )}
@@ -97,10 +119,10 @@ export function FavoritesPage() {
           <Box textAlign="center" py={12}>
             <Heart size={64} color="#d1d5db" style={{ marginBottom: 16 }} />
             <Typography variant="h6" gutterBottom>
-              No Favorites Yet
+              {t('emptyState.title')}
             </Typography>
             <Typography color="text.secondary" mb={3}>
-              Start adding books to your favorites to see them here.
+              {t('emptyState.subtitle')}
             </Typography>
             <Button
               variant="contained"
@@ -108,7 +130,7 @@ export function FavoritesPage() {
               onClick={() => navigate("/home")}
               sx={{ textTransform: "none", borderRadius: 3 }}
             >
-              Browse Books
+              {t('emptyState.button')}
             </Button>
           </Box>
         )}

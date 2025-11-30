@@ -1,7 +1,7 @@
-// src/hooks/useFavoriteBooks.ts
+import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getFavoriteBooks, toggleFavorite } from "../services/favoriteService";
-import { Book } from "../types";
+import { Book, BookWithFavorite } from "../types";
 import { useUserStore } from "../store/useUserStore";
 
 export function useFavoriteBooks() {
@@ -9,58 +9,70 @@ export function useFavoriteBooks() {
   const user = useUserStore((state) => state.user);
 
   const favoriteBooksQuery = useQuery<Book[]>({
-    queryKey: ["favoriteBooks"],
-    queryFn: getFavoriteBooks,
+    queryKey: ["favoriteBooks", user?._id],
+    queryFn: () => getFavoriteBooks(),
+    enabled: !!user?._id,
   });
-
+ 
   const toggleMutation = useMutation({
     mutationFn: toggleFavorite,
     onMutate: async (bookId: string) => {
-      await queryClient.cancelQueries({ queryKey: ["favoriteBooks"] });
+      await queryClient.cancelQueries({ queryKey: ["book", bookId] });
 
-      const prevBooks = queryClient.getQueryData<string[]>(["favorites"]);
-
-      queryClient.setQueryData<Book[]>(
-        ["favoriteBooks"],
-        (oldBooks: Book[] = []) => {
-          const exists = oldBooks.find((b) => b._id === bookId);
-          if (exists) return oldBooks.filter((b) => b._id !== bookId);
-          return [...oldBooks, { _id: bookId } as Book];
-        }
-      );
-
-      const prevAIRecommendations = queryClient.getQueryData<Book[]>([
-        "aiRecommendations", user?._id
+      const previousBook = queryClient.getQueryData<BookWithFavorite>([
+        "book",
+        bookId,
       ]);
 
-      return { prevBooks, prevAIRecommendations };
-    },
-    onError: (err: any, bookId: string, context: any) => {
-      if (context?.prevBooks) {
-        queryClient.setQueryData(["favoriteBooks"], context.prevBooks);
+      if (previousBook) {
+        queryClient.setQueryData<BookWithFavorite>(["book", bookId], {
+          ...previousBook,
+          isFavorited: !previousBook.isFavorited,
+          favorites_count: previousBook.isFavorited
+            ? (previousBook.favorites_count ?? 0) - 1
+            : (previousBook.favorites_count ?? 0) + 1,
+        });
       }
-      if (context?.prevAIRecommendations) {
-        queryClient.setQueryData(
-          ["aiRecommendations", user?._id],
-          context.prevAIRecommendations
-        );
+      return { previousBook };
+    },
+
+    onError: (err, bookId, context) => {
+      if (context?.previousBook) {
+        queryClient.setQueryData(["book", bookId], context.previousBook);
       }
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["favoriteBooks"] });
+    onSettled: (data, error, bookId) => {
+      queryClient.invalidateQueries({
+        queryKey: ["favoriteBooks", user?._id],
+      });
+      queryClient.invalidateQueries({ queryKey: ["book", bookId] });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["aiRecommendations", user?._id] });
-    },
+
+    onSuccess: (response, bookId) => {},
   });
 
-  const isFavorited = (bookId: string) => {
-    return favoriteBooksQuery.data?.some((b: Book) => b._id === bookId);
+  const getBookFromCache = (bookId: string): BookWithFavorite | undefined => {
+    return queryClient.getQueryData<BookWithFavorite>(["book", bookId]);
   };
 
-  const countFavorites = () => {
-    return favoriteBooksQuery.data?.length || 0;
+  const isFavorited = (id: string) =>
+    !!favoriteBooksQuery.data?.some((b) => b._id === id);
+
+  const getFavoriteCount = (bookId: string): number => {
+    const cachedBook = getBookFromCache(bookId);
+    return cachedBook?.favorites_count ?? 0;
   };
 
-  return { favoriteBooksQuery, toggleMutation, isFavorited, countFavorites };
+  const countFavoritesForUser = (): number => {
+    return favoriteBooksQuery.data?.length ?? 0;
+  };
+
+  return {
+    favoriteBooksQuery,
+    toggleMutation,
+    isFavorited,
+    getFavoriteCount,
+    countFavoritesForUser,
+    getBookFromCache,
+  };
 }

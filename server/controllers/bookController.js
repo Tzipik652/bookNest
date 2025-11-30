@@ -6,10 +6,16 @@ import {
   getBookRecommendations,
 } from "../services/aiService.js";
 import redisClient from "../config/redisClient.js";
+import { createBookSchema, updateBookSchema } from "../validations/bookValidator.js";
 
 export const createBook = catchAsync(async (req, res, next) => {
+    const { error, value } = createBookSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+      const messages = error.details.map((detail) => detail.message);
+      throw new AppError(messages.join(", "), 400);
+    }
   const userId = req.user._id;
-  const bookData = req.body;
+  const bookData = value;
   if (!userId) {
     return res.status(403).json({ error: "Forbidden" });
   }
@@ -20,7 +26,7 @@ export const createBook = catchAsync(async (req, res, next) => {
     throw new AppError("Missing required fields: title or description", 400);
   }
   try {
-    let summary="";
+    let summary = "";
     try {
       summary = await generateBookSummary(
         bookData.title,
@@ -29,32 +35,36 @@ export const createBook = catchAsync(async (req, res, next) => {
       );
 
     } catch (error) {
-      if (error.message.includes("AI service error") || error.code === 503) {
+      const errorCode = error.code || error.status;
+      if (errorCode === 503 || String(error.message).toLowerCase().includes("overloaded") || String(error.message).toLowerCase().includes("unavailable")) {
+        console.log("Gemini service unavailable (503 or overload). Using default summary.");
         summary = "AI summary is not available at the moment.";
       }
-      else 
+      else {
+        console.error("Unrecoverable Gemini Error:", error);
         throw error;
-    }
-
-      const newBook = await bookModel.create({
-        ...bookData,
-        ai_summary: summary,
-        user_id: req.user._id,
-      });
-
-      res.status(201).json(newBook);
-    } catch (error) {
-      if (error.message.includes("AI service error") || error.code === 503) {
-        return res.status(503).json({ error: "AI service is currently unavailable. Please try again later." });
-      } else if (error.message.includes("duplicate") || error.code === 23505) {
-        console.log(error);
-        return res.status(409).json({ error: "A book with the same title already exists." });
       }
-      console.error("Error creating book:", error);
-      return res.status(500).json({ error: "Internal Server Error" });
     }
 
-  });
+    const newBook = await bookModel.create({
+      ...bookData,
+      ai_summary: summary,
+      user_id: req.user._id,
+    });
+
+    res.status(201).json(newBook);
+  } catch (error) {
+    if (error.message.includes("AI service error") || error.code === 503) {
+      return res.status(503).json({ error: "AI service is currently unavailable. Please try again later." });
+    } else if (error.message.includes("duplicate") || error.code === 23505) {
+      console.log(error);
+      return res.status(409).json({ error: "A book with the same title already exists." });
+    }
+    console.error("Error creating book:", error);
+    return res.status(500).json({ error: error, message: error.message});
+  }
+
+});
 
 export const getAllBooks = catchAsync(async (req, res) => {
   try {
@@ -74,7 +84,7 @@ export const getAllBooks = catchAsync(async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching paginated books:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: error, message: error.message});
   }
 });
 
@@ -92,7 +102,7 @@ export const getBooksByCategory = catchAsync(async (req, res) => {
       res.status(200).json(books);
     } catch (error) {
       console.error("Error fetching books by category:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: error, message: error.message});
     }
   } else {
     try {
@@ -111,7 +121,7 @@ export const getBooksByCategory = catchAsync(async (req, res) => {
 
     } catch (error) {
       console.error("Error fetching paginated books:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      res.status(500).json({ error: error, message: error.message});
     }
   }
 });
@@ -125,12 +135,52 @@ export const getBookById = catchAsync(async (req, res, next) => {
 
 export const updateBook = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const updates = req.body;
   const userId = req.user._id;
 
   const book = await bookModel.findById(id);
   if (!book) throw new AppError("Book not found", 404);
-  if (book.user_id !== userId) throw new AppError("Forbidden", 403);
+  if (book.user_id !== userId && req.user.role !== "admin") throw new AppError("Forbidden", 403);
+  if (book.user_id !== userId && req.user.role !== "admin") throw new AppError("Forbidden", 403);
+  const { error, value } = updateBookSchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    const messages = error.details.map(d => d.message);
+    return next(new AppError(messages.join(", "), 400));
+  }
+const updates = value;
+
+if (updates.title || updates.description || updates.author) {
+    try {
+      let summary = "";
+      try {
+        summary = await generateBookSummary(
+          updates.title || book.title,
+          updates.author || book.author,
+          updates.description || book.description
+        );
+      } catch (error) {
+        const errorCode = error.code || error.status;
+        if (
+          errorCode === 503 ||
+          String(error.message).toLowerCase().includes("overloaded") ||
+          String(error.message).toLowerCase().includes("unavailable")
+        ) {
+          console.log("Gemini service unavailable. Using default summary.");
+          summary = "AI summary is not available at the moment.";
+        } else {
+          console.error("Unrecoverable Gemini Error:", error);
+          throw error;
+        }
+      }
+      updates.ai_summary = summary;
+    } catch (error) {
+      if (error.message.includes("AI service error") || error.code === 503) {
+        return res
+          .status(503)
+          .json({ error: "AI service is currently unavailable. Please try again later." });
+      }
+      console.error("Error generating AI summary:", error);
+    }
+  }
 
   const updatedBook = await bookModel.update(id, updates);
   res.status(200).json(updatedBook);
@@ -142,7 +192,7 @@ export const deleteBook = catchAsync(async (req, res, next) => {
 
   const book = await bookModel.findById(id);
   if (!book) throw new AppError("Book not found", 404);
-  if (book.user_id !== userId) throw new AppError("Forbidden", 403);
+  if (book.user_id !== userId && req.user.role !== "admin") throw new AppError("Forbidden", 403);
 
   await bookModel.remove(id);
   res.status(200).json({ message: "Book deleted successfully" });

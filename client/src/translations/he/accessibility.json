@@ -1,0 +1,11 @@
+{
+  "menuTitle": "הגדרות נגישות",
+  "ariaLabel": "פתיחת תפריט נגישות",
+  "darkMode": "מצב כהה",
+  "highContrast": "ניגודיות גבוהה",
+  "largeText": "טקסט גדול",
+  "reduceMotion": "הפחתת אנימציות",
+  "underlineLinks": "הדגשת קווים תחתונים לקישורים",
+  "dyslexicFont": "גופן ידידותי",
+  "screenReader": "מצב קורא מסך"
+}

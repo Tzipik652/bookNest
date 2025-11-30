@@ -115,7 +115,6 @@ export async function countBookFavorites(bookId) {
 const findBooksByIds = async (ids) => {
   const { data: books, error } = await supabase
     .from('books')
-    // בחירה מפורשת וצירוף שם קטגוריה
     .select(`
         _id,
         title,
@@ -136,8 +135,6 @@ const findBooksByIds = async (ids) => {
     console.error("Error fetching books by IDs:", error);
     throw new Error(error.message);
   }
-
-  // שיטוח הנתונים
   const cleanedBooks = (books || []).map(book => {
       const { category_details, ...rest } = book;
       return {
@@ -151,7 +148,6 @@ const findBooksByIds = async (ids) => {
 
 export const getBooksByCategory = async (category) => {
     
-  // **1. איתור ה-UUID לפי שם הקטגוריה (הכרחי)**
   let categoryId = null;
   const { data: categoryData, error: categoryError } = await supabase
     .from("categories")
@@ -165,7 +161,6 @@ export const getBooksByCategory = async (category) => {
   }
   categoryId = categoryData.id;
 
-  // **2. שליפת הספרים לפי ה-UUID וצירוף שם הקטגוריה**
   const { data: books, error } = await supabase
     .from('books')
     .select(`
@@ -199,6 +194,20 @@ export const getBooksByCategory = async (category) => {
   
   return cleanedBooks;
 }
+export const getFavoritesCount = async () => {
+  const { count, error } = await supabase
+    .from('user_favorites')
+    .select('*', { count: 'exact', head: true });
+
+  if (error) {
+    console.error("Error fetching favorites count:", error);
+    throw new Error(error.message);
+  }
+
+  return count || 0;
+};
+
+
 
 
 export default {
@@ -207,5 +216,6 @@ export default {
   isFavorite,
   getFavoriteBooksList,
   getFavoriteBooks,
-  countBookFavorites
+  countBookFavorites,
+  getFavoritesCount
 };

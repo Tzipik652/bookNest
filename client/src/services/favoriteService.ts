@@ -1,10 +1,11 @@
 import axios from "axios";
 import { Book, Favorite } from "../types";
 import { useUserStore } from "../store/useUserStore";
+import api from "../lib/axiosInstance";
 
 
 const API_BASE_URL =
-  `${process.env.REACT_APP_SERVER_URL}/favorites` || "http://localhost:5000/favorites";
+  `${import.meta.env.VITE_SERVER_URL}/favorites` || "http://localhost:5000/favorites";
 
 function handleAxiosError(error: any): never {
   if (axios.isAxiosError(error)) {
@@ -21,11 +22,7 @@ function handleAxiosError(error: any): never {
 //Favorites
 export async function getFavoriteBooks(): Promise<Book[]> {
  try {
-    const res = await axios.get(`${API_BASE_URL}`, {
-      headers: {
-        Authorization: `Bearer ${useUserStore.getState().token}`,
-      },
-    });
+    const res = await api.get(`${API_BASE_URL}`);
     return res.data;
   } catch (error) {
     handleAxiosError(error);
@@ -36,11 +33,7 @@ export async function getFavoriteBooks(): Promise<Book[]> {
 
 export async function isFavorite(bookId: string): Promise<boolean> {
  try {
-    const res = await axios.get(`${API_BASE_URL}/${bookId}`, {
-      headers: {
-        Authorization: `Bearer ${useUserStore.getState().token}`,
-      },
-    });
+    const res = await api.get(`${API_BASE_URL}/${bookId}`);
     return res.data.favorite;
   } catch (error) {
     handleAxiosError(error);
@@ -50,14 +43,9 @@ export async function isFavorite(bookId: string): Promise<boolean> {
 
 export async function toggleFavorite(bookId: string) {
   try {
-    const res = await axios.post(
+    const res = await api.post(
       `${API_BASE_URL}/toggle`,
-      { bookId }, 
-      {
-        headers: {
-          Authorization: `Bearer ${useUserStore.getState().token}`,
-        },
-      }
+      { bookId }
     );
     return res.data.message.includes("Added");
   } catch (error) {
@@ -67,7 +55,7 @@ export async function toggleFavorite(bookId: string) {
 
 export async function getBookLikes(bookId: string): Promise<number> {
  try {
-    const res = await axios.get(`${API_BASE_URL}/count/${bookId}`);
+    const res = await api.get(`${API_BASE_URL}/count/${bookId}`);
     return res.data;
   } catch (error) {
     handleAxiosError(error);
@@ -87,4 +75,17 @@ function generateMockai_summary(
   ];
 
   return summaries[Math.floor(Math.random() * summaries.length)];
+}
+export async function getFavoritesCount(): Promise<number> {
+  const user = useUserStore.getState().user;
+  const token = useUserStore.getState().token;
+
+  if (!token) throw new Error("Must be logged in to add books");
+  if (user?.role !== "admin") throw new Error("Admin access required");
+  try {
+    const res = await api.get(`${API_BASE_URL}/all/count`);
+    return res.data.count;
+  } catch (error) {
+    handleAxiosError(error);
+  }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { addBook } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
@@ -15,27 +15,49 @@ import {
   CircularProgress,
   Snackbar,
 } from "@mui/material";
-import { ArrowBack, AutoAwesome, CheckCircle } from '@mui/icons-material';
+import { Button as ShadcnButton } from "../components/ui/button";
+import { ArrowBack, AutoAwesome, CheckCircle } from "@mui/icons-material";
 import { useUserStore } from "../store/useUserStore";
-import { Category } from '../types';
+import { Category } from "../types";
+import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
+import { useForm } from "react-hook-form";
+import { BookFormValues, bookSchema } from "../schemas/book.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export function AddBookPage() {
+  const isKeyboardMode = useKeyboardModeBodyClass();
+  const { t } = useTranslation(["addBook", "common"]);
+
   const navigate = useNavigate();
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [img_url, setImg_url] = useState("");
-  const [price, setPrice] = useState("");
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const { user: currentUser } = useUserStore();
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const actionsRef = useRef<HTMLDivElement | null>(null);
 
+  // --------------------
+  // RHF + ZOD
+  // --------------------
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<BookFormValues>({
+    resolver: zodResolver(bookSchema),
+    defaultValues: {
+      title: "",
+      author: "",
+      description: "",
+      category: "",
+      img_url: "",
+      price: "",
+    },
+  });
+
+  // Load categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -48,46 +70,39 @@ export function AddBookPage() {
     fetchCategories();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setSuccessMessage("");
-
-    if (!title || !author || !description || !category) {
-      setError("Please fill in all required fields");
-      setShowAlert(true);
-      return;
-    }
-
+  // Submit handler
+  const onSubmit = async (data: BookFormValues) => {
     setIsSubmitting(true);
+    actionsRef.current?.scrollIntoView({ behavior: "smooth" });
     try {
       const newBook = await addBook({
-        title,
-        author,
-        description,
-        category,
-        imgUrl:
-          img_url ||
+        title: data.title,
+        author: data.author,
+        description: data.description,
+        category: data.category,
+        img_url:
+          data.img_url ||
           "https://images.unsplash.com/photo-1560362415-c88a4c066155?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-        price: price ? parseFloat(price) : undefined,
+        price: data.price ? parseFloat(data.price) : undefined,
       });
 
-      setSuccessMessage(`${newBook.title} was added successfully!`);
-      setShowSuccess(true);
+      toast.success(t('successMessage', { bookTitle: newBook.title }));
+
+      reset();
 
       setTimeout(() => {
         navigate(`/book/${newBook._id}`);
       }, 1500);
     } catch (err: any) {
-      console.log(err);
-
       if (err.message === "Book already exists.") {
-        setError("This book already exists in the database.");
+        toast.error(t("errorBookExists"));
+        // setError(t('errorBookExists'));
       } else {
-        setError("Failed to add book. Please try again.");
+        toast.error(t("errorGeneral"));
+        // setError(t('errorGeneral'));
       }
 
-      setShowAlert(true);
+      // setShowAlert(true);
       setIsSubmitting(false);
     }
   };
@@ -95,72 +110,102 @@ export function AddBookPage() {
   return (
     <Box minHeight="100vh" bgcolor="#f9fafb" py={6}>
       <Box maxWidth="sm" mx="auto" px={2}>
-        <Button
-          startIcon={<ArrowBack />}
-          variant="text"
+        <ShadcnButton
+          variant="ghost"
           onClick={() => navigate(-1)}
-          sx={{ mb: 3 }}
+          className="mb-6 gap-2"
         >
-          Back
-        </Button>
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t('common:back')}
+        </ShadcnButton>
+
 
         <Card elevation={3}>
           <CardHeader
-            title="Add New Book"
-            subheader="Share a book with the BookNest community. AI will generate a summary automatically."
+            className="notranslate"
+            title={t("pageTitle")}
+            subheader={t("pageSubheader")}
           />
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent>
               <Alert
-                icon={<AutoAwesome fontSize="small" sx={{ color: '#16A34A' }} />}
+                icon={
+                  <AutoAwesome fontSize="small" sx={{ color: "#16A34A" }} />
+                }
                 severity="info"
-                sx={{
-                  mb: 3,
-                  // background: "linear-gradient(to right, #dffdd7ff, #cee4b1ff)",
-                }}
+                sx={{ mb: 3 }}
+                className="notranslate"
               >
-                AI will automatically generate a summary based on your title,
-                description, and category.
+                {t("aiAlert")}
               </Alert>
 
               <TextField
                 fullWidth
-                label="Title *"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                className="notranslate"
+                label={t("titleLabel")}
                 margin="normal"
-                required
+                {...register("title")}
+                error={!!errors.title}
+                helperText={errors.title?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               />
 
               <TextField
                 fullWidth
-                label="Author *"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
+                className="notranslate"
+                label={t("authorLabel")}
                 margin="normal"
-                required
+                {...register("author")}
+                error={!!errors.author}
+                helperText={errors.author?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               />
 
               <TextField
                 fullWidth
-                label="Description *"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                className="notranslate"
+                label={t("descriptionLabel")}
                 margin="normal"
-                required
                 multiline
                 rows={5}
+                {...register("description")}
+                error={!!errors.description}
+                helperText={errors.description?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               />
 
               <TextField
                 select
                 fullWidth
-                label="Category *"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                className="notranslate"
+                label={t("categoryLabel")}
                 margin="normal"
-                required
+                {...register("category")}
+                error={!!errors.category}
+                helperText={errors.category?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               >
                 {categories.map((cat) => (
                   <MenuItem key={cat.id} value={cat.name}>
@@ -171,26 +216,33 @@ export function AddBookPage() {
 
               <TextField
                 fullWidth
-                label="Image URL (Optional)"
-                value={img_url}
-                onChange={(e) => setImg_url(e.target.value)}
-                type="url"
+                className="notranslate"
+                label={t("imageURLLabel")}
                 margin="normal"
-                helperText="Leave blank to use a default image"
+                {...register("img_url")}
+                error={!!errors.img_url}
+                helperText={errors.img_url?.message}
               />
 
               <TextField
                 fullWidth
-                label="Price (Optional)"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                className="notranslate"
+                label={t("priceLabel")}
                 type="number"
-                inputProps={{ min: 0, step: 0.01 }}
                 margin="normal"
+                {...register("price")}
+                error={!!errors.price}
+                helperText={errors.price?.message}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               />
             </CardContent>
 
-            <CardActions sx={{ p: 3, pt: 0, gap: 2 }}>
+            <CardActions ref={actionsRef} sx={{ p: 3, pt: 0, gap: 2 }}>
               <Button
                 type="submit"
                 variant="contained"
@@ -198,10 +250,13 @@ export function AddBookPage() {
                 fullWidth
                 disabled={isSubmitting}
                 startIcon={
-                  isSubmitting ? <CircularProgress color="inherit" size={18} /> : null
+                  isSubmitting ? (
+                    <CircularProgress color="inherit" size={18} />
+                  ) : null
                 }
+                className="notranslate"
               >
-                {isSubmitting ? "Adding Book..." : "Add Book"}
+                {isSubmitting ? t("addingButton") : t("addButton")}
               </Button>
 
               <Button
@@ -210,32 +265,26 @@ export function AddBookPage() {
                 fullWidth
                 onClick={() => navigate(-1)}
                 disabled={isSubmitting}
+                className="notranslate"
               >
-                Cancel
+                {t("cancelButton")}
               </Button>
             </CardActions>
           </form>
         </Card>
       </Box>
-
-      {/*  error message*/}
+{/* 
       <Snackbar
         open={showAlert}
         autoHideDuration={4000}
         onClose={() => setShowAlert(false)}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert
-          onClose={() => setShowAlert(false)}
-          severity="error"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
+        <Alert severity="error" variant="filled" sx={{ width: "100%" }}>
           {error}
         </Alert>
       </Snackbar>
 
-      {/*  success message */}
       <Snackbar
         open={showSuccess}
         autoHideDuration={3000}
@@ -244,14 +293,13 @@ export function AddBookPage() {
       >
         <Alert
           icon={<CheckCircle fontSize="inherit" />}
-          onClose={() => setShowSuccess(false)}
           severity="success"
           variant="filled"
           sx={{ width: "100%" }}
         >
           {successMessage}
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
     </Box>
   );
 }

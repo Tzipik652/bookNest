@@ -1,21 +1,21 @@
 import { createClient } from "redis";
 import dotenv from "dotenv";
 dotenv.config();
-if (!process.env.REDIS_URL) {
-  throw new Error("❌ Missing REDIS_URL in environment variables.");
+const portNumber = Number(process.env.REDIS_PORT);
+if (isNaN(portNumber) || portNumber <= 0 || portNumber > 65535) {
+  throw new Error(`REDIS_PORT is invalid: ${process.env.REDIS_PORT}`);
 }
+
 const redisClient = createClient({
-  url: process.env.REDIS_URL,
-  socket: {
-    tls: true,
-    rejectUnauthorized: false, // מבטל בדיקה של התעודה
-  reconnectStrategy: () => 2000,
-  },
+  url: `redis://default:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${portNumber}`,
 });
 
-redisClient.on("error", (err) => console.error("Redis Error:", err));
-redisClient.on("connect", () => console.log("Redis connected"));
+redisClient.on("error", (err) => console.log("Redis Client Error", err));
 
 await redisClient.connect();
+
+await redisClient.set("foo", "bar");
+const result = await redisClient.get("foo");
+console.log(result); // >>> bar
 
 export default redisClient;

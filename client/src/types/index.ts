@@ -5,6 +5,7 @@ export interface User {
   auth_provider: string;
   favorites: string[];
   profile_picture?: string;
+  role: "user" | "admin";
 }
 
 export interface Book {
@@ -22,6 +23,7 @@ export interface Book {
     email: string;
   };
   date_created: string;
+  favorites_count?: number;
 }
 
 export interface Favorite {
@@ -56,6 +58,8 @@ export interface Comment {
   id: string;
   book_id: string;
   user_id: string;
+  user_name:string; 
+  profile_picture?:string;
   text: string;
   created_at: string;
   updated_at: string;
@@ -65,4 +69,8 @@ export interface Comment {
 export type CommentWithReactions = Comment & {
   userReaction?: ReactionType;
   reactionCounts: ReactionCounts;
+};
+
+export type BookWithFavorite = Book & {
+  isFavorited: boolean;
 };

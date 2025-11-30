@@ -1,0 +1,65 @@
+{
+  "dashboard": {
+    "pageTitle": "לוח בקרה למנהל מערכת",
+    "pageSubtitle": "ניהול פלטפורמת BookNest",
+    "unauthorizedError": "גישה לא מורשית: נדרשת גישת מנהל מערכת",
+    "loadDataFailed": "הטעינה של נתוני מנהל המערכת נכשלה",
+    "overviewTitle": "סקירת פלטפורמה",
+    "booksMgtTitle": "ניהול ספרים",
+    "usersTitle": "משתמשים",
+    "recentActivityTitle": "פעילות אחרונה",
+    "stats": {
+      "totalBooks": "סה\"כ ספרים",
+      "totalUsers": "סה\"כ משתמשים",
+      "totalComments": "סה\"כ תגובות",
+      "totalReactions": "סה\"כ ריאקציות",
+      "totalFavorites": "סה\"כ מועדפים",
+      "recentUploads": "העלאות אחרונות (5)",
+      "engagementTitle": "מעורבות",
+      "reactionsText": "ריאקציות",
+      "avgReactions": "ממוצע",
+      "reactionsPerComment": "ריאקציות לתגובה",
+      "activityTitle": "פעילות",
+      "recentText": "אחרונים",
+      "ofTotalBooksRecent": "מתוך סה\"כ הספרים שנוספו לאחרונה"
+    },
+    "booksTable": {
+      "cardTitle": "ניהול כלל הספרים",
+      "cardDescription": "צפייה וניהול של כל הספרים בספרייה",
+      "headerTitle": "שם הספר",
+      "headerAuthor": "מחבר",
+      "headerCategory": "קטגוריה",
+      "headerUploader": "הועלה ע\"י",
+      "headerDate": "תאריך",
+      "headerActions": "פעולות",
+      "deleteConfirm": "האם אתה בטוח שברצונך למחוק ספר זה? פעולה זו תסיר גם את כל התגובות והמועדפים המשויכים אליו.",
+      "deleteSuccess": "הספר נמחק בהצלחה",
+      "deleteFailed": "המחיקה של הספר נכשלה"
+    },
+    "commentsCard": {
+      "cardTitle": "תגובות אחרונות",
+      "userOnBook": "{{userName}} על",
+      "unknownUser": "משתמש לא ידוע",
+      "unknownBook": "ספר לא ידוע",
+      "deleteConfirm": "האם אתה בטוח שברצונך למחוק תגובה זו?",
+      "deleteSuccess": "התגובה נמחקה בהצלחה",
+      "deleteFailed": "המחיקה של התגובה נכשלה",
+      "editSave": "שמור",
+      "editCancel": "בטל",
+      "updateSuccess": "התגובה עודכנה",
+      "updateFailed": "העדכון נכשל"
+    },
+    "userList": {
+      "roleAdmin": "מנהל",
+      "roleUser": "משתמש",
+      "save": "שמור",
+      "cancel": "בטל",
+      "editSuccess": "המשתמש עודכן בהצלחה",
+      "editFailed": "העדכון של המשתמש נכשל",
+      "deleteTitle": "מחיקת משתמש",
+      "deleteConfirm": "האם אתה בטוח שברצונך למחוק משתמש זה?",
+      "deleteSuccess": "המשתמש נמחק",
+      "deleteFailed": "המחיקה של המשתמש נכשלה"
+    }
+  }
+}

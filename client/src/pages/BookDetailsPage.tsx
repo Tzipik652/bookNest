@@ -1,10 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { CommentSection } from '../components/CommentSection';
-
-import { Book } from "../types";
-
-import { getBookById, deleteBook } from "../services/bookService";
+import { CommentSection } from "../components/CommentSection";
+import { deleteBook, getBookById } from "../services/bookService";
 import {
   Box,
   Button,
@@ -17,8 +14,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Skeleton,
 } from "@mui/material";
-
+import { Button as ShadcnButton } from "../components/ui/button";
 import {
   Favorite,
   FavoriteBorder,
@@ -27,55 +25,53 @@ import {
   Delete,
   AutoAwesome,
 } from "@mui/icons-material";
-
 import { useUserStore } from "../store/useUserStore";
 import { useFavoriteBooks } from "../hooks/useFavorites";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useDynamicTheme } from "../theme";
+import { Book, BookWithFavorite } from "../types";
+import { useTranslation } from "react-i18next";
+import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
+import Narrator from "../components/Narrator";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export function BookDetailsPage() {
+  const { t } = useTranslation(["bookDetails", "common"]);
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const theme = useDynamicTheme();
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
+
   const { user: currentUser } = useUserStore();
+  const { toggleMutation, isFavorited } = useFavoriteBooks();
 
-  const [book, setBook] = useState<Book | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const { isFavorited, toggleMutation } = useFavoriteBooks();
-  const favorited = isFavorited(id || "");
 
-  useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      return;
-    }
+  const {
+    data: fetchedBook,
+    isLoading,
+    error,
+  } = useQuery<Book>({
+    queryKey: ["book", id],
+    queryFn: () => getBookById(id || ""),
+    enabled: !!id && id !== "deleted",
+  });
 
-    const fetchBook = async () => {
-      try {
-        const data = await getBookById(id);
-        setBook(data);
-      } catch (err) {
-        console.error(err);
-        setBook(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const cachedBook = queryClient.getQueryData<BookWithFavorite>(["book", id]);
 
-    fetchBook();
-  }, [id]);
+  const book: BookWithFavorite | undefined = fetchedBook
+    ? { ...fetchedBook, isFavorited: isFavorited(fetchedBook._id) }
+    : cachedBook;
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <Box
-        minHeight="100vh"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <Typography>Loading...</Typography>
+      <Box p={4}>
+        <Skeleton variant="rectangular" width="100%" height={400} />
+        <Skeleton width="60%" height={50} sx={{ mt: 2 }} />
+        <Skeleton width="40%" height={40} />
+        <Skeleton width="80%" height={30} sx={{ mt: 2 }} />
       </Box>
     );
   }
@@ -88,81 +84,76 @@ export function BookDetailsPage() {
         alignItems="center"
         justifyContent="center"
       >
-        <Box textAlign="center"
-          style={{ backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}
-        >
-          <Typography variant="h5" mb={2}>
-            Book Not Found
-          </Typography>
-          <Button variant="contained" onClick={() => navigate(-1)}>
-            Go Back
-          </Button>
-        </Box>
+        <Typography variant="h5">{t("bookNotFound")}</Typography>
       </Box>
     );
   }
 
   const isOwner = currentUser?._id === book.user_id;
+  const isAdmin = currentUser?.role === "admin";
 
   const handleFavoriteToggle = () => {
     if (!currentUser) {
-      const encodedPath = encodeURIComponent(location.pathname);
-      navigate(`/login?redirect=${encodedPath}`);
+      const encoded = encodeURIComponent(location.pathname);
+      navigate(`/login?redirect=${encoded}`);
       return;
     }
     toggleMutation.mutate(book._id);
   };
 
-  const handleDelete = () => {
-    deleteBook(book._id);
+  const handleDelete = async () => {
+    await deleteBook(book._id);
+    queryClient.removeQueries({ queryKey: ["book", book._id] });
     navigate("/my-books");
   };
 
   return (
     <Box
-      style={{ backgroundColor: theme.palette.background.paper, color: theme.palette.text.primary }}
-
-      minHeight="100vh" bgcolor="#f9fafb" py={6}>
+      style={{
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+      }}
+      minHeight="100vh"
+      py={6}
+    >
       <Box maxWidth="md" mx="auto" px={2}>
-        <Button
-          startIcon={<ArrowBack />}
+        <ShadcnButton
+          variant="ghost"
           onClick={() => navigate(-1)}
-          variant="text"
-          sx={{ mb: 3 }}
+          className="mb-6 gap-2"
         >
-          Back
-        </Button>
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t('common:back')}
+        </ShadcnButton>
+
 
         <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={4}>
-          {/* Book Cover */}
           <Box flex={1}>
-            <Card sx={{ overflow: "hidden" }}>
+            <Card>
               <CardMedia
                 component="img"
                 image={book.img_url}
                 alt={book.title}
-                sx={{ aspectRatio: "3 / 4", objectFit: "cover" }}
+                sx={{ aspectRatio: "3/4", objectFit: "cover" }}
               />
             </Card>
           </Box>
 
-          {/* Book Details */}
           <Box flex={1}>
             <Card elevation={0} sx={{ bgcolor: "transparent" }}>
               <CardContent>
                 <Typography variant="h4" gutterBottom>
                   {book.title}
                 </Typography>
+
                 <Typography variant="h6" color="text.secondary" gutterBottom>
-                  by {book.author}
+                  {t("authorPrefix", { author: book.author })}
                 </Typography>
 
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
-                  <Chip
-                    label={book.category}
-                    color="default"
-                    variant="outlined"
-                  />
+                  <Chip label={book.category} variant="outlined" />
+
                   {book.price && (
                     <Typography variant="h6">
                       ${book.price.toFixed(2)}
@@ -170,70 +161,66 @@ export function BookDetailsPage() {
                   )}
                 </Box>
 
-                {/* Action Buttons */}
                 <Box display="flex" gap={2} mb={3} flexWrap="wrap">
                   <Button
-                    variant={favorited ? "contained" : "outlined"}
+                    variant={book.isFavorited ? "contained" : "outlined"}
                     color="primary"
-                    startIcon={favorited ? <Favorite /> : <FavoriteBorder />}
+                    startIcon={
+                      book.isFavorited ? <Favorite /> : <FavoriteBorder />
+                    }
                     onClick={handleFavoriteToggle}
+                    disabled={toggleMutation.isPending}
                   >
-                    {favorited ? "Remove from Favorites" : "Add to Favorites"}
+                    {book.isFavorited
+                      ? t("buttonRemoveFavorite")
+                      : t("buttonAddFavorite")}
                   </Button>
 
-                  {isOwner && (
+                  {(isOwner || isAdmin) && (
                     <>
                       <Button
                         variant="outlined"
                         startIcon={<Edit />}
                         onClick={() => navigate(`/edit-book/${book._id}`)}
                       >
-                        Edit
+                        {t("common:buttonEdit")}
                       </Button>
+
                       <Button
                         variant="contained"
                         color="error"
                         startIcon={<Delete />}
                         onClick={() => setShowDeleteDialog(true)}
                       >
-                        Delete
+                        {t("common:buttonDelete")}
                       </Button>
                     </>
                   )}
                 </Box>
 
-                {/* Description */}
-                <Box mb={4}>
-                  <Typography variant="h6" gutterBottom>
-                    Description
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    {book.description}
-                  </Typography>
-                </Box>
+                <Typography variant="body1" sx={{ mb: 2 }}>
+                  {t("favoritesCount", { count: book.favorites_count })}
+                </Typography>
 
-                {/* AI Summary */}
-                <Box
-                  p={3}
-                  borderRadius={2}
-                  border="1px solid #e0e0e0"
-                  sx={{
-                    // background: "linear-gradient(135deg, #eef2ff, #f3e8ff)",
-                  }}
-                  mb={3}
-                >
-                  <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <Typography variant="h6" gutterBottom>
+                  {t("headerDescription")}
+                </Typography>
+                <Typography variant="body1" color="text.secondary" mb={3}>
+                  {book.description}
+                </Typography>
+
+                <Box p={3} borderRadius={2} border="1px solid #e0e0e0" mb={3}>
+                  <Box display="flex" alignItems="center" gap={1} mb={0}>
                     <AutoAwesome color="primary" />
-                    <Typography variant="h6">AI Summary</Typography>
-                  </Box>
-                  <Typography variant="body1" color="text.secondary">
-                    {book.ai_summary}
-                  </Typography>
+                    <Typography variant="h6">{t("headerAISummary")}</Typography>
                 </Box>
+                  <Typography variant="body1" color="text.secondary">
+                    <Narrator text={book.ai_summary} />
+                  </Typography>
+                  </Box>
 
-                {/* Uploader Info */}
                 <Typography variant="body2" color="text.secondary">
-                  Uploaded by {book.user.name}
+                  {t("uploadedByPrefix", { userName: book.user?.name })}
                   <br />
                   {new Date(book.date_created).toLocaleDateString()}
                 </Typography>
@@ -243,30 +230,29 @@ export function BookDetailsPage() {
         </Box>
       </Box>
 
-      {/* Comment Section */}
-      <Box className="mt-12">
+      <Box mt={8}>
         <CommentSection bookId={book._id} bookOwnerId={book.user_id} />
       </Box>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
       >
-        <DialogTitle>Are you sure?</DialogTitle>
+        <DialogTitle>{t("common:dialogTitleConfirm")}</DialogTitle>
         <DialogContent>
           <Typography>
-            This will permanently delete "{book.title}" from your library. This
-            action cannot be undone.
+            {t("common:confirmDeleteWithName", { name: book.title })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+          <Button onClick={() => setShowDeleteDialog(false)}>
+            {t("common:buttonCancel")}
+          </Button>
           <Button onClick={handleDelete} color="error" variant="contained">
-            Delete
+            {t("common:buttonDelete")}
           </Button>
         </DialogActions>
       </Dialog>
-    </Box >
+    </Box>
   );
 }

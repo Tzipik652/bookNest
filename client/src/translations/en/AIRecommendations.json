@@ -1,0 +1,10 @@
+{
+  "title": "AI Recommended Books",
+  "subtitle": "Our AI analyzes your favorite books to suggest titles you might enjoy",
+  "alertBasedOnFavorites": "Based on your {{count}} favorite books, we've found these recommendations for you.",
+  "alertNoFavorites": "Add some books to your favorites to get personalized recommendations.",
+  "buttonGenerating": "Generating...",
+  "buttonGetMore": "Get More Recommendations",
+  "noRecommendationsTitle": "No Recommendations Available",
+  "noRecommendationsText": "Add some books to your favorites to get started"
+}

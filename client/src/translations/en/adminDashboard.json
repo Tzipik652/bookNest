@@ -1,0 +1,65 @@
+{
+  "dashboard": {
+    "pageTitle": "Admin Dashboard",
+    "pageSubtitle": "Manage BookNest platform",
+    "unauthorizedError": "Unauthorized: Admin access required",
+    "loadDataFailed": "Failed to load admin data",
+    "overviewTitle": "Platform Overview",
+    "booksMgtTitle": "Books Management",
+    "usersTitle": "Users",
+    "recentActivityTitle": "Recent Activity",
+    "stats": {
+      "totalBooks": "Total Books",
+      "totalUsers": "Total Users",
+      "totalComments": "Total Comments",
+      "totalReactions": "Total Reactions",
+      "totalFavorites": "Total Favorites",
+      "recentUploads": "Recent Uploads (5)",
+      "engagementTitle": "Engagement",
+      "reactionsText": "Reactions",
+      "avgReactions": "avg",
+      "reactionsPerComment": "reactions per comment",
+      "activityTitle": "Activity",
+      "recentText": "Recent",
+      "ofTotalBooksRecent": "of total books added recently"
+    },
+    "booksTable": {
+      "cardTitle": "All Books Management",
+      "cardDescription": "View and manage all books in the library",
+      "headerTitle": "Title",
+      "headerAuthor": "Author",
+      "headerCategory": "Category",
+      "headerUploader": "Uploader",
+      "headerDate": "Date",
+      "headerActions": "Actions",
+      "deleteConfirm": "Are you sure you want to delete this book? This will also remove all associated comments and favorites.",
+      "deleteSuccess": "Book deleted successfully",
+      "deleteFailed": "Failed to delete book"
+    },
+    "commentsCard": {
+      "cardTitle": "Recent Comments",
+      "userOnBook": "{{userName}} on",
+      "unknownUser": "Unknown User",
+      "unknownBook": "Unknown Book",
+      "deleteConfirm": "Are you sure you want to delete this comment?",
+      "deleteSuccess": "Comment deleted successfully",
+      "deleteFailed": "Failed to delete comment",
+      "editSave": "Save",
+      "editCancel": "Cancel",
+      "updateSuccess": "Comment updated",
+      "updateFailed": "Update failed"
+    },
+    "userList": {
+      "roleAdmin": "Admin",
+      "roleUser": "User",
+      "save": "Save",
+      "cancel": "Cancel",
+      "editSuccess": "User updated successfully",
+      "editFailed": "Failed to update user",
+      "deleteTitle": "Delete User",
+      "deleteConfirm": "Are you sure you want to delete this user?",
+      "deleteSuccess": "User deleted",
+      "deleteFailed": "Failed to delete user"
+    }
+  }
+}

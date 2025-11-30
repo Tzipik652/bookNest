@@ -1,20 +1,19 @@
 // client/src/App.tsx
-import React, { Suspense } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import React, { Suspense, useEffect } from "react";
+import { Routes, Route, useLocation, Router } from "react-router-dom";
 import { CircularProgress, Box, GlobalStyles } from "@mui/material";
-
+import { Toaster } from "sonner";
+import { KeyboardShortcutsHelp } from './components/KeyboardShortcutsHelp';
+import { KeyboardWelcomeToast } from './components/KeyboardWelcomeToast';
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-
 import { useUserStore } from "./store/useUserStore";
 import { useAccessibilityStore } from "./store/accessibilityStore";
 import AccessibilityMenu from "./components/AccessibilityMenu";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage";
+import ScrollButton from "./components/ScrollButton";
+import { useTranslation } from "react-i18next";
 
 // Lazy-loaded pages
 const LazyLoginPage = React.lazy(() =>
@@ -58,6 +57,45 @@ const LazyAIRecommendationsPage = React.lazy(() =>
     default: module.AIRecommendationsPage,
   }))
 );
+const LazyResetPasswordPage = React.lazy(() =>
+  import("./pages/ResetPassword").then((module) => ({
+    default: module.ResetPassword,
+  }))
+);
+const LazyNotFoundPage = React.lazy(() =>
+  import("./pages/NotFoundPage").then((module) => ({
+    default: module.NotFoundPage,
+  }))
+);
+
+const LazyContactPage = React.lazy(() =>
+  import("./pages/ContactPage").then((module) => ({
+    default: module.ContactPage,
+  }))
+);
+
+const LazyPrivacyPolicyPage = React.lazy(() =>
+  import("./pages/PrivacyPolicyPage").then((module) => ({
+    default: module.PrivacyPolicyPage,
+  }))
+);
+const LazyForgotPasswordPage = React.lazy(() =>
+  import("./pages/ForgotPassword").then((module) => ({
+    default: module.ForgotPassword,
+  }))
+);
+
+const LazyTermsOfServicePage = React.lazy(() =>
+  import("./pages/TermsOfServicePage").then((module) => ({
+    default: module.TermsOfServicePage,
+  }))
+);
+
+const LazyFAQPage = React.lazy(() =>
+  import("./pages/FAQPage").then((module) => ({
+    default: module.FAQPage,
+  }))
+);
 
 // Loader for lazy routes
 const RouteFallback = () => (
@@ -72,7 +110,16 @@ const RouteFallback = () => (
 );
 
 function App() {
+  const { t, i18n } = useTranslation('common');
   const { user: currentUser } = useUserStore();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [pathname]);
 
   const {
     darkMode,
@@ -85,108 +132,135 @@ function App() {
   } = useAccessibilityStore();
 
   // Auto ARIA-label for icon-only buttons
-document.querySelectorAll("button, [role='button'], a").forEach((el) => {
-  const text = el.textContent;
-  if (!el.getAttribute("aria-label") && text && text.trim() === "") {
-    el.setAttribute("aria-label", "button");
-  }
-});
+  document.querySelectorAll("button, [role='button'], a").forEach((el) => {
+    const text = el.textContent;
+    if (!el.getAttribute("aria-label") && text && text.trim() === "") {
+      el.setAttribute("aria-label", "button");
+    }
+  });
+useEffect(() => {
+    document.documentElement.dir = i18n.dir(i18n.language);
+    
+    document.documentElement.lang = i18n.language;
 
-
+  }, [i18n.language]);
   return (
-    <Router>
-      <div className="min-h-screen">
+    <div className="min-h-screen">
+      {/* Skip link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded"
+      >
+        Skip to main content
+      </a>
 
-        {/* Skip link */}
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded"
-        >
-          Skip to main content
-        </a>
+      <Navbar />
+      <AccessibilityMenu />
 
-        <Navbar />
-        <AccessibilityMenu />
+      {/* Global Accessibility Overrides */}
+      <GlobalStyles
+        styles={{
+          body: {
+            backgroundColor: darkMode
+              ? "#121212"
+              : highContrast
+              ? "#000"
+              : "#fff",
 
-        {/* Global Accessibility Overrides */}
-        <GlobalStyles
-          styles={{
-            body: {
-              backgroundColor: darkMode
-                ? "#121212"
-                : highContrast
-                ? "#000"
-                : "#fff",
+            color: darkMode || highContrast ? "#fff" : "#000",
+            fontSize: largeText ? "1.2rem" : "1rem",
+            transition: reduceMotion ? "none" : "all 0.3s ease",
+            fontFamily: dyslexicFont ? "OpenDyslexic, Arial" : "inherit",
+          },
 
-              color: darkMode || highContrast ? "#fff" : "#000",
-              fontSize: largeText ? "1.2rem" : "1rem",
-              transition: reduceMotion ? "none" : "all 0.3s ease",
-              fontFamily: dyslexicFont ? "OpenDyslexic, Arial" : "inherit",
-            },
+          a: {
+            textDecoration: underlineLinks ? "underline" : "none",
+          },
+        }}
+      />
+      <ScrollButton />
 
-            a: {
-              textDecoration: underlineLinks ? "underline" : "none",
-            },
-          }}
-        />
+      <Suspense fallback={<RouteFallback />}>
+        <Toaster position="top-right" richColors />
+        <Routes>
+          <Route path="/" element={<LazyHomePage />} />
+          <Route path="/login" element={<LazyLoginPage />} />
+          <Route path="/register" element={<LazyRegisterPage />} />
+          <Route path="/forgot-password" element={<LazyForgotPasswordPage />} />
+          <Route
+            path="/reset-password/:token"
+            element={<LazyResetPasswordPage />}
+          />
 
-        <Suspense fallback={<RouteFallback />}>
-          <Routes>
-            <Route path="/" element={<LazyHomePage />} />
-            <Route path="/login" element={<LazyLoginPage />} />
-            <Route path="/register" element={<LazyRegisterPage />} />
-            <Route path="/home" element={<LazyHomePage />} />
+          <Route path="/home" element={<LazyHomePage />} />
 
-            <Route path="/book/:id" element={<LazyBookDetailsPage />} />
+          <Route path="/book/:id" element={<LazyBookDetailsPage />} />
 
-            <Route
-              path="/add-book"
-              element={
-                <ProtectedRoute>
-                  <LazyAddBookPage />
-                </ProtectedRoute>
-              }
-            />
+          <Route
+            path="/add-book"
+            element={
+              <ProtectedRoute>
+                <LazyAddBookPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedRoute>
+                <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit-book/:id"
+            element={
+              <ProtectedRoute>
+                <LazyEditBookPage />
+              </ProtectedRoute>
+            }
+          />
 
-            <Route
-              path="/edit-book/:id"
-              element={
-                <ProtectedRoute>
-                  <LazyEditBookPage />
-                </ProtectedRoute>
-              }
-            />
+          <Route
+            path="/my-books"
+            element={
+              <ProtectedRoute>
+                <LazyMyBooksPage />
+              </ProtectedRoute>
+            }
+          />
 
-            <Route
-              path="/my-books"
-              element={
-                <ProtectedRoute>
-                  <LazyMyBooksPage />
-                </ProtectedRoute>
-              }
-            />
+          <Route
+            path="/favorites"
+            element={
+              <ProtectedRoute>
+                <LazyFavoritesPage />
+              </ProtectedRoute>
+            }
+          />
 
-            <Route
-              path="/favorites"
-              element={
-                <ProtectedRoute>
-                  <LazyFavoritesPage />
-                </ProtectedRoute>
-              }
-            />
+          <Route
+            path="/recommendations"
+            element={
+              <ProtectedRoute>
+                <LazyAIRecommendationsPage />
+              </ProtectedRoute>
+            }
+          />
 
-            <Route
-              path="/recommendations"
-              element={
-                <ProtectedRoute>
-                  <LazyAIRecommendationsPage />
-                </ProtectedRoute>
-              }
-            />
+          <Route path="*" element={<LazyNotFoundPage />} />
+          <Route path="/contact" element={<LazyContactPage />} />
+          <Route path="/privacy-policy" element={<LazyPrivacyPolicyPage />} />
+          <Route
+            path="/terms-of-service"
+            element={<LazyTermsOfServicePage />}
+          />
+          <Route path="/faq" element={<LazyFAQPage />} />
+        </Routes>
+      </Suspense>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
+<KeyboardShortcutsHelp />
+        <KeyboardWelcomeToast />
 
         {/* Screen reader ARIA announcements */}
         {screenReader && (
@@ -207,9 +281,8 @@ document.querySelectorAll("button, [role='button'], a").forEach((el) => {
           </div>
         )}
 
-        <Footer />
-      </div>
-    </Router>
+      <Footer />
+    </div>
   );
 }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Book } from "../types/index";
+import { Book, BookWithFavorite } from "../types/index";
 import { getBooksByUserId } from "../services/bookService";
 import { BookCard } from "../components/BookCard";
 import { Search, BookPlus } from "lucide-react";
@@ -14,12 +14,21 @@ import {
   Grid,
 } from "@mui/material";
 import BookGridSkeleton from "../components/BookGridSkeleton";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFavoriteBooks } from "../hooks/useFavorites";
+import { useTranslation } from "react-i18next";
+import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function MyBooksPage() {
+  const { t } = useTranslation("myBooksPage");
+  const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+
+  const queryClient = useQueryClient();
+  const { isFavorited } = useFavoriteBooks();
 
   useEffect(() => {
     async function fetchBooks() {
@@ -27,6 +36,20 @@ export function MyBooksPage() {
       try {
         const data = await getBooksByUserId();
         setBooks(Array.isArray(data) ? data : []);
+
+        data?.forEach((book: Book) => {
+          queryClient.setQueryData<BookWithFavorite>(
+            ["book", book._id],
+            (existing) => ({
+              ...existing,
+              ...book,
+              favorites_count:
+                existing?.favorites_count ?? book.favorites_count ?? 0,
+              isFavorited:
+                existing?.isFavorited ?? isFavorited(book._id) ?? false,
+            })
+          );
+        });
       } catch (error) {
         console.error("Failed to fetch user's books:", error);
       } finally {
@@ -48,7 +71,7 @@ export function MyBooksPage() {
       startIcon={<BookPlus size={18} />}
       onClick={() => navigate("/add-book")}
     >
-      Add New Book
+      {t("addButton")}
     </Button>
   );
 
@@ -62,10 +85,10 @@ export function MyBooksPage() {
         <Box textAlign="center" py={15}>
           <BookPlus size={64} color="#ccc" />
           <Typography variant="h5" mt={2} mb={1}>
-            No Books Yet
+            {t("emptyState.title")}
           </Typography>
           <Typography color="text.secondary" mb={3}>
-            Start building your library by adding your first book
+            {t("emptyState.subtitle")}
           </Typography>
           <AddBookButton />
         </Box>
@@ -76,7 +99,7 @@ export function MyBooksPage() {
       <>
         <TextField
           fullWidth
-          placeholder="Search your books..."
+          placeholder={t("searchPlaceholder")}
           variant="outlined"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -106,7 +129,7 @@ export function MyBooksPage() {
         ) : (
           <Box textAlign="center" py={10}>
             <Typography color="text.secondary">
-              No books found matching your search.
+              {t("emptySearchMessage")}
             </Typography>
           </Box>
         )}
@@ -126,7 +149,7 @@ export function MyBooksPage() {
           }}
         >
           <Typography variant="h4" fontWeight="bold">
-            My Books
+            {t("pageTitle")}
           </Typography>
           {books.length > 0 && <AddBookButton />}
         </Box>

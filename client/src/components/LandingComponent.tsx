@@ -1,58 +1,77 @@
-import { Box, Button, Container, Typography } from '@mui/material'
 import React from 'react'
+import { Box, Button, Container, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const LandingComponent = () => {
-      const navigate = useNavigate();
-    
+  const navigate = useNavigate();
+  const { t } = useTranslation(['landing', 'common']); 
+  const commonDir = t('common:dir') as 'rtl' | 'ltr';
+
   return (
-    <Box
-        sx={{
-          bgcolor: "primary.main",
-          color: "primary.contrastText",
-          py: 12,
-          textAlign: "center",
-        }}
+    <Box dir={commonDir}
+      sx={{
+        backgroundImage: `url("https://images.unsplash.com/photo-1662582631700-676a217d511f?auto=format&fit=crop&w=1600&q=80")`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+
+        color: "white",
+        py: 35,
+        textAlign: "center",
+
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          inset: 0,
+          backgroundColor: "rgba(0,0,0,0.5)",
+        }
+      }}
+    >
+      <Container
+        maxWidth="md"
+        sx={{ position: "relative", zIndex: 1 }}
       >
-        <Container maxWidth="md">
-          <Typography variant="h3" component="h1" gutterBottom>
-            Welcome to BookNest
-          </Typography>
-          <Typography variant="h6" mb={4}>
-            Discover, organize, and share your favorite books with AI-powered
-            recommendations
-          </Typography>
-          <Box
+        <Typography variant="h3" component="h1" gutterBottom>
+          {t('heading')}
+        </Typography>
+
+        <Typography variant="h6" mb={4}>
+          {t('subheading')}
+        </Typography>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate("/login")}
+          >
+            {t('loginButton')}
+          </Button>
+
+          <Button
+            variant="outlined"
+            color="inherit"
+            onClick={() => navigate("/register")}
             sx={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 2,
-              flexWrap: "wrap",
+              borderColor: "white",
+              "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
             }}
           >
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </Button>
-            <Button
-              variant="outlined"
-              color="inherit"
-              onClick={() => navigate("/register")}
-              sx={{
-                borderColor: "white",
-                color: "main.contrastText",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
-              }}
-            >
-              Register
-            </Button>
-          </Box>
-        </Container>
-      </Box>
-  )
+            {t('registerButton')}
+          </Button>
+        </Box>
+      </Container>
+    </Box>
+  );
 }
 
 export default LandingComponent;
