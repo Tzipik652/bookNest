@@ -32,6 +32,7 @@ import {
 } from "@mui/material";
 import { toast } from "sonner";
 import CommentItemSkeleton from "./CommentItemSkeleton";
+import { useTranslation } from "react-i18next";
 
 interface CommentSectionProps {
   bookId: string;
@@ -39,6 +40,7 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
+  const { t } = useTranslation(["comments", "common"]);
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
   const [comments, setComments] = useState<CommentWithReactions[]>([]);
@@ -76,7 +78,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       setComments(commentsWithReactions);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load comments");
+      toast.error(t("errorLoadFailed"));
       setIsLoading(false);
     } finally {
       setIsLoading(false);
@@ -90,7 +92,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     }
 
     if (!newComment.trim()) {
-      toast.error("Please enter a comment");
+      toast.error(t("errorCommentRequired"));
       return;
     }
 
@@ -112,7 +114,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       setComments((prevComments) => [commentWithReactions, ...prevComments]);
 
       setNewComment("");
-      toast.success("Comment added successfully");
+      toast.success(t("successAdd"));
       setTimeout(() => {
         commentRefs.current[commentWithReactions.id]?.scrollIntoView({
           behavior: "smooth",
@@ -121,7 +123,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       }, 100);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to add comment");
+      toast.error(t("errorAddFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -130,11 +132,11 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     try {
       await deleteComment(commentId);
       await loadComments();
-      toast.success("Comment deleted");
+      toast.success(t("successDelete"));
       setCommentToDelete(null);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to delete comment");
+      toast.error(t("errorDeleteFailed"));
     }
   };
 
@@ -190,7 +192,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
 
     } catch (error) {
       console.error(error);
-      toast.error("Failed to add reaction");
+      toast.error(t("errorAddFailed"));
       await loadComments();
     } finally {
       setLoadingComments((prev) => {
@@ -210,7 +212,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       <Stack direction="row" alignItems="center" spacing={2} mb={4}>
         <MessageSquare size={28} />
         <Typography variant="h5" fontWeight={600}>
-          Comments
+          {t("title")}
         </Typography>
         <Chip
           label={comments.length}
@@ -238,8 +240,8 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
               rows={4}
               placeholder={
                 currentUser
-                  ? "Share your thoughts about this book..."
-                  : "Please log in to comment"
+                  ? t("placeholderLoggedIn")
+                  : t("placeholderLoggedOut")
               }
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
@@ -259,7 +261,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
                 endIcon={<Send size={18} />}
                 aria-label="Post Comment"
               >
-                {isSubmitting ? "Posting..." : "Post Comment"}
+                {isSubmitting ? t("posting") : t("postButton")}
               </Button>
             </Box>
           </Stack>
@@ -285,7 +287,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
               style={{ opacity: 0.3, marginBottom: 16 }}
             />
             <Typography variant="body1" color="text.secondary">
-              No comments yet. Be the first to share your thoughts!
+             {t("noCommentsText")}
             </Typography>
           </Box>
         ) : (
@@ -315,15 +317,14 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
         onClose={() => setCommentToDelete(null)}
         PaperProps={{ sx: { borderRadius: 2 } }}
       >
-        <DialogTitle>Delete Comment</DialogTitle>
+        <DialogTitle>{t("deleteTitle")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this comment? This action cannot be
-            undone.
+           {t("deleteConfirm")}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setCommentToDelete(null)}>Cancel</Button>
+          <Button onClick={() => setCommentToDelete(null)}>{t("common:buttonCancel")}</Button>
           <Button
             variant="contained"
             color="error"
@@ -332,7 +333,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
             }
             aria-label="Delete comment"
           >
-            Delete
+            {t("common:buttonDelete")}
           </Button>
         </DialogActions>
       </Dialog>

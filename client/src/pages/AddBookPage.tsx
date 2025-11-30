@@ -15,6 +15,7 @@ import {
   CircularProgress,
   Snackbar,
 } from "@mui/material";
+import { Button as ShadcnButton } from "../components/ui/button";
 import { ArrowBack, AutoAwesome, CheckCircle } from "@mui/icons-material";
 import { useUserStore } from "../store/useUserStore";
 import { Category } from "../types";
@@ -24,6 +25,7 @@ import { BookFormValues, bookSchema } from "../schemas/book.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export function AddBookPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
@@ -108,16 +110,17 @@ export function AddBookPage() {
   return (
     <Box minHeight="100vh" bgcolor="#f9fafb" py={6}>
       <Box maxWidth="sm" mx="auto" px={2}>
-        <Button
-          startIcon={<ArrowBack />}
-          variant="text"
+        <ShadcnButton
+          variant="ghost"
           onClick={() => navigate(-1)}
-          sx={{ mb: 3 }}
-          className="notranslate"
           aria-label={t("common:back")}
+          className="mb-6 gap-2"
         >
-          {t("common:back")}
-        </Button>
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t('common:back')}
+        </ShadcnButton>
+
 
         <Card elevation={3}>
           <CardHeader

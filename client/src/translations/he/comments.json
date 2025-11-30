@@ -1,0 +1,17 @@
+{
+  "title": "תגובות",
+  "placeholderLoggedIn": "שתף את מחשבותיך על הספר...",
+  "placeholderLoggedOut": "אנא התחבר כדי להגיב",
+  "posting": "שולח...",
+  "postButton": "פרסם תגובה",
+  "noCommentsTitle": "אין תגובות עדיין",
+  "noCommentsText": "היה הראשון לשתף את מחשבותיך!",
+  "deleteTitle": "מחיקת תגובה",
+  "deleteConfirm": "האם אתה בטוח שברצונך למחוק תגובה זו? פעולה זו אינה ניתנת לביטול.",
+  "errorLoadFailed": "טעינת התגובות נכשלה",
+  "errorCommentRequired": "אנא הזן תגובה",
+  "errorAddFailed": "שליחת התגובה נכשלה",
+  "errorDeleteFailed": "מחיקת התגובה נכשלה",
+  "successAdd": "התגובה נוספה בהצלחה",
+  "successDelete": "התגובה נמחקה"
+}

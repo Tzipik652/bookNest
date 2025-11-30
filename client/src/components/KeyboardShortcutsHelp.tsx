@@ -7,29 +7,34 @@ import {
 } from '../components/ui/dialog';
 import { Keyboard } from 'lucide-react';
 import { Box, Typography, Chip } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+
+import { heShortcutType } from '../types/i18n';
 
 interface Shortcut {
     key: string;
-    description: string;
-    category: string;
+    descriptionKey: keyof heShortcutType;
+    categoryKey: keyof heShortcutType;
 }
 
-const shortcuts: Shortcut[] = [
-    { key: '/', description: 'Focus search', category: 'Navigation' },
-    { key: 'Ctrl + K', description: 'Focus search (alternative)', category: 'Navigation' },
-    { key: 'C', description: 'Open category selector', category: 'Navigation' },
-    { key: 'ESC', description: 'Clear search / Close dialogs', category: 'Navigation' },
-    { key: '↑ ↓ ← →', description: 'Navigate between books', category: 'Grid Navigation' },
-    { key: 'Enter', description: 'Open selected book', category: 'Grid Navigation' },
-    { key: 'Space', description: 'Open selected book', category: 'Grid Navigation' },
-    { key: 'Home', description: 'Go to first book', category: 'Grid Navigation' },
-    { key: 'End', description: 'Go to last book', category: 'Grid Navigation' },
-    { key: 'Ctrl + N', description: 'Next page', category: 'Pagination' },
-    { key: 'Ctrl + P', description: 'Previous page', category: 'Pagination' },
-    { key: '?', description: 'Show this help dialog', category: 'Help' },
+const rawShortcuts: Omit<Shortcut, 'description'>[] = [
+    { key: '/', descriptionKey: 'descriptionFocusSearch', categoryKey: 'categoryNavigation' },
+    { key: 'Ctrl + K', descriptionKey: 'descriptionFocusSearchAlt', categoryKey: 'categoryNavigation' },
+    { key: 'C', descriptionKey: 'descriptionOpenCategory', categoryKey: 'categoryNavigation' },
+    { key: 'ESC', descriptionKey: 'descriptionClearClose', categoryKey: 'categoryNavigation' },
+    { key: '↑ ↓ ← →', descriptionKey: 'descriptionNavigateBooks', categoryKey: 'categoryGridNavigation' },
+    { key: 'Enter', descriptionKey: 'descriptionOpenBook', categoryKey: 'categoryGridNavigation' },
+    { key: 'Space', descriptionKey: 'descriptionOpenBookSpace', categoryKey: 'categoryGridNavigation' },
+    { key: 'Home', descriptionKey: 'descriptionGoToFirst', categoryKey: 'categoryGridNavigation' },
+    { key: 'End', descriptionKey: 'descriptionGoToLast', categoryKey: 'categoryGridNavigation' },
+    { key: 'Ctrl + N', descriptionKey: 'descriptionNextPage', categoryKey: 'categoryPagination' },
+    { key: 'Ctrl + P', descriptionKey: 'descriptionPreviousPage', categoryKey: 'categoryPagination' },
+    { key: '?', descriptionKey: 'descriptionShowHelp', categoryKey: 'categoryHelp' },
 ];
 
 export function KeyboardShortcutsHelp() {
+    const { t } = useTranslation(['keyboardShortcutsHelp', 'common']);
+    const commonDir = t('common:dir') as 'rtl' | 'ltr';
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
@@ -46,7 +51,7 @@ export function KeyboardShortcutsHelp() {
         window.addEventListener('keydown', handleKeyPress);
         return () => window.removeEventListener('keydown', handleKeyPress);
     }, []);
-    
+
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = "hidden";
@@ -59,13 +64,14 @@ export function KeyboardShortcutsHelp() {
         };
     }, [isOpen]);
 
-    const groupedShortcuts = shortcuts.reduce((acc, shortcut) => {
-        if (!acc[shortcut.category]) {
-            acc[shortcut.category] = [];
-        }
-        acc[shortcut.category].push(shortcut);
-        return acc;
-    }, {} as Record<string, Shortcut[]>);
+const groupedShortcuts = rawShortcuts.reduce((acc, shortcut) => {
+    const translatedCategoryName = t(shortcut.categoryKey); 
+        if (!acc[translatedCategoryName]) {
+        acc[translatedCategoryName] = [];
+    }
+    acc[translatedCategoryName].push(shortcut);
+    return acc;
+}, {} as Record<string, Omit<Shortcut, 'description'>[]>);
 
     return (
         <>
@@ -74,7 +80,8 @@ export function KeyboardShortcutsHelp() {
                 sx={{
                     position: 'fixed',
                     bottom: 20,
-                    right: 20,
+                    right: commonDir === 'ltr' ? 20 : 'auto',
+                    left: commonDir === 'rtl' ? 20 : 'auto',
                     zIndex: 1000,
                 }}
             >
@@ -102,7 +109,7 @@ export function KeyboardShortcutsHelp() {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-xl">
                             <Keyboard className="h-6 w-6 text-green-600" />
-                            Keyboard Shortcuts
+                            {t('dialogTitle')}
                         </DialogTitle>
                     </DialogHeader>
 
@@ -139,7 +146,7 @@ export function KeyboardShortcutsHelp() {
                                             }}
                                         >
                                             <Typography variant="body2" sx={{ flex: 1 }}>
-                                                {shortcut.description}
+                                                {t(shortcut.descriptionKey)}
                                             </Typography>
                                             <Chip
                                                 label={shortcut.key}
@@ -168,7 +175,7 @@ export function KeyboardShortcutsHelp() {
                         }}
                     >
                         <Typography variant="caption" color="text.secondary">
-                            Press <strong>ESC</strong> to close this dialog
+                            {t('closeHint', { components: { strong: <strong /> } })}
                         </Typography>
                     </Box>
                 </DialogContent>

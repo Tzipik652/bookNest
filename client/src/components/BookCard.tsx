@@ -10,15 +10,18 @@ import { useFavoriteBooks } from "../hooks/useFavorites";
 import { useDynamicTheme } from "../theme";
 import { useQueryClient } from "@tanstack/react-query";
 import { BookWithFavorite } from "../types/index";
+import { useTranslation } from "react-i18next";
 interface BookCardProps {
   book: Book;
 }
 
 export function BookCard({ book }: BookCardProps) {
+  const { t } = useTranslation(["bookCard", "common"]);
   const theme = useDynamicTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const { user: currentUser } = useUserStore();
+  const commonDir = t('common:dir') as 'rtl' | 'ltr';
 
   const queryClient = useQueryClient();
   const { toggleMutation } = useFavoriteBooks();
@@ -49,6 +52,7 @@ export function BookCard({ book }: BookCardProps) {
 
   return (
     <Card
+    dir={commonDir}
       className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
       style={{
         backgroundColor: theme.palette.background.paper,
@@ -79,14 +83,13 @@ export function BookCard({ book }: BookCardProps) {
                 onClick={handleFavoriteClick}
                 className="shrink-0"
                 disabled={isLoading}
-                aria-label={displayedBook.isFavorited ? "Remove from favorites" : "Add to favorites"}
+                aria-label={t('bookCard:heartAriaLabel')}
               >
                 <Heart
-                  className={`h-5 w-5 transition-colors ${
-                    displayedBook.isFavorited
+                  className={`h-5 w-5 transition-colors ${displayedBook.isFavorited
                       ? "fill-red-500 text-red-500"
                       : "text-gray-400"
-                  } ${isLoading ? "opacity-50" : ""}`}
+                    } ${isLoading ? "opacity-50" : ""}`}
                   style={{ cursor: isLoading ? "not-allowed" : "pointer" }}
                 />
               </Button>
@@ -119,7 +122,7 @@ export function BookCard({ book }: BookCardProps) {
           onClick={() => navigate(`/book/${book._id}`)}
           aria-label="click to view details of the book"
         >
-          View Details
+          {t('viewDetails')}
         </Button>
       </CardFooter>
     </Card>

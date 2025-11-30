@@ -1,0 +1,20 @@
+{
+  "dialogTitle": "Keyboard Shortcuts",
+  "categoryNavigation": "Navigation",
+  "categoryGridNavigation": "Grid Navigation",
+  "categoryPagination": "Pagination",
+  "categoryHelp": "Help",
+  "descriptionFocusSearch": "Focus search",
+  "descriptionFocusSearchAlt": "Focus search (alternative)",
+  "descriptionOpenCategory": "Open category selector",
+  "descriptionClearClose": "Clear search / Close dialogs",
+  "descriptionNavigateBooks": "Navigate between books",
+  "descriptionOpenBook": "Open selected book",
+  "descriptionOpenBookSpace": "Open selected book",
+  "descriptionGoToFirst": "Go to first book",
+  "descriptionGoToLast": "Go to last book",
+  "descriptionNextPage": "Next page",
+  "descriptionPreviousPage": "Previous page",
+  "descriptionShowHelp": "Show this help dialog",
+  "closeHint": "Press **ESC** to close this dialog"
+}

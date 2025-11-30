@@ -16,6 +16,7 @@ import {
   DialogActions,
   Skeleton,
 } from "@mui/material";
+import { Button as ShadcnButton } from "../components/ui/button";
 import {
   Favorite,
   FavoriteBorder,
@@ -32,6 +33,7 @@ import { Book, BookWithFavorite } from "../types";
 import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
 import Narrator from "../components/Narrator";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export function BookDetailsPage() {
   const { t } = useTranslation(["bookDetails", "common"]);
@@ -115,15 +117,17 @@ export function BookDetailsPage() {
       py={6}
     >
       <Box maxWidth="md" mx="auto" px={2}>
-        <Button
-          startIcon={<ArrowBack />}
+        <ShadcnButton
+          variant="ghost"
           onClick={() => navigate(-1)}
-          variant="text"
-          sx={{ mb: 3 }}
-          aria-label={t("common:buttonGoBack")}
+          aria-label={t("common:back")}
+          className="mb-6 gap-2"
         >
-          {t("common:buttonGoBack")}
-        </Button>
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t('common:back')}
+        </ShadcnButton>
+
 
         <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={4}>
           <Box flex={1}>
