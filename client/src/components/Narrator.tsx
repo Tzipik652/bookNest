@@ -35,19 +35,19 @@ export default function Narrator({ text }: { text: string }) {
         mb={0.5}
       >
         {!isSpeaking || isPaused ? (
-        <IconButton size="small" onClick={speak} sx={{ p: 0.3 }}>
+        <IconButton size="small" onClick={speak} sx={{ p: 0.3 }} aria-label="button to start narration">
           <PlayArrow sx={{ fontSize: 18 }} />
         </IconButton>) : (
-        <IconButton size="small" onClick={pause} sx={{ p: 0.3 }}>
+        <IconButton size="small" onClick={pause} sx={{ p: 0.3 }} aria-label="button to pause narration">
           <Pause sx={{ fontSize: 18 }} />
         </IconButton>)}
-        <IconButton size="small" onClick={stop} sx={{ p: 0.3 }}>
+        <IconButton size="small" onClick={stop} sx={{ p: 0.3 }} aria-label="button to stop narration">
           <Stop sx={{ fontSize: 18 }} />
         </IconButton>
       </Box>
 
       {/* --- Text below --- */}
-      <Typography variant="body2" sx={{ whiteSpace: "normal" }}>
+      <Typography className="book-summary" data-skip-sr variant="body2" sx={{ whiteSpace: "normal" }}>
         {highlighted}
       </Typography>
     </Box>

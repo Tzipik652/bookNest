@@ -51,6 +51,7 @@ export function KeyboardWelcomeToast() {
             size="small"
             onClick={handleDismiss}
             sx={{ minWidth: 'auto', p: 1 }}
+            aria-label="Close keyboard welcome toast"
           >
             <X size={18} />
           </Button>
@@ -78,6 +79,7 @@ export function KeyboardWelcomeToast() {
                   bgcolor: 'rgba(22, 163, 74, 0.04)'
                 }
               }}
+              aria-label="Got it button to close keyboard welcome toast"
             >
               Got it!
             </Button>

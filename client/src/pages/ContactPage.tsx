@@ -77,7 +77,7 @@ export function ContactPage() {
             <p className="text-gray-600">
               {t('contact:auth.login_description')}
             </p>
-            <Button onClick={() => navigate("/login")} className="w-full">
+            <Button onClick={() => navigate("/login")} className="w-full" aria-label={t('contact:auth.go_to_login')}>
               {t('contact:auth.go_to_login')}
             </Button>
           </CardContent>
@@ -92,6 +92,7 @@ export function ContactPage() {
           variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-6 gap-2"
+          aria-label={t('common:back')}
         >
           <ArrowLeft className="h-4 w-4" />
           {t('common:back')}
@@ -126,6 +127,7 @@ export function ContactPage() {
                     onClick={() => setMessageSent(false)}
                     variant="outline"
                     className="border-green-600 text-green-700 hover:bg-green-100"
+                    aria-label={t('contact:success.button_another')}
                   >
                     {t('contact:success.button_another')}
                   </Button>
@@ -167,9 +169,10 @@ export function ContactPage() {
                       type="submit"
                       className="w-full gap-2"
                       disabled={isSubmitting}
+                      aria-label={isSubmitting ? t('common:sending') : t('contact:form.submit_button')}
                     >
                       <Send className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
-                      {isSubmitting ? t('common:sending') : t('contact:form.submit_button')}                     {isSubmitting ? 'Sending...' : 'Send Message'}
+                      {isSubmitting ? t('common:sending') : t('contact:form.submit_button')}
                     </Button>
                   </form>
                 </CardContent>
@@ -223,6 +226,7 @@ export function ContactPage() {
                   variant="outline"
                   className="w-full gap-2"
                   onClick={() => navigate('/faq')}
+                  aria-label={t('contact:faq.button')}
                 >
                   <HelpCircle className="h-4 w-4" />
                   {t('contact:faq.button')}

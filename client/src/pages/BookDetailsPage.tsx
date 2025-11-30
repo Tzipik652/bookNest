@@ -120,6 +120,7 @@ export function BookDetailsPage() {
           onClick={() => navigate(-1)}
           variant="text"
           sx={{ mb: 3 }}
+          aria-label={t("common:buttonGoBack")}
         >
           {t("common:buttonGoBack")}
         </Button>
@@ -166,6 +167,11 @@ export function BookDetailsPage() {
                     }
                     onClick={handleFavoriteToggle}
                     disabled={toggleMutation.isPending}
+                    aria-label={
+                      book.isFavorited
+                        ? t("buttonRemoveFavorite")
+                        : t("buttonAddFavorite")
+                    }
                   >
                     {book.isFavorited
                       ? t("buttonRemoveFavorite")
@@ -178,6 +184,7 @@ export function BookDetailsPage() {
                         variant="outlined"
                         startIcon={<Edit />}
                         onClick={() => navigate(`/edit-book/${book._id}`)}
+                        aria-label={t("common:buttonEdit")}
                       >
                         {t("common:buttonEdit")}
                       </Button>
@@ -187,6 +194,7 @@ export function BookDetailsPage() {
                         color="error"
                         startIcon={<Delete />}
                         onClick={() => setShowDeleteDialog(true)}
+                        aria-label={t("common:buttonDelete")}
                       >
                         {t("common:buttonDelete")}
                       </Button>
@@ -209,11 +217,11 @@ export function BookDetailsPage() {
                   <Box display="flex" alignItems="center" gap={1} mb={0}>
                     <AutoAwesome color="primary" />
                     <Typography variant="h6">{t("headerAISummary")}</Typography>
-                </Box>
-                  <Typography variant="body1" color="text.secondary">
-                    <Narrator text={book.ai_summary} />
-                  </Typography>
                   </Box>
+                  <Box mt={2}>
+                    <Narrator text={book.ai_summary} />
+                  </Box>
+                </Box>
 
                 <Typography variant="body2" color="text.secondary">
                   {t("uploadedByPrefix", { userName: book.user?.name })}
@@ -241,10 +249,10 @@ export function BookDetailsPage() {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowDeleteDialog(false)}>
+          <Button onClick={() => setShowDeleteDialog(false)} aria-label={t("common:buttonCancel")}>
             {t("common:buttonCancel")}
           </Button>
-          <Button onClick={handleDelete} color="error" variant="contained">
+          <Button onClick={handleDelete} color="error" variant="contained" aria-label={t("common:buttonDelete")}>
             {t("common:buttonDelete")}
           </Button>
         </DialogActions>

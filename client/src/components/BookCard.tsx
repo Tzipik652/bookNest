@@ -79,6 +79,7 @@ export function BookCard({ book }: BookCardProps) {
                 onClick={handleFavoriteClick}
                 className="shrink-0"
                 disabled={isLoading}
+                aria-label={displayedBook.isFavorited ? "Remove from favorites" : "Add to favorites"}
               >
                 <Heart
                   className={`h-5 w-5 transition-colors ${
@@ -116,6 +117,7 @@ export function BookCard({ book }: BookCardProps) {
         <Button
           className="w-full"
           onClick={() => navigate(`/book/${book._id}`)}
+          aria-label="click to view details of the book"
         >
           View Details
         </Button>

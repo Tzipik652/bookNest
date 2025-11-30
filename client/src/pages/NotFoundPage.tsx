@@ -36,6 +36,7 @@ export function NotFoundPage() {
             onClick={() => navigate(-1)}
             variant="outline"
             className="gap-2"
+            aria-label={t('notFound.backButton')}
           >
             <ArrowLeft className="h-5 w-5" />
            {t('notFound.backButton')}
@@ -43,6 +44,7 @@ export function NotFoundPage() {
           <Button
             onClick={() => navigate('/')}
             className="gap-2"
+            aria-label={t('notFound.homeButton')}
           >
             <Home className="h-5 w-5" />
             {t('notFound.homeButton')}

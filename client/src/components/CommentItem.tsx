@@ -84,6 +84,7 @@ const CommentItem=forwardRef<HTMLDivElement, CommentItemProps>(({
                 color="error"
                 size="small"
                 sx={{ "&:hover": { bgcolor: "error.lighter" } }}
+                aria-label="Delete comment"
               >
                 <Trash2 size={18} />
               </IconButton>
@@ -123,6 +124,7 @@ const CommentItem=forwardRef<HTMLDivElement, CommentItemProps>(({
                     color: isActive ? color : "#6b7280",
                     fontWeight: isActive ? 600 : 400,
                   }}
+                  aria-label={`React with ${type}`}
                 >
                   <span
                     style={{

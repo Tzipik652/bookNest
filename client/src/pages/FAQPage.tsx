@@ -51,6 +51,7 @@ export function FAQPage() {
                         variant="ghost"
                         className="mb-4 gap-2"
                         onClick={() => navigate(-1)}
+                        aria-label={t('common:back')}
                     >
                         <ArrowLeft className="h-4 w-4" />
                         {t('common:back')}
@@ -100,7 +101,7 @@ export function FAQPage() {
                                 <p className="text-gray-700 mb-4">
                                     {t('faq:contact.text')}
                                 </p>
-                                <Button onClick={() => navigate('/contact')}>
+                                <Button onClick={() => navigate('/contact')} aria-label={t('faq:contact.button')}>
                                     {t('faq:contact.button')}
                                 </Button>
                             </div>

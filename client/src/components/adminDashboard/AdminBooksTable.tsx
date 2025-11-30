@@ -132,7 +132,7 @@ export const AdminBooksTable = ({
                       </td>
                       <td className="py-3 px-4 text-gray-500">
                         {new Date(book.date_created).toLocaleDateString(
-                            t('common:locale') // שימוש ב-Locale המתאים (he-IL או en-US)
+                            t('common:locale')
                           )}
                       </td>
                       <td className="py-3 px-4">
@@ -141,6 +141,7 @@ export const AdminBooksTable = ({
                             variant="ghost"
                             size="icon"
                             onClick={() => navigate(`/book/${book._id}`)}
+                            aria-label="book details"
                           >
                             <BookOpen className="h-4 w-4 text-gray-500" />
                           </Button>
@@ -148,6 +149,7 @@ export const AdminBooksTable = ({
                             variant="ghost"
                             size="icon"
                             onClick={() => handleEditBook(book._id)}
+                            aria-label="edit book"
                           >
                             <Edit className="h-4 w-4 text-green-600" />
                           </Button>
@@ -155,6 +157,7 @@ export const AdminBooksTable = ({
                             variant="ghost"
                             size="icon"
                             onClick={() => handleDeleteBook(book._id)}
+                            aria-label="delete book"
                           >
                             <Trash2 className="h-4 w-4 text-red-600" />
                           </Button>
@@ -209,6 +212,7 @@ export const AdminBooksTable = ({
                         size="sm"
                         className="flex-1 h-8 text-xs"
                         onClick={() => navigate(`/book/${book._id}`)}
+                        aria-label="book details"
                       >
                         <BookOpen className="h-3.5 w-3.5 ml-1" />
                       </Button>
@@ -217,6 +221,7 @@ export const AdminBooksTable = ({
                         size="sm"
                         className="h-8 px-2"
                         onClick={() => handleEditBook(book._id)}
+                        aria-label="edit book"
                       >
                         <Edit className="h-3.5 w-3.5 text-green-600" />
                       </Button>
@@ -225,6 +230,7 @@ export const AdminBooksTable = ({
                         size="sm"
                         className="h-8 px-2"
                         onClick={() => handleDeleteBook(book._id)}
+                        aria-label="delete book"
                       >
                         <Trash2 className="h-3.5 w-3.5 text-red-600" />
                       </Button>

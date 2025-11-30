@@ -125,6 +125,7 @@ export function RecentComments({
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteComment(comment.id)}
+                          aria-label="delete comment"
                         >
                           <Trash2 className="h-4 w-4 text-red-600" />
                         </Button>
@@ -134,6 +135,7 @@ export function RecentComments({
                             variant="ghost"
                             size="sm"
                             onClick={() => startEdit(comment)}
+                            aria-label="edit comment"
                           >
                             <Edit className="h-3.5 w-3.5 text-green-600" />
                           </Button>
@@ -149,10 +151,11 @@ export function RecentComments({
                         />
 
                         <div className="flex gap-2">
-                          <Button onClick={saveEdit}>{commentsTexts.editSave}</Button>
+                          <Button onClick={saveEdit} aria-label="save edit">{commentsTexts.editSave}</Button>
                           <Button
                             variant="ghost"
                             onClick={() => setEditingId(null)}
+                            aria-label="cancel edit"
                           >
                             {commentsTexts.editCancel}
                           </Button>

@@ -67,17 +67,6 @@ export function Footer() {
                     <p className="text-slate-400 text-sm">
                         © {currentYear} BookNest. All rights reserved.
                     </p>
-                    {/* <div className="flex gap-6 text-sm">
-            <button className="text-slate-400 hover:text-green-400 transition-colors">
-              Privacy Policy
-            </button>
-            <button className="text-slate-400 hover:text-green-400 transition-colors">
-              Terms of Service
-            </button>
-            <button className="text-slate-400 hover:text-green-400 transition-colors">
-              Contact
-            </button>
-          </div> */}
                     <div className="flex gap-6 text-sm">
                         <Link
                             to="/privacy-policy"

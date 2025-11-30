@@ -73,28 +73,28 @@ export function Navbar() {
           {user ? (
             <>
               <Link to="/home">
-                <Button variant="ghost" className={getButtonClasses("/home")}>
+                <Button variant="ghost" className={getButtonClasses("/home")} aria-label='home'>
                   <Home className="h-4 w-4" /> Home
                 </Button>
               </Link>
               <Link to="/my-books">
-                <Button variant="ghost" className={getButtonClasses("/my-books")}>
+                <Button variant="ghost" className={getButtonClasses("/my-books")} aria-label='my books'>
                   <Library className="h-4 w-4" /> My Books
                 </Button>
               </Link>
               <Link to="/favorites">
-                <Button variant="ghost" className={getButtonClasses("/favorites")}>
+                <Button variant="ghost" className={getButtonClasses("/favorites")} aria-label='favorites'>
                   <Heart className="h-4 w-4" /> Favorites
                 </Button>
               </Link>
               <Link to="/add-book">
-                <Button variant="ghost" className={getButtonClasses("/add-book")}>
+                <Button variant="ghost" className={getButtonClasses("/add-book")} aria-label='add book'>
                   <PlusCircle className="h-4 w-4" /> Add Book
                 </Button>
               </Link>
 
               <Link to="/recommendations">
-                <Button variant="ghost" className={getButtonClasses("/recommendations")}>
+                <Button variant="ghost" className={getButtonClasses("/recommendations")} aria-label='AI recommendations'>
                   <Sparkles className="h-4 w-4" /> AI Recommendations
                 </Button>
               </Link>
@@ -103,7 +103,7 @@ export function Navbar() {
               </div>
               {user.role === "admin" && (
                 <Link to="/admin-dashboard">
-                  <Button variant="ghost" className={getButtonClasses("/admin-dashboard")}>
+                  <Button variant="ghost" className={getButtonClasses("/admin-dashboard")} aria-label='admin dashboard'>
                     <Shield className="h-4 w-4" />
                     Admin
                   </Button>
@@ -114,7 +114,7 @@ export function Navbar() {
                   <User className="h-4 w-4" />
                   <span className="text-sm">{user.name}</span>
                 </div>
-                <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2">
+                <Button variant="outline" size="sm" onClick={handleLogout} className="gap-2" aria-label='logout'>
                   <LogOut className="h-4 w-4" /> Logout
                 </Button>
               </div>
@@ -122,17 +122,17 @@ export function Navbar() {
           ) : (
             <>
               <Link to={`/login?redirect=${encodedPath}`}>
-                <Button variant="ghost">Login</Button>
+                <Button variant="ghost" aria-label='login'>Login</Button>
               </Link>
               <Link to={`/register?redirect=${encodedPath}`}>
-                <Button>Register</Button>
+                <Button aria-label='register'>Register</Button>
               </Link>
             </>
           )}
         </div>
 
         {/* Mobile Menu Button */}
-        <button className="lg:hidden" onClick={() => setOpen(true)}>
+        <button className="lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu">
           <Menu className="w-7 h-7" />
         </button>
       </div>
@@ -151,57 +151,57 @@ export function Navbar() {
             }`}
           onClick={(e) => e.stopPropagation()}
         >
-          <button className="mb-4 self-end" onClick={() => setOpen(false)}>
+          <button className="mb-4 self-end" onClick={() => setOpen(false)} aria-label="Close menu">
             <X className="w-6 h-6" />
           </button>
 
           {user ? (
             <>
               <Link to="/home" onClick={() => setOpen(false)}>
-                <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/home")}`}>
+                <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/home")}`} aria-label='home'>
                   <Home className="h-4 w-4" /> Home
                 </Button>
               </Link>
               <Link to="/my-books" onClick={() => setOpen(false)}>
-                <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/my-books")}`}>
+                <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/my-books")}`} aria-label='my books'>
                   <Library className="h-4 w-4" /> My Books
                 </Button>
               </Link>
               <Link to="/favorites" onClick={() => setOpen(false)}>
-                <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/favorites")}`}>
+                <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/favorites")}`} aria-label='favorites'>
                   <Heart className="h-4 w-4" /> Favorites
                 </Button>
               </Link>
               <Link to="/add-book" onClick={() => setOpen(false)}>
-                <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/add-book")}`}>
+                <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/add-book")}`} aria-label='add book'>
                   <PlusCircle className="h-4 w-4" /> Add Book
                 </Button>
               </Link>
               <Link to="/recommendations" onClick={() => setOpen(false)}>
-                <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/recommendations")}`}>
+                <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/recommendations")}`} aria-label='AI Recommendations'>
                   <Sparkles className="h-4 w-4" /> AI Recommendations
                 </Button>
               </Link>
               <GoogleTranslate />
               {user.role === "admin" && (
                 <Link to="/admin-dashboard">
-                  <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/admin-dashboard")}`}>
+                  <Button variant="ghost" className={`w-full justify-start ${getButtonClasses("/admin-dashboard")}`}aria-label='admin'>
                     <Shield className="h-4 w-4" />
                     Admin
                   </Button>
                 </Link>
               )}
-              <Button variant="outline" onClick={handleLogout} className="w-full justify-start gap-2 mt-4">
+              <Button variant="outline" onClick={handleLogout} className="w-full justify-start gap-2 mt-4" aria-label='logout'>
                 <LogOut className="h-4 w-4" /> Logout
               </Button>
             </>
           ) : (
             <>
               <Link to={`/login?redirect=${encodedPath}`} onClick={() => setOpen(false)}>
-                <Button className="w-full">Login</Button>
+                <Button className="w-full" aria-label='login'>Login</Button>
               </Link>
               <Link to={`/register?redirect=${encodedPath}`} onClick={() => setOpen(false)}>
-                <Button className="w-full">Register</Button>
+                <Button className="w-full" aria-label='register'>Register</Button>
               </Link>
             </>
           )}

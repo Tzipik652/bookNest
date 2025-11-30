@@ -257,6 +257,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
                 onClick={handleAddComment}
                 disabled={!currentUser || isSubmitting || !newComment.trim()}
                 endIcon={<Send size={18} />}
+                aria-label="Post Comment"
               >
                 {isSubmitting ? "Posting..." : "Post Comment"}
               </Button>
@@ -329,6 +330,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
             onClick={() =>
               commentToDelete && handleDeleteComment(commentToDelete)
             }
+            aria-label="Delete comment"
           >
             Delete
           </Button>
