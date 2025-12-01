@@ -98,6 +98,7 @@ export function ResetPassword() {
                     <IconButton
                       onClick={() => setShowPassword(!showPassword)}
                       edge="end"
+                      aria-label="show password"
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -119,6 +120,7 @@ export function ResetPassword() {
                     <IconButton
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       edge="end"
+                      aria-label="show confirm password"
                     >
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -141,6 +143,9 @@ export function ResetPassword() {
               variant="contained"
               fullWidth
               disabled={isSubmitting}
+              aria-label={isSubmitting
+                ? t("resetPassword.updatingButton")
+                : t("resetPassword.submitButton")}
             >
              {isSubmitting
                 ? t("resetPassword.updatingButton")

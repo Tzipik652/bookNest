@@ -129,7 +129,6 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({
                     fontWeight: isActive ? 600 : 400,
                   }}
                   aria-label={`${emoji} ${t(type, { ns: 'reaction_type' })}: ${count}`}
-
                 >
                   <span
                     style={{

@@ -172,12 +172,10 @@ export function RecentComments({
                             </span>
                             <span
                               style={bookTitleStyle}
-                              // הוספת לוגיקת ריחוף
                               onMouseEnter={(e) => {
                                 if (!highContrast) e.currentTarget.style.textDecoration = 'underline';
                               }}
                               onMouseLeave={(e) => {
-                                // במצב רגיל, נחזיר ל-none. במצב ניגודיות גבוהה, תמיד יש underline
                                 if (!highContrast) e.currentTarget.style.textDecoration = 'none';
                               }}
                               onClick={() =>

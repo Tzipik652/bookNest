@@ -77,6 +77,7 @@ export function TermsOfServicePage() {
           variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-6 gap-2"
+          aria-label={t('common:back')}
         >
           {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
           {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}

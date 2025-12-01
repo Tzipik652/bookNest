@@ -290,7 +290,6 @@ const hoverBgStyle = {
                           onClick={() => navigate(`/book/${book._id}`)}
                           style={highContrast ? { borderColor: theme.palette.text.primary, color: theme.palette.text.primary } : {}}
                         >
-                          {/* שימוש בסגנון הדינמי לטקסט/אייקון*/}
                           <BookOpen className="h-3.5 w-3.5 ml-1" style={highContrast ? { color: theme.palette.text.primary } : viewButtonStyle} />
                         </Button>
                         <Button

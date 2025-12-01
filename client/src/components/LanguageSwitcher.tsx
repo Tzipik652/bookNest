@@ -13,7 +13,6 @@ const LanguageSwitcher = () => {
     { code: 'he', label: 'עברית', flag: '🇮🇱' },
   ];
 
-  // סגירת התפריט בלחיצה בחוץ
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -28,10 +27,8 @@ const LanguageSwitcher = () => {
   }, [dropdownRef]);
 
   const handleLanguageChange = (langCode: 'en' | 'he') => {
-    // שינוי השפה ב-i18n
     i18n.changeLanguage(langCode);
     
-    // שינוי כיוון הדף
     document.body.dir = langCode === 'he' ? 'rtl' : 'ltr';
     
     setIsOpen(false);
@@ -45,6 +42,7 @@ const LanguageSwitcher = () => {
         className="gap-2"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
+        aria-label='Language'
       >
         <Globe className="h-4 w-4" />
         <span className="inline-block">
@@ -61,6 +59,7 @@ const LanguageSwitcher = () => {
               className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors
                 ${i18n.language === lang.code ? 'text-green-600 font-medium' : 'text-gray-700 dark:text-gray-200'}
               `}
+              aria-label={lang.label}
             >
               <span className="flex items-center gap-2">
                 <span>{lang.flag}</span> {lang.label}
@@ -73,5 +72,6 @@ const LanguageSwitcher = () => {
     </div>
   );
 };
+
 
 export default LanguageSwitcher;

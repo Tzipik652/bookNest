@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 import { Card as MuiCard } from '@mui/material';
 import { Button as MuiButton } from '@mui/material';
-// ייבוא רכיבי MUI
 import { Box, Typography, Container } from '@mui/material';
 
 export function ContactPage() {
@@ -43,7 +42,7 @@ export function ContactPage() {
 
     try {
       // NOTE: Using a placeholder URL/API endpoint
-      const res = await fetch("http://localhost:5000/contact", {
+      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -77,7 +76,6 @@ export function ContactPage() {
   };
 
 
-  // --- 1. מצב חוסר הרשאה (Login Required) ---
   if (!currentUser?.name || !currentUser?.email) {
     return (
       <Box
@@ -101,7 +99,6 @@ export function ContactPage() {
     );
   }
 
-  // --- 2. מצב טופס רגיל / הצלחה ---
   return (
     <Box
       sx={{ minHeight: '100vh', bgcolor: 'background.default' }}
@@ -112,6 +109,7 @@ export function ContactPage() {
           variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-6 gap-2"
+          aria-label={t('common:back')}
         >
           {isRTL ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
           {t('common:back')}
@@ -123,7 +121,6 @@ export function ContactPage() {
             sx={{
               p: 1.5,
               borderRadius: 2,
-              // רקע שקוף למחצה בצבע ירוק בבהיר, או אפור בכהה
               bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(22, 163, 74, 0.1)',
               color: 'primary.main',
               display: 'flex',
@@ -143,18 +140,15 @@ export function ContactPage() {
           </Box>
         </Box>
 
-        {/* טופס / הצלחה / מידע ליצירת קשר */}
         <div className="grid md:grid-cols-3 gap-8">
 
           {/* Contact Form OR Success Message (2/3 col) */}
           {messageSent ? (
-            // --- 3. מצב הצלחה (Success Message) ---
             <MuiCard
               className="md:col-span-2"
               sx={{
                 border: '1px solid',
                 borderColor: 'success.light',
-                // שימוש בצבע רקע סמנטי מה-Theme
                 bgcolor: 'success.lightest'
               }}
             >
@@ -196,7 +190,6 @@ export function ContactPage() {
               </CardContent>
             </MuiCard>
           ) : (
-            // --- 4. מצב טופס רגיל ---
             <div className="md:col-span-2">
               <Card>
                 <CardContent className="pt-6">
@@ -231,6 +224,7 @@ export function ContactPage() {
                       type="submit"
                       className="w-full gap-2"
                       disabled={isSubmitting}
+                      aria-label={isSubmitting ? t('common:sending') : t('contact:form.submit_button')}
                     >
                       <Send className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
                       {isSubmitting ? t('common:sending') : t('contact:form.submit_button')}
@@ -244,20 +238,17 @@ export function ContactPage() {
           {/* Contact Information (1/3 col) */}
           <div className="space-y-6">
 
-            {/* מידע ליצירת קשר */}
             <Card>
               <CardContent className="pt-6 space-y-4">
-                {/* דוא"ל */}
                 <Box sx={{ display: 'flex', alignItems: 'start', gap: 1.5, textAlign: alignment }}>
                   <Box
-                    // רקע עדין יותר במצב רגיל, ושומר על ניגודיות במצב כהה
                     sx={{
                       p: 1,
                       borderRadius: 1,
-                      color: 'info.main', // צבע האייקון עצמו (כחול ראשי)
+                      color: 'info.main',
                       bgcolor: (theme) => theme.palette.mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.1)' // רקע אפור בהיר בכהה
-                        : 'rgba(59, 130, 246, 0.1)', // כחול בהיר ושקוף בבהיר (כמו bg-blue-100)
+                        ? 'rgba(255, 255, 255, 0.1)'
+                        : 'rgba(59, 130, 246, 0.1)',
                     }}
                   >
                     <Mail className="h-5 w-5" />
@@ -323,6 +314,7 @@ export function ContactPage() {
                   variant="outline"
                   className="w-full gap-2"
                   onClick={() => navigate('/faq')}
+                  aria-label={t('contact:faq.button')}
                 >
                   <HelpCircle className="h-4 w-4" />
                   {t('contact:faq.button')}

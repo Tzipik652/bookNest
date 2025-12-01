@@ -43,7 +43,6 @@ export function PrivacyPolicyPage() {
       );
     }
 
-    // פסקאות רגילות
     return (
       <Typography 
         variant="body1" 
@@ -52,7 +51,7 @@ export function PrivacyPolicyPage() {
         sx={{ 
           lineHeight: 1.8, 
           mb: 3, 
-          textAlign: alignment // יישור לפי שפה
+          textAlign: alignment 
         }}
       >
         {key}
@@ -61,7 +60,6 @@ export function PrivacyPolicyPage() {
   };
 
   return (
-    // Box ראשי - שולט על רקע הדף לפי הגדרות הנגישות (background.default)
     <Box 
       sx={{ 
         minHeight: '100vh', 
@@ -74,16 +72,15 @@ export function PrivacyPolicyPage() {
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
-          className="mb-6 gap-2" // Tailwind class for layout is fine
+          className="mb-6 gap-2"
+          aria-label={t('common:back')} 
         >
           {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
           {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
           {t('common:back')}
         </Button>
 
-        {/* כותרת הדף ואייקון */}
         <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
-          {/* Box לאייקון - צבעי הרקע והאייקון מתאימים את עצמם ל-Theme */}
           <Box 
             sx={{ 
               p: 1.5, 
@@ -111,7 +108,6 @@ export function PrivacyPolicyPage() {
         <Card>
           <CardContent className="pt-6 space-y-6">
             
-            {/* סעיף Introduction - השתמש ב-Box ו-Typography */}
             <Box component="section" sx={{ pb: 2 }}>
               <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
                 {sections.introduction.title}
