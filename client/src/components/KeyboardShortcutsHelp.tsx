@@ -4,13 +4,17 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from '../components/ui/dialog';
+} from '../components/ui/dialog'; // רכיב Shadcn UI
 import { Keyboard } from 'lucide-react';
-import { Box, Typography, Chip } from '@mui/material';
+import { Box, Typography, Chip, useTheme } from '@mui/material'; // 👈 ייבוא useTheme ו-Box/Typography/Chip
 import { useTranslation } from 'react-i18next';
+
+// 👈 ייבוא useAccessibilityStore כדי לקבל את highContrast
+import { useAccessibilityStore } from '../store/accessibilityStore'; 
 
 import { heShortcutType } from '../types/i18n';
 
+// הגדרת קיצורי הדרך
 interface Shortcut {
     key: string;
     descriptionKey: keyof heShortcutType;
@@ -35,6 +39,8 @@ const rawShortcuts: Omit<Shortcut, 'description'>[] = [
 export function KeyboardShortcutsHelp() {
     const { t } = useTranslation(['keyboardShortcutsHelp', 'common']);
     const commonDir = t('common:dir') as 'rtl' | 'ltr';
+    const theme = useTheme(); // 👈 שימוש ב-useTheme
+    const { highContrast } = useAccessibilityStore(); // 👈 ייבוא highContrast
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
@@ -64,18 +70,18 @@ export function KeyboardShortcutsHelp() {
         };
     }, [isOpen]);
 
-const groupedShortcuts = rawShortcuts.reduce((acc, shortcut) => {
-    const translatedCategoryName = t(shortcut.categoryKey); 
+    const groupedShortcuts = rawShortcuts.reduce((acc, shortcut) => {
+        const translatedCategoryName = t(shortcut.categoryKey);
         if (!acc[translatedCategoryName]) {
-        acc[translatedCategoryName] = [];
-    }
-    acc[translatedCategoryName].push(shortcut);
-    return acc;
-}, {} as Record<string, Omit<Shortcut, 'description'>[]>);
+            acc[translatedCategoryName] = [];
+        }
+        acc[translatedCategoryName].push(shortcut);
+        return acc;
+    }, {} as Record<string, Omit<Shortcut, 'description'>[]>);
 
     return (
         <>
-            {/* כפתור קבוע בפינה */}
+            {/* כפתור קבוע בפינה - Chip */}
             <Box
                 sx={{
                     position: 'fixed',
@@ -91,24 +97,39 @@ const groupedShortcuts = rawShortcuts.reduce((acc, shortcut) => {
                     onClick={() => setIsOpen(true)}
                     sx={{
                         cursor: 'pointer',
-                        bgcolor: '#16A34A',
-                        color: 'white',
+                        // ✅ צבע רקע דינמי
+                        bgcolor: theme.palette.primary.main, 
+                        // ✅ צבע טקסט דינמי
+                        color: theme.palette.primary.contrastText, 
                         fontSize: '1rem',
                         fontWeight: 'bold',
                         padding: '10px',
                         '&:hover': {
-                            bgcolor: '#15803D',
+                            // ✅ ריחוף דינמי
+                            bgcolor: theme.palette.primary.dark, 
                         },
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                        // ✅ צל דינמי
+                        boxShadow: theme.shadows[3],
                     }}
                 />
             </Box>
 
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogContent className="max-w-2xl bg-white max-h-[80vh] overflow-y-auto">
+                {/* DialogContent - זהו רכיב Shadcn. יש לטפל בצבע הרקע שלו 
+                  באמצעות style/sx כדי שיגיב ל-Theme/highContrast
+                */}
+                <DialogContent 
+                    className="max-w-2xl max-h-[80vh] overflow-y-auto"
+                    style={{
+                        backgroundColor: highContrast ? theme.palette.background.default : theme.palette.background.paper,
+                        color: highContrast ? theme.palette.text.primary : theme.palette.text.primary,
+                        border: highContrast ? `2px solid ${theme.palette.text.primary}` : 'none'
+                    }}
+                >
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-xl">
-                            <Keyboard className="h-6 w-6 text-green-600" />
+                            {/* ✅ צבע אייקון דינמי */}
+                            <Keyboard className="h-6 w-6" style={{ color: theme.palette.primary.main }} />
                             {t('dialogTitle')}
                         </DialogTitle>
                     </DialogHeader>
@@ -120,9 +141,11 @@ const groupedShortcuts = rawShortcuts.reduce((acc, shortcut) => {
                                     variant="subtitle1"
                                     sx={{
                                         fontWeight: 'bold',
-                                        color: '#16A34A',
+                                        // ✅ צבע כותרת דינמי
+                                        color: theme.palette.primary.main, 
                                         mb: 1,
-                                        borderBottom: '2px solid #16A34A',
+                                        // ✅ גבול דינמי
+                                        borderBottom: `2px solid ${highContrast ? theme.palette.text.primary : theme.palette.primary.main}`,
                                         pb: 0.5,
                                     }}
                                 >
@@ -138,22 +161,30 @@ const groupedShortcuts = rawShortcuts.reduce((acc, shortcut) => {
                                                 justifyContent: 'space-between',
                                                 alignItems: 'center',
                                                 padding: '8px 12px',
-                                                bgcolor: '#f9fafb',
+                                                // ✅ רקע פריט דינמי
+                                                bgcolor: theme.palette.background.default, 
                                                 borderRadius: 1,
                                                 '&:hover': {
-                                                    bgcolor: '#f3f4f6',
+                                                    // ✅ ריחוף דינמי
+                                                    bgcolor: theme.palette.action.hover,
                                                 },
+                                                // ✅ גבול במצב ניגודיות גבוהה
+                                                border: highContrast ? `1px solid ${theme.palette.text.primary}` : 'none'
                                             }}
                                         >
-                                            <Typography variant="body2" sx={{ flex: 1 }}>
+                                            {/* ✅ צבע טקסט דינמי */}
+                                            <Typography variant="body2" sx={{ flex: 1 }} color="text.primary">
                                                 {t(shortcut.descriptionKey)}
                                             </Typography>
                                             <Chip
                                                 label={shortcut.key}
                                                 size="small"
                                                 sx={{
-                                                    bgcolor: 'white',
-                                                    border: '1px solid #e5e7eb',
+                                                    // ✅ רקע דינמי
+                                                    bgcolor: theme.palette.background.paper, 
+                                                    // ✅ גבול דינמי
+                                                    border: `1px solid ${theme.palette.divider}`,
+                                                    color: theme.palette.text.primary,
                                                     fontFamily: 'monospace',
                                                     fontWeight: 'bold',
                                                     minWidth: '80px',
@@ -170,7 +201,8 @@ const groupedShortcuts = rawShortcuts.reduce((acc, shortcut) => {
                         sx={{
                             mt: 3,
                             pt: 2,
-                            borderTop: '1px solid #e5e7eb',
+                            // ✅ גבול עליון דינמי
+                            borderTop: `1px solid ${theme.palette.divider}`,
                             textAlign: 'center',
                         }}
                     >

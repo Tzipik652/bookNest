@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -10,12 +10,18 @@ import { toast } from 'sonner';
 import { useUserStore } from '../store/useUserStore';
 import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
+import { Card as MuiCard } from '@mui/material';
+import { Button as MuiButton } from '@mui/material';
+// ייבוא רכיבי MUI
+import { Box, Typography, Container } from '@mui/material';
 
 export function ContactPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(['contact', 'common']);
   const isRTL = i18n.dir() === 'rtl';
+  const alignment = isRTL ? 'right' : 'left';
+
   const [formData, setFormData] = useState({
     subject: '',
     message: ''
@@ -36,6 +42,7 @@ export function ContactPage() {
     setIsSubmitting(true);
 
     try {
+      // NOTE: Using a placeholder URL/API endpoint
       const res = await fetch("http://localhost:5000/contact", {
         method: "POST",
         headers: {
@@ -68,72 +75,128 @@ export function ContactPage() {
       [e.target.name]: e.target.value
     });
   };
+
+
+  // --- 1. מצב חוסר הרשאה (Login Required) ---
   if (!currentUser?.name || !currentUser?.email) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <Box
+        sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}
+        dir={i18n.dir()}
+      >
         <Card className="max-w-md mx-auto">
           <CardContent className="pt-6 text-center space-y-4">
-            <h2 className="text-red-600">{t('contact:auth.login_required')}</h2>
-            <p className="text-gray-600">
+            <Typography variant="h5" component="h2" color="error.main" sx={{ fontWeight: 'bold' }}>
+              {t('contact:auth.login_required')}
+            </Typography>
+            <Typography color="text.secondary">
               {t('contact:auth.login_description')}
-            </p>
+            </Typography>
             <Button onClick={() => navigate("/login")} className="w-full">
               {t('contact:auth.go_to_login')}
             </Button>
           </CardContent>
         </Card>
-      </div>
+      </Box>
     );
   }
+
+  // --- 2. מצב טופס רגיל / הצלחה ---
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-         <Button
+    <Box
+      sx={{ minHeight: '100vh', bgcolor: 'background.default' }}
+      dir={i18n.dir()}
+    >
+      <Container maxWidth="lg" sx={{ px: 4, py: 4 }}>
+        <Button
           variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-6 gap-2"
         >
-          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
-          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
+          {isRTL ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
           {t('common:back')}
         </Button>
 
-        <div className="mb-8 flex items-center gap-3">
-          <div className="bg-green-100 p-3 rounded-lg">
-            <Mail className="h-8 w-8 text-green-600" />
-          </div>
-          <div>
-            <h1 className="mb-1">{t('contact:title')}</h1>
-            <p className="text-gray-600">{t('contact:subtitle')}</p>
-          </div>
-        </div>
+        {/* כותרת הדף */}
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box
+            sx={{
+              p: 1.5,
+              borderRadius: 2,
+              // רקע שקוף למחצה בצבע ירוק בבהיר, או אפור בכהה
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(22, 163, 74, 0.1)',
+              color: 'primary.main',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Mail className="h-8 w-8" />
+          </Box>
+          <Box>
+            <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary" sx={{ mb: 0.5 }}>
+              {t('contact:title')}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              {t('contact:subtitle')}
+            </Typography>
+          </Box>
+        </Box>
 
+        {/* טופס / הצלחה / מידע ליצירת קשר */}
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Contact Form */}
+
+          {/* Contact Form OR Success Message (2/3 col) */}
           {messageSent ? (
-            <Card className="border-green-200 bg-green-50">
+            // --- 3. מצב הצלחה (Success Message) ---
+            <MuiCard
+              className="md:col-span-2"
+              sx={{
+                border: '1px solid',
+                borderColor: 'success.light',
+                // שימוש בצבע רקע סמנטי מה-Theme
+                bgcolor: 'success.lightest'
+              }}
+            >
               <CardContent className="pt-6">
-                <div className="text-center py-8">
-                  <div className="mb-4 flex justify-center">
-                    <div className="bg-green-100 p-4 rounded-full">
-                      <CheckCircle2 className="h-12 w-12 text-green-600" />
-                    </div>
-                  </div>
-                  <h2 className="mb-3 text-green-800">{t('contact:success.title')}</h2>
-                  <p className="text-green-700 mb-6 max-w-md mx-auto">
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+                    <Box
+                      sx={{
+                        bgcolor: 'success.light',
+                        p: 2,
+                        borderRadius: '50%',
+                        color: 'success.dark'
+                      }}
+                    >
+                      <CheckCircle2 className="h-12 w-12" />
+                    </Box>
+                  </Box>
+                  <Typography variant="h5" component="h2" color="success.dark" sx={{ mb: 1, fontWeight: 'bold' }}>
+                    {t('contact:success.title')}
+                  </Typography>
+                  <Typography color="success.dark" sx={{ mb: 3, maxWidth: 'md', mx: 'auto' }}>
                     {t('contact:success.description')}
-                  </p>
-                  <Button
+                  </Typography>
+                  <MuiButton
                     onClick={() => setMessageSent(false)}
-                    variant="outline"
-                    className="border-green-600 text-green-700 hover:bg-green-100"
+                    variant="outlined"
+                    sx={{
+                      borderColor: 'success.main',
+                      color: 'success.main',
+                      '&:hover': {
+                        bgcolor: 'success.light',
+                        borderColor: 'success.dark',
+                      }
+                    }}
                   >
                     {t('contact:success.button_another')}
-                  </Button>
-                </div>
+                  </MuiButton>
+                </Box>
               </CardContent>
-            </Card>
+            </MuiCard>
           ) : (
+            // --- 4. מצב טופס רגיל ---
             <div className="md:col-span-2">
               <Card>
                 <CardContent className="pt-6">
@@ -170,56 +233,92 @@ export function ContactPage() {
                       disabled={isSubmitting}
                     >
                       <Send className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
-                      {isSubmitting ? t('common:sending') : t('contact:form.submit_button')}                     {isSubmitting ? 'Sending...' : 'Send Message'}
+                      {isSubmitting ? t('common:sending') : t('contact:form.submit_button')}
                     </Button>
                   </form>
                 </CardContent>
               </Card>
             </div>
           )}
-          {/* Contact Information */}
+
+          {/* Contact Information (1/3 col) */}
           <div className="space-y-6">
+
+            {/* מידע ליצירת קשר */}
             <Card>
               <CardContent className="pt-6 space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <Mail className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="mb-1">{t('common:email')}</h3>
-                    <p className="text-sm text-gray-600">booknestwebsite@gmail.com</p>
-                  </div>
-                </div>
+                {/* דוא"ל */}
+                <Box sx={{ display: 'flex', alignItems: 'start', gap: 1.5, textAlign: alignment }}>
+                  <Box
+                    // רקע עדין יותר במצב רגיל, ושומר על ניגודיות במצב כהה
+                    sx={{
+                      p: 1,
+                      borderRadius: 1,
+                      color: 'info.main', // צבע האייקון עצמו (כחול ראשי)
+                      bgcolor: (theme) => theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.1)' // רקע אפור בהיר בכהה
+                        : 'rgba(59, 130, 246, 0.1)', // כחול בהיר ושקוף בבהיר (כמו bg-blue-100)
+                    }}
+                  >
+                    <Mail className="h-5 w-5" />
+                  </Box>
+                  <Box>
+                    <Typography variant="h6" component="h3" color="text.primary" sx={{ mb: 0.5, fontWeight: 'bold' }}>
+                      {t('common:email')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">booknestwebsite@gmail.com</Typography>
+                  </Box>
+                </Box>
 
-                <div className="flex items-start gap-3">
-                  <div className="bg-green-100 p-2 rounded-lg">
-                    <MapPin className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="mb-1">{t('contact:info.location_label')}</h3>
-                    <p className="text-sm text-gray-600">
+                {/* מיקום */}
+                <Box sx={{ display: 'flex', alignItems: 'start', gap: 1.5, textAlign: alignment }}>
+                  <Box sx={{ 
+                    p: 1, 
+                    borderRadius: 1, 
+                    color: 'primary.main', 
+                    bgcolor: (theme) => theme.palette.mode === 'dark' 
+                      ? 'rgba(255, 255, 255, 0.1)' 
+                      : 'rgba(22, 163, 74, 0.1)', 
+                  }}>
+                    <MapPin className="h-5 w-5" />
+                  </Box>
+                  <Box>
+                    <Typography variant="h6" component="h3" color="text.primary" sx={{ mb: 0.5, fontWeight: 'bold' }}>
+                      {t('contact:info.location_label')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
                       {t('contact:info.address_line1')}<br />
                       {t('contact:info.address_line2')}<br />
                       {t('contact:info.address_country')}
-                    </p>
-                  </div>
-                </div>
+                    </Typography>
+                  </Box>
+                </Box>
               </CardContent>
             </Card>
 
+            {/* FAQ Card */}
             <Card>
               <CardContent className="pt-6">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="bg-yellow-100 p-2 rounded-lg">
-                    <HelpCircle className="h-5 w-5 text-yellow-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="mb-1">{t('contact:faq.title')}</h3>
-                    <p className="text-sm text-gray-600">
+                <Box sx={{ display: 'flex', alignItems: 'start', gap: 1.5, mb: 3, textAlign: alignment }}>
+                  <Box sx={{ 
+                    p: 1, 
+                    borderRadius: 1, 
+                    color: 'warning.main', 
+                    bgcolor: (theme) => theme.palette.mode === 'dark' 
+                      ? 'rgba(255, 255, 255, 0.1)' 
+                      : 'rgba(245, 158, 11, 0.1)', 
+                  }}>
+                    <HelpCircle className="h-5 w-5" />
+                  </Box>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" component="h3" color="text.primary" sx={{ mb: 0.5, fontWeight: 'bold' }}>
+                      {t('contact:faq.title')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
                       {t('contact:faq.description')}
-                    </p>
-                  </div>
-                </div>
+                    </Typography>
+                  </Box>
+                </Box>
                 <Button
                   variant="outline"
                   className="w-full gap-2"
@@ -232,7 +331,7 @@ export function ContactPage() {
             </Card>
           </div>
         </div>
-      </div>
-    </div>
+      </Container>
+    </Box>
   );
 }

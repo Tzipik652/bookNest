@@ -273,33 +273,6 @@ export function AddBookPage() {
           </form>
         </Card>
       </Box>
-{/* 
-      <Snackbar
-        open={showAlert}
-        autoHideDuration={4000}
-        onClose={() => setShowAlert(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="error" variant="filled" sx={{ width: "100%" }}>
-          {error}
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={showSuccess}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccess(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          icon={<CheckCircle fontSize="inherit" />}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {successMessage}
-        </Alert>
-      </Snackbar> */}
     </Box>
   );
 }

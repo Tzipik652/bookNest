@@ -15,18 +15,21 @@ import { UserList } from "../components/adminDashboard/UserList";
 import { RecentComments } from "../components/adminDashboard/RecentComments";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 import { useTranslation } from "react-i18next";
+// ייבוא רכיבי MUI
+import { Box, Typography, Container, useTheme } from '@mui/material';
 
 export function AdminDashboardPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
   const { t } = useTranslation(["adminDashboard", "common"]);
   const adminTexts = t('dashboard', { returnObjects: true }) as any;
+  const theme = useTheme(); // שימוש ב-Theme
+
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
   const [userMap, setUserMap] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
 
   const [isReactionsLoading, setIsReactionsLoading] = useState(true);
-
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -130,25 +133,39 @@ export function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={t('common:dir')}>
-      <div className="container mx-auto px-4 py-8">
+    <Box 
+      sx={{ minHeight: '100vh', bgcolor: 'background.default' }} 
+      dir={t('common:dir')}
+    >
+      <Container maxWidth="xl" sx={{ px: 4, py: 4 }}>
+        
         {/* Header */}
-        <div className="mb-8 flex items-center gap-3">
-          <div className="bg-green-100 p-3 rounded-lg">
-            <Shield className="h-8 w-8 text-green-600" />
-          </div>
-          <div>
-            <h1 className="mb-1 text-2xl font-bold text-gray-900">
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box 
+            sx={{ 
+              p: 1.5, 
+              borderRadius: 2, 
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(22, 163, 74, 0.1)',
+              color: 'primary.main',
+            }}
+          >
+            <Shield className="h-8 w-8" />
+          </Box>
+          <Box>
+            <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary">
               {adminTexts.pageTitle}
-            </h1>
-            <p className="text-gray-600">{adminTexts.pageSubtitle}</p>
-          </div>
-        </div>
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              {adminTexts.pageSubtitle}
+            </Typography>
+          </Box>
+        </Box>
 
-        {/* Stats */}
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+        {/* Stats Section */}
+        <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
           {adminTexts.overviewTitle}
-        </h2>
+        </Typography>
+
         <StatsCards
           favoritesCount={favoritesCount}
           totalBooksCount={books.length}
@@ -161,30 +178,30 @@ export function AdminDashboardPage() {
           translationKeys={adminTexts.stats}
         />
 
-        {/* Books */}
-        <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
+        {/* Books Management Section */}
+        <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
           {adminTexts.booksMgtTitle}
-        </h2>
+        </Typography>
         <AdminBooksTable
           books={books}
           userMap={userMap}
           isLoading={isLoading}
         />
 
-        {/* Users */}
-        <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
+        {/* Users Management Section */}
+        <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
           {adminTexts.usersTitle}
-        </h2>
+        </Typography>
         <UserList
           users={users}
           currentUser={currentUser}
           isLoading={isLoading}
         />
 
-        {/* Recent Comments */}
-        <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
+        {/* Recent Comments Section */}
+        <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
           {adminTexts.recentActivityTitle}
-        </h2>
+        </Typography>
         <RecentComments
           recentComments={recentComments}
           booksMap={booksMap}
@@ -192,7 +209,7 @@ export function AdminDashboardPage() {
           reactionCounts={reactionCounts}
           isLoading={isLoading}
         />
-      </div>
-    </div>
+      </Container>
+    </Box>
   );
 }

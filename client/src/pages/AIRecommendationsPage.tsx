@@ -105,11 +105,10 @@ export function AIRecommendationsPage() {
             {getAlertMessage()}
           </Typography>
         </Alert>
-
-        <Button
+       <Button
           variant="contained"
-          color="primary"
           onClick={handleRefresh}
+          sx={{ backgroundColor: "primary.main" ,color:"primary.contrastText"}}
           disabled={isRefreshing}
           startIcon={
             isRefreshing ? (

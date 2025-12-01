@@ -7,10 +7,12 @@ import {
     AccordionItem,
     AccordionTrigger
 } from '../components/ui/accordion';
-import { ArrowLeft, HelpCircle, MessageCircle } from 'lucide-react';
+import { ArrowLeft, HelpCircle, MessageCircle, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef, useState } from 'react';
+import { Box, Typography, Container, useTheme } from '@mui/material';
 
+// ממשקים נשארים זהים
 interface FAQItem {
     question: string;
     answer: string;
@@ -22,16 +24,20 @@ interface FAQSection {
 }
 import { faqs } from '../lib/faqs';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
+import { useAccessibilityStore } from '../store/accessibilityStore';
 
 export function FAQPage() {
+    const {darkMode, highContrast}=useAccessibilityStore();
     const isKeyboardMode = useKeyboardModeBodyClass();
-    const { t } = useTranslation(['faq', 'common']);
+    const { t, i18n } = useTranslation(['faq', 'common']);
     const faqSections = t('faq:sections', { returnObjects: true }) as FAQSection[];
     const navigate = useNavigate();
     const [isLoading] = useState(false);
     const [firstLoad, setFirstLoad] = useState(true);
     const discoverRef = useRef<HTMLHeadingElement | null>(null);
+    const isRTL = i18n.dir() === 'rtl';
 
+    // הלוגיקה של useEffect נשארת זהה
     useEffect(() => {
         if (!isLoading) {
             if (firstLoad) {
@@ -42,43 +48,65 @@ export function FAQPage() {
             }
         }
     }, [isLoading]);
+
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="container mx-auto px-4 py-8">
+        // החלפת div ראשי ב-Box עם רקע דינמי
+        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }} dir={i18n.dir()}>
+            <Container maxWidth="md" sx={{ px: 4, py: 4 }}>
                 {/* Header */}
-                <div className="mb-8">
+                <Box sx={{ mb: 4 }}>
                     <Button
                         variant="ghost"
                         className="mb-4 gap-2"
                         onClick={() => navigate(-1)}
                     >
-                        <ArrowLeft className="h-4 w-4" />
+                        {isRTL ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
                         {t('common:back')}
                     </Button>
 
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="bg-green-100 p-3 rounded-lg">
-                            <HelpCircle className="h-8 w-8 text-green-600" />
-                        </div>
-                        <h1>{t('faq:pageTitle')}</h1>
-                    </div>
-                    <p className="text-gray-600">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                        {/* אייקון ראשי - שימוש בצבעי Theme */}
+                        <Box sx={{
+                            p: 1.5,
+                            borderRadius: 2,
+                            // רקע עדין ירוק בבהיר, אפור בכהה
+                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(22, 163, 74, 0.1)',
+                            color: 'primary.main',
+                        }}>
+                            <HelpCircle className="h-8 w-8" />
+                        </Box>
+                        {/* שימוש ב-Typography לכותרת הראשית */}
+                        <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary">
+                            {t('faq:pageTitle')}
+                        </Typography>
+                    </Box>
+                    <Typography variant="body1" color="text.secondary">
                         {t('faq:subtitle')}
-                    </p>
-                </div>
+                    </Typography>
+                </Box>
 
                 {/* FAQ Sections */}
-                <div className="space-y-6">
+                <Box sx={{ spaceY: 6 }}>
                     {Array.isArray(faqSections) && faqSections.map((section: any, idx: any) => (
-                        <Card key={idx}>
+                        <Card key={idx} className="mb-6">
                             <CardContent className="pt-6">
-                                <h2 className="mb-4 text-green-600">{section.category}</h2>
+                                {/* כותרת קטגוריה - שימוש בצבע ראשי */}
+                                <Typography
+                                    component="h2"
+                                    variant="h5"
+                                    sx={{ mb: 2, color: 'primary.main', fontWeight: 'bold' }}
+                                >
+                                    {section.category}
+                                </Typography>
                                 <Accordion type="single" collapsible className="w-full">
                                     {section.questions.map((faq: any, faqIdx: any) => (
                                         <AccordionItem key={faqIdx} value={`item-${idx}-${faqIdx}`}>
                                             <AccordionTrigger>{faq.question}</AccordionTrigger>
-                                            <AccordionContent className="text-gray-700">
-                                                {faq.answer}
+                                            {/* טקסט תשובה - שימוש בצבע טקסט משני */}
+                                            <AccordionContent>
+                                                <Typography color="text.secondary">
+                                                    {faq.answer}
+                                                </Typography>
                                             </AccordionContent>
                                         </AccordionItem>
                                     ))}
@@ -86,28 +114,78 @@ export function FAQPage() {
                             </CardContent>
                         </Card>
                     ))}
-                </div>
+                </Box>
 
-                {/* Still Need Help */}
-                <Card className="mt-8 bg-green-50 border-green-200">
-                    <CardContent className="pt-6">
-                        <div className="flex items-start gap-4">
-                            <div className="bg-green-100 p-3 rounded-lg">
-                                <MessageCircle className="h-6 w-6 text-green-600" />
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="mb-2">{t('faq:contact.title')}</h3>
-                                <p className="text-gray-700 mb-4">
-                                    {t('faq:contact.text')}
-                                </p>
-                                <Button onClick={() => navigate('/contact')}>
-                                    {t('faq:contact.button')}
-                                </Button>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
+
+                {/* --- Still Need Help: שחזור למצב Tailwind המקורי --- */}
+                {/* מחליפים את <Card className="mt-8 bg-green-50 border-green-200">... בבלוק Box דינמי */}
+                <Box
+                    sx={{
+                        mt: 4,
+                        p: 3,
+                        borderRadius: 2,
+
+                        // --- 1. רקע וגבולות המגיבים למצב כהה ולניגודיות גבוהה (ה-Switch שלך) ---
+                        bgcolor: (theme) =>
+                            highContrast
+                                ? theme.palette.background.default // נקיעת הרקע משחור ב-Theme
+                                : darkMode
+                                    ? '#1c3639' // ירוק כהה ב-Dark Mode
+                                    : '#dcfce7', // ירוק בהיר ב-Light Mode
+
+                        border: '1px solid',
+                        borderColor: (theme) =>
+                            highContrast
+                                ? theme.palette.text.primary // גבול לבן ב-High Contrast
+                                : darkMode
+                                    ? '#375a3e'
+                                    : '#bbf7d0',
+
+                        // --- 2. טיפול ב-HCM של מערכת ההפעלה (אופציונלי, אבל מומלץ) ---
+                        '@media (forced-colors: active)': {
+                            bgcolor: 'Canvas', // רקע המערכת
+                            border: '3px solid',
+                            borderColor: 'Highlight', // צבע גבול המערכת
+                        }
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'start', gap: 2 }}>
+
+                        {/* האייקון הקטן - גם הוא חייב להיות דינמי! */}
+                        <Box sx={{
+                            p: 1.5,
+                            borderRadius: 1,
+                            // צבע אייקון: בהיר בכהה (כדי לבלוט), כהה בבהיר
+                            color: (theme) => theme.palette.mode === 'dark' ? '#34d399' : '#059669',
+                            // רקע אייקון: כהה בכהה, בהיר בבהיר
+                            bgcolor: (theme) => theme.palette.mode === 'dark' ? '#104e4c' : '#a7f3d0',
+                        }}>
+                            <MessageCircle className="h-6 w-6" />
+                        </Box>
+
+                        <Box sx={{ flexGrow: 1 }}>
+                            {/* הטקסטים: משתמשים בצבעי Theme רגילים (text.primary/secondary) 
+                                - עכשיו הם יהפכו ללבנים וקריאים, כי הרקע כהה. */}
+                            <Typography component="h3" variant="h6" color="text.primary" sx={{ mb: 0.5, fontWeight: 'bold' }}>
+                                {t('faq:contact.title')}
+                            </Typography>
+
+                            <Typography color="text.secondary" sx={{ mb: 2 }}>
+                                {t('faq:contact.text')}
+                            </Typography>
+
+                            {/* הכפתור (שומרים על Button של Shadcn עם סטיילינג Tailwind, כדי לשמור על המראה שאתה אוהב) */}
+                            <Button
+                                onClick={() => navigate('/contact')}
+                                // אפקטי הריחוף נשארים
+                                className="hover:bg-green-700 hover:text-white transition-colors duration-200"
+                            >
+                                {t('faq:contact.button')}
+                            </Button>
+                        </Box>
+                    </Box>
+                </Box>
+            </Container>
+        </Box>
     );
 }
