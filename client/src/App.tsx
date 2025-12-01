@@ -14,7 +14,7 @@ import AccessibilityMenu from "./components/AccessibilityMenu";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import ScrollButton from "./components/ScrollButton";
 import { useTranslation } from "react-i18next";
-import ScreenReaderController from "./components/ScreenReaderController";
+import { useScreenReader } from "./hooks/useScreenReader";
 
 // Lazy-loaded pages
 const LazyLoginPage = React.lazy(() =>
@@ -114,6 +114,7 @@ function App() {
   const { t, i18n } = useTranslation("common");
   const { user: currentUser } = useUserStore();
   const { pathname } = useLocation();
+  useScreenReader();
 
   useEffect(() => {
     window.scrollTo({
@@ -151,8 +152,6 @@ function App() {
       <Navbar />
       <AccessibilityMenu />
       
-      <ScreenReaderController />
-
       {/* Global Accessibility Overrides */}
       <GlobalStyles
         styles={{

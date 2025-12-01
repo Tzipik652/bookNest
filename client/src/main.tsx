@@ -10,7 +10,6 @@ import AccessibilityMenu from "./components/AccessibilityMenu";
 import { useDynamicTheme } from "./theme";
 import { BrowserRouter } from "react-router-dom";
 import "./i18n";
-import { ScreenReaderProvider } from "./components/ScreenReaderProvider";
 
 const queryClient = new QueryClient();
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID!;
@@ -21,9 +20,7 @@ function Root() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AccessibilityMenu />
-      {/* <ScreenReaderProvider> */}
         <App />
-      {/* </ScreenReaderProvider> */}
     </ThemeProvider>
   );
 }

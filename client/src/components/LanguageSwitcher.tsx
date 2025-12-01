@@ -59,7 +59,7 @@ const LanguageSwitcher = () => {
               className={`w-full text-left px-4 py-2 text-sm flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors
                 ${i18n.language === lang.code ? 'text-green-600 font-medium' : 'text-gray-700 dark:text-gray-200'}
               `}
-              aria-label={i18n.language}
+              aria-label={lang.label}
             >
               <span className="flex items-center gap-2">
                 <span>{lang.flag}</span> {lang.label}
