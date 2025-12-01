@@ -26,6 +26,10 @@ const ai = new GoogleGenAI({ apiKey });
  */
 export async function generateBookSummary(title, author, description) {
   const prompt = `
+        You will receive a book title, author, and description.
+        Detect the language that appears most consistently in these fields
+        and write the summary in that language.
+
         Create a concise and engaging summary (2-3 sentences) for the book titled:
         "${title}" by "${author}".
         Use the following book description as reference: "${description},
@@ -33,22 +37,21 @@ export async function generateBookSummary(title, author, description) {
         Make sure the summary is clear and well-written.
     `;
 
-    try {
-        //  Corrected call according to documentation
-        const response = await ai.models.generateContent({
-             model: MODEL_NAME,
-             contents: prompt,
-             config: { 
-                 temperature: 0.7 // creativity level
-             }
-        });
-        
-        return response.text.trim();
-        
-    } catch (error) {
-        console.error("Gemini Summary Error:", error);
-        throw error; // default value in case of error
-    }
+  try {
+    //  Corrected call according to documentation
+    const response = await ai.models.generateContent({
+      model: MODEL_NAME,
+      contents: prompt,
+      config: {
+        temperature: 0.7, // creativity level
+      },
+    });
+
+    return response.text.trim();
+  } catch (error) {
+    console.error("Gemini Summary Error:", error);
+    throw error; // default value in case of error
+  }
 }
 
 // --- 2. AI Recommendations ---
@@ -90,5 +93,3 @@ export async function getBookRecommendations(favoriteBooks, candidateBooks) {
     return [];
   }
 }
-
-
