@@ -27,8 +27,12 @@ const ai = new GoogleGenAI({ apiKey });
 export async function generateBookSummary(title, author, description) {
   const prompt = `
         You will receive a book title, author, and description.
-        Detect the language that appears most consistently in these fields
-        and write the summary in that language.
+    Detect the dominant language silently and use it to write the summary.
+
+    IMPORTANT:
+    - Do NOT explain the language you detected.
+    - Do NOT mention detection results.
+    - Output ONLY the final summary, nothing else.
 
         Create a concise and engaging summary (2-3 sentences) for the book titled:
         "${title}" by "${author}".
