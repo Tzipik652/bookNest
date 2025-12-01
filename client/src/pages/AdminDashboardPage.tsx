@@ -15,6 +15,7 @@ import { UserList } from "../components/adminDashboard/UserList";
 import { RecentComments } from "../components/adminDashboard/RecentComments";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 import { useTranslation } from "react-i18next";
+import { Box, Typography } from "@mui/material";
 
 export function AdminDashboardPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
@@ -130,69 +131,81 @@ export function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={t('common:dir')}>
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8 flex items-center gap-3">
-          <div className="bg-green-100 p-3 rounded-lg">
-            <Shield className="h-8 w-8 text-green-600" />
-          </div>
-          <div>
-            <h1 className="mb-1 text-2xl font-bold text-gray-900">
-              {adminTexts.pageTitle}
-            </h1>
-            <p className="text-gray-600">{adminTexts.pageSubtitle}</p>
-          </div>
+    <Box
+      component="main"
+      sx={{
+        minHeight: '100vh',
+        backgroundColor: 'grey.50',
+        p: 4,
+      }}
+      dir={t('common:dir')}
+    >
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2,
+        mb: 4
+      }}>
+        <Box sx={{
+          p: 2,
+          bgcolor: 'success.light',
+          borderRadius: 2
+        }}>
+          <Shield className="h-8 w-8 text-green-600" />
+        </Box>
+        <div>
+          <Typography component="h1" variant="h4" fontWeight="bold" color="text.primary">
+            {adminTexts.pageTitle}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {adminTexts.pageSubtitle}
+          </Typography>
         </div>
+      </Box>
 
-        {/* Stats */}
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          {adminTexts.overviewTitle}
-        </h2>
-        <StatsCards
-          favoritesCount={favoritesCount}
-          totalBooksCount={books.length}
-          totalUsersCount={users.length}
-          commentsCount={comments.length}
-          reactionsCount={reactionCounts ? calculatedTotalReactions : 0}
-          recentUploads={recentBooks.length}
-          isLoading={isLoading}
-          isReactionsLoading={isReactionsLoading}
-          translationKeys={adminTexts.stats}
-        />
+      <Typography component="h2" variant="h5" fontWeight="semibold" color="text.primary" sx={{ mb: 2 }}>
+        {adminTexts.overviewTitle}
+      </Typography>
+      <StatsCards
+        favoritesCount={favoritesCount}
+        totalBooksCount={books.length}
+        totalUsersCount={users.length}
+        commentsCount={comments.length}
+        reactionsCount={reactionCounts ? calculatedTotalReactions : 0}
+        recentUploads={recentBooks.length}
+        isLoading={isLoading}
+        isReactionsLoading={isReactionsLoading}
+        translationKeys={adminTexts.stats}
+      />
 
-        {/* Books */}
-        <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
-          {adminTexts.booksMgtTitle}
-        </h2>
-        <AdminBooksTable
-          books={books}
-          userMap={userMap}
-          isLoading={isLoading}
-        />
+      <Typography component="h2" variant="h5" fontWeight="semibold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
+        {adminTexts.booksMgtTitle}
+      </Typography>
+      <AdminBooksTable
+        books={books}
+        userMap={userMap}
+        isLoading={isLoading}
+      />
 
-        {/* Users */}
-        <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
-          {adminTexts.usersTitle}
-        </h2>
-        <UserList
-          users={users}
-          currentUser={currentUser}
-          isLoading={isLoading}
-        />
+      <Typography component="h2" variant="h5" fontWeight="semibold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
+        {adminTexts.usersTitle}
+      </Typography>
+      <UserList
+        users={users}
+        currentUser={currentUser}
+        isLoading={isLoading}
+      />
 
-        {/* Recent Comments */}
-        <h2 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
-          {adminTexts.recentActivityTitle}
-        </h2>
-        <RecentComments
-          recentComments={recentComments}
-          booksMap={booksMap}
-          userMap={userMap}
-          reactionCounts={reactionCounts}
-          isLoading={isLoading}
-        />
-      </div>
-    </div>
+      <Typography component="h2" variant="h5" fontWeight="semibold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
+        {adminTexts.recentActivityTitle}
+      </Typography>
+      <RecentComments
+        recentComments={recentComments}
+        booksMap={booksMap}
+        userMap={userMap}
+        reactionCounts={reactionCounts}
+        isLoading={isLoading}
+      />
+    </Box>
   );
 }

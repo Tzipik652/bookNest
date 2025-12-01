@@ -1,22 +1,19 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { addBook } from "../services/bookService";
-import { getCategories } from "../services/categoryService";
 import {
   Box,
   Button,
   Card,
   CardContent,
-  CardHeader,
   CardActions,
   TextField,
   MenuItem,
   Alert,
   CircularProgress,
-  Snackbar,
+  Typography,
 } from "@mui/material";
 import { Button as ShadcnButton } from "../components/ui/button";
-import { ArrowBack, AutoAwesome, CheckCircle } from "@mui/icons-material";
+import { ArrowBack, AutoAwesome } from "@mui/icons-material";
 import { useUserStore } from "../store/useUserStore";
 import { Category } from "../types";
 import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
@@ -26,6 +23,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { addBook } from "../services/bookService";
+import { getCategories } from "../services/categoryService";
 
 export function AddBookPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
@@ -108,7 +107,7 @@ export function AddBookPage() {
   };
 
   return (
-    <Box minHeight="100vh" bgcolor="#f9fafb" py={6}>
+    <Box minHeight="100vh" bgcolor="#f9fafb" py={6} component="main">
       <Box maxWidth="sm" mx="auto" px={2}>
         <ShadcnButton
           variant="ghost"
@@ -121,14 +120,14 @@ export function AddBookPage() {
           {t('common:back')}
         </ShadcnButton>
 
+        <Typography component="h1" variant="h3" fontWeight="bold" gutterBottom>
+          {t("pageTitle")}
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+          {t("pageSubheader")}
+        </Typography>
 
         <Card elevation={3}>
-          <CardHeader
-            className="notranslate"
-            title={t("pageTitle")}
-            subheader={t("pageSubheader")}
-          />
-
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent>
               <Alert
