@@ -15,19 +15,20 @@ import { UserList } from "../components/adminDashboard/UserList";
 import { RecentComments } from "../components/adminDashboard/RecentComments";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 import { useTranslation } from "react-i18next";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Container, useTheme } from '@mui/material';
 
 export function AdminDashboardPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
   const { t } = useTranslation(["adminDashboard", "common"]);
   const adminTexts = t('dashboard', { returnObjects: true }) as any;
+  const theme = useTheme();
+
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
   const [userMap, setUserMap] = useState<Record<string, string>>({});
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
 
   const [isReactionsLoading, setIsReactionsLoading] = useState(true);
-
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -131,81 +132,83 @@ export function AdminDashboardPage() {
   }
 
   return (
-    <Box
-      component="main"
-      sx={{
-        minHeight: '100vh',
-        backgroundColor: 'grey.50',
-        p: 4,
-      }}
+    <Box 
+      sx={{ minHeight: '100vh', bgcolor: 'background.default' }} 
       dir={t('common:dir')}
     >
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        mb: 4
-      }}>
-        <Box sx={{
-          p: 2,
-          bgcolor: 'success.light',
-          borderRadius: 2
-        }}>
-          <Shield className="h-8 w-8 text-green-600" />
+      <Container maxWidth="xl" sx={{ px: 4, py: 4 }}>
+        
+        {/* Header */}
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box 
+            sx={{ 
+              p: 1.5, 
+              borderRadius: 2, 
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(22, 163, 74, 0.1)',
+              color: 'primary.main',
+            }}
+          >
+            <Shield className="h-8 w-8" />
+          </Box>
+          <Box>
+            <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary">
+              {adminTexts.pageTitle}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              {adminTexts.pageSubtitle}
+            </Typography>
+          </Box>
         </Box>
-        <div>
-          <Typography component="h1" variant="h4" fontWeight="bold" color="text.primary">
-            {adminTexts.pageTitle}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {adminTexts.pageSubtitle}
-          </Typography>
-        </div>
-      </Box>
 
-      <Typography component="h2" variant="h5" fontWeight="semibold" color="text.primary" sx={{ mb: 2 }}>
-        {adminTexts.overviewTitle}
-      </Typography>
-      <StatsCards
-        favoritesCount={favoritesCount}
-        totalBooksCount={books.length}
-        totalUsersCount={users.length}
-        commentsCount={comments.length}
-        reactionsCount={reactionCounts ? calculatedTotalReactions : 0}
-        recentUploads={recentBooks.length}
-        isLoading={isLoading}
-        isReactionsLoading={isReactionsLoading}
-        translationKeys={adminTexts.stats}
-      />
+        {/* Stats Section */}
+        <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+          {adminTexts.overviewTitle}
+        </Typography>
 
-      <Typography component="h2" variant="h5" fontWeight="semibold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
-        {adminTexts.booksMgtTitle}
-      </Typography>
-      <AdminBooksTable
-        books={books}
-        userMap={userMap}
-        isLoading={isLoading}
-      />
+        <StatsCards
+          favoritesCount={favoritesCount}
+          totalBooksCount={books.length}
+          totalUsersCount={users.length}
+          commentsCount={comments.length}
+          reactionsCount={reactionCounts ? calculatedTotalReactions : 0}
+          recentUploads={recentBooks.length}
+          isLoading={isLoading}
+          isReactionsLoading={isReactionsLoading}
+          translationKeys={adminTexts.stats}
+        />
 
-      <Typography component="h2" variant="h5" fontWeight="semibold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
-        {adminTexts.usersTitle}
-      </Typography>
-      <UserList
-        users={users}
-        currentUser={currentUser}
-        isLoading={isLoading}
-      />
+        {/* Books Management Section */}
+        <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
+          {adminTexts.booksMgtTitle}
+        </Typography>
+        <AdminBooksTable
+          books={books}
+          userMap={userMap}
+          isLoading={isLoading}
+        />
 
-      <Typography component="h2" variant="h5" fontWeight="semibold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
-        {adminTexts.recentActivityTitle}
-      </Typography>
-      <RecentComments
-        recentComments={recentComments}
-        booksMap={booksMap}
-        userMap={userMap}
-        reactionCounts={reactionCounts}
-        isLoading={isLoading}
-      />
+        {/* Users Management Section */}
+        <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
+          {adminTexts.usersTitle}
+        </Typography>
+        <UserList
+          users={users}
+          currentUser={currentUser}
+          isLoading={isLoading}
+        />
+
+        {/* Recent Comments Section */}
+        <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
+          {adminTexts.recentActivityTitle}
+        </Typography>
+        <RecentComments
+          recentComments={recentComments}
+          booksMap={booksMap}
+          userMap={userMap}
+          reactionCounts={reactionCounts}
+          isLoading={isLoading}
+        />
+      </Container>
     </Box>
   );
 }

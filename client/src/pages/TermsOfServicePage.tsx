@@ -1,32 +1,78 @@
-import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+// ייבוא רכיבי MUI לטיפול ב-Theme ובנגישות
+import { Box, Typography, Container, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { ArrowLeft, ArrowRight, FileText } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, Circle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
+
+// ----------------------------------------------------------------------
 
 export function TermsOfServicePage() {
   const { t } = useTranslation(["terms", "common"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
+  // לוודא שהתרגום הוחזר כאובייקט
   const tos = t('termsOfService', { returnObjects: true }) as any;
   const sections = tos.sections;
+
+
   const renderContent = (key: string | string[]) => {
     if (Array.isArray(key)) {
       return (
-        <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+        <List dense sx={{ pl: 0, pt: 0, pb: 2 }}>
           {key.map((item, index) => (
-            <li key={index}>{item}</li>
+            <ListItem
+              key={index}
+              alignItems="flex-start"
+              sx={{ pl: 0, py: 0.5 }}
+              dir={t('common:dir')}
+            >
+              <ListItemIcon sx={{ minWidth: 24, mt: '4px' }}>
+                <Circle size={6} fill="currentColor" />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <Typography variant="body1" color="text.primary" sx={{
+                    textAlign: t('common:dir') === 'rtl' ? 'right' : 'left'
+                  }}>
+                    {item}
+                  </Typography>
+                }
+              />
+            </ListItem>
           ))}
-        </ul>
+        </List>
       );
     }
-    return <p className="text-gray-700 leading-relaxed">{key}</p>;
+
+    // שימוש ב-Typography במקום <p> - הטקסט יקבל את צבע ה-Theme הנכון
+    return (
+      <Typography
+        variant="body1"
+        color="text.primary"
+        paragraph
+        sx={{ lineHeight: 1.8, mb: 3 }} // מרחק שורה ורווח תחתון עקבי
+        dir={t('common:dir')}
+      >
+        {key}
+      </Typography>
+    );
   };
+
   return (
-    <div className="min-h-screen bg-gray-50" dir={t('common:dir')}>
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    // Box ראשי - שולט על רקע הדף לפי הגדרות הנגישות (background.default)
+    <Box
+      sx={{
+        minHeight: '100vh',
+        bgcolor: 'background.default', // צבע רקע דינמי
+        color: 'text.primary', // צבע טקסט דינמי
+      }}
+      dir={t('common:dir')}
+    >
+      {/* Container - מגביל רוחב ומספק ריפוד */}
+      <Container maxWidth="md" sx={{ py: 4 }}>
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
@@ -38,117 +84,80 @@ export function TermsOfServicePage() {
           {t('common:back')}
         </Button>
 
-        <div className="mb-8 flex items-center gap-3">
-          <div className="bg-green-100 p-3 rounded-lg">
-            <FileText className="h-8 w-8 text-green-600" />
-          </div>
-          <div>
-            <h1 className="mb-1">{tos.pageTitle}</h1>
-            <p className="text-gray-600">{tos.lastUpdated}</p>
-          </div>
-        </div>
+        {/* כותרת הדף ואייקון */}
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          {/* Box לאייקון - צבעי הרקע והאייקון מתאימים את עצמם ל-Theme */}
+          <Box
+            sx={{
+              p: 1.5,
+              borderRadius: 2,
+              // רקע שקוף למחצה בצבע ירוק בבהיר, או אפור בכהה
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(22, 163, 74, 0.1)',
+              color: 'primary.main', // האייקון בצבע הראשי של ה-Theme
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <FileText className="h-8 w-8" />
+          </Box>
 
+          <Box>
+            {/* H1 - כותרת ראשית (h4 מבחינת גודל גופן) */}
+            <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary" gutterBottom sx={{ mb: 0.5 }}>
+              {tos.pageTitle}
+            </Typography>
+            {/* טקסט משני (תאריך עדכון) */}
+            <Typography variant="body2" color="text.secondary">
+              {tos.lastUpdated}
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* כרטיס המכיל את תוכן התקנון */}
         <Card>
           <CardContent className="pt-6 space-y-6">
-            {/* 1. Agreement to Terms */}
-            <section>
-              <h2 className="mb-3">{sections.agreement.title}</h2>
-              {renderContent(sections.agreement.p1)}
-            </section>
+            {Object.values(sections).map((section: any, index: number) => (
+              // Box component="section" מבטיח סמנטיקה נכונה
+              <Box component="section" key={index} sx={{ pb: 2, pt: index === 0 ? 0 : 2 }}>
+                {/* H2 - כותרת סעיף */}
+                <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                  {section.title}
+                </Typography>
 
-            {/* 2. Description of Service */}
-            <section>
-              <h2 className="mb-3">{sections.description.title}</h2>
-              {renderContent(sections.description.p1)}
-            </section>
+                {/* רינדור פסקאות ורשימות לפי המבנה של קובץ התרגום */}
+                {section.p1 && renderContent(section.p1)}
+                {section.p2 && renderContent(section.p2)}
+                {section.list && renderContent(section.list)}
 
-            {/* 3. User Accounts */}
-            <section>
-              <h2 className="mb-3">{sections.accounts.title}</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                {sections.accounts.p1}
-              </p>
-              {renderContent(sections.accounts.list)}
-            </section>
-
-            {/* 4. User Content */}
-            <section>
-              <h2 className="mb-3">{sections.userContent.title}</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                {sections.userContent.p1}
-              </p>
-              {renderContent(sections.userContent.list)}
-            </section>
-
-            {/* 5. Intellectual Property */}
-            <section>
-              <h2 className="mb-3">{sections.ip.title}</h2>
-              {renderContent(sections.ip.p1)}
-            </section>
-
-            {/* 6. Prohibited Activities */}
-            <section>
-              <h2 className="mb-3">{sections.prohibited.title}</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                {sections.prohibited.p1}
-              </p>
-              {renderContent(sections.prohibited.list)}
-            </section>
-
-            {/* 7. AI-Generated Content */}
-            <section>
-              <h2 className="mb-3">{sections.aiContent.title}</h2>
-              {renderContent(sections.aiContent.p1)}
-            </section>
-
-            {/* 8. Community Guidelines */}
-            <section>
-              <h2 className="mb-3">{sections.community.title}</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                {sections.community.p1}
-              </p>
-              {renderContent(sections.community.list)}
-            </section>
-
-            {/* 9. Disclaimer of Warranties */}
-            <section>
-              <h2 className="mb-3">{sections.disclaimer.title}</h2>
-              {renderContent(sections.disclaimer.p1)}
-            </section>
-
-            {/* 10. Limitation of Liability */}
-            <section>
-              <h2 className="mb-3">{sections.limitation.title}</h2>
-              {renderContent(sections.limitation.p1)}
-            </section>
-
-            {/* 11. Termination */}
-            <section>
-              <h2 className="mb-3">{sections.termination.title}</h2>
-              {renderContent(sections.termination.p1)}
-            </section>
-
-            {/* 12. Changes to Terms */}
-            <section>
-              <h2 className="mb-3">{sections.changes.title}</h2>
-              {renderContent(sections.changes.p1)}
-            </section>
-
-            {/* 13. Contact Information */}
-            <section>
-              <h2 className="mb-3">{sections.contact.title}</h2>
-              <p className="text-gray-700 leading-relaxed">
-                {sections.contact.p1_start}{' '}
-                <Link to="/contact" className="text-green-600 hover:underline">
-                  {/* שימוש במפתח הקישור הכללי מתוך common.json */}
-                  {sections.contact.p1_link}
-                </Link>
-                {sections.contact.p1_end}
-              </p>
-            </section>
+                {/* טיפול מיוחד בסעיף יצירת קשר עם קישור */}
+                {section.p1_start && (
+                  <Typography variant="body1" color="text.primary" sx={{ lineHeight: 1.8 }}>
+                    {section.p1_start}{' '}
+                    <Link to="/contact" style={{ textDecoration: 'none' }}>
+                      <Typography
+                        component="span"
+                        color="primary" // צבע קישור מה-Theme
+                        sx={{
+                          textDecoration: 'underline',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          '&:hover': { opacity: 0.8 }
+                        }}
+                      >
+                        {section.p1_link}
+                      </Typography>
+                    </Link>
+                    {' '}{section.p1_end}
+                  </Typography>
+                )}
+              </Box>
+            ))}
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </Container>
+    </Box>
   );
 }
+
+// ----------------------------------------------------------------------

@@ -1,7 +1,8 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Box, Typography, Container, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { ArrowLeft, ArrowRight, Shield } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Shield, Circle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
@@ -9,23 +10,65 @@ export function PrivacyPolicyPage() {
   const { t } = useTranslation(["policy", "common"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
-const policy = t('privacyPolicy', { returnObjects: true }) as any;
+  const policy = t('privacyPolicy', { returnObjects: true }) as any;
   const sections = policy.sections;
+
   const renderContent = (key: string | string[]) => {
+    const direction = t('common:dir');
+    const alignment = direction === 'rtl' ? 'right' : 'left';
+
     if (Array.isArray(key)) {
       return (
-        <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
+        <List dense sx={{ pl: 0, pt: 0, pb: 2 }}>
           {key.map((item, index) => (
-            <li key={index}>{item}</li>
+            <ListItem 
+              key={index} 
+              alignItems="flex-start" 
+              sx={{ pl: 0, py: 0.5 }}
+            >
+              <ListItemIcon sx={{ minWidth: 24, mt: '4px' }}>
+                <Circle size={6} fill="currentColor" />
+              </ListItemIcon>
+              <ListItemText 
+                dir={direction}
+                primary={
+                  <Typography variant="body1" color="text.primary" sx={{ textAlign: alignment }}>
+                    {item}
+                  </Typography>
+                } 
+              />
+            </ListItem>
           ))}
-        </ul>
+        </List>
       );
     }
-    return <p className="text-gray-700 leading-relaxed">{key}</p>;
+
+    return (
+      <Typography 
+        variant="body1" 
+        color="text.primary" 
+        paragraph 
+        sx={{ 
+          lineHeight: 1.8, 
+          mb: 3, 
+          textAlign: alignment 
+        }}
+      >
+        {key}
+      </Typography>
+    );
   };
+
   return (
-    <div className="min-h-screen bg-gray-50" dir={t('common:dir')}>
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <Box 
+      sx={{ 
+        minHeight: '100vh', 
+        bgcolor: 'background.default', 
+        color: 'text.primary', 
+      }} 
+      dir={t('common:dir')}
+    >
+      <Container maxWidth="md" sx={{ py: 4 }}>
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
@@ -34,100 +77,138 @@ const policy = t('privacyPolicy', { returnObjects: true }) as any;
         >
           {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
           {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
-          {t('common:back')} 
-          
+          {t('common:back')}
         </Button>
 
-        <div className="mb-8 flex items-center gap-3">
-          <div className="bg-green-100 p-3 rounded-lg">
-            <Shield className="h-8 w-8 text-green-600" />
-          </div>
-          <div>
-            <h1 className="mb-1">{policy.pageTitle}</h1>
-            <p className="text-gray-600">{policy.lastUpdated}</p>
-          </div>
-        </div>
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box 
+            sx={{ 
+              p: 1.5, 
+              borderRadius: 2, 
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(22, 163, 74, 0.1)',
+              color: 'primary.main',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Shield className="h-8 w-8" />
+          </Box>
+
+          <Box>
+            <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary" gutterBottom sx={{ mb: 0.5 }}>
+              {policy.pageTitle}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {policy.lastUpdated}
+            </Typography>
+          </Box>
+        </Box>
 
         <Card>
           <CardContent className="pt-6 space-y-6">
-            <section>
-              <h2 className="mb-3">{sections.introduction.title}</h2>
-              <p className="text-gray-700 leading-relaxed">
-                {renderContent(sections.introduction.p1)}
-              </p>
-            </section>
+            
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.introduction.title}
+              </Typography>
+              {renderContent(sections.introduction.p1)}
+            </Box>
 
             {/* 2. Information We Collect */}
-            <section>
-              <h2 className="mb-3">{sections.informationCollected.title}</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                {sections.informationCollected.p1}
-              </p>
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.informationCollected.title}
+              </Typography>
+              {renderContent(sections.informationCollected.p1)}
               {renderContent(sections.informationCollected.list)}
-            </section>
+            </Box>
 
             {/* 3. How We Use Your Information */}
-            <section>
-              <h2 className="mb-3">{sections.howWeUse.title}</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                {sections.howWeUse.p1}
-              </p>
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.howWeUse.title}
+              </Typography>
+              {renderContent(sections.howWeUse.p1)}
               {renderContent(sections.howWeUse.list)}
-            </section>
+            </Box>
 
-{/* 4. Data Storage */}
             {/* 4. Data Storage */}
-            <section>
-              <h2 className="mb-3">{sections.dataStorage.title}</h2>
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.dataStorage.title}
+              </Typography>
               {renderContent(sections.dataStorage.p1)}
-            </section>
+            </Box>
 
             {/* 5. Data Sharing */}
-            <section>
-              <h2 className="mb-3">{sections.dataSharing.title}</h2>
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.dataSharing.title}
+              </Typography>
               {renderContent(sections.dataSharing.p1)}
-            </section>
+            </Box>
 
             {/* 6. Your Rights */}
-            <section>
-              <h2 className="mb-3">{sections.yourRights.title}</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                {sections.yourRights.p1}
-              </p>
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.yourRights.title}
+              </Typography>
+              {renderContent(sections.yourRights.p1)}
               {renderContent(sections.yourRights.list)}
-            </section>
+            </Box>
 
             {/* 7. Cookies and Tracking */}
-            <section>
-              <h2 className="mb-3">{sections.cookies.title}</h2>
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.cookies.title}
+              </Typography>
               {renderContent(sections.cookies.p1)}
-            </section>
+            </Box>
 
             {/* 8. Children's Privacy */}
-            <section>
-              <h2 className="mb-3">{sections.childrensPrivacy.title}</h2>
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.childrensPrivacy.title}
+              </Typography>
               {renderContent(sections.childrensPrivacy.p1)}
-            </section>
+            </Box>
 
             {/* 9. Changes to This Policy */}
-            <section>
-              <h2 className="mb-3">{sections.changes.title}</h2>
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.changes.title}
+              </Typography>
               {renderContent(sections.changes.p1)}
-            </section>
+            </Box>
 
-            <section>
-              <h2 className="mb-3">{sections.contact.title}</h2>
-              <p className="text-gray-700 leading-relaxed">
+            {/* 10. Contact Information */}
+            <Box component="section">
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.contact.title}
+              </Typography>
+              <Typography variant="body1" color="text.primary" sx={{ lineHeight: 1.8 }}>
                 {sections.contact.p1_start}{' '}
-                <a href="/contact" className="text-green-600 hover:underline">
-                  {sections.contact.p1_link}
-                </a>{' '}
-                {sections.contact.p1_end}
-              </p>
-            </section>
+                <Link to="/contact" style={{ textDecoration: 'none' }}>
+                  <Typography 
+                    component="span" 
+                    color="primary" 
+                    sx={{ 
+                      textDecoration: 'underline',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      '&:hover': { opacity: 0.8 }
+                    }}
+                  >
+                    {sections.contact.p1_link}
+                  </Typography>
+                </Link>
+                {' '}{sections.contact.p1_end}
+              </Typography>
+            </Box>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </Container>
+    </Box>
   );
 }
