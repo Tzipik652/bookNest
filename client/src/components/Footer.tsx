@@ -1,98 +1,161 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, Heart, Sparkles, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Box, Typography, useTheme } from '@mui/material'; 
 
 export function Footer() {
-    const { t } = useTranslation(["footer", "common"]); // טעינת Namespaces
+    const { t } = useTranslation(["footer", "common"]);
     const currentYear = new Date().getFullYear();
     const commonDir = t('common:dir') as 'rtl' | 'ltr';
+    const theme = useTheme(); 
+
+    const originalColors = {
+        bg: '#0f172a', // bg-slate-900
+        textSecondary: '#cbd5e1', // text-slate-300
+        textPrimary: '#ffffff', // text-white
+        highlight: '#4ade80', // text-green-400
+        divider: '#1e293b', // border-slate-800
+    };
+
+    // קביעת הצבעים: משתמשים בצבעים הקשיחים במצב 'light', וצבעי Theme סמנטיים במצב 'dark'
+    const getDynamicColor = (key: keyof typeof originalColors, type: 'bg' | 'text' | 'link' | 'divider') => {
+        if (theme.palette.mode === 'light') {
+            return originalColors[key];
+        }
+        
+        // במצבי Dark Mode / High Contrast: משתמשים בצבעי Theme
+        switch (type) {
+            case 'bg': return theme.palette.background.paper;
+            case 'text': return key === 'textPrimary' ? theme.palette.text.primary : theme.palette.text.secondary;
+            case 'link': return theme.palette.text.secondary;
+            case 'divider': return theme.palette.divider;
+            default: return originalColors[key];
+        }
+    };
 
     return (
-        <footer className="bg-slate-900 text-slate-300 mt-auto">
+        <Box 
+            component="footer" 
+            sx={{
+                bgcolor: getDynamicColor('bg', 'bg'), 
+                color: getDynamicColor('textSecondary', 'text'), 
+                mt: 'auto'
+            }}
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div 
+                    className="grid grid-cols-1 md:grid-cols-4 gap-8"
+                    style={{ direction: commonDir }}
+                >
                     {/* Brand Section */}
                     <div className="col-span-1 md:col-span-2">
-                        <div className="flex items-center gap-2 mb-4">
-                            <BookOpen className="h-8 w-8 text-green-400" />
-                            <span className="text-white text-2xl">BookNest</span>
-                        </div>
-                        <p className="text-slate-400 max-w-md">
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                            <BookOpen className="h-8 w-8" style={{ color: getDynamicColor('highlight', 'link') }} />
+                            <Typography variant="h6" sx={{ color: getDynamicColor('textPrimary', 'text'), fontWeight: 'bold' }}>
+                                BookNest
+                            </Typography>
+                        </Box>
+                        <Typography variant="body2" sx={{ color: getDynamicColor('textSecondary', 'text'), maxWidth: '400px' }}>
                             {t("tagline")}
-                        </p>
+                        </Typography>
                     </div>
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className="text-white mb-4">{t("quickLinksTitle")}</h3>
+                        {/* ✅ צבע כותרת: לבן קשיח במצב בהיר, text.primary בכהה */}
+                        <Typography variant="subtitle1" sx={{ color: getDynamicColor('textPrimary', 'text'), mb: 2, fontWeight: 'bold' }}>
+                            {t("quickLinksTitle")}
+                        </Typography>
                         <ul className="space-y-2">
-                            <li>
-                                <Link to="/home" className="hover:text-green-400 transition-colors flex items-center gap-2">
-                                    <Home className="h-4 w-4" />
-                                    {t("linkHome")}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/my-books" className="hover:text-green-400 transition-colors flex items-center gap-2">
-                                    <BookOpen className="h-4 w-4" />
-                                    {t("linkMyBooks")}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/favorites" className="hover:text-green-400 transition-colors flex items-center gap-2">
-                                    <Heart className="h-4 w-4" />
-                                    {t("linkFavorites")}
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/recommendations" className="hover:text-green-400 transition-colors flex items-center gap-2">
-                                    <Sparkles className="h-4 w-4" />
-                                    {t("linkRecommendations")}
-                                </Link>
-                            </li>
+                            {[
+                                { to: "/home", icon: Home, text: t("linkHome") },
+                                { to: "/my-books", icon: BookOpen, text: t("linkMyBooks") },
+                                { to: "/favorites", icon: Heart, text: t("linkFavorites") },
+                                { to: "/recommendations", icon: Sparkles, text: t("linkRecommendations") },
+                            ].map((item) => (
+                                <li key={item.to}>
+                                    <Link 
+                                        to={item.to}
+                                        style={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            gap: theme.spacing(1),
+                                            // צבע רגיל: אפור בהיר קשיח במצב בהיר, text.secondary בכהה
+                                            color: getDynamicColor('textSecondary', 'link') 
+                                        }}
+                                        className="transition-colors"
+                                        // ✅ ריחוף דינמי: ירוק קשיח במצב בהיר, primary.main בכהה
+                                        onMouseOver={e => (e.currentTarget.style.color = getDynamicColor('highlight', 'link'))}
+                                        onMouseOut={e => (e.currentTarget.style.color = getDynamicColor('textSecondary', 'link'))}
+                                    >
+                                        <item.icon className="h-4 w-4" />
+                                        <Box component="span">
+                                            {item.text}
+                                        </Box>
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
                     {/* Features */}
                     <div>
-                        <h3 className="text-white mb-4">{t("featuresTitle")}</h3>
+                        {/* ✅ צבע כותרת: לבן קשיח במצב בהיר, text.primary בכהה */}
+                        <Typography variant="subtitle1" sx={{ color: getDynamicColor('textPrimary', 'text'), mb: 2, fontWeight: 'bold' }}>
+                            {t("featuresTitle")}
+                        </Typography>
                         <ul className="space-y-2">
-                            <li className="text-slate-400">{t("featureDiscovery")}</li>
-                            <li className="text-slate-400">{t("featureCollection")}</li>
-                            <li className="text-slate-400">{t("featureAI")}</li>
-                            <li className="text-slate-400">{t("featureLists")}</li>
+                            {/* ✅ צבע טקסט: אפור בהיר קשיח במצב בהיר, text.secondary בכהה */}
+                            <Typography component="li" sx={{ color: getDynamicColor('textSecondary', 'text') }} variant="body2">{t("featureDiscovery")}</Typography>
+                            <Typography component="li" sx={{ color: getDynamicColor('textSecondary', 'text') }} variant="body2">{t("featureCollection")}</Typography>
+                            <Typography component="li" sx={{ color: getDynamicColor('textSecondary', 'text') }} variant="body2">{t("featureAI")}</Typography>
+                            <Typography component="li" sx={{ color: getDynamicColor('textSecondary', 'text') }} variant="body2">{t("featureLists")}</Typography>
                         </ul>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <p className="text-slate-400 text-sm">
+                <Box 
+                    sx={{
+                        // ✅ גבול דינמי: אפור כהה קשיח במצב בהיר, divider בכהה
+                        borderTop: `1px solid ${getDynamicColor('divider', 'divider')}`, 
+                        mt: 8,
+                        pt: 4,
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: 4
+                    }}
+                >
+                    {/* ✅ צבע טקסט קטן: אפור בהיר קשיח במצב בהיר, text.secondary בכהה */}
+                    <Typography variant="caption" sx={{ color: getDynamicColor('textSecondary', 'text') }}>
                         {t("copyright", { year: currentYear })}
-                    </p>
+                    </Typography>
                     
                     <div className="flex gap-6 text-sm">
-                        <Link
-                            to="/privacy-policy"
-                            className="text-slate-400 hover:text-green-400 transition-colors"
-                        >
-                            {t("privacyPolicy")}
-                        </Link>
-                        <Link
-                            to="/terms-of-service"
-                            className="text-slate-400 hover:text-green-400 transition-colors"
-                        >
-                           {t("termsOfService")}
-                        </Link>
-                        <Link
-                            to="/contact"
-                            className="text-slate-400 hover:text-green-400 transition-colors"
-                        >
-                            {t("contact")}
-                        </Link>
+                        {/* קישורי תחתית */}
+                        {[
+                            { to: "/privacy-policy", text: t("privacyPolicy") },
+                            { to: "/terms-of-service", text: t("termsOfService") },
+                            { to: "/contact", text: t("contact") },
+                        ].map((item) => (
+                            <Link
+                                key={item.to}
+                                to={item.to}
+                                className="transition-colors"
+                                // צבע רגיל: אפור בהיר קשיח במצב בהיר, text.secondary בכהה
+                                style={{ color: getDynamicColor('textSecondary', 'link') }}
+                                // ✅ ריחוף דינמי: ירוק קשיח במצב בהיר, primary.main בכהה
+                                onMouseOver={e => (e.currentTarget.style.color = getDynamicColor('highlight', 'link'))}
+                                onMouseOut={e => (e.currentTarget.style.color = getDynamicColor('textSecondary', 'link'))}
+                            >
+                                {item.text}
+                            </Link>
+                        ))}
                     </div>
-                </div>
+                </Box>
             </div>
-        </footer>
+        </Box>
     );
 }
