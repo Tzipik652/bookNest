@@ -16,7 +16,12 @@ import {
   CardHeader, // Added
 } from "@mui/material";
 import { Button as ShadcnButton } from "../components/ui/button";
-import { ArrowBack, AutoAwesome, CheckCircle, CloudUpload } from "@mui/icons-material"; // Added CloudUpload
+import {
+  ArrowBack,
+  AutoAwesome,
+  CheckCircle,
+  CloudUpload,
+} from "@mui/icons-material"; // Added CloudUpload
 import { useUserStore } from "../store/useUserStore";
 import { Category } from "../types";
 import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
@@ -27,19 +32,18 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME; 
-const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET; 
+const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME;
+const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 import { addBook } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
 
 export function AddBookPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
-  const { t } = useTranslation(["addBook", "common"]);
+  const { t } = useTranslation(["addBook", "common", "category"]);
 
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // State להעלאת תמונה
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -51,8 +55,8 @@ export function AddBookPage() {
     handleSubmit,
     formState: { errors },
     reset,
-    setValue, // אנחנו צריכים את זה כדי לעדכן את השדה ידנית
-    watch, // כדי לראות שינויים
+    setValue,
+    watch,
   } = useForm<BookFormValues>({
     resolver: zodResolver(bookSchema),
     defaultValues: {
@@ -65,9 +69,10 @@ export function AddBookPage() {
     },
   });
 
-  // פונקציה להעלאת התמונה ל-Cloudinary
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log("Selected file:", file);
+
     if (!file) return;
 
     setUploadingImage(true);
@@ -88,11 +93,9 @@ export function AddBookPage() {
 
       const data = await res.json();
 
-      // העדכון הקריטי: אנחנו מכניסים את ה-URL שהתקבל לתוך הטופס
       setValue("img_url", data.secure_url);
-      setImagePreview(data.secure_url); // מציג תצוגה מקדימה למשתמש
+      setImagePreview(data.secure_url);
       toast.success(t("successUpload"));
-
     } catch (error) {
       console.error("Error uploading image:", error);
       toast.error(t("errorUpload"));
@@ -122,19 +125,20 @@ export function AddBookPage() {
         author: data.author,
         description: data.description,
         category: data.category,
-        img_url: data.img_url || "https://images.unsplash.com/photo-1560362415-c88a4c066155",
+        img_url:
+          data.img_url ||
+          "https://images.unsplash.com/photo-1560362415-c88a4c066155",
         price: data.price ? parseFloat(data.price) : undefined,
       });
 
-      toast.success(t('successMessage', { bookTitle: newBook.title }));
+      toast.success(t("successMessage", { bookTitle: newBook.title }));
       reset();
-      setImagePreview(null); // איפוס התצוגה המקדימה
+      setImagePreview(null);
 
       setTimeout(() => {
         navigate(`/book/${newBook._id}`);
       }, 1500);
     } catch (err: any) {
-      // ... (הקוד הקיים שלך לטיפול בשגיאות)
       toast.error(t("errorGeneral"));
       setIsSubmitting(false);
     }
@@ -143,51 +147,55 @@ export function AddBookPage() {
   return (
     <Box minHeight="100vh" bgcolor="#f9fafb" py={6} component="main">
       <Box maxWidth="sm" mx="auto" px={2}>
-        {/* ... כפתור חזרה הקיים שלך ... */}
-          <ArrowBack className="h-4 w-4" /> {t('common:back')}
         <ShadcnButton
           variant="ghost"
           onClick={() => navigate(-1)}
           aria-label={t("common:back")}
           className="mb-6 gap-2"
         >
-          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
-          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
-          {t('common:back')}
+          {t("common:dir") === "rtl" ? (
+            <ArrowRight className="h-4 w-4" />
+          ) : null}
+          {t("common:dir") === "ltr" ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t("common:back")}
         </ShadcnButton>
-        <Typography component="h1" variant="h3" fontWeight="bold" gutterBottom>
-          {t("pageTitle")}
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          {t("pageSubheader")}
-        </Typography>
 
         <Card elevation={3}>
-          <CardHeader className="notranslate" title={t("pageTitle")} subheader={t("pageSubheader")} />
+          <CardHeader
+            className="notranslate"
+            title={t("pageTitle")}
+            subheader={t("pageSubheader")}
+          />
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent>
-              {/* ... שדות קיימים (Title, Author, Description, Category) ... */}
-              <TextField fullWidth label={t("titleLabel")} margin="normal" {...register("title")} error={!!errors.title} helperText={errors.title?.message} />
+              <TextField
+                fullWidth
+                label={t("titleLabel")}
+                margin="normal"
+                {...register("title")}
+                error={!!errors.title}
+                helperText={errors.title?.message}
+              />
               <TextField
                 fullWidth
                 label={t("authorLabel")}
                 margin="normal"
                 {...register("author")}
                 error={!!errors.author}
-                helperText={errors.author?.message} />
+                helperText={errors.author?.message}
+              />
               <TextField
                 fullWidth
                 className="notranslate"
                 label={t("descriptionLabel")}
                 margin="normal"
-                multiline // מאפשר כמה שורות
-                rows={5}   // גודל ברירת מחדל של 5 שורות
+                multiline
+                rows={5}
                 {...register("description")}
                 error={!!errors.description}
                 helperText={errors.description?.message}
                 onKeyDown={(e) => {
-                  // מונע שליחת טופס בלחיצה על Enter, אבל מאפשר שורות חדשות עם Shift+Enter
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     handleSubmit(onSubmit)();
@@ -201,6 +209,7 @@ export function AddBookPage() {
                 label={t("categoryLabel")}
                 margin="normal"
                 {...register("category")}
+                value={watch("category") || ""}
                 error={!!errors.category}
                 helperText={errors.category?.message}
                 onKeyDown={(e) => {
@@ -211,12 +220,11 @@ export function AddBookPage() {
               >
                 {categories.map((cat) => (
                   <MenuItem key={cat.id} value={cat.name}>
-                    {cat.name}
+                    {t(`category:${cat.name}`)}{" "}
                   </MenuItem>
                 ))}
               </TextField>
 
-              {/* --- החלק החדש של העלאת תמונה --- */}
               <Box sx={{ mt: 2, mb: 1 }}>
                 <input
                   accept="image/*"
@@ -230,28 +238,36 @@ export function AddBookPage() {
                     variant="outlined"
                     component="span"
                     fullWidth
-                    startIcon={uploadingImage ? <CircularProgress size={20} /> : <CloudUpload />}
+                    startIcon={
+                      uploadingImage ? (
+                        <CircularProgress size={20} />
+                      ) : (
+                        <CloudUpload />
+                      )
+                    }
                     disabled={uploadingImage}
-                     sx={{
-                  gap: 1, 
-                  "& .MuiButton-endIcon": {
-                    margin: 0, 
-                  },
-                  alignItems: "center",
-                }}
+                    sx={{
+                      gap: 1,
+                      "& .MuiButton-endIcon": {
+                        margin: 0,
+                      },
+                      alignItems: "center",
+                    }}
                   >
                     {uploadingImage ? t("uploading") : t("uploadButton")}
-                    
                   </Button>
                 </label>
 
-                {/* תצוגה מקדימה אם יש תמונה */}
                 {imagePreview && (
                   <Box mt={2} display="flex" justifyContent="center">
                     <img
                       src={imagePreview}
                       alt="Preview"
-                      style={{ maxHeight: 200, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                      style={{
+                        maxHeight: 200,
+                        borderRadius: 8,
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      }}
                     />
                   </Box>
                 )}
@@ -263,22 +279,27 @@ export function AddBookPage() {
                 label={t("imageURLLabel")}
                 margin="normal"
                 {...register("img_url")}
-                // אם רוצים שזה יהיה לקריאה בלבד אחרי העלאה:
                 InputProps={{
-                  readOnly: !!imagePreview
+                  readOnly: !!imagePreview,
                 }}
-                InputLabelProps={{ shrink: true }} // כדי שהלייבל לא יכסה את הטקסט
+                InputLabelProps={{ shrink: true }}
                 error={!!errors.img_url}
                 helperText={errors.img_url?.message}
               />
               {/* ------------------------------------- */}
 
-              <TextField fullWidth label={t("priceLabel")} type="number" margin="normal" {...register("price")} error={!!errors.price} helperText={errors.price?.message} />
-
+              <TextField
+                fullWidth
+                label={t("priceLabel")}
+                type="number"
+                margin="normal"
+                {...register("price")}
+                error={!!errors.price}
+                helperText={errors.price?.message}
+              />
             </CardContent>
 
             <CardActions ref={actionsRef} sx={{ p: 3, pt: 0, gap: 2 }}>
-
               <Button
                 type="submit"
                 variant="contained"
@@ -288,7 +309,6 @@ export function AddBookPage() {
                 startIcon={
                   isSubmitting ? (
                     <CircularProgress color="inherit" size={18} />
-
                   ) : null
                 }
                 className="notranslate"
@@ -306,9 +326,7 @@ export function AddBookPage() {
                 aria-label={t("cancelButton")}
               >
                 {t("cancelButton")}
-
               </Button>
-
             </CardActions>
           </form>
         </Card>

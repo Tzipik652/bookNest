@@ -123,11 +123,12 @@ export function BookDetailsPage() {
           aria-label={t("common:back")}
           className="mb-6 gap-2"
         >
-          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
-          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
-          {t('common:back')}
+          {t("common:dir") === "rtl" ? (
+            <ArrowRight className="h-4 w-4" />
+          ) : null}
+          {t("common:dir") === "ltr" ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t("common:back")}
         </ShadcnButton>
-
 
         <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={4}>
           <Box flex={1}>
@@ -153,7 +154,10 @@ export function BookDetailsPage() {
                 </Typography>
 
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
-                  <Chip label={book.category} variant="outlined" />
+                  <Chip
+                    label={t(`category:${book.category}`)}
+                    variant="outlined"
+                  />
 
                   {book.price && (
                     <Typography variant="h6">
@@ -274,10 +278,18 @@ export function BookDetailsPage() {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowDeleteDialog(false)} aria-label={t("common:buttonCancel")}>
+          <Button
+            onClick={() => setShowDeleteDialog(false)}
+            aria-label={t("common:buttonCancel")}
+          >
             {t("common:buttonCancel")}
           </Button>
-          <Button onClick={handleDelete} color="error" variant="contained" aria-label={t("common:buttonDelete")}>
+          <Button
+            onClick={handleDelete}
+            color="error"
+            variant="contained"
+            aria-label={t("common:buttonDelete")}
+          >
             {t("common:buttonDelete")}
           </Button>
         </DialogActions>

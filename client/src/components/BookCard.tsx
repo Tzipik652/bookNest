@@ -102,7 +102,7 @@ export function BookCard({ book }: BookCardProps) {
             {book.author}
           </p>
           <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm mb-3">
-            {book.category}
+            {t(`category:${book.category}`)}
           </span>
           <p
             className="text-sm text-gray-700 line-clamp-3 overflow-hidden"
