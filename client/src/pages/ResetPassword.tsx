@@ -98,7 +98,7 @@ export function ResetPassword() {
                     <IconButton
                       onClick={() => setShowPassword(!showPassword)}
                       edge="end"
-                      aria-label="show password"
+                      aria-label={showPassword ?t("hidePassword") :t("showPassword")}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -120,7 +120,7 @@ export function ResetPassword() {
                     <IconButton
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       edge="end"
-                      aria-label="show confirm password"
+                      aria-label={showConfirmPassword ?t("hidePassword") :t("showPassword")}
                     >
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>

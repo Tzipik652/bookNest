@@ -53,7 +53,7 @@ const LandingComponent = () => {
             variant="contained"
             color="primary"
             onClick={() => navigate("/login")}
-            aria-label='click to login'
+            aria-label={t('loginButton')}
           >
             {t('loginButton')}
           </Button>
@@ -66,7 +66,7 @@ const LandingComponent = () => {
               borderColor: "white",
               "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
             }}
-            aria-label='click to register'
+            aria-label={t('registerButton')}
           >
             {t('registerButton')}
           </Button>

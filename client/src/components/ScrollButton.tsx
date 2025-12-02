@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowUp, ArrowDown } from "lucide-react";
+import { t } from "i18next";
 
 export default function ScrollButton() {
   const [visible, setVisible] = useState(false);
@@ -42,14 +43,16 @@ export default function ScrollButton() {
       <button
         onClick={scrollToTop}
         className="p-2 rounded-full bg-gray-100/70 text-gray-700 shadow-sm hover:bg-gray-200/80 hover:scale-105 transform transition-all duration-200"
-        aria-label="Scroll to top"
+        aria-label={t("scrollToTop")}
+        title={t("Scroll to top")}
       >
         <ArrowUp className="w-5 h-5" />
       </button>
       <button
         onClick={scrollToBottom}
         className="p-2 rounded-full bg-gray-100/70 text-gray-700 shadow-sm hover:bg-gray-200/80 hover:scale-105 transform transition-all duration-200"
-        aria-label="Scroll to bottom"
+        aria-label={t("scrollToBottom")}
+        title={t("Scroll to bottom")}
       >
         <ArrowDown className="w-5 h-5" />
       </button>

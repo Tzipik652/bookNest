@@ -195,6 +195,7 @@ export function RecentComments({
                             size="sm"
                             onClick={() => handleDeleteComment(comment.id)}
                             style={deleteButtonStyle}
+                              aria-label={t("buttonDelete")}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -205,6 +206,7 @@ export function RecentComments({
                               size="sm"
                               onClick={() => startEdit(comment)}
                               style={editButtonStyle}
+                              aria-label={t("buttonEdit")}
                             >
                               <Edit className="h-3.5 w-3.5" />
                             </Button>
@@ -234,6 +236,7 @@ export function RecentComments({
                                     backgroundColor: theme.palette.success.main, 
                                     color: theme.palette.success.contrastText,
                                 }}
+                                aria-label={commentsTexts.editSave}
                             >
                                 {commentsTexts.editSave}
                             </Button>
@@ -244,6 +247,7 @@ export function RecentComments({
                                   color: theme.palette.text.secondary,
                                   backgroundColor: theme.palette.action.hover,
                                }}
+                               aria-label={commentsTexts.editCancel}
                             >
                               {commentsTexts.editCancel}
                             </Button>

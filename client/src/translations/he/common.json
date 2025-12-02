@@ -17,6 +17,7 @@
   "password": "סיסמה",
   "login": "התחברות",
   "register": "הרשמה",
+
   
   "buttonCancel": "ביטול",
   "buttonDelete": "מחק",
@@ -24,7 +25,11 @@
   "buttonSaveChanges": "שמור שינויים",
   "buttonGoBack": "חזור אחורה",
   "buttonBackToHome": "חזרה לעמוד הבית",
-  
+  "menu": "תפריט",
+  "close": "סגור",
+  "scrollToTop": "גלילה לכיוון מעלה",
+  "scrollToBottom": "גלילה לכיוון מטה",
+
   "dialogTitleConfirm": "האם אתה בטוח?",
   "confirmDeleteGeneric": "האם אתה בטוח שברצונך למחוק פריט זה? פעולה זו אינה ניתנת לביטול.",
   "confirmDeleteWithName": "פעולה זו תמחק לצמיתות את \"{{name}}\". פעולה זו אינה ניתנת לביטול.",
