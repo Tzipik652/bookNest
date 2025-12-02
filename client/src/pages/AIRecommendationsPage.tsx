@@ -105,10 +105,16 @@ export function AIRecommendationsPage() {
             {getAlertMessage()}
           </Typography>
         </Alert>
-       <Button
+        <Button
           variant="contained"
           onClick={handleRefresh}
-          sx={{ backgroundColor: "primary.main" ,color:"primary.contrastText"}}
+          sx={{
+            backgroundColor: "primary.main", color: "primary.contrastText", gap: 1,
+            "& .MuiButton-endIcon": {
+              margin: 0,
+            },
+            alignItems: "center",
+          }}
           disabled={isRefreshing}
           startIcon={
             isRefreshing ? (
@@ -149,7 +155,7 @@ export function AIRecommendationsPage() {
         <Box textAlign="center" py={10}>
           <AutoAwesome sx={{ fontSize: 64, color: "#d1d5db", mb: 2 }} />
           <Typography variant="h6" gutterBottom>
-           {t('noRecommendationsTitle')}
+            {t('noRecommendationsTitle')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {t('noRecommendationsText')}

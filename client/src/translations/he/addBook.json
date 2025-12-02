@@ -13,5 +13,9 @@
   "cancelButton": "ביטול",
   "successMessage": "{{bookTitle}} נוסף בהצלחה!",
   "errorBookExists": "הספר הזה כבר קיים במאגר הנתונים.",
-  "errorGeneral": "הוספת הספר נכשלה. אנא נסה שוב."
+  "errorGeneral": "הוספת הספר נכשלה. אנא נסה שוב.",
+    "successUpload":"התמונה הועלתה בהצלחה!",
+  "errorUpload":"העלאת התמונה נכשלה. אנא נסה שוב.",
+  "uploading":"מעלה...",
+  "uploadButton":"העלה תמונה"
 }

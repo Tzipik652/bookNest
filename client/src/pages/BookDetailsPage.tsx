@@ -171,6 +171,13 @@ export function BookDetailsPage() {
                     }
                     onClick={handleFavoriteToggle}
                     disabled={toggleMutation.isPending}
+                    sx={{
+                      gap: 1,
+                      "& .MuiButton-endIcon": {
+                        margin: 0,
+                      },
+                      alignItems: "center",
+                    }}
                     aria-label={
                       book.isFavorited
                         ? t("buttonRemoveFavorite")
@@ -188,6 +195,13 @@ export function BookDetailsPage() {
                         variant="outlined"
                         startIcon={<Edit />}
                         onClick={() => navigate(`/edit-book/${book._id}`)}
+                        sx={{
+                          gap: 1,
+                          "& .MuiButton-endIcon": {
+                            margin: 0,
+                          },
+                          alignItems: "center",
+                        }}
                         aria-label={t("common:buttonEdit")}
                       >
                         {t("common:buttonEdit")}
@@ -198,6 +212,13 @@ export function BookDetailsPage() {
                         color="error"
                         startIcon={<Delete />}
                         onClick={() => setShowDeleteDialog(true)}
+                        sx={{
+                          gap: 1,
+                          "& .MuiButton-endIcon": {
+                            margin: 0,
+                          },
+                          alignItems: "center",
+                        }}
                         aria-label={t("common:buttonDelete")}
                       >
                         {t("common:buttonDelete")}
