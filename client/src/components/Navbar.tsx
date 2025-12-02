@@ -15,12 +15,11 @@ import {
   X,
 } from "lucide-react";
 
-import { useUserStore } from '../store/useUserStore';
-import { useQueryClient } from '@tanstack/react-query';
-import { useAccessibilityStore } from '../store/accessibilityStore';
-import LanguageSwitcher from './LanguageSwitcher';
-import { useTranslation } from 'react-i18next';
-
+import { useUserStore } from "../store/useUserStore";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAccessibilityStore } from "../store/accessibilityStore";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -177,14 +176,16 @@ export function Navbar() {
             </>
           )}
           <LanguageSwitcher />
-
         </div>
 
         {/* Mobile Menu Button */}
         <button
           className="lg:hidden"
           onClick={() => setOpen(true)}
-          aria-label="menu"
+          aria-label={t("menu")}
+          dir={isRtl ? "rtl" : "ltr"}
+          style={{ cursor: "pointer" }}
+          title={t("menu")}
         >
           <Menu className="w-7 h-7" />
         </button>
@@ -217,7 +218,7 @@ export function Navbar() {
           <button
             className="mb-4 self-end"
             onClick={() => setOpen(false)}
-            aria-label="close"
+            aria-label={t("close")}
           >
             <X className="w-6 h-6" />
           </button>
@@ -308,13 +309,17 @@ export function Navbar() {
                 to={`/login?redirect=${encodedPath}`}
                 onClick={() => setOpen(false)}
               >
-                <Button className="w-full" aria-label={t("login")}>{t("login")}</Button>
+                <Button className="w-full" aria-label={t("login")}>
+                  {t("login")}
+                </Button>
               </Link>
               <Link
                 to={`/register?redirect=${encodedPath}`}
                 onClick={() => setOpen(false)}
               >
-                <Button className="w-full" aria-label={t("register")}>{t("register")}</Button>
+                <Button className="w-full" aria-label={t("register")}>
+                  {t("register")}
+                </Button>
               </Link>
             </>
           )}

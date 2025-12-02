@@ -214,6 +214,7 @@ const hoverBgStyle = {
                               size="icon"
                               onClick={() => navigate(`/book/${book._id}`)}
                               style={viewButtonStyle}
+                              aria-label={t("viewDetails")} 
                             >
                               <BookOpen className="h-4 w-4" /> 
                             </Button>
@@ -222,6 +223,7 @@ const hoverBgStyle = {
                               size="icon"
                               onClick={() => handleEditBook(book._id)}
                               style={editButtonStyle}
+                              aria-label={t("buttonEdit")}                 
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -230,6 +232,7 @@ const hoverBgStyle = {
                               size="icon"
                               onClick={() => handleDeleteBook(book._id)}
                               style={deleteButtonStyle}
+                              aria-label={t("buttonDelete")}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -289,6 +292,7 @@ const hoverBgStyle = {
                           className="flex-1 h-8 text-xs"
                           onClick={() => navigate(`/book/${book._id}`)}
                           style={highContrast ? { borderColor: theme.palette.text.primary, color: theme.palette.text.primary } : {}}
+                          aria-label={t("viewDetails")}
                         >
                           <BookOpen className="h-3.5 w-3.5 ml-1" style={highContrast ? { color: theme.palette.text.primary } : viewButtonStyle} />
                         </Button>
@@ -298,6 +302,7 @@ const hoverBgStyle = {
                           className="h-8 px-2"
                           onClick={() => handleEditBook(book._id)}
                           style={highContrast ? { borderColor: theme.palette.text.primary } : {}}
+                          aria-label={t("buttonEdit")}
                         >
                           <Edit className="h-3.5 w-3.5" style={highContrast ? { color: theme.palette.text.primary } : editButtonStyle} />
                         </Button>
@@ -307,6 +312,7 @@ const hoverBgStyle = {
                           className="h-8 px-2"
                           onClick={() => handleDeleteBook(book._id)}
                            style={highContrast ? { borderColor: theme.palette.text.primary } : {}}
+                           aria-label={t("buttonDelete")}
                         >
                           <Trash2 className="h-3.5 w-3.5" style={highContrast ? { color: theme.palette.text.primary } : deleteButtonStyle} />
                         </Button>

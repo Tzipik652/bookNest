@@ -261,6 +261,7 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                         }
                         style={{ backgroundColor: roleButtonBg, color: theme.palette.primary.contrastText }}
                         className={`px-3 py-1 rounded text-xs`}
+                        aria-label={userEditFormData.isAdmin ? userListTexts.roleAdmin : userListTexts.roleUser}
                       >
                         {userEditFormData.isAdmin ? userListTexts.roleAdmin : userListTexts.roleUser}
                       </button>
@@ -283,6 +284,7 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                                 backgroundColor: theme.palette.success.main, 
                                 color: theme.palette.success.contrastText,
                             }}
+                            aria-label={t('common:save')}
                         >
                           {t('common:save')}
                         </Button>
@@ -295,6 +297,7 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                               color: theme.palette.text.secondary,
                               backgroundColor: theme.palette.background.paper,
                           }}
+                          aria-label={t('common:cancel')}
                         >
                           {t('common:cancel')}
                         </Button>
@@ -306,6 +309,7 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                             variant="ghost" 
                             onClick={() => handleEditClick(user)}
                             style={editButtonStyle}
+                            aria-label={t('buttonEdit')}
                         >
                           <Edit className="h-3.5 w-3.5" />
                         </Button>
@@ -315,6 +319,7 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                             variant="ghost"
                             onClick={() => setDeleteUserId(user._id)}
                             style={deleteButtonStyle}
+                            aria-label={t("buttonDelete")}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
@@ -341,6 +346,7 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                         borderColor: theme.palette.divider, 
                         color: theme.palette.text.secondary 
                       }}
+                      aria-label={t('common:cancel')}
                     >
                       {t('common:cancel')}
                     </Button>
@@ -351,6 +357,7 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                           backgroundColor: theme.palette.error.main, 
                           color: theme.palette.error.contrastText,
                       }}
+                      aria-label={t('common:delete')}
                     >
                       {t('common:delete')}
                     </Button>

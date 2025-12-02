@@ -163,6 +163,7 @@ export function FAQPage() {
                             <Button
                                 onClick={() => navigate('/contact')}
                                 className="hover:bg-green-700 hover:text-white transition-colors duration-200"
+                                aria-label={t('faq:contact.button')}
                             >
                                 {t('faq:contact.button')}
                             </Button>

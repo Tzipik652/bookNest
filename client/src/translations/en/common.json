@@ -17,6 +17,7 @@
   "password": "Password",
   "login": "Login",
   "register": "Register",
+
   
   "buttonCancel": "Cancel",
   "buttonDelete": "Delete",
@@ -24,6 +25,11 @@
   "buttonSaveChanges": "Save Changes",
   "buttonGoBack": "Go Back",
   "buttonBackToHome": "Back to Home",
+  "menu": "Menu",
+  "close": "close",
+  "scrollToTop": "scroll to top",
+  "scrollToBottom": "scroll to bottom",
+  
   
   "dialogTitleConfirm": "Are you sure?",
   "confirmDeleteGeneric": "Are you sure you want to delete this item? This action cannot be undone.",

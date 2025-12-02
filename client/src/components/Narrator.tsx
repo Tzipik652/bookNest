@@ -1,6 +1,7 @@
 import { VolumeUp, Pause, PlayArrow, Stop } from "@mui/icons-material";
 import { IconButton, Typography, Box } from "@mui/material";
 import { useSpeechNarrator } from "../hooks/useNarrator";
+import { t } from "i18next";
 
 export default function Narrator({ text }: { text: string }) {
   const { currentIndex, speak, pause, stop, isPaused, isSpeaking } =
@@ -35,19 +36,41 @@ export default function Narrator({ text }: { text: string }) {
         mb={0.5}
       >
         {!isSpeaking || isPaused ? (
-        <IconButton size="small" onClick={speak} sx={{ p: 0.3 }} aria-label="button to start narration">
-          <PlayArrow sx={{ fontSize: 18 }} />
-        </IconButton>) : (
-        <IconButton size="small" onClick={pause} sx={{ p: 0.3 }} aria-label="button to pause narration">
-          <Pause sx={{ fontSize: 18 }} />
-        </IconButton>)}
-        <IconButton size="small" onClick={stop} sx={{ p: 0.3 }} aria-label="button to stop narration">
+          <IconButton
+            size="small"
+            onClick={speak}
+            sx={{ p: 0.3 }}
+            aria-label={t('startNarration')}
+          >
+            <PlayArrow sx={{ fontSize: 18 }} />
+          </IconButton>
+        ) : (
+          <IconButton
+            size="small"
+            onClick={pause}
+            sx={{ p: 0.3 }}
+            aria-label={t('pauseNarration')}
+          >
+            <Pause sx={{ fontSize: 18 }} />
+          </IconButton>
+        )}
+        <IconButton
+          size="small"
+          onClick={stop}
+          sx={{ p: 0.3 }}
+          aria-label={t('stopNarration')}
+        >
           <Stop sx={{ fontSize: 18 }} />
         </IconButton>
       </Box>
 
       {/* --- Text below --- */}
-      <Typography className="book-summary" data-skip-sr variant="body2" sx={{ whiteSpace: "normal" }}>
+      <Typography
+        className="book-summary"
+        data-skip-sr
+        variant="body2"
+        sx={{ whiteSpace: "normal" }}
+      >
         {highlighted}
       </Typography>
     </Box>

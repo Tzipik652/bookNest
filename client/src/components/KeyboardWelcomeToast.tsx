@@ -66,6 +66,7 @@ export function KeyboardWelcomeToast() {
               order: commonDir === 'rtl' ? -1 : 1,
               color: theme.palette.text.secondary
             }}
+            aria-label='X'
           >
             <X size={18} />
           </Button>
@@ -98,6 +99,7 @@ export function KeyboardWelcomeToast() {
                   bgcolor: theme.palette.primary.light
                 }
               }}
+              aria-label={t('dismissButton')}
             >
               {t('dismissButton')}
             </Button>
