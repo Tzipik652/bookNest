@@ -4,7 +4,7 @@ import { Globe, Check } from "lucide-react";
 import { Button } from './ui/button';
 
 const LanguageSwitcher = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -42,7 +42,7 @@ const LanguageSwitcher = () => {
         className="gap-2"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        aria-label='Language'
+        aria-label={t("navbar:language")}
       >
         <Globe className="h-4 w-4" />
         <span className="inline-block">

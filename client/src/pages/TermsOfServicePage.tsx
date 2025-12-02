@@ -1,5 +1,4 @@
 import { Link, useNavigate } from 'react-router-dom';
-// ייבוא רכיבי MUI לטיפול ב-Theme ובנגישות
 import { Box, Typography, Container, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
@@ -7,7 +6,6 @@ import { ArrowLeft, ArrowRight, FileText, Circle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
-// 
 
 export function TermsOfServicePage() {
   const { t } = useTranslation(["terms", "common"]);

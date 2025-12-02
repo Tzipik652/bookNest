@@ -1,12 +1,12 @@
 import { VolumeUp, Pause, PlayArrow, Stop } from "@mui/icons-material";
 import { IconButton, Typography, Box } from "@mui/material";
 import { useSpeechNarrator } from "../hooks/useNarrator";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export default function Narrator({ text }: { text: string }) {
   const { currentIndex, speak, pause, stop, isPaused, isSpeaking } =
     useSpeechNarrator(text);
-
+  const { t } = useTranslation("boolDetails");
   const isHebrew = /[\u0590-\u05FF]/.test(text);
 
   const highlighted =
