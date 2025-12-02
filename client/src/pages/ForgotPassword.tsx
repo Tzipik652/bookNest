@@ -95,6 +95,9 @@ export function ForgotPassword() {
                 size="large"
                 disabled={isSubmitting}
                 startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
+                aria-label={isSubmitting
+                  ? t("forgotPassword.sendingButton")
+                  : t("forgotPassword.submitButton")}
               >
                 {isSubmitting
                   ? t("forgotPassword.sendingButton")

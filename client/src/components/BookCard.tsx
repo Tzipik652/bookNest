@@ -120,6 +120,7 @@ export function BookCard({ book }: BookCardProps) {
         <Button
           className="w-full"
           onClick={() => navigate(`/book/${book._id}`)}
+          aria-label={t('viewDetails')}
         >
           {t('viewDetails')}
         </Button>
