@@ -242,10 +242,10 @@ export function BookDetailsPage() {
                   <Box display="flex" alignItems="center" gap={1} mb={0}>
                     <AutoAwesome color="primary" />
                     <Typography variant="h6">{t("headerAISummary")}</Typography>
-                    </Box>
+                  </Box>
                   <Box mt={2}>
                     <Narrator text={book.ai_summary} />
-                  </Typography>
+                  </Box>
                 </Box>
 
                 <Typography variant="body2" color="text.secondary">

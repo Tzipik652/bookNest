@@ -12,7 +12,8 @@ import {
   CircularProgress,
   Typography,
   IconButton, // Added
-  InputAdornment, // Added
+  InputAdornment,
+  CardHeader, // Added
 } from "@mui/material";
 import { Button as ShadcnButton } from "../components/ui/button";
 import { ArrowBack, AutoAwesome, CheckCircle, CloudUpload } from "@mui/icons-material"; // Added CloudUpload
@@ -143,7 +144,6 @@ export function AddBookPage() {
     <Box minHeight="100vh" bgcolor="#f9fafb" py={6} component="main">
       <Box maxWidth="sm" mx="auto" px={2}>
         {/* ... כפתור חזרה הקיים שלך ... */}
-        <ShadcnButton variant="ghost" onClick={() => navigate(-1)} className="mb-6 gap-2">
           <ArrowBack className="h-4 w-4" /> {t('common:back')}
         <ShadcnButton
           variant="ghost"
