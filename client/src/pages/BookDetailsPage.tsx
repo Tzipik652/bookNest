@@ -170,6 +170,13 @@ export function BookDetailsPage() {
                     }
                     onClick={handleFavoriteToggle}
                     disabled={toggleMutation.isPending}
+                    sx={{
+                      gap: 1,
+                      "& .MuiButton-endIcon": {
+                        margin: 0,
+                      },
+                      alignItems: "center",
+                    }}
                   >
                     {book.isFavorited
                       ? t("buttonRemoveFavorite")
@@ -182,6 +189,13 @@ export function BookDetailsPage() {
                         variant="outlined"
                         startIcon={<Edit />}
                         onClick={() => navigate(`/edit-book/${book._id}`)}
+                        sx={{
+                          gap: 1,
+                          "& .MuiButton-endIcon": {
+                            margin: 0,
+                          },
+                          alignItems: "center",
+                        }}
                       >
                         {t("common:buttonEdit")}
                       </Button>
@@ -191,6 +205,13 @@ export function BookDetailsPage() {
                         color="error"
                         startIcon={<Delete />}
                         onClick={() => setShowDeleteDialog(true)}
+                        sx={{
+                          gap: 1,
+                          "& .MuiButton-endIcon": {
+                            margin: 0,
+                          },
+                          alignItems: "center",
+                        }}
                       >
                         {t("common:buttonDelete")}
                       </Button>
@@ -213,11 +234,11 @@ export function BookDetailsPage() {
                   <Box display="flex" alignItems="center" gap={1} mb={0}>
                     <AutoAwesome color="primary" />
                     <Typography variant="h6">{t("headerAISummary")}</Typography>
-                </Box>
+                  </Box>
                   <Typography variant="body1" color="text.secondary">
                     <Narrator text={book.ai_summary} />
                   </Typography>
-                  </Box>
+                </Box>
 
                 <Typography variant="body2" color="text.secondary">
                   {t("uploadedByPrefix", { userName: book.user?.name })}

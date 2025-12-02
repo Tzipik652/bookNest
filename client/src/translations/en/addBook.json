@@ -13,5 +13,10 @@
   "cancelButton": "Cancel",
   "successMessage": "{{bookTitle}} was added successfully!",
   "errorBookExists": "This book already exists in the database.",
-  "errorGeneral": "Failed to add book. Please try again."
+  "errorGeneral": "Failed to add book. Please try again.",
+  "successUpload":"Image uploaded successfully!",
+  "errorUpload":"Failed to upload image. Please try again.",
+  "uploading":"Uploading...",
+  "uploadButton":"Upload Book Cover"
+
 }

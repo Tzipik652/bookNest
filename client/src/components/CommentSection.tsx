@@ -5,7 +5,6 @@ import {
   getComments,
   addComment,
   deleteComment,
-  getCommentById,
 } from "../services/commentService";
 import {
   toggleReaction,
@@ -30,6 +29,7 @@ import {
   Box,
   Chip,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles"; // 👈 ייבוא חדש!
 import { toast } from "sonner";
 import CommentItemSkeleton from "./CommentItemSkeleton";
 import { useTranslation } from "react-i18next";
@@ -43,6 +43,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
   const { t } = useTranslation(["comments", "common"]);
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
+  const theme = useTheme(); // 👈 שימוש ב-Theme
   const [comments, setComments] = useState<CommentWithReactions[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -193,6 +194,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     } catch (error) {
       console.error(error);
       toast.error(t("errorAddFailed"));
+      // אם יש שגיאה, טוענים מחדש כדי לשחזר את המצב
       await loadComments();
     } finally {
       setLoadingComments((prev) => {
@@ -222,7 +224,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
         />
       </Stack>
 
-      {/* Add Comment Form */}
+      {/* Add Comment Form - משתמש ב-divider נגיש */}
       <Card
         elevation={0}
         sx={{
@@ -259,6 +261,13 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
                 onClick={handleAddComment}
                 disabled={!currentUser || isSubmitting || !newComment.trim()}
                 endIcon={<Send size={18} />}
+                sx={{
+                  gap: 1, 
+                  "& .MuiButton-endIcon": {
+                    margin: 0, 
+                  },
+                  alignItems: "center",
+                }}
               >
                 {isSubmitting ? t("posting") : t("postButton")}
               </Button>
@@ -277,16 +286,19 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
               textAlign: "center",
               py: 8,
               px: 3,
-              bgcolor: "grey.50",
+              // ✅ הותאם ל-Theme: משתמש בצבע הרקע של Card ב-Dark Mode
+              bgcolor: theme.palette.background.paper,
               borderRadius: 2,
+              border: `1px solid ${theme.palette.divider}` // ✅ גבול נגיש
             }}
           >
             <MessageSquare
               size={48}
-              style={{ opacity: 0.3, marginBottom: 16 }}
+              // ✅ צבע אייקון משני הנגיש
+              style={{ opacity: 0.3, marginBottom: 16, color: theme.palette.text.secondary }}
             />
             <Typography variant="body1" color="text.secondary">
-             {t("noCommentsText")}
+              {t("noCommentsText")}
             </Typography>
           </Box>
         ) : (
@@ -300,6 +312,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
                 }}
                 key={comment.id}
                 comment={comment}
+                // מאפשר לבעל הספר או אדמין למחוק
                 isBookOwner={isBookOwner || isAdmin}
                 currentUserId={currentUser?._id || ""}
                 onDelete={() => setCommentToDelete(comment.id)}
@@ -310,7 +323,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
         )}
       </Stack>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation Dialog - משתמש במרכיבי MUI סטנדרטיים שהם נגישים */}
       <Dialog
         open={!!commentToDelete}
         onClose={() => setCommentToDelete(null)}
@@ -319,7 +332,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
         <DialogTitle>{t("deleteTitle")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-           {t("deleteConfirm")}
+            {t("deleteConfirm")}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>

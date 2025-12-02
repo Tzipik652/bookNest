@@ -92,11 +92,11 @@ export function AddBookPage() {
       // העדכון הקריטי: אנחנו מכניסים את ה-URL שהתקבל לתוך הטופס
       setValue("img_url", data.secure_url);
       setImagePreview(data.secure_url); // מציג תצוגה מקדימה למשתמש
-      toast.success("Image uploaded successfully!");
+      toast.success(t("successUpload"));
 
     } catch (error) {
       console.error("Error uploading image:", error);
-      toast.error("Failed to upload image");
+      toast.error(t("errorUpload"));
     } finally {
       setUploadingImage(false);
     }
@@ -193,8 +193,6 @@ export function AddBookPage() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
-                    // זה קו קריטי לשליחה דרך מקלדת, ודאי ש-handleSubmit(onSubmit) נמצא בזמינות.
-                    // אם תיאור הבעיה הוא רק בגלל חוסר שדה, זה לא קריטי עכשיו.
                   }
                 }}
               >
@@ -221,8 +219,16 @@ export function AddBookPage() {
                     fullWidth
                     startIcon={uploadingImage ? <CircularProgress size={20} /> : <CloudUpload />}
                     disabled={uploadingImage}
+                     sx={{
+                  gap: 1, 
+                  "& .MuiButton-endIcon": {
+                    margin: 0, 
+                  },
+                  alignItems: "center",
+                }}
                   >
-                    {uploadingImage ? "Uploading..." : "Upload Book Cover"}
+                    {uploadingImage ? t("uploading") : t("uploadButton")}
+                    
                   </Button>
                 </label>
 
@@ -238,7 +244,6 @@ export function AddBookPage() {
                 )}
               </Box>
 
-              {/* אנחנו משאירים את שדה ה-URL למקרה שהמשתמש רוצה להדביק קישור ידנית, אבל הוא יתמלא אוטומטית */}
               <TextField
                 fullWidth
                 className="notranslate"
@@ -246,9 +251,9 @@ export function AddBookPage() {
                 margin="normal"
                 {...register("img_url")}
                 // אם רוצים שזה יהיה לקריאה בלבד אחרי העלאה:
-                // InputProps={{
-                //   readOnly: !!imagePreview,
-                // }}
+                InputProps={{
+                  readOnly: !!imagePreview
+                }}
                 InputLabelProps={{ shrink: true }} // כדי שהלייבל לא יכסה את הטקסט
                 error={!!errors.img_url}
                 helperText={errors.img_url?.message}
