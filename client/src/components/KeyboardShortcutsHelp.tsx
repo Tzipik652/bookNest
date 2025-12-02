@@ -208,7 +208,7 @@ export function KeyboardShortcutsHelp() {
                       pb: 0.5,
                     }}
                   >
-                    {t(`category:${category}`)}
+                    {t(`category:${category.replace(/\s+/g, '')}`)}
                   </Typography>
 
                   <Box

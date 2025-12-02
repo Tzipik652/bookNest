@@ -220,7 +220,7 @@ export function AddBookPage() {
               >
                 {categories.map((cat) => (
                   <MenuItem key={cat.id} value={cat.name}>
-                    {t(`category:${cat.name}`)}{" "}
+                    {t(`category:${cat.name.replace(/\s+/g, '')}`)}{" "}
                   </MenuItem>
                 ))}
               </TextField>
