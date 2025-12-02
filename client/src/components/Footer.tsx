@@ -62,7 +62,6 @@ export function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        {/* ✅ צבע כותרת: לבן קשיח במצב בהיר, text.primary בכהה */}
                         <Typography variant="subtitle1" sx={{ color: getDynamicColor('textPrimary', 'text'), mb: 2, fontWeight: 'bold' }}>
                             {t("quickLinksTitle")}
                         </Typography>
@@ -128,13 +127,12 @@ export function Footer() {
                         gap: 4
                     }}
                 >
-                    {/* ✅ צבע טקסט קטן: אפור בהיר קשיח במצב בהיר, text.secondary בכהה */}
                     <Typography variant="caption" sx={{ color: getDynamicColor('textSecondary', 'text') }}>
                         {t("copyright", { year: currentYear })}
+
                     </Typography>
                     
                     <div className="flex gap-6 text-sm">
-                        {/* קישורי תחתית */}
                         {[
                             { to: "/privacy-policy", text: t("privacyPolicy") },
                             { to: "/terms-of-service", text: t("termsOfService") },
@@ -144,9 +142,7 @@ export function Footer() {
                                 key={item.to}
                                 to={item.to}
                                 className="transition-colors"
-                                // צבע רגיל: אפור בהיר קשיח במצב בהיר, text.secondary בכהה
                                 style={{ color: getDynamicColor('textSecondary', 'link') }}
-                                // ✅ ריחוף דינמי: ירוק קשיח במצב בהיר, primary.main בכהה
                                 onMouseOver={e => (e.currentTarget.style.color = getDynamicColor('highlight', 'link'))}
                                 onMouseOut={e => (e.currentTarget.style.color = getDynamicColor('textSecondary', 'link'))}
                             >

@@ -140,6 +140,9 @@ export function LoginPage() {
                 size="large"
                 disabled={isSubmitting}
                 startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
+                aria-label={isSubmitting
+                  ? t("login.loggingInButton")
+                  : t("login.submitButton")}
               >
                 {isSubmitting
                   ? t("login.loggingInButton")

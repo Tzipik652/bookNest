@@ -15,14 +15,13 @@ import { UserList } from "../components/adminDashboard/UserList";
 import { RecentComments } from "../components/adminDashboard/RecentComments";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 import { useTranslation } from "react-i18next";
-// ייבוא רכיבי MUI
 import { Box, Typography, Container, useTheme } from '@mui/material';
 
 export function AdminDashboardPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
   const { t } = useTranslation(["adminDashboard", "common"]);
   const adminTexts = t('dashboard', { returnObjects: true }) as any;
-  const theme = useTheme(); // שימוש ב-Theme
+  const theme = useTheme();
 
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
   const [userMap, setUserMap] = useState<Record<string, string>>({});

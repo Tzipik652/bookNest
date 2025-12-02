@@ -123,6 +123,7 @@ export function AIRecommendationsPage() {
               <Refresh />
             )
           }
+          aria-label={isRefreshing ? t('buttonGenerating') : t('buttonGetMore')}
         >
           {isRefreshing ? t('buttonGenerating') : t('buttonGetMore')}
         </Button>

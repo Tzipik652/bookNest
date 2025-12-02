@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-// ייבוא רכיבי Theme ו-Utilities מ-MUI
 import { Avatar, Dialog, DialogActions, DialogContent, DialogTitle, useTheme, alpha } from "@mui/material"; 
 import { Button } from "../ui/button";
 import { toast } from "sonner";
@@ -7,7 +6,6 @@ import { deleteUser, updateUser } from "../../services/userService";
 import { User } from "../../types";
 import { Edit, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-// יש לוודא שזהו המיקום הנכון של ה-store שלך
 import { useAccessibilityStore } from "../../store/accessibilityStore"; 
 
 interface UserListProps {
@@ -21,7 +19,6 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
   const userListTexts = t('dashboard.userList', { returnObjects: true }) as Record<string, string>;
   const commonDir = t('common:dir') as 'rtl' | 'ltr';
   
-  // ייבוא Theme ונגישות
   const theme = useTheme();
   const { highContrast } = useAccessibilityStore(); 
 
@@ -82,9 +79,7 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
     if (!deleteUserId) return;
     try {
       await deleteUser(deleteUserId);
-      setUsers((prev) =>
-        prev.filter((u) => u._id !== deleteUserId)
-      );
+      setUsers((prev) => prev.filter((u) => u._id !== deleteUserId));
       toast.success(userListTexts.deleteSuccess);
       setDeleteUserId(null);
     } catch (err) {
@@ -92,21 +87,16 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
     }
   };
 
-  // --- הגדרות עיצוב דינמיות ---
   
-  // צבע גבול/רקע של הכרטיס במצב רגיל
   const cardBorderColor = highContrast ? theme.palette.text.primary : theme.palette.divider;
   const hoverShadow = highContrast ? `0 0 10px ${theme.palette.text.primary}` : theme.shadows[4];
 
-  // סגנון טקסט ראשי (שם משתמש)
   const primaryTextStyle = { color: theme.palette.text.primary };
 
-  // סגנון טקסט משני (אימייל, טקסט אפור) - משופר לקריאות במצב בהיר
   const secondaryTextStyle = highContrast 
     ? { color: theme.palette.text.primary } 
     : { color: theme.palette.mode === 'light' ? theme.palette.grey[700] : theme.palette.text.secondary }; 
 
-  // סגנון תגית תפקיד - משתמש רגיל
   const userRoleChipStyle = {
     backgroundColor: highContrast 
         ? 'transparent' 
@@ -119,7 +109,6 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
         : `1px solid ${theme.palette.divider}`,
   };
 
-  // סגנון תגית תפקיד - אדמין (נשתמש ב-Primary/Secondary)
   const adminRoleChipStyle = {
     backgroundColor: highContrast 
         ? theme.palette.background.default
@@ -132,27 +121,23 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
         : `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
   };
 
-  // סגנון כפתור שינוי תפקיד במצב עריכה
   const roleButtonBg = userEditFormData.isAdmin 
-      ? theme.palette.primary.main // אדמין - סגול/כחול
+      ? theme.palette.primary.main
       : theme.palette.mode === 'light' 
-          ? theme.palette.grey[500] // משתמש - אפור כהה יותר במצב בהיר
-          : theme.palette.text.secondary; // אפור במצב כהה
+          ? theme.palette.grey[500]
+          : theme.palette.text.secondary;
 
-  // סגנון Input
   const inputStyle = {
     backgroundColor: theme.palette.background.paper,
     border: `1px solid ${theme.palette.divider}`,
     color: theme.palette.text.primary,
     '&:focus': {
         outline: 'none',
-        // שינוי צבע הרינג בפוקוס לירוק דינמי
         boxShadow: `0 0 0 2px ${alpha(theme.palette.success.main, 0.5)}`, 
         borderColor: theme.palette.success.main,
     }
   };
 
-  // סגנון כפתורי פעולה
   const getActionButtonStyle = (colorKey: 'primary' | 'success' | 'error') => {
     const mainColor = theme.palette[colorKey].main;
     const iconColor = highContrast ? theme.palette.text.primary : mainColor;
@@ -188,14 +173,12 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
         ? Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              // שימוש בצבע רקע דינמי עבור ה-Skeleton
               style={{ backgroundColor: skeletonBgColor }}
               className="h-32 w-full rounded-xl animate-pulse"
             />
           ))
         : usersState.map((user) => {
             const isEditing = editingUserId === user._id;
-            // בחירת סגנון התגית המתאים (אדמין או משתמש רגיל)
             const roleChipStyle = user.role === "admin" ? adminRoleChipStyle : userRoleChipStyle;
             
             return (
@@ -204,7 +187,6 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                 className="border rounded-lg p-3 flex flex-col"
                 style={{ 
                     borderColor: cardBorderColor, 
-                    // הוספת סגנון ריחוף דינמי
                     transition: 'box-shadow 0.2s, border-color 0.2s',
                 }}
                 onMouseEnter={(e) => {
@@ -239,7 +221,7 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                               name: e.target.value,
                             })
                           }
-                          style={inputStyle} // שימוש בסגנון Input דינמי
+                          style={inputStyle}
                           className="w-full rounded px-2 py-1 text-sm focus:outline-none focus:ring-2"
                         />
                       ) : (
@@ -256,7 +238,7 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                               email: e.target.value,
                             })
                           }
-                          style={inputStyle} // שימוש בסגנון Input דינמי
+                          style={inputStyle}
                           className="w-full rounded px-2 py-1 text-xs focus:outline-none focus:ring-2"
                         />
                       ) : (
@@ -277,16 +259,16 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                             isAdmin: !userEditFormData.isAdmin,
                           })
                         }
-                        // שימוש בצבע רקע דינמי וצבע טקסט קבוע (לבן)
                         style={{ backgroundColor: roleButtonBg, color: theme.palette.primary.contrastText }}
                         className={`px-3 py-1 rounded text-xs`}
+                        aria-label={userEditFormData.isAdmin ? userListTexts.roleAdmin : userListTexts.roleUser}
                       >
                         {userEditFormData.isAdmin ? userListTexts.roleAdmin : userListTexts.roleUser}
                       </button>
                     ) : (
                       <span 
                           className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium shrink-0"
-                          style={roleChipStyle} // שימוש בסגנון תגית דינמי
+                          style={roleChipStyle}
                       >
                         {user.role === "admin" ? userListTexts.roleAdmin : userListTexts.roleUser}
                       </span>
@@ -298,11 +280,11 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                         <Button 
                             size="sm" 
                             onClick={() => handleSave(user._id)}
-                            // שימוש בצבעי Theme עבור כפתור שמירה
                             style={{ 
                                 backgroundColor: theme.palette.success.main, 
                                 color: theme.palette.success.contrastText,
                             }}
+                            aria-label={t('common:save')}
                         >
                           {t('common:save')}
                         </Button>
@@ -310,12 +292,12 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                           size="sm"
                           variant="outline"
                           onClick={handleCancel}
-                          // שימוש בצבעי Theme עבור כפתור ביטול
                           style={{ 
                               borderColor: theme.palette.divider,
                               color: theme.palette.text.secondary,
                               backgroundColor: theme.palette.background.paper,
                           }}
+                          aria-label={t('common:cancel')}
                         >
                           {t('common:cancel')}
                         </Button>
@@ -326,7 +308,8 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                             size="sm" 
                             variant="ghost" 
                             onClick={() => handleEditClick(user)}
-                            style={editButtonStyle} // שימוש בסגנון דינמי
+                            style={editButtonStyle}
+                            aria-label={t('buttonEdit')}
                         >
                           <Edit className="h-3.5 w-3.5" />
                         </Button>
@@ -335,7 +318,8 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                             size="sm"
                             variant="ghost"
                             onClick={() => setDeleteUserId(user._id)}
-                            style={deleteButtonStyle} // שימוש בסגנון דינמי
+                            style={deleteButtonStyle}
+                            aria-label={t("buttonDelete")}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
@@ -345,7 +329,6 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                   </div>
                 </div>
 
-                {/* Delete confirmation Dialog - נשאר רכיב MUI טהור */}
                 <Dialog
                   open={deleteUserId === user._id}
                   onClose={() => setDeleteUserId(null)}
@@ -363,17 +346,18 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
                         borderColor: theme.palette.divider, 
                         color: theme.palette.text.secondary 
                       }}
+                      aria-label={t('common:cancel')}
                     >
                       {t('common:cancel')}
                     </Button>
                     <Button
                       size="sm"
                       onClick={handleDelete}
-                      // שימוש בצבעי Theme עבור כפתור מחיקה
                       style={{ 
                           backgroundColor: theme.palette.error.main, 
                           color: theme.palette.error.contrastText,
                       }}
+                      aria-label={t('common:delete')}
                     >
                       {t('common:delete')}
                     </Button>

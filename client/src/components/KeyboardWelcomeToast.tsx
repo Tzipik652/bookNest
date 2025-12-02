@@ -2,20 +2,18 @@ import { useEffect, useState } from 'react';
 import { Alert, Snackbar, Button, Box, Typography, useTheme } from '@mui/material'; // 👈 ייבוא useTheme
 import { Keyboard, X } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
-// 👈 ייבוא useAccessibilityStore
 import { useAccessibilityStore } from '../store/accessibilityStore'; 
 
 export function KeyboardWelcomeToast() {
   const { t } = useTranslation(['welcomeToast', 'common']);
   const commonDir = t('common:dir') as 'rtl' | 'ltr';
-  const theme = useTheme(); // 👈 שימוש ב-useTheme
-  const { highContrast } = useAccessibilityStore(); // 👈 ייבוא highContrast
+  const theme = useTheme();
+  const { highContrast } = useAccessibilityStore();
 
   const [isOpen, setIsOpen] = useState(false);
   const STORAGE_KEY = 'keyboard-welcome-shown';
 
   useEffect(() => {
-    // ... הלוגיקה נשארת זהה
     const hasSeenWelcome = localStorage.getItem(STORAGE_KEY);
 
     if (!hasSeenWelcome) {
@@ -36,6 +34,7 @@ export function KeyboardWelcomeToast() {
     handleClose();
   };
 
+
   return (
     <Snackbar
       open={isOpen}
@@ -47,16 +46,12 @@ export function KeyboardWelcomeToast() {
         severity="info"
         sx={{
           width: '100%',
-          // 💡 שינוי: רקע דינמי
           bgcolor: theme.palette.background.paper, 
-          // 💡 שינוי: גבול דינמי
           border: `2px solid ${highContrast ? theme.palette.text.primary : theme.palette.primary.main}`, 
-          // 💡 שינוי: הצל משתנה עם ה-Theme
           boxShadow: theme.shadows[8],
           
-          // 💡 שינוי: צבע האייקון דינמי
           '& .MuiAlert-icon': {
-            color: theme.palette.primary.main // ישתנה ללבן במצב ניגודיות גבוהה או Dark Mode
+            color: theme.palette.primary.main 
           },
           direction: commonDir
         }}
@@ -69,9 +64,9 @@ export function KeyboardWelcomeToast() {
               minWidth: 'auto',
               p: 1,
               order: commonDir === 'rtl' ? -1 : 1,
-              // 💡 שינוי: צבע האיקס דינמי
               color: theme.palette.text.secondary
             }}
+            aria-label='X'
           >
             <X size={18} />
           </Button>
@@ -97,15 +92,14 @@ export function KeyboardWelcomeToast() {
               onClick={handleClose}
               sx={{
                 textTransform: 'none',
-                // 💡 שינוי: גבול וצבע טקסט דינמי
                 borderColor: theme.palette.primary.main,
                 color: theme.palette.primary.main,
-                // 💡 שינוי: ריחוף דינמי
                 '&:hover': {
                   borderColor: theme.palette.primary.dark,
-                  bgcolor: theme.palette.primary.light // או צבע רקע שקוף למחצה
+                  bgcolor: theme.palette.primary.light
                 }
               }}
+              aria-label={t('dismissButton')}
             >
               {t('dismissButton')}
             </Button>

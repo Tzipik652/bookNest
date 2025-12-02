@@ -1,19 +1,16 @@
-import { useEffect, useState, useRef, ChangeEvent } from "react"; // Added ChangeEvent
+import { useState, useRef, ChangeEvent, useEffect } from "react"; // Added ChangeEvent
 import { useNavigate } from "react-router-dom";
-import { addBook } from "../services/bookService";
-import { getCategories } from "../services/categoryService";
 import {
   Box,
   Button,
   Card,
   CardContent,
-  CardHeader,
   CardActions,
   TextField,
   MenuItem,
   Alert,
   CircularProgress,
-  Snackbar,
+  Typography,
   IconButton, // Added
   InputAdornment, // Added
 } from "@mui/material";
@@ -29,9 +26,10 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-// --- הגדרות קלאודינרי (כדאי לשים בקובץ env בעתיד) ---
-const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME; // החליפי בשם הענן שלך
-const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET; // החליפי ב-preset שיצרת
+const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME; 
+const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET; 
+import { addBook } from "../services/bookService";
+import { getCategories } from "../services/categoryService";
 
 export function AddBookPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
@@ -142,12 +140,27 @@ export function AddBookPage() {
   };
 
   return (
-    <Box minHeight="100vh" bgcolor="#f9fafb" py={6}>
+    <Box minHeight="100vh" bgcolor="#f9fafb" py={6} component="main">
       <Box maxWidth="sm" mx="auto" px={2}>
         {/* ... כפתור חזרה הקיים שלך ... */}
         <ShadcnButton variant="ghost" onClick={() => navigate(-1)} className="mb-6 gap-2">
           <ArrowBack className="h-4 w-4" /> {t('common:back')}
+        <ShadcnButton
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          aria-label={t("common:back")}
+          className="mb-6 gap-2"
+        >
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t('common:back')}
         </ShadcnButton>
+        <Typography component="h1" variant="h3" fontWeight="bold" gutterBottom>
+          {t("pageTitle")}
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+          {t("pageSubheader")}
+        </Typography>
 
         <Card elevation={3}>
           <CardHeader className="notranslate" title={t("pageTitle")} subheader={t("pageSubheader")} />
@@ -279,6 +292,7 @@ export function AddBookPage() {
                   ) : null
                 }
                 className="notranslate"
+                aria-label={t("addButton")}
               >
                 {isSubmitting ? t("addingButton") : t("addButton")}
               </Button>
@@ -289,6 +303,7 @@ export function AddBookPage() {
                 onClick={() => navigate(-1)}
                 disabled={isSubmitting}
                 className="notranslate"
+                aria-label={t("cancelButton")}
               >
                 {t("cancelButton")}
 

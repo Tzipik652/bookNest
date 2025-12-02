@@ -129,6 +129,7 @@ export function FavoritesPage() {
               size="large"
               onClick={() => navigate("/home")}
               sx={{ textTransform: "none", borderRadius: 3 }}
+              aria-label={t('emptyState.button')}
             >
               {t('emptyState.button')}
             </Button>

@@ -7,5 +7,8 @@
   "favoritesCount": "{{count}} users liked this book",
   "headerDescription": "Description",
   "headerAISummary": "AI Summary",
-  "uploadedByPrefix": "Uploaded by {{userName}}"
+  "uploadedByPrefix": "Uploaded by {{userName}}",
+  "startNarration": "start narration",
+  "pauseNarration": "pause narration",
+  "stopNarration": "stop narration"
 }

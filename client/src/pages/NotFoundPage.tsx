@@ -3,7 +3,6 @@ import { Button } from '../components/ui/button';
 import { Home, ArrowLeft, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
-// ייבוא רכיבי MUI
 import { Box, Typography } from '@mui/material';
 
 export function NotFoundPage() {
@@ -11,15 +10,12 @@ export function NotFoundPage() {
   const navigate = useNavigate();
   const { t } = useTranslation("common");
 
-  // לוגיקה ליישור טקסט לפי שפה
   const alignment = t('dir') === 'rtl' ? 'right' : 'left';
 
   return (
-    // Box ראשי - משתמש בצבע הרקע הדינמי ובגובה מלא
     <Box
       sx={{
         minHeight: '100vh',
-        // שימוש בצבע הרקע הדינמי במקום ה-Gradient הקשיח
         bgcolor: 'background.default',
         color: 'text.primary',
         display: 'flex',
@@ -31,14 +27,12 @@ export function NotFoundPage() {
     >
       <Box sx={{ textAlign: 'center', maxWidth: '48rem' }}>
         
-        {/* Large 404 (כותרת מוצנעת) */}
         <Box sx={{ mb: 4 }}>
           <Typography 
             component="h1" 
-            variant="h1" // H1 הוא הנכון מבחינת סמנטיקה, גם אם הוא מוצנע
+            variant="h1" 
             sx={{ 
               fontSize: '10rem', 
-              // צבע ראשי עם שקיפות כדי להתאים לכל רקע
               color: 'primary.main', 
               opacity: 0.3,
               fontWeight: 'bold',
@@ -52,10 +46,10 @@ export function NotFoundPage() {
         <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
           <Box 
             sx={{ 
-              bgcolor: 'background.paper', // רקע לבן או כהה (כמו Card/Paper)
+              bgcolor: 'background.paper',
               p: 3, 
               borderRadius: '50%', 
-              boxShadow: 3, // צל עדין
+              boxShadow: 3,
               color: 'primary.main' 
             }}
           >
@@ -73,8 +67,8 @@ export function NotFoundPage() {
           {t('notFound.title')}
         </Typography>
         <Typography 
-          variant="h6" // גודל טקסט ראשי
-          color="text.secondary" // צבע טקסט משני עדין
+          variant="h6" 
+          color="text.secondary"
           sx={{ mb: 4, textAlign: alignment }}
         >
           {t('notFound.mainMessage')}
@@ -85,7 +79,8 @@ export function NotFoundPage() {
           <Button
             onClick={() => navigate(-1)}
             variant="outline"
-            className="gap-2" // Tailwind classes for layout are fine
+            className="gap-2"
+            aria-label={t('notFound.backButton')}
           >
             <ArrowLeft className="h-5 w-5" />
             {t('notFound.backButton')}
@@ -93,6 +88,7 @@ export function NotFoundPage() {
           <Button
             onClick={() => navigate('/')}
             className="gap-2"
+            aria-label={t('notFound.homeButton')}
           >
             <Home className="h-5 w-5" />
             {t('notFound.homeButton')}

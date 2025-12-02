@@ -268,6 +268,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
                   },
                   alignItems: "center",
                 }}
+                aria-label={isSubmitting ? t("posting") : t("postButton")}
               >
                 {isSubmitting ? t("posting") : t("postButton")}
               </Button>
@@ -343,6 +344,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
             onClick={() =>
               commentToDelete && handleDeleteComment(commentToDelete)
             }
+            aria-label={t("common:buttonDelete")}
           >
             {t("common:buttonDelete")}
           </Button>

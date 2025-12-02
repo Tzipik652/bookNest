@@ -70,6 +70,7 @@ export function MyBooksPage() {
       variant="contained"
       startIcon={<BookPlus size={18} />}
       onClick={() => navigate("/add-book")}
+      aria-label={t("addButton")}
     >
       {t("addButton")}
     </Button>

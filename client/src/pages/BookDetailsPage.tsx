@@ -120,6 +120,7 @@ export function BookDetailsPage() {
         <ShadcnButton
           variant="ghost"
           onClick={() => navigate(-1)}
+          aria-label={t("common:back")}
           className="mb-6 gap-2"
         >
           {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
@@ -177,6 +178,11 @@ export function BookDetailsPage() {
                       },
                       alignItems: "center",
                     }}
+                    aria-label={
+                      book.isFavorited
+                        ? t("buttonRemoveFavorite")
+                        : t("buttonAddFavorite")
+                    }
                   >
                     {book.isFavorited
                       ? t("buttonRemoveFavorite")
@@ -196,6 +202,7 @@ export function BookDetailsPage() {
                           },
                           alignItems: "center",
                         }}
+                        aria-label={t("common:buttonEdit")}
                       >
                         {t("common:buttonEdit")}
                       </Button>
@@ -212,6 +219,7 @@ export function BookDetailsPage() {
                           },
                           alignItems: "center",
                         }}
+                        aria-label={t("common:buttonDelete")}
                       >
                         {t("common:buttonDelete")}
                       </Button>
@@ -234,8 +242,8 @@ export function BookDetailsPage() {
                   <Box display="flex" alignItems="center" gap={1} mb={0}>
                     <AutoAwesome color="primary" />
                     <Typography variant="h6">{t("headerAISummary")}</Typography>
-                  </Box>
-                  <Typography variant="body1" color="text.secondary">
+                    </Box>
+                  <Box mt={2}>
                     <Narrator text={book.ai_summary} />
                   </Typography>
                 </Box>
@@ -266,10 +274,10 @@ export function BookDetailsPage() {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowDeleteDialog(false)}>
+          <Button onClick={() => setShowDeleteDialog(false)} aria-label={t("common:buttonCancel")}>
             {t("common:buttonCancel")}
           </Button>
-          <Button onClick={handleDelete} color="error" variant="contained">
+          <Button onClick={handleDelete} color="error" variant="contained" aria-label={t("common:buttonDelete")}>
             {t("common:buttonDelete")}
           </Button>
         </DialogActions>
