@@ -12,6 +12,7 @@ import categoryRouter from './routes/categoryRouter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import path from "path";
 import { fileURLToPath } from "url";
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
