@@ -1,0 +1,17 @@
+{
+    "minTitleLength": "Title must be at least 2 characters",
+    "minAuthorLength": "Author must be at least 2 characters",
+    "minDescriptionLength": "Description must be at least 10 characters",
+    "categoryRequired": "Category is required",
+    "invalidImageUrl": "Invalid image URL. Must be a valid URL or empty.",
+    "invalidPrice": "Price must be a valid number",
+    "emailRequired": "Email is required",
+    "invalidEmail": "Invalid email address",
+    "minPasswordLength": "Password must be at least 6 characters",
+    "confirmPasswordRequired": "Please confirm your password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "minNameLength": "Name must be at least 2 characters",
+    "passwordUppercase": "Password must contain at least one uppercase letter",
+    "passwordNumber": "Password must contain at least one number",
+    "passwordSpecialChar": "Password must contain at least one special character"
+}

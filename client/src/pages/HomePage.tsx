@@ -36,7 +36,7 @@ export function HomePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useUserStore();
-
+  const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
@@ -107,7 +107,19 @@ export function HomePage() {
       );
     });
   }, [books, favoriteBooksQuery.data, queryClient]);
+  useEffect(() => {
+    if (!isCategorySelectOpen) return; // לא מאזינים אם החלון סגור
 
+    const handleScroll = () => {
+      setIsCategorySelectOpen(false);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isCategorySelectOpen]);
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
 
@@ -194,7 +206,7 @@ export function HomePage() {
           mb={2}
           py={2}
           ref={discoverRef}
-        className="notranslate"
+          className="notranslate"
         >
           {t('home:page_title')}
         </Typography>
@@ -202,7 +214,7 @@ export function HomePage() {
         {/* Filters */}
         <Box sx={{ display: "flex", gap: 2, mb: 6, flexWrap: "wrap" }}>
           <TextField
-          className="notranslate"
+            className="notranslate"
             id="search-books"
             value={searchQuery}
             placeholder={t('home:search_placeholder')}
@@ -225,6 +237,12 @@ export function HomePage() {
               onChange={e => {
                 setSelectedCategory(e.target.value);
                 setCurrentPage(1);
+              }}
+              open={isCategorySelectOpen}
+              onOpen={() => setIsCategorySelectOpen(true)}
+              onClose={() => setIsCategorySelectOpen(false)}
+              MenuProps={{
+                disableScrollLock: true,
               }}
               label={t('home:category_label')}
             >
@@ -275,7 +293,7 @@ export function HomePage() {
         ) : (
           <Box textAlign="center" py={12}>
             <Typography color="text.secondary" className="notranslate">
-             {t('home:no_books_found')}
+              {t('home:no_books_found')}
             </Typography>
           </Box>
         )}
