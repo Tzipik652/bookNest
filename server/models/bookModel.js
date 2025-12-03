@@ -271,6 +271,33 @@ export const getBooksByCategory = async (category) => {
   return data.map(normalizeBook);
 };
 
+export async function searchBooks(searchTerm, page, limit, categoryId) {
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  let query = supabase
+    .from("books")
+    .select(bookSelectQuery, { count: "exact" })
+    .order("title", { ascending: true });
+
+  if (searchTerm) {
+    query = query.or(
+      `title.ilike.%${searchTerm}%,author.ilike.%${searchTerm}%`
+    );
+  }
+  if (categoryId) {
+    query = query.eq("category", categoryId);
+  }
+  const { data, count, error } = await query.range(from, to);
+
+  if (error) throw error;
+
+  return {
+    books: data.map(normalizeBook),
+    totalPages: Math.ceil(count / limit),
+  };
+}
+
 export default {
   create,
   findAll,
@@ -281,4 +308,5 @@ export default {
   getFavoriteBooks,
   findPaginated,
   getBooksByCategory,
+  searchBooks,
 };

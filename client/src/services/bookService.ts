@@ -110,11 +110,12 @@ export async function deleteBook(id: string): Promise<void> {
   }
 }
 
-export async function searchBooks(search: string, page = 1, limit = 10) {
+export async function searchBooks(search: string, page = 1, limit = 10, category?:string) {
   try {
     const res = await api.get(`${API_BASE_URL}/search`, {
-      params: { s: search, page, limit },
+      params: { s: search, page, limit, category },
     });
+    console.log("search", search)
     return res.data;
   } catch (error) {
     handleAxiosError(error);
