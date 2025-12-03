@@ -69,7 +69,7 @@ export function AddBookPage() {
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
+console.log(file)
     setUploadingImage(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -134,7 +134,6 @@ export function AddBookPage() {
         navigate(`/book/${newBook._id}`);
       }, 1500);
     } catch (err: any) {
-      // ... (הקוד הקיים שלך לטיפול בשגיאות)
       toast.error(t("errorGeneral"));
       setIsSubmitting(false);
     }
@@ -143,8 +142,7 @@ export function AddBookPage() {
   return (
     <Box minHeight="100vh" bgcolor="#f9fafb" py={6} component="main">
       <Box maxWidth="sm" mx="auto" px={2}>
-        {/* ... כפתור חזרה הקיים שלך ... */}
-          <ArrowBack className="h-4 w-4" /> {t('common:back')}
+
         <ShadcnButton
           variant="ghost"
           onClick={() => navigate(-1)}
@@ -163,7 +161,7 @@ export function AddBookPage() {
         </Typography>
 
         <Card elevation={3}>
-          <CardHeader className="notranslate" title={t("pageTitle")} subheader={t("pageSubheader")} />
+          {/* <CardHeader className="notranslate" title={t("pageTitle")} subheader={t("pageSubheader")} /> */}
 
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent>

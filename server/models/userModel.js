@@ -6,9 +6,11 @@ export async function getUserById(id) {
     .from('users')
     .select('*')
     .eq('_id', id)
+    .eq('is_deleted', false) // ⬅️ נוסף: סינון משתמשים מחוקים
     .single();
 
   if (error) throw error;
+  // הערה: אם המשתמש קיים אך is_deleted=true, השאילתה תחזיר NULL.
   return data;
 }
 
@@ -39,31 +41,32 @@ export async function getFavoriteBooksList(id) {
   const { data, error } = await supabase
     .from('user_favorites')
     .select('book_id') // Selecting only the book_id (UUID)
-    .eq('user_id', id); 
+    .eq('user_id', id);
 
   if (error) {
     throw error;
   }
-  
+
   // Returning a clean array of book UUID strings: ['uuid1', 'uuid2', ...]
   return data.map(item => item.book_id);
 }
 export async function getUsers() {
   const { data, error } = await supabase
     .from('users')
-    .select('*');
+    .select('*')
+    .eq('is_deleted', false); // ⬅️ נוסף: סינון משתמשים מחוקים
 
   if (error) throw error;
   return data;
 }
 export async function deleteUser(id) {
-  const { data, error } = await supabase
-    .from('users')
-    .delete()
-    .eq('_id', id)
-    .select()
-    .single();
+  const { data, error } = await supabase
+    .from('users')
+    .update({ is_deleted: true }) // ⬅️ עדכון דגל המחיקה
+    .eq('_id', id)
+    .select()
+    .single();
 
-  if (error) throw error;
-  return data;
+  if (error) throw error;
+  return data;
 }
