@@ -1,4 +1,4 @@
-import { useState, useRef, ChangeEvent, useEffect } from "react"; // Added ChangeEvent
+import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -11,12 +11,15 @@ import {
   Alert,
   CircularProgress,
   Typography,
-  IconButton, // Added
+  IconButton,
   InputAdornment,
-  CardHeader, // Added
 } from "@mui/material";
 import { Button as ShadcnButton } from "../components/ui/button";
-import { ArrowBack, AutoAwesome, CheckCircle, CloudUpload } from "@mui/icons-material"; // Added CloudUpload
+import {
+  CloudUpload,
+  Delete,
+  Close
+} from "@mui/icons-material";
 import { useUserStore } from "../store/useUserStore";
 import { Category } from "../types";
 import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
@@ -27,8 +30,8 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME; 
-const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET; 
+const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME;
+const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
 import { addBook } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
 
@@ -51,8 +54,8 @@ export function AddBookPage() {
     handleSubmit,
     formState: { errors },
     reset,
-    setValue, // אנחנו צריכים את זה כדי לעדכן את השדה ידנית
-    watch, // כדי לראות שינויים
+    setValue, // כדי לעדכן את השדה img_url
+    watch,   // כדי לראות שינויים בשדה img_url
   } = useForm<BookFormValues>({
     resolver: zodResolver(bookSchema),
     defaultValues: {
@@ -65,11 +68,25 @@ export function AddBookPage() {
     },
   });
 
+  // --- לוגיקה חדשה ---
+  const watchedImgUrl = watch("img_url"); // עוקב אחרי הערך ב-TextField
+
+  // פונקציה להסרת התמונה/הקישור
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    setValue("img_url", "", { shouldValidate: true }); // מנקה את השדה בטופס
+    // איפוס ה-input של הקובץ כדי שאפשר יהיה להעלות שוב
+    const fileInput = document.getElementById("raised-button-file") as HTMLInputElement;
+    if (fileInput) fileInput.value = "";
+  };
+
   // פונקציה להעלאת התמונה ל-Cloudinary
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-console.log(file)
+
+    // ניתן להוסיף כאן בדיקת גודל/סוג קובץ
+
     setUploadingImage(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -88,18 +105,31 @@ console.log(file)
 
       const data = await res.json();
 
-      // העדכון הקריטי: אנחנו מכניסים את ה-URL שהתקבל לתוך הטופס
-      setValue("img_url", data.secure_url);
-      setImagePreview(data.secure_url); // מציג תצוגה מקדימה למשתמש
+      // העדכון: מכניסים את ה-URL שהתקבל לתוך הטופס
+      setValue("img_url", data.secure_url, { shouldValidate: true });
+      setImagePreview(data.secure_url);
       toast.success(t("successUpload"));
 
     } catch (error) {
       console.error("Error uploading image:", error);
       toast.error(t("errorUpload"));
+      handleRemoveImage(); // לנקות את הכל במקרה של כישלון
     } finally {
       setUploadingImage(false);
     }
   };
+
+  // אפקט להצגת תצוגה מקדימה גם כאשר המשתמש מזין URL ידנית
+  useEffect(() => {
+    if (watchedImgUrl) {
+      if (watchedImgUrl !== imagePreview) {
+        setImagePreview(watchedImgUrl);
+      }
+    } else {
+      setImagePreview(null);
+    }
+  }, [watchedImgUrl]);
+
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -161,11 +191,8 @@ console.log(file)
         </Typography>
 
         <Card elevation={3}>
-          {/* <CardHeader className="notranslate" title={t("pageTitle")} subheader={t("pageSubheader")} /> */}
-
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent>
-              {/* ... שדות קיימים (Title, Author, Description, Category) ... */}
               <TextField fullWidth label={t("titleLabel")} margin="normal" {...register("title")} error={!!errors.title} helperText={errors.title?.message} />
               <TextField
                 fullWidth
@@ -179,8 +206,8 @@ console.log(file)
                 className="notranslate"
                 label={t("descriptionLabel")}
                 margin="normal"
-                multiline // מאפשר כמה שורות
-                rows={5}   // גודל ברירת מחדל של 5 שורות
+                multiline
+                rows={5}
                 {...register("description")}
                 error={!!errors.description}
                 helperText={errors.description?.message}
@@ -214,43 +241,62 @@ console.log(file)
                 ))}
               </TextField>
 
-              {/* --- החלק החדש של העלאת תמונה --- */}
-              <Box sx={{ mt: 2, mb: 1 }}>
+              {/* --- החלק המעודכן של העלאת תמונה --- */}
+              <Box sx={{ mt: 2, mb: 3 }}>
                 <input
                   accept="image/*"
                   style={{ display: "none" }}
                   id="raised-button-file"
                   type="file"
                   onChange={handleImageUpload}
+                  disabled={!!imagePreview || uploadingImage} // הוספנו disabled אם יש תצוגה מקדימה
                 />
-                <label htmlFor="raised-button-file">
-                  <Button
-                    variant="outlined"
-                    component="span"
-                    fullWidth
-                    startIcon={uploadingImage ? <CircularProgress size={20} /> : <CloudUpload />}
-                    disabled={uploadingImage}
-                     sx={{
-                  gap: 1, 
-                  "& .MuiButton-endIcon": {
-                    margin: 0, 
-                  },
-                  alignItems: "center",
-                }}
-                  >
-                    {uploadingImage ? t("uploading") : t("uploadButton")}
-                    
-                  </Button>
-                </label>
 
-                {/* תצוגה מקדימה אם יש תמונה */}
+                {/* כפתור העלאה - מוצג רק אם אין תמונה */}
+                {!imagePreview && (
+                  <label htmlFor="raised-button-file">
+                    <Button
+                      variant="outlined"
+                      component="span"
+                      fullWidth
+                      startIcon={uploadingImage ? <CircularProgress size={20} /> : <CloudUpload />}
+                      disabled={uploadingImage}
+                      sx={{ py: 1.5, borderStyle: 'dashed' }}
+                    >
+                      {uploadingImage ? t("uploading") : t("uploadButton")}
+                    </Button>
+                  </label>
+                )}
+
+                {/* תצוגה מקדימה + כפתור מחיקה */}
                 {imagePreview && (
-                  <Box mt={2} display="flex" justifyContent="center">
+                  <Box position="relative" mt={2} display="inline-flex">
                     <img
                       src={imagePreview}
                       alt="Preview"
-                      style={{ maxHeight: 200, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                      style={{
+                        maxHeight: 200,
+                        maxWidth: "100%",
+                        borderRadius: 8,
+                        border: "1px solid #e0e0e0"
+                      }}
                     />
+                    {/* כפתור מחיקה צף על התמונה */}
+                    <IconButton
+                      size="small"
+                      onClick={handleRemoveImage}
+                      title={t("removeImage", { defaultValue: "remove image" })}
+                      sx={{
+                        position: "absolute",
+                        top: -10,
+                        right: -10,
+                        bgcolor: "background.paper",
+                        boxShadow: 2,
+                        "&:hover": { bgcolor: "error.light", color: "white" }
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
                   </Box>
                 )}
               </Box>
@@ -261,15 +307,34 @@ console.log(file)
                 label={t("imageURLLabel")}
                 margin="normal"
                 {...register("img_url")}
-                // אם רוצים שזה יהיה לקריאה בלבד אחרי העלאה:
-                InputProps={{
-                  readOnly: !!imagePreview
-                }}
-                InputLabelProps={{ shrink: true }} // כדי שהלייבל לא יכסה את הטקסט
+
+                // לוגיקה לנעילת השדה
+                disabled={!!imagePreview && watchedImgUrl === imagePreview}
+
+                InputLabelProps={{ shrink: true }}
                 error={!!errors.img_url}
-                helperText={errors.img_url?.message}
+
+                // הודעה דינמית למשתמש
+                helperText={
+                  errors.img_url?.message ||
+                  (imagePreview && watchedImgUrl === imagePreview
+                    ? t("urlLockedMessage", {
+                      defaultValue: "The link was locked after uploading the image. Use the delete button to change it."
+                    })
+                    : t("urlHelpText", { defaultValue: "Insert a link to an image or upload a file" }))
+                }
+
+                // כפתור מחיקה בתוך השדה
+                InputProps={{
+                  endAdornment: watchedImgUrl ? (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleRemoveImage} edge="end" title={t("removeImage")}>
+                        <Delete color="error" />
+                      </IconButton>
+                    </InputAdornment>
+                  ) : null,
+                }}
               />
-              {/* ------------------------------------- */}
 
               <TextField fullWidth label={t("priceLabel")} type="number" margin="normal" {...register("price")} error={!!errors.price} helperText={errors.price?.message} />
 
