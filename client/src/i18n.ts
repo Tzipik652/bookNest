@@ -72,6 +72,10 @@ import heNavbar from './translations/he/navbar.json'
 import enValidation from './translations/en/validation.json'
 import heValidation from './translations/he/validation.json'
 
+import enCategory from './translations/en/category.json'
+import heCategory from './translations/he/category.json'
+
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -100,6 +104,7 @@ i18n
         welcomeToast:enWelcomeToast,
         landing:enLanding,
         navbar:enNavbar,
+        category:enCategory,
         validation:enValidation
       },
       he: {
@@ -125,10 +130,11 @@ i18n
         welcomeToast:heWelcomeToast,
         landing:heLanding,
         navbar:heNavbar,
+        category:heCategory,
         validation:heValidation
       },
     },
-    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms','accessibility','bookCard','comments','footer','keyboardShortcutsHelp','welcomeToast','landing','navbar','validation'],
+    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms','accessibility','bookCard','comments','footer','keyboardShortcutsHelp','welcomeToast','landing','navbar','category','validation'],
     defaultNS: 'common',
     supportedLngs: ['en', 'he'],
     fallbackLng: 'en',
