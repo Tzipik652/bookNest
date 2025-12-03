@@ -69,6 +69,9 @@ import heLanding from './translations/he/landing.json'
 import enNavbar from './translations/en/navbar.json'
 import heNavbar from './translations/he/navbar.json'
 
+import enValidation from './translations/en/validation.json'
+import heValidation from './translations/he/validation.json'
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -96,7 +99,8 @@ i18n
         keyboardShortcutsHelp:enKeyboardShortcutsHelp,
         welcomeToast:enWelcomeToast,
         landing:enLanding,
-        navbar:enNavbar
+        navbar:enNavbar,
+        validation:enValidation
       },
       he: {
         common: heCommon,
@@ -120,10 +124,11 @@ i18n
         keyboardShortcutsHelp:heKeyboardShortcutsHelp,
         welcomeToast:heWelcomeToast,
         landing:heLanding,
-        navbar:heNavbar
+        navbar:heNavbar,
+        validation:heValidation
       },
     },
-    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms','accessibility','bookCard','comments','footer','keyboardShortcutsHelp','welcomeToast','landing','navbar'],
+    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms','accessibility','bookCard','comments','footer','keyboardShortcutsHelp','welcomeToast','landing','navbar','validation'],
     defaultNS: 'common',
     supportedLngs: ['en', 'he'],
     fallbackLng: 'en',

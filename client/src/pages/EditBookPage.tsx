@@ -4,7 +4,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { bookSchema, BookFormValues } from "../schemas/book.schema";
+import { BookFormValues, createBookSchema } from "../schemas/book.schema";
 import { getBookById, updateBook } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
 
@@ -32,7 +32,7 @@ import { Button as ShadcnButton } from "../components/ui/button";
 
 
 export function EditBookPage() {
-  const { t } = useTranslation(["editBook", "common"]);
+  const { t } = useTranslation(["editBook", "common","validation"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -42,6 +42,7 @@ export function EditBookPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitError, setSubmitError] = useState("");
+const formSchema = createBookSchema(t);
 
   const handleNavigateBack = () => {
     if (location.state?.from) {
@@ -58,7 +59,7 @@ export function EditBookPage() {
     control,
     formState: { errors, isSubmitting, isDirty },
   } = useForm<BookFormValues>({
-    resolver: zodResolver(bookSchema),
+    resolver: zodResolver(formSchema),
   });
 
   useEffect(() => {

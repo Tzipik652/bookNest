@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ResetPasswordFormValues, resetPasswordSchema } from "../schemas/auth.register";
+import { createResetPasswordSchema, ResetPasswordFormValues } from "../schemas/auth.register";
 import { resetPassword } from "../services/authService";
 import { Book, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
@@ -25,20 +25,20 @@ import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function ResetPassword() {
   const isKeyboardMode = useKeyboardModeBodyClass();
-  const { t } = useTranslation("auth");
+  const { t } = useTranslation(["auth","validation"]);
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+const schema = createResetPasswordSchema(t);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ResetPasswordFormValues>({
-    resolver: zodResolver(resetPasswordSchema),
+    resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: ResetPasswordFormValues) => {

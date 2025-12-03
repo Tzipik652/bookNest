@@ -20,17 +20,17 @@ import { useUserStore } from "../store/useUserStore";
 import { loginLocal, loginWithGoogle } from "../services/userService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, LoginFormValues } from "../schemas/login.schema";
+import { createLoginSchema, LoginFormValues } from "../schemas/login.schema";
 import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function LoginPage() {
-  const { t } = useTranslation(["auth","common"]);
+  const { t } = useTranslation(["auth","common","validation"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useUserStore();
-
+const schema = createLoginSchema(t);
   const [error, setError] = useState("");
 
   const getRedirectPath = () => {
@@ -44,7 +44,7 @@ export function LoginPage() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: LoginFormValues) => {

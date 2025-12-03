@@ -24,7 +24,7 @@ import { useUserStore } from "../store/useUserStore";
 import { Category } from "../types";
 import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
 import { useForm } from "react-hook-form";
-import { BookFormValues, bookSchema } from "../schemas/book.schema";
+import { BookFormValues, createBookSchema } from "../schemas/book.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -37,7 +37,7 @@ import { getCategories } from "../services/categoryService";
 
 export function AddBookPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
-  const { t } = useTranslation(["addBook", "common"]);
+  const { t } = useTranslation(["addBook", "common","validation"]);
 
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,7 +48,7 @@ export function AddBookPage() {
 
   const [categories, setCategories] = useState<Category[]>([]);
   const actionsRef = useRef<HTMLDivElement | null>(null);
-
+const formSchema = createBookSchema(t);
   const {
     register,
     handleSubmit,
@@ -57,7 +57,7 @@ export function AddBookPage() {
     setValue, // כדי לעדכן את השדה img_url
     watch,   // כדי לראות שינויים בשדה img_url
   } = useForm<BookFormValues>({
-    resolver: zodResolver(bookSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       author: "",
