@@ -1,70 +1,70 @@
 // src/i18n.ts
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
 
-import enCommon from './translations/en/common.json';
-import heCommon from './translations/he/common.json';
+import enCommon from "./translations/en/common.json";
+import heCommon from "./translations/he/common.json";
 
-import enHome from './translations/en/home.json';
-import heHome from './translations/he/home.json';
+import enHome from "./translations/en/home.json";
+import heHome from "./translations/he/home.json";
 
-import enAddBook from './translations/en/addBook.json'
-import heAddBook from './translations/he/addBook.json'
+import enAddBook from "./translations/en/addBook.json";
+import heAddBook from "./translations/he/addBook.json";
 
-import enAdminDashboard from './translations/en/adminDashboard.json'
-import heAdminDashboard from './translations/he/adminDashboard.json'
+import enAdminDashboard from "./translations/en/adminDashboard.json";
+import heAdminDashboard from "./translations/he/adminDashboard.json";
 
-import enAIRecommendations from './translations/en/AIRecommendations.json'
-import heAIRecommendations from './translations/he/AIRecommendations.json'
+import enAIRecommendations from "./translations/en/AIRecommendations.json";
+import heAIRecommendations from "./translations/he/AIRecommendations.json";
 
-import enBookDetails from './translations/en/bookDetails.json'
-import heBookDetails from './translations/he/bookDetails.json'
+import enBookDetails from "./translations/en/bookDetails.json";
+import heBookDetails from "./translations/he/bookDetails.json";
 
-import enContact from './translations/en/contact.json'
-import heContact from './translations/he/contact.json'
+import enContact from "./translations/en/contact.json";
+import heContact from "./translations/he/contact.json";
 
-import enEditBook from './translations/en/editBook.json'
-import heEditBook from './translations/he/editBook.json'
+import enEditBook from "./translations/en/editBook.json";
+import heEditBook from "./translations/he/editBook.json";
 
-import enFAQ from './translations/en/faq.json'
-import heFAQ from './translations/he/faq.json'
+import enFAQ from "./translations/en/faq.json";
+import heFAQ from "./translations/he/faq.json";
 
-import enFavorites from './translations/en/favorites.json'
-import heFavorites from './translations/he/favorites.json'
+import enFavorites from "./translations/en/favorites.json";
+import heFavorites from "./translations/he/favorites.json";
 
-import enAuth from './translations/en/auth.json'
-import heAuth from './translations/he/auth.json'
+import enAuth from "./translations/en/auth.json";
+import heAuth from "./translations/he/auth.json";
 
-import enMyBooksPage from './translations/en/myBooksPage.json'
-import heMyBooksPage from './translations/he/myBooksPage.json'
+import enMyBooksPage from "./translations/en/myBooksPage.json";
+import heMyBooksPage from "./translations/he/myBooksPage.json";
 
-import enPolicy from './translations/en/policy.json'
-import hePolicy from './translations/he/policy.json'
+import enPolicy from "./translations/en/policy.json";
+import hePolicy from "./translations/he/policy.json";
 
-import enTerms from './translations/en/terms.json'
-import heTerms from './translations/he/terms.json'
+import enTerms from "./translations/en/terms.json";
+import heTerms from "./translations/he/terms.json";
 
-import enAccessibility from './translations/en/accessibility.json'
-import heAccessibility from './translations/he/accessibility.json'
+import enAccessibility from "./translations/en/accessibility.json";
+import heAccessibility from "./translations/he/accessibility.json";
 
-import enBookCard from './translations/en/bookCard.json'
-import heBookCard from './translations/he/bookCard.json'
+import enBookCard from "./translations/en/bookCard.json";
+import heBookCard from "./translations/he/bookCard.json";
 
-import enComments from './translations/en/comments.json'
-import heComments from './translations/he/comments.json'
+import enComments from "./translations/en/comments.json";
+import heComments from "./translations/he/comments.json";
 
-import enFooter from './translations/en/footer.json'
-import heFooter from './translations/he/footer.json'
+import enFooter from "./translations/en/footer.json";
+import heFooter from "./translations/he/footer.json";
 
-import enKeyboardShortcutsHelp from './translations/en/keyboardShortcutsHelp.json'
-import heKeyboardShortcutsHelp from './translations/he/keyboardShortcutsHelp.json'
+import enKeyboardShortcutsHelp from "./translations/en/keyboardShortcutsHelp.json";
+import heKeyboardShortcutsHelp from "./translations/he/keyboardShortcutsHelp.json";
 
-import enWelcomeToast from './translations/en/welcomeToast.json'
-import heWelcomeToast from './translations/he/welcomeToast.json'
+import enWelcomeToast from "./translations/en/welcomeToast.json";
+import heWelcomeToast from "./translations/he/welcomeToast.json";
 
-import enLanding from './translations/en/landing.json'
-import heLanding from './translations/he/landing.json'
+import enLanding from "./translations/en/landing.json";
+import heLanding from "./translations/he/landing.json";
 
 import enNavbar from './translations/en/navbar.json'
 import heNavbar from './translations/he/navbar.json'
@@ -137,8 +137,8 @@ i18n
       escapeValue: false,
     },
     detection: {
-      order: ['cookie', 'localStorage', 'navigator'],
-    }
+      order: ["cookie", "localStorage", "navigator"],
+    },
   });
 
 export default i18n;

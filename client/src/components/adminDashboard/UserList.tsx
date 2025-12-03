@@ -156,7 +156,6 @@ export function UserList({ users, currentUser, isLoading }: UserListProps) {
   const editButtonStyle = getActionButtonStyle('success');
   const deleteButtonStyle = getActionButtonStyle('error');
   
-  // סגנון Skeleton
   const skeletonBgColor = highContrast 
     ? theme.palette.text.secondary 
     : theme.palette.mode === 'dark' 

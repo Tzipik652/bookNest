@@ -8,11 +8,10 @@ import {
   CardActions,
   TextField,
   MenuItem,
-  Alert,
   CircularProgress,
-  Typography,
   IconButton,
   InputAdornment,
+  CardHeader,
 } from "@mui/material";
 import { Button as ShadcnButton } from "../components/ui/button";
 import {
@@ -20,7 +19,6 @@ import {
   Delete,
   Close
 } from "@mui/icons-material";
-import { useUserStore } from "../store/useUserStore";
 import { Category } from "../types";
 import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
 import { useForm } from "react-hook-form";
@@ -37,25 +35,27 @@ import { getCategories } from "../services/categoryService";
 
 export function AddBookPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
-  const { t } = useTranslation(["addBook", "common","validation"]);
+  const { t } = useTranslation(["addBook", "common", "validation", "category"]);
 
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // State להעלאת תמונה
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [categories, setCategories] = useState<Category[]>([]);
   const actionsRef = useRef<HTMLDivElement | null>(null);
-const formSchema = createBookSchema(t);
+  
+  // יצירת הסכימה עם ה-t
+  const formSchema = createBookSchema(t);
+  
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    setValue, // כדי לעדכן את השדה img_url
-    watch,   // כדי לראות שינויים בשדה img_url
+    setValue,
+    watch,
   } = useForm<BookFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -68,25 +68,19 @@ const formSchema = createBookSchema(t);
     },
   });
 
-  // --- לוגיקה חדשה ---
-  const watchedImgUrl = watch("img_url"); // עוקב אחרי הערך ב-TextField
+  const watchedImgUrl = watch("img_url");
 
-  // פונקציה להסרת התמונה/הקישור
   const handleRemoveImage = () => {
     setImagePreview(null);
-    setValue("img_url", "", { shouldValidate: true }); // מנקה את השדה בטופס
-    // איפוס ה-input של הקובץ כדי שאפשר יהיה להעלות שוב
+    setValue("img_url", "", { shouldValidate: true });
     const fileInput = document.getElementById("raised-button-file") as HTMLInputElement;
     if (fileInput) fileInput.value = "";
   };
 
-  // פונקציה להעלאת התמונה ל-Cloudinary
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (!file) return;
-
-    // ניתן להוסיף כאן בדיקת גודל/סוג קובץ
-
     setUploadingImage(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -105,21 +99,18 @@ const formSchema = createBookSchema(t);
 
       const data = await res.json();
 
-      // העדכון: מכניסים את ה-URL שהתקבל לתוך הטופס
       setValue("img_url", data.secure_url, { shouldValidate: true });
       setImagePreview(data.secure_url);
       toast.success(t("successUpload"));
-
     } catch (error) {
       console.error("Error uploading image:", error);
       toast.error(t("errorUpload"));
-      handleRemoveImage(); // לנקות את הכל במקרה של כישלון
+      handleRemoveImage();
     } finally {
       setUploadingImage(false);
     }
   };
 
-  // אפקט להצגת תצוגה מקדימה גם כאשר המשתמש מזין URL ידנית
   useEffect(() => {
     if (watchedImgUrl) {
       if (watchedImgUrl !== imagePreview) {
@@ -152,13 +143,15 @@ const formSchema = createBookSchema(t);
         author: data.author,
         description: data.description,
         category: data.category,
-        img_url: data.img_url || "https://images.unsplash.com/photo-1560362415-c88a4c066155",
+        img_url:
+          data.img_url ||
+          "https://images.unsplash.com/photo-1560362415-c88a4c066155",
         price: data.price ? parseFloat(data.price) : undefined,
       });
 
-      toast.success(t('successMessage', { bookTitle: newBook.title }));
+      toast.success(t("successMessage", { bookTitle: newBook.title }));
       reset();
-      setImagePreview(null); // איפוס התצוגה המקדימה
+      setImagePreview(null);
 
       setTimeout(() => {
         navigate(`/book/${newBook._id}`);
@@ -172,35 +165,51 @@ const formSchema = createBookSchema(t);
   return (
     <Box minHeight="100vh" bgcolor="#f9fafb" py={6} component="main">
       <Box maxWidth="sm" mx="auto" px={2}>
-
         <ShadcnButton
           variant="ghost"
           onClick={() => navigate(-1)}
           aria-label={t("common:back")}
           className="mb-6 gap-2"
         >
-          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
-          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
-          {t('common:back')}
+          {t("common:dir") === "rtl" ? (
+            <ArrowRight className="h-4 w-4" />
+          ) : null}
+          {t("common:dir") === "ltr" ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t("common:back")}
         </ShadcnButton>
-        <Typography component="h1" variant="h3" fontWeight="bold" gutterBottom>
-          {t("pageTitle")}
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          {t("pageSubheader")}
-        </Typography>
 
         <Card elevation={3}>
+          {/* Form מתחיל כאן פעם אחת בלבד */}
           <form onSubmit={handleSubmit(onSubmit)}>
+            
+            <CardHeader
+              className="notranslate"
+              title={t("pageTitle")}
+              subheader={t("pageSubheader")}
+            />
+
             <CardContent>
-              <TextField fullWidth label={t("titleLabel")} margin="normal" {...register("title")} error={!!errors.title} helperText={errors.title?.message} />
+              {/* Title Field */}
+              <TextField
+                fullWidth
+                label={t("titleLabel")}
+                margin="normal"
+                {...register("title")}
+                error={!!errors.title}
+                helperText={errors.title?.message}
+              />
+
+              {/* Author Field */}
               <TextField
                 fullWidth
                 label={t("authorLabel")}
                 margin="normal"
                 {...register("author")}
                 error={!!errors.author}
-                helperText={errors.author?.message} />
+                helperText={errors.author?.message}
+              />
+
+              {/* Description Field */}
               <TextField
                 fullWidth
                 className="notranslate"
@@ -212,13 +221,14 @@ const formSchema = createBookSchema(t);
                 error={!!errors.description}
                 helperText={errors.description?.message}
                 onKeyDown={(e) => {
-                  // מונע שליחת טופס בלחיצה על Enter, אבל מאפשר שורות חדשות עם Shift+Enter
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     handleSubmit(onSubmit)();
                   }
                 }}
               />
+
+              {/* Category Field */}
               <TextField
                 select
                 fullWidth
@@ -226,33 +236,29 @@ const formSchema = createBookSchema(t);
                 label={t("categoryLabel")}
                 margin="normal"
                 {...register("category")}
+                value={watch("category") || ""}
                 error={!!errors.category}
                 helperText={errors.category?.message}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                  }
-                }}
               >
                 {categories.map((cat) => (
                   <MenuItem key={cat.id} value={cat.name}>
-                    {cat.name}
+                    {t(`category:${cat.name.replace(/\s+/g, "")}`)}{" "}
                   </MenuItem>
                 ))}
               </TextField>
 
-              {/* --- החלק המעודכן של העלאת תמונה --- */}
-              <Box sx={{ mt: 2, mb: 3 }}>
+              {/* Image Upload Logic */}
+              <Box sx={{ mt: 2, mb: 1 }}>
                 <input
                   accept="image/*"
                   style={{ display: "none" }}
                   id="raised-button-file"
                   type="file"
                   onChange={handleImageUpload}
-                  disabled={!!imagePreview || uploadingImage} // הוספנו disabled אם יש תצוגה מקדימה
+                  disabled={!!imagePreview || uploadingImage}
                 />
 
-                {/* כפתור העלאה - מוצג רק אם אין תמונה */}
+                {/* Upload Button */}
                 {!imagePreview && (
                   <label htmlFor="raised-button-file">
                     <Button
@@ -268,7 +274,7 @@ const formSchema = createBookSchema(t);
                   </label>
                 )}
 
-                {/* תצוגה מקדימה + כפתור מחיקה */}
+                {/* Preview */}
                 {imagePreview && (
                   <Box position="relative" mt={2} display="inline-flex">
                     <img
@@ -278,14 +284,14 @@ const formSchema = createBookSchema(t);
                         maxHeight: 200,
                         maxWidth: "100%",
                         borderRadius: 8,
-                        border: "1px solid #e0e0e0"
+                        border: "1px solid #e0e0e0",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                       }}
                     />
-                    {/* כפתור מחיקה צף על התמונה */}
                     <IconButton
                       size="small"
                       onClick={handleRemoveImage}
-                      title={t("removeImage", { defaultValue: "remove image" })}
+                      title={t("removeImage")}
                       sx={{
                         position: "absolute",
                         top: -10,
@@ -301,31 +307,16 @@ const formSchema = createBookSchema(t);
                 )}
               </Box>
 
+              {/* Image URL Field */}
               <TextField
                 fullWidth
                 className="notranslate"
                 label={t("imageURLLabel")}
                 margin="normal"
                 {...register("img_url")}
-
-                // לוגיקה לנעילת השדה
                 disabled={!!imagePreview && watchedImgUrl === imagePreview}
-
-                InputLabelProps={{ shrink: true }}
-                error={!!errors.img_url}
-
-                // הודעה דינמית למשתמש
-                helperText={
-                  errors.img_url?.message ||
-                  (imagePreview && watchedImgUrl === imagePreview
-                    ? t("urlLockedMessage", {
-                      defaultValue: "The link was locked after uploading the image. Use the delete button to change it."
-                    })
-                    : t("urlHelpText", { defaultValue: "Insert a link to an image or upload a file" }))
-                }
-
-                // כפתור מחיקה בתוך השדה
                 InputProps={{
+                  readOnly: !!imagePreview,
                   endAdornment: watchedImgUrl ? (
                     <InputAdornment position="end">
                       <IconButton onClick={handleRemoveImage} edge="end" title={t("removeImage")}>
@@ -334,14 +325,32 @@ const formSchema = createBookSchema(t);
                     </InputAdornment>
                   ) : null,
                 }}
+                InputLabelProps={{ shrink: true }}
+                error={!!errors.img_url}
+                helperText={
+                  errors.img_url?.message ||
+                  (imagePreview && watchedImgUrl === imagePreview
+                    ? t("urlLockedMessage", {
+                      defaultValue: "The link was locked after uploading the image."
+                    })
+                    : t("urlHelpText", { defaultValue: "Insert a link to an image or upload a file" }))
+                }
               />
 
-              <TextField fullWidth label={t("priceLabel")} type="number" margin="normal" {...register("price")} error={!!errors.price} helperText={errors.price?.message} />
-
+              {/* Price Field */}
+              <TextField
+                fullWidth
+                label={t("priceLabel")}
+                type="number"
+                margin="normal"
+                {...register("price")}
+                error={!!errors.price}
+                helperText={errors.price?.message}
+              />
             </CardContent>
 
+            {/* Actions */}
             <CardActions ref={actionsRef} sx={{ p: 3, pt: 0, gap: 2 }}>
-
               <Button
                 type="submit"
                 variant="contained"
@@ -351,7 +360,6 @@ const formSchema = createBookSchema(t);
                 startIcon={
                   isSubmitting ? (
                     <CircularProgress color="inherit" size={18} />
-
                   ) : null
                 }
                 className="notranslate"
@@ -369,9 +377,7 @@ const formSchema = createBookSchema(t);
                 aria-label={t("cancelButton")}
               >
                 {t("cancelButton")}
-
               </Button>
-
             </CardActions>
           </form>
         </Card>

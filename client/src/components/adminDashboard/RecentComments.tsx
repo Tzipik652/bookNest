@@ -75,9 +75,6 @@ export function RecentComments({
     }
   };
 
-  // --- הגדרות עיצוב דינמיות ---
-  
-  // סגנון כרטיס התגובה
   const commentCardStyle = {
     backgroundColor: theme.palette.background.paper,
     boxShadow: highContrast ? 'none' : theme.shadows[1], 
@@ -85,23 +82,18 @@ export function RecentComments({
     transition: 'box-shadow 0.2s, border-color 0.2s',
   };
   
-  // סגנון טקסט ראשי (שם משתמש, תוכן תגובה)
   const primaryTextStyle = { color: theme.palette.text.primary };
 
-  // סגנון טקסט משני/אפור (תאריך, תגובות) - משופר לקריאות במצב בהיר
   const secondaryTextStyle = highContrast 
     ? { color: theme.palette.text.primary } 
     : { color: theme.palette.mode === 'light' ? theme.palette.grey[700] : theme.palette.text.secondary }; 
 
-  // סגנון כותרת הספר (הטקסט הירוק) - ללא סגנון ריחוף כאן
   const bookTitleStyle = { 
     color: highContrast ? theme.palette.text.primary : theme.palette.success.main,
     cursor: 'pointer',
-    // במצב ניגודיות גבוהה, תמיד יש קו תחתי
     textDecoration: highContrast ? 'underline' : 'none', 
   };
   
-  // סגנון כפתורי פעולה
   const getActionButtonStyle = (colorKey: 'success' | 'error') => {
     const mainColor = theme.palette[colorKey].main;
     const iconColor = highContrast ? theme.palette.text.primary : mainColor;
@@ -120,7 +112,6 @@ export function RecentComments({
   const editButtonStyle = getActionButtonStyle('success');
   const deleteButtonStyle = getActionButtonStyle('error');
   
-  // סגנון Skeleton (רקע אפור/כהה)
   const skeletonBgColor = highContrast 
     ? theme.palette.text.secondary 
     : theme.palette.mode === 'dark' 

@@ -12,7 +12,7 @@ import {
   Divider,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@mui/material/styles"; // 👈 ייבוא חשוב: גישה ל-Theme
+import { useTheme } from "@mui/material/styles"; 
 
 interface CommentItemProps {
   comment: CommentWithReactions;
@@ -30,15 +30,15 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({
   onReaction,
 }, ref) => {
   const { t } = useTranslation("common");
-  const theme = useTheme(); // 👈 שימוש ב-Theme
+  const theme = useTheme();
   const currentLocale = t('locale'); 
   const commonDir = t('dir') as 'rtl' | 'ltr';
   const reactions: Array<{ type: ReactionType; emoji: string; color: string }> =
     [
-      { type: "like", emoji: "👍", color: "#3b82f6" }, // כחול (כדאי לשקול להשתמש ב-theme.palette.info.main)
-      { type: "dislike", emoji: "👎", color: "#ef4444" }, // אדום
-      { type: "happy", emoji: "😀", color: "#ec4899" }, // ורוד
-      { type: "angry", emoji: "😠", color: "#f59e0b" }, // כתום
+      { type: "like", emoji: "👍", color: "#3b82f6" },
+      { type: "dislike", emoji: "👎", color: "#ef4444" },
+      { type: "happy", emoji: "😀", color: "#ec4899" },
+      { type: "angry", emoji: "😠", color: "#f59e0b" },
     ];
 
   return (
@@ -91,7 +91,6 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({
                 color="error"
                 size="small"
                 sx={{ 
-                    // ✅ התאמה לניגוד גבוה במצב ריחוף (Dark Mode)
                     "&:hover": { 
                         bgcolor: theme.palette.error.dark,
                         color: theme.palette.error.contrastText 

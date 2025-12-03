@@ -206,7 +206,7 @@ const formSchema = createBookSchema(t);
                         key={cat.id || cat._id || cat.name}
                         value={cat.name}
                       >
-                        {cat.name}
+                         {t(`category:${cat.name.replace(/\s+/g, '')}`)}
                       </MenuItem>
                     ))}
                   </TextField>

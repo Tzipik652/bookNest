@@ -248,7 +248,7 @@ export function HomePage() {
             >
               {categories.map(cat => (
                 <MenuItem key={cat.id} value={cat.name}>
-                  {cat.name}
+                   {t(`category:${cat.name.replace(/\s+/g, '')}`)}
                 </MenuItem>
               ))}
             </Select>

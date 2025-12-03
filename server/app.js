@@ -8,16 +8,16 @@ import commentRouter from "./routes/commentRouter.js";
 import commentReactionRouter from "./routes/commentReactionRouter.js";
 import authRouter from "./routes/authRouter.js";
 import contactRouter from "./routes/contactRouter.js";
+import categoryRouter from './routes/categoryRouter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import path from "path";
 import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-import categoryRouter from './routes/categoryRouter.js';
 const app = express();
 
 // Middleware
