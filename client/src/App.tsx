@@ -165,7 +165,6 @@ function App() {
             color: darkMode || highContrast ? "#fff" : "#000",
             fontSize: largeText ? "1.2rem" : "1rem",
             transition: reduceMotion ? "none" : "all 0.3s ease",
-            fontFamily: dyslexicFont ? "OpenDyslexic, Arial" : "inherit",
           },
 
           a: {

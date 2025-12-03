@@ -155,7 +155,7 @@ export function BookDetailsPage() {
 
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
                   <Chip
-                    label={t(`category:${book.category}`)}
+                    label={t(`category:${book.category.replace(/\s+/g, '')}`)}
                     variant="outlined"
                   />
 

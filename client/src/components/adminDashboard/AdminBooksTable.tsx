@@ -279,7 +279,7 @@ export const AdminBooksTable = ({
                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0"
                             style={categoryChipStyle}
                           >
-                            {t(`category:${book.category}`)}
+                            {t(`category:${book.category.replace(/\s+/g, '')}`)}
                           </span>
                         </td>
                         <td className="py-3 px-4" style={lightTextColorStyle}>
@@ -375,7 +375,7 @@ export const AdminBooksTable = ({
                           className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
                           style={categoryChipStyle}
                         >
-                          {book.category}
+                          {t(`category:${book.category.replace(/\s+/g, '')}`)}
                         </span>
                       </div>
 
