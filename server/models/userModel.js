@@ -60,13 +60,13 @@ export async function getUsers() {
   return data;
 }
 export async function deleteUser(id) {
-  const { data, error } = await supabase
-    .from('users')
-    .update({ is_deleted: true }) // ⬅️ עדכון דגל המחיקה
-    .eq('_id', id)
-    .select()
-    .single();
+  const { data, error } = await supabase
+    .from('users')
+    .update({ is_deleted: true }) // ⬅️ עדכון דגל המחיקה
+    .eq('_id', id)
+    .select()
+    .single();
 
-  if (error) throw error;
-  return data;
+  if (error) throw error;
+  return data;
 }

@@ -68,9 +68,10 @@ export function MyBooksPage() {
   const AddBookButton = () => (
     <Button
       variant="contained"
-      startIcon={<BookPlus size={18} />}
+      startIcon={<BookPlus size={18} /> }
       onClick={() => navigate("/add-book")}
       aria-label={t("addButton")}
+       className="mb-6 gap-2"
     >
       {t("addButton")}
     </Button>
