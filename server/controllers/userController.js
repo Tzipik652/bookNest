@@ -52,7 +52,7 @@ export const register = catchAsync(async (req, res, next) => {
     .single();
 
   if (existing) {
-    // 🛑 בדיקה חדשה: אם המשתמש מחוק - נחייה אותו!
+    //  בדיקה חדשה: אם המשתמש מחוק - נחייה אותו!
     if (existing.is_deleted) {
       const hashedPassword = await bcrypt.hash(password, 12);
       const { data: reactivatedUser, error: reactivateError } = await supabase
