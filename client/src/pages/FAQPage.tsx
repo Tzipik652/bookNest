@@ -86,7 +86,6 @@ export function FAQPage() {
                     {Array.isArray(faqSections) && faqSections.map((section: any, idx: any) => (
                         <Card key={idx} className="mb-6">
                             <CardContent className="pt-6">
-                                {/* כותרת קטגוריה - שימוש בצבע ראשי */}
                                 <Typography
                                     component="h2"
                                     variant="h5"

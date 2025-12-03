@@ -91,14 +91,12 @@ export default function AccessibilityMenu() {
 
             {/* Reduce Motion */}
             <ListItem>
-              {/* שימוש במפתח התרגום */}
               <ListItemText primary={t("reduceMotion")} /> 
               <Switch checked={reduceMotion} onChange={toggleReduceMotion} />
             </ListItem>
 
             {/* Underline Links */}
             <ListItem>
-              {/* שימוש במפתח התרגום */}
               <ListItemText primary={t("underlineLinks")} /> 
               <Switch
                 checked={underlineLinks}
@@ -108,14 +106,12 @@ export default function AccessibilityMenu() {
 
             {/* Dyslexic-Friendly Font */}
             <ListItem>
-              {/* שימוש במפתח התרגום */}
               <ListItemText primary={t("dyslexicFont")} /> 
               <Switch checked={dyslexicFont} onChange={toggleDyslexicFont} />
             </ListItem>
 
             {/* Screen Reader Mode */}
             <ListItem>
-              {/* שימוש במפתח התרגום */}
               <ListItemText primary={t("screenReader")} /> 
               <Switch checked={screenReader} onChange={toggleScreenReader} />
             </ListItem>

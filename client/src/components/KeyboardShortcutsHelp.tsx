@@ -4,17 +4,15 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "../components/ui/dialog"; // רכיב Shadcn UI
+} from "../components/ui/dialog"; 
 import { Keyboard } from "lucide-react";
-import { Box, Typography, Chip, useTheme } from "@mui/material"; // 👈 ייבוא useTheme ו-Box/Typography/Chip
+import { Box, Typography, Chip, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-// 👈 ייבוא useAccessibilityStore כדי לקבל את highContrast
 import { useAccessibilityStore } from "../store/accessibilityStore";
 
 import { heShortcutType } from "../types/i18n";
 
-// הגדרת קיצורי הדרך
 interface Shortcut {
   key: string;
   descriptionKey: keyof heShortcutType;
@@ -87,8 +85,8 @@ const rawShortcuts: Omit<Shortcut, "description">[] = [
 export function KeyboardShortcutsHelp() {
   const { t } = useTranslation(["keyboardShortcutsHelp", "common"]);
   const commonDir = t("common:dir") as "rtl" | "ltr";
-  const theme = useTheme(); // 👈 שימוש ב-useTheme
-  const { highContrast } = useAccessibilityStore(); // 👈 ייבוא highContrast
+  const theme = useTheme();
+  const { highContrast } = useAccessibilityStore();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -129,7 +127,6 @@ export function KeyboardShortcutsHelp() {
 
   return (
     <>
-      {/* כפתור קבוע בפינה - Chip */}
       <Box
         sx={{
           position: "fixed",
@@ -145,27 +142,20 @@ export function KeyboardShortcutsHelp() {
           onClick={() => setIsOpen(true)}
           sx={{
             cursor: "pointer",
-            // ✅ צבע רקע דינמי
             bgcolor: theme.palette.primary.main,
-            // ✅ צבע טקסט דינמי
             color: theme.palette.primary.contrastText,
             fontSize: "1rem",
             fontWeight: "bold",
             padding: "10px",
             "&:hover": {
-              // ✅ ריחוף דינמי
               bgcolor: theme.palette.primary.dark,
             },
-            // ✅ צל דינמי
             boxShadow: theme.shadows[3],
           }}
         />
       </Box>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        {/* DialogContent - זהו רכיב Shadcn. יש לטפל בצבע הרקע שלו 
-                  באמצעות style/sx כדי שיגיב ל-Theme/highContrast
-                */}
         <DialogContent
           className="max-w-2xl max-h-[80vh] overflow-y-auto"
           style={{
@@ -222,20 +212,16 @@ export function KeyboardShortcutsHelp() {
                           justifyContent: "space-between",
                           alignItems: "center",
                           padding: "8px 12px",
-                          // ✅ רקע פריט דינמי
                           bgcolor: theme.palette.background.default,
                           borderRadius: 1,
                           "&:hover": {
-                            // ✅ ריחוף דינמי
                             bgcolor: theme.palette.action.hover,
                           },
-                          // ✅ גבול במצב ניגודיות גבוהה
                           border: highContrast
                             ? `1px solid ${theme.palette.text.primary}`
                             : "none",
                         }}
                       >
-                        {/* ✅ צבע טקסט דינמי */}
                         <Typography
                           variant="body2"
                           sx={{ flex: 1 }}
@@ -266,7 +252,6 @@ export function KeyboardShortcutsHelp() {
             sx={{
               mt: 3,
               pt: 2,
-              // ✅ גבול עליון דינמי
               borderTop: `1px solid ${theme.palette.divider}`,
               textAlign: "center",
             }}

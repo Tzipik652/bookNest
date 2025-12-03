@@ -286,7 +286,6 @@ export function AddBookPage() {
                 error={!!errors.img_url}
                 helperText={errors.img_url?.message}
               />
-              {/* ------------------------------------- */}
 
               <TextField
                 fullWidth
