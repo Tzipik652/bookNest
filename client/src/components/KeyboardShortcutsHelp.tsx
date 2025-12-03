@@ -247,12 +247,9 @@ export function KeyboardShortcutsHelp() {
                           label={shortcut.key}
                           size="small"
                           sx={{
-                            // ✅ רקע דינמי
                             bgcolor: theme.palette.background.paper,
-                            // ✅ גבול דינמי
                             border: `1px solid ${theme.palette.divider}`,
                             color: theme.palette.text.primary,
-                            fontFamily: "monospace",
                             fontWeight: "bold",
                             minWidth: "80px",
                           }}
