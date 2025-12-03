@@ -1,4 +1,4 @@
-import { VolumeUp, Pause, PlayArrow, Stop } from "@mui/icons-material";
+import { Pause, PlayArrow, Stop } from "@mui/icons-material";
 import { IconButton, Typography, Box } from "@mui/material";
 import { useSpeechNarrator } from "../hooks/useNarrator";
 import { useTranslation } from "react-i18next";

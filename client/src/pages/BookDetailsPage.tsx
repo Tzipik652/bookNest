@@ -20,7 +20,6 @@ import { Button as ShadcnButton } from "../components/ui/button";
 import {
   Favorite,
   FavoriteBorder,
-  ArrowBack,
   Edit,
   Delete,
   AutoAwesome,

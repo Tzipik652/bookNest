@@ -22,7 +22,6 @@ import {
   CircularProgress,
 
 } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
 import { useUserStore } from '../store/useUserStore';
 import { Category } from '../types';
 import { useTranslation } from 'react-i18next';
