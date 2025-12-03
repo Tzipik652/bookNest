@@ -61,17 +61,14 @@ export const AdminBooksTable = ({
     navigate(`/edit-book/${bookId}`, { state: { from: "/admin-dashboard" } });
   };
 
-  // --- הגדרות עיצוב דינמיות ---
 
-  // צבעי הטקסט הראשיים בטבלה (כותרות עמודות)
   const textColorStyle = highContrast
     ? { color: theme.palette.text.primary }
     : { color: theme.palette.text.secondary };
 
-  // צבע הטקסט הבהיר (שם מחבר, תאריך, אפור קלאסי)
   const lightTextColorStyle = highContrast
     ? { color: theme.palette.text.primary }
-    : // במצב בהיר, משתמשים באפור כהה יותר מברירת המחדל של text.secondary כדי לשפר קריאות (דומה ל-gray-600)
+    : 
       {
         color:
           theme.palette.mode === "light"
@@ -79,7 +76,6 @@ export const AdminBooksTable = ({
             : theme.palette.text.secondary,
       };
 
-  // צבע הרקע של כותרות הטבלה והריחוף (Hover)
   const headerBgStyle = {
     backgroundColor: highContrast
       ? theme.palette.background.default
@@ -94,12 +90,11 @@ export const AdminBooksTable = ({
 
   const hoverBgStyle = {
     backgroundColor: highContrast
-      ? alpha(theme.palette.text.primary, 0.15) // ה-Hover במצב ניגודיות גבוהה
-      : alpha(theme.palette.action.hover, 0.1), // <--- תיקון: הפחתת אטימות ל-10%
+      ? alpha(theme.palette.text.primary, 0.15)
+      : alpha(theme.palette.action.hover, 0.1),
     transition: "background-color 0.15s ease",
   };
 
-  // סגנון תגית הקטגוריה
   const categoryChipStyle = {
     backgroundColor: highContrast
       ? "transparent"
@@ -115,7 +110,6 @@ export const AdminBooksTable = ({
       : `1px solid ${alpha(theme.palette.success.main, 0.3)}`,
   };
 
-  // סגנון כפתורי פעולה
   const getActionButtonStyle = (
     colorKey: "primary" | "success" | "error" | "info"
   ) => {
@@ -279,7 +273,7 @@ export const AdminBooksTable = ({
                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0"
                             style={categoryChipStyle}
                           >
-                            {t(`category:${book.category}`)}
+                            {t(`category:${book.category.replace(/\s+/g, '')}`)}
                           </span>
                         </td>
                         <td className="py-3 px-4" style={lightTextColorStyle}>
@@ -375,7 +369,7 @@ export const AdminBooksTable = ({
                           className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
                           style={categoryChipStyle}
                         >
-                          {book.category}
+                          {t(`category:${book.category.replace(/\s+/g, '')}`)}
                         </span>
                       </div>
 

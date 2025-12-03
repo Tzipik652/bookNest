@@ -15,23 +15,23 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ForgotPasswordFormValues, forgotPasswordSchema } from "../schemas/auth.register";
+import { ForgotPasswordFormValues, createForgotPasswordSchema } from "../schemas/auth.register";
 import { forgotPassword } from "../services/authService";
 import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function ForgotPassword() {
-  const { t } = useTranslation("auth");
+  const { t } = useTranslation(["auth","validation"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-
+const schema = createForgotPasswordSchema(t);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ForgotPasswordFormValues>({
-    resolver: zodResolver(forgotPasswordSchema),
+    resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: ForgotPasswordFormValues) => {

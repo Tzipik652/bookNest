@@ -21,7 +21,6 @@ export function AdminDashboardPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
   const { t } = useTranslation(["adminDashboard", "common"]);
   const adminTexts = t('dashboard', { returnObjects: true }) as any;
-  const theme = useTheme();
 
   const [booksMap, setBooksMap] = useState<Record<string, Book>>({});
   const [userMap, setUserMap] = useState<Record<string, string>>({});

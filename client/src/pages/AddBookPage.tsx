@@ -1,4 +1,4 @@
-import { useState, useRef, ChangeEvent, useEffect } from "react"; // Added ChangeEvent
+import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -8,25 +8,21 @@ import {
   CardActions,
   TextField,
   MenuItem,
-  Alert,
   CircularProgress,
-  Typography,
-  IconButton, // Added
+  IconButton,
   InputAdornment,
-  CardHeader, // Added
+  CardHeader,
 } from "@mui/material";
 import { Button as ShadcnButton } from "../components/ui/button";
 import {
-  ArrowBack,
-  AutoAwesome,
-  CheckCircle,
   CloudUpload,
-} from "@mui/icons-material"; // Added CloudUpload
-import { useUserStore } from "../store/useUserStore";
+  Delete,
+  Close
+} from "@mui/icons-material";
 import { Category } from "../types";
 import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
 import { useForm } from "react-hook-form";
-import { BookFormValues, bookSchema } from "../schemas/book.schema";
+import { BookFormValues, createBookSchema } from "../schemas/book.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -39,7 +35,7 @@ import { getCategories } from "../services/categoryService";
 
 export function AddBookPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
-  const { t } = useTranslation(["addBook", "common", "category"]);
+  const { t } = useTranslation(["addBook", "common", "validation", "category"]);
 
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,7 +45,10 @@ export function AddBookPage() {
 
   const [categories, setCategories] = useState<Category[]>([]);
   const actionsRef = useRef<HTMLDivElement | null>(null);
-
+  
+  // יצירת הסכימה עם ה-t
+  const formSchema = createBookSchema(t);
+  
   const {
     register,
     handleSubmit,
@@ -58,7 +57,7 @@ export function AddBookPage() {
     setValue,
     watch,
   } = useForm<BookFormValues>({
-    resolver: zodResolver(bookSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       author: "",
@@ -69,12 +68,19 @@ export function AddBookPage() {
     },
   });
 
+  const watchedImgUrl = watch("img_url");
+
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    setValue("img_url", "", { shouldValidate: true });
+    const fileInput = document.getElementById("raised-button-file") as HTMLInputElement;
+    if (fileInput) fileInput.value = "";
+  };
+
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log("Selected file:", file);
 
     if (!file) return;
-
     setUploadingImage(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -93,16 +99,28 @@ export function AddBookPage() {
 
       const data = await res.json();
 
-      setValue("img_url", data.secure_url);
+      setValue("img_url", data.secure_url, { shouldValidate: true });
       setImagePreview(data.secure_url);
       toast.success(t("successUpload"));
     } catch (error) {
       console.error("Error uploading image:", error);
       toast.error(t("errorUpload"));
+      handleRemoveImage();
     } finally {
       setUploadingImage(false);
     }
   };
+
+  useEffect(() => {
+    if (watchedImgUrl) {
+      if (watchedImgUrl !== imagePreview) {
+        setImagePreview(watchedImgUrl);
+      }
+    } else {
+      setImagePreview(null);
+    }
+  }, [watchedImgUrl]);
+
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -161,14 +179,17 @@ export function AddBookPage() {
         </ShadcnButton>
 
         <Card elevation={3}>
-          <CardHeader
-            className="notranslate"
-            title={t("pageTitle")}
-            subheader={t("pageSubheader")}
-          />
-
+          {/* Form מתחיל כאן פעם אחת בלבד */}
           <form onSubmit={handleSubmit(onSubmit)}>
+            
+            <CardHeader
+              className="notranslate"
+              title={t("pageTitle")}
+              subheader={t("pageSubheader")}
+            />
+
             <CardContent>
+              {/* Title Field */}
               <TextField
                 fullWidth
                 label={t("titleLabel")}
@@ -177,6 +198,8 @@ export function AddBookPage() {
                 error={!!errors.title}
                 helperText={errors.title?.message}
               />
+
+              {/* Author Field */}
               <TextField
                 fullWidth
                 label={t("authorLabel")}
@@ -185,6 +208,8 @@ export function AddBookPage() {
                 error={!!errors.author}
                 helperText={errors.author?.message}
               />
+
+              {/* Description Field */}
               <TextField
                 fullWidth
                 className="notranslate"
@@ -202,6 +227,8 @@ export function AddBookPage() {
                   }
                 }}
               />
+
+              {/* Category Field */}
               <TextField
                 select
                 fullWidth
@@ -212,19 +239,15 @@ export function AddBookPage() {
                 value={watch("category") || ""}
                 error={!!errors.category}
                 helperText={errors.category?.message}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                  }
-                }}
               >
                 {categories.map((cat) => (
                   <MenuItem key={cat.id} value={cat.name}>
-                    {t(`category:${cat.name}`)}{" "}
+                    {t(`category:${cat.name.replace(/\s+/g, "")}`)}{" "}
                   </MenuItem>
                 ))}
               </TextField>
 
+              {/* Image Upload Logic */}
               <Box sx={{ mt: 2, mb: 1 }}>
                 <input
                   accept="image/*"
@@ -232,62 +255,89 @@ export function AddBookPage() {
                   id="raised-button-file"
                   type="file"
                   onChange={handleImageUpload}
+                  disabled={!!imagePreview || uploadingImage}
                 />
-                <label htmlFor="raised-button-file">
-                  <Button
-                    variant="outlined"
-                    component="span"
-                    fullWidth
-                    startIcon={
-                      uploadingImage ? (
-                        <CircularProgress size={20} />
-                      ) : (
-                        <CloudUpload />
-                      )
-                    }
-                    disabled={uploadingImage}
-                    sx={{
-                      gap: 1,
-                      "& .MuiButton-endIcon": {
-                        margin: 0,
-                      },
-                      alignItems: "center",
-                    }}
-                  >
-                    {uploadingImage ? t("uploading") : t("uploadButton")}
-                  </Button>
-                </label>
 
+                {/* Upload Button */}
+                {!imagePreview && (
+                  <label htmlFor="raised-button-file">
+                    <Button
+                      variant="outlined"
+                      component="span"
+                      fullWidth
+                      startIcon={uploadingImage ? <CircularProgress size={20} /> : <CloudUpload />}
+                      disabled={uploadingImage}
+                      sx={{ py: 1.5, borderStyle: 'dashed' }}
+                    >
+                      {uploadingImage ? t("uploading") : t("uploadButton")}
+                    </Button>
+                  </label>
+                )}
+
+                {/* Preview */}
                 {imagePreview && (
-                  <Box mt={2} display="flex" justifyContent="center">
+                  <Box position="relative" mt={2} display="inline-flex">
                     <img
                       src={imagePreview}
                       alt="Preview"
                       style={{
                         maxHeight: 200,
+                        maxWidth: "100%",
                         borderRadius: 8,
+                        border: "1px solid #e0e0e0",
                         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                       }}
                     />
+                    <IconButton
+                      size="small"
+                      onClick={handleRemoveImage}
+                      title={t("removeImage")}
+                      sx={{
+                        position: "absolute",
+                        top: -10,
+                        right: -10,
+                        bgcolor: "background.paper",
+                        boxShadow: 2,
+                        "&:hover": { bgcolor: "error.light", color: "white" }
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
                   </Box>
                 )}
               </Box>
 
+              {/* Image URL Field */}
               <TextField
                 fullWidth
                 className="notranslate"
                 label={t("imageURLLabel")}
                 margin="normal"
                 {...register("img_url")}
+                disabled={!!imagePreview && watchedImgUrl === imagePreview}
                 InputProps={{
                   readOnly: !!imagePreview,
+                  endAdornment: watchedImgUrl ? (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleRemoveImage} edge="end" title={t("removeImage")}>
+                        <Delete color="error" />
+                      </IconButton>
+                    </InputAdornment>
+                  ) : null,
                 }}
                 InputLabelProps={{ shrink: true }}
                 error={!!errors.img_url}
-                helperText={errors.img_url?.message}
+                helperText={
+                  errors.img_url?.message ||
+                  (imagePreview && watchedImgUrl === imagePreview
+                    ? t("urlLockedMessage", {
+                      defaultValue: "The link was locked after uploading the image."
+                    })
+                    : t("urlHelpText", { defaultValue: "Insert a link to an image or upload a file" }))
+                }
               />
-              {/* ------------------------------------- */}
 
+              {/* Price Field */}
               <TextField
                 fullWidth
                 label={t("priceLabel")}
@@ -299,6 +349,7 @@ export function AddBookPage() {
               />
             </CardContent>
 
+            {/* Actions */}
             <CardActions ref={actionsRef} sx={{ p: 3, pt: 0, gap: 2 }}>
               <Button
                 type="submit"

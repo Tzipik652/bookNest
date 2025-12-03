@@ -8,7 +8,7 @@ import {
   AlertTitle,
   CircularProgress,
 } from "@mui/material";
-import { AutoAwesome, Info, Refresh } from "@mui/icons-material";
+import { AutoAwesome, Refresh } from "@mui/icons-material";
 import { useAIRecommendations } from "../hooks/useAIRecommendations";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import { Book, BookWithFavorite } from "../types";

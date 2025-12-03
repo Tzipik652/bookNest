@@ -24,16 +24,16 @@ export const useDynamicTheme = () => {
         secondary: highContrast ? "#fff" : darkMode ? "#dddddd" : "#333",
       },
       primary: {
-        // במצב כהה/ניגודיות: הרקע של הכפתור יהיה לבן
         main: highContrast || darkMode ? "#fff" : "#16A34A",
-        dark: highContrast || darkMode ? "#e0e0e0" : "#12803A", // שיניתי מעט לאפור בהיר ל-hover
-        // במצב כהה/ניגודיות: הטקסט על הכפתור יהיה שחור
+        dark: highContrast || darkMode ? "#e0e0e0" : "#12803A",
         contrastText: highContrast || darkMode ? "#000" : "#fff",
       },
     },
     typography: {
       fontSize: largeText ? 16 : 14,
-      fontFamily: dyslexicFont ? "'OpenDyslexic', Arial, sans-serif" : "Roboto, Arial",
+       fontFamily: dyslexicFont
+    ? '"OpenDyslexic", sans-serif'
+    : 'Rubik, sans-serif',
     },
     components: {
       MuiCssBaseline: {
@@ -67,7 +67,6 @@ export const useDynamicTheme = () => {
             backgroundColor: highContrast ? "#000" : darkMode ? "#1E1E1E" : "#f9fafb",
             color: highContrast || darkMode ? "#fff" : "#000",
             transition: reduceMotion ? "none" : "all 0.2s ease",
-            // הוספתי גבול לכרטיסיות במצב ניגודיות גבוהה כדי שיראו את המסגרת על רקע שחור
             border: highContrast ? "1px solid #fff" : "none", 
           },
         },
@@ -90,22 +89,16 @@ export const useDynamicTheme = () => {
           },
         },
       },
-      // --- כאן התיקון העיקרי ---
       MuiButton: {
         styleOverrides: {
-          root: {
-            // מחקתי את השורה: color: highContrast || darkMode ? "#fff" : undefined,
-            // כעת הכפתור ייקח את הצבע באופן אוטומטי מ-contrastText (שחור) כשהרקע לבן
-            
+          root: {            
             transition: reduceMotion ? "none" : "all 0.2s ease",
             borderColor: highContrast ? "#fff" : undefined,
             
-            // תיקון לכפתורי Outlined במצב ניגודיות גבוהה (כדי שיראו את הגבול והטקסט בלבן)
             "&.MuiButton-outlined": {
                borderColor: highContrast || darkMode ? "#fff" : undefined,
                color: highContrast || darkMode ? "#fff" : undefined,
             },
-            // תיקון לכפתורי Text במצב ניגודיות גבוהה
             "&.MuiButton-text": {
                color: highContrast || darkMode ? "#fff" : undefined,
             }

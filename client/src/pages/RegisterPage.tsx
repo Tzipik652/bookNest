@@ -18,13 +18,12 @@ import { useUserStore } from "../store/useUserStore";
 import { register } from "../services/userService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, RegisterFormValues } from "../schemas/register.schema";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { createRegisterSchema, RegisterFormValues } from "../schemas/register.schema"; import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function RegisterPage() {
-  const { t } = useTranslation(["auth","common"]);
+  const { t } = useTranslation(["auth", "common", "validation"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,7 +31,7 @@ export function RegisterPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const schema = createRegisterSchema(t);
 
   const getRedirectPath = () => {
     const params = new URLSearchParams(location.search);
@@ -45,7 +44,7 @@ export function RegisterPage() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -173,11 +172,11 @@ export function RegisterPage() {
                 color: "primary.contrastText",
               }}
               disabled={isSubmitting}
-              aria-label= {isSubmitting
+              aria-label={isSubmitting
                 ? t("register.registeringButton")
                 : t("register.submitButton")}
             >
-            {isSubmitting
+              {isSubmitting
                 ? t("register.registeringButton")
                 : t("register.submitButton")}
             </Button>

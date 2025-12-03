@@ -1,6 +1,6 @@
 // client/src/App.tsx
 import React, { Suspense, useEffect } from "react";
-import { Routes, Route, useLocation, Router } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { CircularProgress, Box, GlobalStyles } from "@mui/material";
 import { Toaster } from "sonner";
 import { KeyboardShortcutsHelp } from "./components/KeyboardShortcutsHelp";
@@ -111,8 +111,7 @@ const RouteFallback = () => (
 );
 
 function App() {
-  const { t, i18n } = useTranslation("common");
-  const { user: currentUser } = useUserStore();
+  const { i18n } = useTranslation("common");
   const { pathname } = useLocation();
   useScreenReader();
 
@@ -129,7 +128,6 @@ function App() {
     largeText,
     reduceMotion,
     underlineLinks,
-    dyslexicFont,
     screenReader,
   } = useAccessibilityStore();
 
@@ -165,7 +163,6 @@ function App() {
             color: darkMode || highContrast ? "#fff" : "#000",
             fontSize: largeText ? "1.2rem" : "1rem",
             transition: reduceMotion ? "none" : "all 0.3s ease",
-            fontFamily: dyslexicFont ? "OpenDyslexic, Arial" : "inherit",
           },
 
           a: {

@@ -10,20 +10,18 @@ export function Footer() {
     const theme = useTheme(); 
 
     const originalColors = {
-        bg: '#0f172a', // bg-slate-900
-        textSecondary: '#cbd5e1', // text-slate-300
-        textPrimary: '#ffffff', // text-white
-        highlight: '#4ade80', // text-green-400
-        divider: '#1e293b', // border-slate-800
+        bg: '#0f172a',
+        textSecondary: '#cbd5e1',
+        textPrimary: '#ffffff',
+        highlight: '#4ade80',
+        divider: '#1e293b',
     };
 
-    // קביעת הצבעים: משתמשים בצבעים הקשיחים במצב 'light', וצבעי Theme סמנטיים במצב 'dark'
     const getDynamicColor = (key: keyof typeof originalColors, type: 'bg' | 'text' | 'link' | 'divider') => {
         if (theme.palette.mode === 'light') {
             return originalColors[key];
         }
         
-        // במצבי Dark Mode / High Contrast: משתמשים בצבעי Theme
         switch (type) {
             case 'bg': return theme.palette.background.paper;
             case 'text': return key === 'textPrimary' ? theme.palette.text.primary : theme.palette.text.secondary;
@@ -79,11 +77,9 @@ export function Footer() {
                                             display: 'flex', 
                                             alignItems: 'center', 
                                             gap: theme.spacing(1),
-                                            // צבע רגיל: אפור בהיר קשיח במצב בהיר, text.secondary בכהה
                                             color: getDynamicColor('textSecondary', 'link') 
                                         }}
                                         className="transition-colors"
-                                        // ✅ ריחוף דינמי: ירוק קשיח במצב בהיר, primary.main בכהה
                                         onMouseOver={e => (e.currentTarget.style.color = getDynamicColor('highlight', 'link'))}
                                         onMouseOut={e => (e.currentTarget.style.color = getDynamicColor('textSecondary', 'link'))}
                                     >
@@ -99,12 +95,10 @@ export function Footer() {
 
                     {/* Features */}
                     <div>
-                        {/* ✅ צבע כותרת: לבן קשיח במצב בהיר, text.primary בכהה */}
                         <Typography variant="subtitle1" sx={{ color: getDynamicColor('textPrimary', 'text'), mb: 2, fontWeight: 'bold' }}>
                             {t("featuresTitle")}
                         </Typography>
                         <ul className="space-y-2">
-                            {/* ✅ צבע טקסט: אפור בהיר קשיח במצב בהיר, text.secondary בכהה */}
                             <Typography component="li" sx={{ color: getDynamicColor('textSecondary', 'text') }} variant="body2">{t("featureDiscovery")}</Typography>
                             <Typography component="li" sx={{ color: getDynamicColor('textSecondary', 'text') }} variant="body2">{t("featureCollection")}</Typography>
                             <Typography component="li" sx={{ color: getDynamicColor('textSecondary', 'text') }} variant="body2">{t("featureAI")}</Typography>
@@ -116,7 +110,6 @@ export function Footer() {
                 {/* Bottom Bar */}
                 <Box 
                     sx={{
-                        // ✅ גבול דינמי: אפור כהה קשיח במצב בהיר, divider בכהה
                         borderTop: `1px solid ${getDynamicColor('divider', 'divider')}`, 
                         mt: 8,
                         pt: 4,

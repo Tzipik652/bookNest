@@ -257,7 +257,7 @@ export const getBooksByCategory = async (category) => {
 
   if (!categoryData) return [];
 
-  const { data: books, error } = await supabase
+  const { data, error } = await supabase
     .from("books")
     .select(bookSelectQuery)
     .eq("category", categoryData.id)
