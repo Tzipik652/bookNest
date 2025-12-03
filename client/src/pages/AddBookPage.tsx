@@ -268,6 +268,7 @@ export function AddBookPage() {
                       startIcon={uploadingImage ? <CircularProgress size={20} /> : <CloudUpload />}
                       disabled={uploadingImage}
                       sx={{ py: 1.5, borderStyle: 'dashed' }}
+                       className="mb-6 gap-2"
                     >
                       {uploadingImage ? t("uploading") : t("uploadButton")}
                     </Button>
@@ -357,11 +358,11 @@ export function AddBookPage() {
                 color="primary"
                 fullWidth
                 disabled={isSubmitting}
-                startIcon={
-                  isSubmitting ? (
-                    <CircularProgress color="inherit" size={18} />
-                  ) : null
-                }
+                // startIcon={
+                //   isSubmitting ? (
+                //     <CircularProgress color="inherit" size={18} />
+                //   ) : null
+                // }
                 className="notranslate"
                 aria-label={t("addButton")}
               >

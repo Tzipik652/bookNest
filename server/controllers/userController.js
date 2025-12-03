@@ -146,11 +146,14 @@ export const googleLogin = catchAsync(async (req, res, next) => {
   const { id_token } = req.body;
   if (!id_token) throw new AppError("Google ID token required", 400);
 
+  // 1. אימות הטוקן מול גוגל
   const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${id_token}`);
   const profile = await response.json();
 
   if (!profile.email) throw new AppError("Invalid Google token", 401);
 
+  // 2. חיפוש המשתמש במסד הנתונים
+  // שימי לב: אנחנו לא מסננים כאן is_deleted=false כי אנחנו רוצים למצוא גם מחוקים
   let { data: user } = await supabase
     .from("users")
     .select("*")
@@ -158,8 +161,11 @@ export const googleLogin = catchAsync(async (req, res, next) => {
     .single();
 
   if (!user) {
-    // Create new user
+    // -------------------------
+    // תרחיש א': משתמש חדש לגמרי
+    // -------------------------
     const password = crypto.randomBytes(Math.ceil(12 / 2)).toString("hex").slice(0, 12);
+    
     const { data: newUser, error: insertError } = await supabase
       .from("users")
       .insert([
@@ -170,24 +176,55 @@ export const googleLogin = catchAsync(async (req, res, next) => {
           auth_provider: "google",
           profile_picture: profile.picture,
           role: "user",
+          is_deleted: false // מוודאים שנוצר פעיל
         },
       ])
       .select()
       .single();
+
     if (insertError) throw insertError;
     user = newUser;
-  } else if (!user.auth_provider.includes("google")) {
-    // Update existing user to support both
-    const { data: updatedUser, error: updateError } = await supabase
-      .from("users")
-      .update({ auth_provider: "both", profile_picture: profile.picture })
-      .eq("_id", user._id)
-      .select()
-      .single();
-    if (updateError) throw updateError;
-    user = updatedUser;
+
+  } else {
+    // -------------------------
+    // תרחיש ב': משתמש קיים (פעיל או מחוק)
+    // -------------------------
+    let updates = {};
+    let shouldUpdate = false;
+
+    // 1. בדיקת החייאה (מחיקה רכה)
+    if (user.is_deleted) {
+      updates.is_deleted = false;
+      shouldUpdate = true;
+    }
+
+    // 2. בדיקת ספק אימות (אם היה רק local, נשדרג ל-both)
+    if (user.auth_provider !== "google" && user.auth_provider !== "both") {
+      updates.auth_provider = "both";
+      shouldUpdate = true;
+    }
+
+    // 3. עדכון תמונת פרופיל (אופציונלי - מעדכן אם השתנתה בגוגל)
+    if (profile.picture && user.profile_picture !== profile.picture) {
+      updates.profile_picture = profile.picture;
+      shouldUpdate = true;
+    }
+
+    // ביצוע העדכון בפועל אם יש שינויים
+    if (shouldUpdate) {
+      const { data: updatedUser, error: updateError } = await supabase
+        .from("users")
+        .update(updates)
+        .eq("_id", user._id)
+        .select()
+        .single();
+      
+      if (updateError) throw updateError;
+      user = updatedUser; // מעדכנים את המשתמש המקומי לגרסה החדשה
+    }
   }
 
+  // 3. יצירת טוקן והחזרת תשובה
   const token = generateJWT(user);
   res.json({
     success: true,
