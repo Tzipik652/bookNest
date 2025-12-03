@@ -8,7 +8,7 @@ import crypto from "crypto";
 import AppError from "../utils/AppError.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { registerSchema } from "../validations/userValidation.js";
-import { getUsers, updateUser ,deleteUser as deleteUserRecord} from "../models/userModel.js";
+import { getUsers, updateUser, deleteUser as deleteUserRecord } from "../models/userModel.js";
 
 dotenv.config();
 
@@ -51,17 +51,45 @@ export const register = catchAsync(async (req, res, next) => {
     .eq("email", email)
     .single();
 
-  if (existing) throw new AppError("User already exists", 400);
+  if (existing) {
+    // 🛑 בדיקה חדשה: אם המשתמש מחוק - נחייה אותו!
+    if (existing.is_deleted) {
+      const hashedPassword = await bcrypt.hash(password, 12);
+      const { data: reactivatedUser, error: reactivateError } = await supabase
+        .from("users")
+        .update({
+          is_deleted: false,
+          password: hashedPassword, // עדכון סיסמה אם נשלחה
+          name: name // עדכון שם
+        })
+        .eq("_id", existing._id)
+        .select()
+        .single();
+
+      if (reactivateError) throw reactivateError;
+
+      const token = generateJWT(reactivatedUser);
+      return res.json({
+        success: true,
+        message: "User reactivated successfully", // הודעה חדשה
+        token,
+        user: reactivatedUser,
+      });
+    } else {
+      // המשתמש קיים ופעיל
+      throw new AppError("User already exists", 400);
+    }
+  }
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  const { data: user, err } = await supabase
+  const { data: user, error: insertError } = await supabase
     .from("users")
     .insert([{ email, password: hashedPassword, name, auth_provider: "local" }])
     .select()
     .single();
 
-  if (err) throw error;
+  if (insertError) throw insertError;
 
   const token = generateJWT(user);
   res.json({
@@ -90,8 +118,10 @@ export const login = catchAsync(async (req, res, next) => {
     .single();
 
   if (!user) throw new AppError("Invalid credentials", 401);
+  
+  if (user.is_deleted) throw new AppError("Account is inactive. Please contact support or try registering.", 401);
   if (user.auth_provider !== "local") throw new AppError("Please login with Google", 401);
-
+  
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new AppError("Invalid credentials", 401);
 
@@ -173,43 +203,43 @@ export const googleLogin = catchAsync(async (req, res, next) => {
   });
 });
 export const getAllUsers = catchAsync(async (req, res, next) => {
-  const user=req.user;
-  if( !user ||user.role!=="admin" ){
-    throw new AppError("Forbidden",403);
+  const user = req.user;
+  if (!user || user.role !== "admin") {
+    throw new AppError("Forbidden", 403);
   }
- const users= await getUsers();
- res.json({
-  success:true,
-  users
- });
+  const users = await getUsers();
+  res.json({
+    success: true,
+    users
+  });
 })
 export const update = catchAsync(async (req, res, next) => {
-    const user = req.user;
-    const targetUserId = req.params.id; 
-    const isAllowed = user.role === "admin" || user._id === targetUserId;
-    if (!isAllowed) {
-        throw new AppError("Forbidden: You can only modify your own account or be an Admin.", 403);
-    }
-    const updatedUser = await updateUser(targetUserId, req.body);
-    
-    res.json({
-        success: true,
-        updatedUser
-    });
+  const user = req.user;
+  const targetUserId = req.params.id;
+  const isAllowed = user.role === "admin" || user._id === targetUserId;
+  if (!isAllowed) {
+    throw new AppError("Forbidden: You can only modify your own account or be an Admin.", 403);
+  }
+  const updatedUser = await updateUser(targetUserId, req.body);
+
+  res.json({
+    success: true,
+    updatedUser
+  });
 });
 
 export const deleteUser = catchAsync(async (req, res, next) => {
-    const user = req.user;
-    const targetUserId = req.params.id;
-    const isAllowed = user.role === "admin" || user._id === targetUserId;
-    if (!isAllowed) {
-        throw new AppError("Forbidden: You can only modify your own account or be an Admin.", 403);
-    }
-    
-    const deletedUser = await deleteUserRecord(targetUserId); 
-        
-    res.json({
-        success: true,
-        deletedUser
-    });
+  const user = req.user;
+  const targetUserId = req.params.id;
+  const isAllowed = user.role === "admin" || user._id === targetUserId;
+  if (!isAllowed) {
+    throw new AppError("Forbidden: You can only modify your own account or be an Admin.", 403);
+  }
+
+  const deletedUser = await deleteUserRecord(targetUserId);
+
+  res.json({
+    success: true,
+    deletedUser
+  });
 });

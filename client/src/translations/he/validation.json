@@ -1,0 +1,17 @@
+{
+    "minTitleLength": "הכותרת חייבת להיות באורך של לפחות 2 תווים",
+    "minAuthorLength": "שם המחבר חייב להיות באורך של לפחות 2 תווים",
+    "minDescriptionLength": "התיאור חייב להיות באורך של לפחות 10 תווים",
+    "categoryRequired": "יש לבחור קטגוריה",
+    "invalidImageUrl": "כתובת ה-URL לתמונה אינה חוקית. הקישור חייב להיות תקין או שהשדה צריך להיות ריק.",
+    "invalidPrice": "המחיר חייב להיות מספר חוקי",
+    "emailRequired": "כתובת אימייל נדרשת",
+    "invalidEmail": "כתובת אימייל לא תקינה",
+    "minPasswordLength": "הסיסמה חייבת להכיל לפחות 6 תווים",
+    "confirmPasswordRequired": "אנא אשר את הסיסמה",
+    "passwordsDoNotMatch": "הסיסמאות אינן תואמות",
+    "minNameLength": "השם חייב להכיל לפחות 2 תווים",
+    "passwordUppercase": "הסיסמה חייבת להכיל לפחות אות גדולה אחת (באנגלית)",
+    "passwordNumber": "הסיסמה חייבת להכיל לפחות ספרה אחת",
+    "passwordSpecialChar": "הסיסמה חייבת להכיל לפחות תו מיוחד אחד"
+}
