@@ -202,17 +202,10 @@ export const searchBooks = catchAsync(async (req, res) => {
   const searchTerm = req.query.s || "";
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
-  const offset = (page - 1) * limit;
+  const categoryId = req.query.category;
+  const result = await bookModel.searchBooks(searchTerm, page, limit, categoryId);
 
-  const books = await bookModel.findAll();
-  const filteredBooks = books.filter((b) =>
-    b.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredBooks.length / limit);
-  const currentPageBooks = filteredBooks.slice(offset, offset + limit);
-
-  res.status(200).json({ totalPages, currentPageBooks });
+  res.status(200).json(result);
 });
 
 export const getBooksByUserId = catchAsync(async (req, res, next) => {
