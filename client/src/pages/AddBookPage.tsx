@@ -1,4 +1,4 @@
-import { useState, useRef, ChangeEvent, useEffect } from "react"; // Added ChangeEvent
+import { useState, useRef, ChangeEvent, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -8,21 +8,11 @@ import {
   CardActions,
   TextField,
   MenuItem,
-  Alert,
   CircularProgress,
-  Typography,
-  IconButton, // Added
-  InputAdornment,
-  CardHeader, // Added
+  CardHeader,
 } from "@mui/material";
 import { Button as ShadcnButton } from "../components/ui/button";
-import {
-  ArrowBack,
-  AutoAwesome,
-  CheckCircle,
-  CloudUpload,
-} from "@mui/icons-material"; // Added CloudUpload
-import { useUserStore } from "../store/useUserStore";
+import { CloudUpload } from "@mui/icons-material";
 import { Category } from "../types";
 import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
 import { useForm } from "react-hook-form";
@@ -34,6 +24,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_UPLOAD_PRESET;
+
 import { addBook } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
 
@@ -71,16 +62,15 @@ export function AddBookPage() {
 
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log("Selected file:", file);
 
     if (!file) return;
-
     setUploadingImage(true);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", UPLOAD_PRESET);
 
     try {
+      
       const res = await fetch(
         `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
         {
@@ -220,7 +210,7 @@ export function AddBookPage() {
               >
                 {categories.map((cat) => (
                   <MenuItem key={cat.id} value={cat.name}>
-                    {t(`category:${cat.name.replace(/\s+/g, '')}`)}{" "}
+                    {t(`category:${cat.name.replace(/\s+/g, "")}`)}{" "}
                   </MenuItem>
                 ))}
               </TextField>
@@ -286,7 +276,6 @@ export function AddBookPage() {
                 error={!!errors.img_url}
                 helperText={errors.img_url?.message}
               />
-              {/* ------------------------------------- */}
 
               <TextField
                 fullWidth

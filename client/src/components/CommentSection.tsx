@@ -29,7 +29,7 @@ import {
   Box,
   Chip,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles"; // 👈 ייבוא חדש!
+import { useTheme } from "@mui/material/styles";
 import { toast } from "sonner";
 import CommentItemSkeleton from "./CommentItemSkeleton";
 import { useTranslation } from "react-i18next";
@@ -43,7 +43,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
   const { t } = useTranslation(["comments", "common"]);
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
-  const theme = useTheme(); // 👈 שימוש ב-Theme
+  const theme = useTheme();
   const [comments, setComments] = useState<CommentWithReactions[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -194,7 +194,6 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     } catch (error) {
       console.error(error);
       toast.error(t("errorAddFailed"));
-      // אם יש שגיאה, טוענים מחדש כדי לשחזר את המצב
       await loadComments();
     } finally {
       setLoadingComments((prev) => {
@@ -224,7 +223,6 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
         />
       </Stack>
 
-      {/* Add Comment Form - משתמש ב-divider נגיש */}
       <Card
         elevation={0}
         sx={{
@@ -287,15 +285,13 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
               textAlign: "center",
               py: 8,
               px: 3,
-              // ✅ הותאם ל-Theme: משתמש בצבע הרקע של Card ב-Dark Mode
               bgcolor: theme.palette.background.paper,
               borderRadius: 2,
-              border: `1px solid ${theme.palette.divider}` // ✅ גבול נגיש
+              border: `1px solid ${theme.palette.divider}`
             }}
           >
             <MessageSquare
               size={48}
-              // ✅ צבע אייקון משני הנגיש
               style={{ opacity: 0.3, marginBottom: 16, color: theme.palette.text.secondary }}
             />
             <Typography variant="body1" color="text.secondary">
@@ -313,7 +309,6 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
                 }}
                 key={comment.id}
                 comment={comment}
-                // מאפשר לבעל הספר או אדמין למחוק
                 isBookOwner={isBookOwner || isAdmin}
                 currentUserId={currentUser?._id || ""}
                 onDelete={() => setCommentToDelete(comment.id)}
@@ -324,7 +319,6 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
         )}
       </Stack>
 
-      {/* Delete Confirmation Dialog - משתמש במרכיבי MUI סטנדרטיים שהם נגישים */}
       <Dialog
         open={!!commentToDelete}
         onClose={() => setCommentToDelete(null)}

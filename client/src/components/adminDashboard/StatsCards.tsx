@@ -8,7 +8,6 @@ import {
   AlertCircle,
   Sparkles,
 } from "lucide-react";
-// ייבוא רכיבי MUI ו-Hooks
 import { Box, Typography, Skeleton, useTheme, alpha } from '@mui/material';
 import { useAccessibilityStore } from "../../store/accessibilityStore";
 
@@ -26,7 +25,6 @@ interface StatTranslationKeys {
   ofTotalBooksRecent: string;
 }
 
-// Custom hook for smooth animated numbers (נשאר ללא שינוי)
 function useAnimatedNumber(
   targetValue: number,
   duration: number = 2000,
@@ -75,7 +73,6 @@ interface StatsCardsProps {
   translationKeys: StatTranslationKeys;
 }
 
-// Skeleton מותאם ל-MUI Theme
 function StatCardSkeleton() {
   return (
     <Box
@@ -127,31 +124,25 @@ export function StatsCards({
     }
   };
 
-  // פונקציית עזר להגדרת צבעים דינמיים לכרטיסים
   const getCardStyles = (colorType: 'success' | 'info' | 'secondary' | 'error' | 'warning') => {
     const mainColor = theme.palette[colorType].main;
     const isDark = theme.palette.mode === 'dark';
 
     return {
-      // רקע הכרטיס
       bg: highContrast 
           ? theme.palette.background.default 
           : isDark 
-            ? alpha(mainColor, 0.1) // כהה: רקע שקוף בצבע
-            : theme.palette.background.paper, // בהיר: לבן
+            ? alpha(mainColor, 0.1)
+            : theme.palette.background.paper,
       
-      // רקע האייקון
       iconBg: highContrast 
               ? theme.palette.background.paper 
               : alpha(mainColor, isDark ? 0.2 : 0.1),
       
-      // צבע האייקון
       iconColor: highContrast ? theme.palette.text.primary : mainColor,
       
-      // גבול (בעיקר לניגודיות גבוהה)
       border: highContrast ? `2px solid ${theme.palette.text.primary}` : `1px solid ${alpha(mainColor, 0.2)}`,
       
-      // Gradient עדין למצב בהיר בלבד
       gradient: !isDark && !highContrast 
         ? `linear-gradient(135deg, ${alpha(mainColor, 0.05)} 0%, ${alpha(mainColor, 0.01)} 100%)` 
         : 'none'

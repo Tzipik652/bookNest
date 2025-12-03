@@ -138,7 +138,6 @@ export function ContactPage() {
           {t("common:back")}
         </Button>
 
-        {/* כותרת הדף */}
         <Box sx={{ mb: 4, display: "flex", alignItems: "center", gap: 2 }}>
           <Box
             sx={{
@@ -328,7 +327,6 @@ export function ContactPage() {
                   </Box>
                 </Box>
 
-                {/* מיקום */}
                 <Box
                   sx={{
                     display: "flex",
