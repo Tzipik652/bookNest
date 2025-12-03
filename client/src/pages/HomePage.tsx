@@ -13,7 +13,7 @@ import {
 
 import { Search } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getBooks, getBooksByCategory } from "../services/bookService";

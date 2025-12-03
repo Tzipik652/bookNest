@@ -3,7 +3,6 @@ import axios from "axios";
 import { useUserStore } from "../store/useUserStore";
 import { toast } from "sonner";
 import { queryClient } from "./globalQueryClient";
-import { set } from "zod";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_SERVER_URL || "http://localhost:5000",

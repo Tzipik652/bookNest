@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent, Skeleton, Stack, Divider, Box } from "@mui/material";
+import { Card, CardContent, Skeleton, Stack, Divider } from "@mui/material";
 
 export default function CommentItemSkeleton() {
   return (

@@ -21,7 +21,6 @@ interface FAQSection {
     category: string;
     questions: FAQItem[];
 }
-import { faqs } from '../lib/faqs';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 import { useAccessibilityStore } from '../store/accessibilityStore';
 
@@ -36,7 +35,6 @@ export function FAQPage() {
     const discoverRef = useRef<HTMLHeadingElement | null>(null);
     const isRTL = i18n.dir() === 'rtl';
 
-    // הלוגיקה של useEffect נשארת זהה
     useEffect(() => {
         if (!isLoading) {
             if (firstLoad) {
