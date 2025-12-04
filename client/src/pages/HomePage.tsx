@@ -41,10 +41,13 @@ export function HomePage() {
   const { user } = useUserStore();
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
+
+  const debounceRef = useRef<number|null>(null);
 
   const discoverRef = useRef<HTMLHeadingElement | null>(null);
   const { favoriteBooksQuery } = useFavoriteBooks();
@@ -57,13 +60,13 @@ export function HomePage() {
   });
 
   const { data: booksResult, isLoading } = useQuery({
-    queryKey: ["books", selectedCategory, searchQuery, currentPage],
+    queryKey: ["books", selectedCategory, debouncedSearchQuery, currentPage],
     queryFn: () => {
-      if (searchQuery) {
+      if (debouncedSearchQuery) {
         const categoryObj = categories.find((c) => c.name === selectedCategory);
         const categoryId = categoryObj ? categoryObj.id : undefined;
         return searchBooks(
-          searchQuery,
+          debouncedSearchQuery,
           currentPage,
           BOOKS_PER_PAGE,
           categoryId
@@ -231,7 +234,17 @@ export function HomePage() {
             aria-label={t("home:search_placeholder")}
             value={searchQuery}
             placeholder={t("home:search_placeholder")}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={
+              (e) => {
+                const value = e.target.value;
+                setSearchQuery(value)
+                clearTimeout(debounceRef.current || undefined);
+                debounceRef.current = window.setTimeout(()=>{
+                  console.log(e.target.value)
+                  setDebouncedSearchQuery(value)
+                },300)
+              }
+            }
             sx={{ flex: 1, minWidth: 250, maxWidth: 400 }}
             InputProps={{
               startAdornment: (
