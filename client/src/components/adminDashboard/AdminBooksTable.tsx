@@ -6,28 +6,26 @@ import {
   Skeleton,
   useTheme,
   alpha,
+  TextField,
+  InputAdornment,
+  Pagination,
+  Box,
 } from "@mui/material";
-import { BookOpen, Edit, Trash2 } from "lucide-react";
+import { BookOpen, Edit, Trash2, Search as SearchIcon } from "lucide-react";
 import { CardTitle, CardDescription } from "../ui/card";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 import { Book } from "../../types";
-import { deleteBook } from "../../services/bookService";
+import { deleteBook, getBooks, searchBooks } from "../../services/bookService";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAccessibilityStore } from "../../store/accessibilityStore";
 
 interface AdminBooksTableProps {
-  books: Book[];
-  isLoading?: boolean;
   userMap: Record<string, string>;
 }
 
-export const AdminBooksTable = ({
-  books,
-  isLoading,
-  userMap,
-}: AdminBooksTableProps) => {
+export const AdminBooksTable = ({ userMap }: AdminBooksTableProps) => {
   const { t } = useTranslation(["adminDashboard", "common"]);
   const booksTableTexts = t("dashboard.booksTable", {
     returnObjects: true,
@@ -35,22 +33,83 @@ export const AdminBooksTable = ({
 
   const theme = useTheme();
   const { highContrast } = useAccessibilityStore();
-
-  const [currentBooks, setCurrentBooks] = useState<Book[]>(books);
   const navigate = useNavigate();
 
+  // --- States ---
+  const [currentBooks, setCurrentBooks] = useState<Book[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const ITEMS_PER_PAGE = 20;
+
+  // Search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // 1. Debounce Effect
   useEffect(() => {
-    setCurrentBooks(books);
-  }, [books]);
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setPage(1); 
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+  // 2. Fetch Data Function using your Service
+  const fetchBooksData = async () => {
+    setIsLoading(true);
+    try {
+      let response;
+
+      if (debouncedSearch) {
+        response = await searchBooks(debouncedSearch, page, ITEMS_PER_PAGE);
+      } else {
+        response = await getBooks({ page, limit: ITEMS_PER_PAGE });
+      }
+
+      if (response) {
+        const booksList = response.books || response.docs || [];
+        const pagesTotal = response.totalPages || 1;
+
+        setCurrentBooks(booksList);
+        setTotalPages(pagesTotal);
+      }
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      toast.error(t("common:errorLoadingData"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 3. Trigger Fetch on Page or Search Change
+  useEffect(() => {
+    fetchBooksData();
+        setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const tableTop = document.getElementById("table-top-anchor");
+      if (tableTop) {
+        tableTop.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100); 
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, debouncedSearch]);
 
   const handleDeleteBook = async (bookId: string) => {
     if (window.confirm(booksTableTexts.deleteConfirm)) {
       try {
         await deleteBook(bookId);
-        setCurrentBooks((prevBooks) =>
-          prevBooks.filter((book) => book._id !== bookId)
-        );
         toast.success(booksTableTexts.deleteSuccess);
+        
+        fetchBooksData();
+        
       } catch (error) {
         toast.error(booksTableTexts.deleteFailed);
       }
@@ -61,15 +120,18 @@ export const AdminBooksTable = ({
     navigate(`/edit-book/${bookId}`, { state: { from: "/admin-dashboard" } });
   };
 
+const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
 
+  // --- Styles (Same as before) ---
   const textColorStyle = highContrast
     ? { color: theme.palette.text.primary }
     : { color: theme.palette.text.secondary };
 
   const lightTextColorStyle = highContrast
     ? { color: theme.palette.text.primary }
-    : 
-      {
+    : {
         color:
           theme.palette.mode === "light"
             ? theme.palette.grey[700]
@@ -133,9 +195,8 @@ export const AdminBooksTable = ({
 
   return (
     <div dir={t("common:dir")}>
-      {/* --- Books Table --- */}
       <Card
-        id="total-books-section"
+        id="table-top-anchor" 
         className="mb-8 shadow-sm"
         style={
           highContrast
@@ -143,14 +204,45 @@ export const AdminBooksTable = ({
             : { border: "0" }
         }
       >
-        <CardHeader>
-          <CardTitle style={{ color: theme.palette.text.primary }}>
-            {booksTableTexts.cardTitle}
-          </CardTitle>
-          <CardDescription style={{ color: theme.palette.text.secondary }}>
-            {booksTableTexts.cardDescription}
-          </CardDescription>
-        </CardHeader>
+<CardHeader
+          title={
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                flexDirection: { xs: 'column', md: 'row' }, 
+                justifyContent: 'space-between', 
+                alignItems: { xs: 'stretch', md: 'center' },
+                gap: 2 
+              }}
+            >
+              <Box>
+                {/* <CardTitle style={{ color: theme.palette.text.primary }}>
+                  {booksTableTexts.cardTitle}
+                </CardTitle> */}
+                <CardDescription style={{ color: theme.palette.text.secondary }}>
+                  {booksTableTexts.cardDescription}
+                </CardDescription>
+              </Box>
+
+              {/* שדה החיפוש */}
+              <TextField
+                placeholder={t("common:search", "Search...")}
+                variant="outlined"
+                size="small"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                sx={{ width: { xs: "100%", md: 300 } }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon size={20} className="text-gray-500" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+          }
+        />
 
         <CardContent>
           {/* --- Desktop Table --- */}
@@ -165,40 +257,22 @@ export const AdminBooksTable = ({
             <table className="w-full text-sm">
               <thead>
                 <tr style={headerBgStyle}>
-                  <th
-                    className="text-start py-3 px-4 font-medium"
-                    style={textColorStyle}
-                  >
+                  <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
                     {booksTableTexts.headerTitle}
                   </th>
-                  <th
-                    className="text-start py-3 px-4 font-medium"
-                    style={textColorStyle}
-                  >
+                  <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
                     {booksTableTexts.headerAuthor}
                   </th>
-                  <th
-                    className="text-start py-3 px-4 font-medium"
-                    style={textColorStyle}
-                  >
+                  <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
                     {booksTableTexts.headerCategory}
                   </th>
-                  <th
-                    className="text-start py-3 px-4 font-medium"
-                    style={textColorStyle}
-                  >
+                  <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
                     {booksTableTexts.headerUploader}
                   </th>
-                  <th
-                    className="text-start py-3 px-4 font-medium"
-                    style={textColorStyle}
-                  >
+                  <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
                     {booksTableTexts.headerDate}
                   </th>
-                  <th
-                    className="text-right py-3 px-4 font-medium"
-                    style={textColorStyle}
-                  >
+                  <th className="text-right py-3 px-4 font-medium" style={textColorStyle}>
                     {booksTableTexts.headerActions}
                   </th>
                 </tr>
@@ -206,30 +280,12 @@ export const AdminBooksTable = ({
               <tbody>
                 {isLoading
                   ? Array.from({ length: 5 }).map((_, i) => (
-                      <tr
-                        key={i}
-                        className="border-b last:border-0"
-                        style={{
-                          borderColor: highContrast
-                            ? theme.palette.text.primary
-                            : theme.palette.divider,
-                        }}
-                      >
-                        <td className="py-3 px-4">
-                          <Skeleton className="h-4 w-32" />
-                        </td>
-                        <td className="py-3 px-4">
-                          <Skeleton className="h-4 w-24" />
-                        </td>
-                        <td className="py-3 px-4">
-                          <Skeleton className="h-6 w-20 rounded-full" />
-                        </td>
-                        <td className="py-3 px-4">
-                          <Skeleton className="h-4 w-24" />
-                        </td>
-                        <td className="py-3 px-4">
-                          <Skeleton className="h-4 w-20" />
-                        </td>
+                      <tr key={i} className="border-b last:border-0">
+                        <td className="py-3 px-4"><Skeleton className="h-4 w-32" /></td>
+                        <td className="py-3 px-4"><Skeleton className="h-4 w-24" /></td>
+                        <td className="py-3 px-4"><Skeleton className="h-6 w-20 rounded-full" /></td>
+                        <td className="py-3 px-4"><Skeleton className="h-4 w-24" /></td>
+                        <td className="py-3 px-4"><Skeleton className="h-4 w-20" /></td>
                         <td className="py-3 px-4">
                           <div className="flex justify-end gap-2">
                             <Skeleton className="h-8 w-8" />
@@ -249,20 +305,13 @@ export const AdminBooksTable = ({
                           ...(!highContrast && { "&:hover": hoverBgStyle }),
                         }}
                         onMouseEnter={(e) => {
-                          if (!highContrast)
-                            e.currentTarget.style.backgroundColor =
-                              hoverBgStyle.backgroundColor;
+                          if (!highContrast) e.currentTarget.style.backgroundColor = hoverBgStyle.backgroundColor;
                         }}
                         onMouseLeave={(e) => {
-                          if (!highContrast)
-                            e.currentTarget.style.backgroundColor =
-                              "transparent";
+                          if (!highContrast) e.currentTarget.style.backgroundColor = "transparent";
                         }}
                       >
-                        <td
-                          className="py-3 px-4 font-medium"
-                          style={{ color: theme.palette.text.primary }}
-                        >
+                        <td className="py-3 px-4 font-medium" style={{ color: theme.palette.text.primary }}>
                           {book.title}
                         </td>
                         <td className="py-3 px-4" style={lightTextColorStyle}>
@@ -273,16 +322,14 @@ export const AdminBooksTable = ({
                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0"
                             style={categoryChipStyle}
                           >
-                            {t(`category:${book.category.replace(/\s+/g, '')}`)}
+                            {t(`category:${book.category.replace(/\s+/g, "")}`)}
                           </span>
                         </td>
                         <td className="py-3 px-4" style={lightTextColorStyle}>
                           {userMap[book.user_id]}
                         </td>
                         <td className="py-3 px-4" style={lightTextColorStyle}>
-                          {new Date(book.date_created).toLocaleDateString(
-                            t("common:locale")
-                          )}
+                          {new Date(book.date_created).toLocaleDateString(t("common:locale"))}
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex gap-2 justify-end">
@@ -291,7 +338,6 @@ export const AdminBooksTable = ({
                               size="icon"
                               onClick={() => navigate(`/book/${book._id}`)}
                               style={viewButtonStyle}
-                              aria-label={t("viewDetails")}
                             >
                               <BookOpen className="h-4 w-4" />
                             </Button>
@@ -300,7 +346,6 @@ export const AdminBooksTable = ({
                               size="icon"
                               onClick={() => handleEditBook(book._id)}
                               style={editButtonStyle}
-                              aria-label={t("buttonEdit")}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -309,7 +354,6 @@ export const AdminBooksTable = ({
                               size="icon"
                               onClick={() => handleDeleteBook(book._id)}
                               style={deleteButtonStyle}
-                              aria-label={t("buttonDelete")}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -319,146 +363,64 @@ export const AdminBooksTable = ({
                     ))}
               </tbody>
             </table>
+
+            {!isLoading && currentBooks.length === 0 && (
+                 <div className="p-8 text-center text-gray-500">
+                     {t("common:noResults", "No books found.")}
+                 </div>
+            )}
           </div>
+
           {/* Small Screen Cards */}
           <div className="md:hidden space-y-4">
-            <div className="md:hidden space-y-3">
-              {isLoading
-                ? Array.from({ length: 5 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="border rounded-lg p-3"
-                      style={{
-                        borderColor: highContrast
-                          ? theme.palette.text.primary
-                          : theme.palette.divider,
-                      }}
-                    >
-                      <Skeleton className="h-4 w-3/4 mb-2" />
-                      <Skeleton className="h-3 w-1/2" />
-                    </div>
-                  ))
-                : currentBooks.map((book) => (
+             {isLoading ? (
+                 <Skeleton className="h-20 w-full" />
+             ) : (
+                currentBooks.map((book) => (
                     <div
                       key={book._id}
-                      className="border rounded-lg p-3 transition-shadow"
-                      style={
-                        highContrast
-                          ? {
-                              border: `1px solid ${theme.palette.text.primary}`,
-                            }
-                          : { borderColor: theme.palette.divider }
-                      }
+                      className="border rounded-lg p-3"
+                      style={{ borderColor: theme.palette.divider }}
                     >
-                      <div className="flex justify-between items-start gap-3 mb-2">
-                        <div className="flex-1 min-w-0">
-                          <h3
-                            className="font-medium text-sm truncate"
-                            style={{ color: theme.palette.text.primary }}
-                          >
-                            {book.title}
-                          </h3>
-                          <p
-                            className="text-xs truncate"
-                            style={lightTextColorStyle}
-                          >
-                            {book.author}
-                          </p>
-                        </div>
-                        <span
-                          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium shrink-0"
-                          style={categoryChipStyle}
-                        >
-                          {t(`category:${book.category.replace(/\s+/g, '')}`)}
-                        </span>
-                      </div>
-
-                      <div
-                        className="flex justify-between items-center text-xs mb-2"
-                        style={lightTextColorStyle}
-                      >
-                        <span>{userMap[book.user_id]}</span>
-                        <span>
-                          {new Date(book.date_created).toLocaleDateString(
-                            t("common:locale")
-                          )}
-                        </span>
-                      </div>
-
-                      <div className="flex gap-1.5">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 h-8 text-xs"
-                          onClick={() => navigate(`/book/${book._id}`)}
-                          style={
-                            highContrast
-                              ? {
-                                  borderColor: theme.palette.text.primary,
-                                  color: theme.palette.text.primary,
-                                }
-                              : {}
-                          }
-                          aria-label={t("viewDetails")}
-                        >
-                          <BookOpen
-                            className="h-3.5 w-3.5 ml-1"
-                            style={
-                              highContrast
-                                ? { color: theme.palette.text.primary }
-                                : viewButtonStyle
-                            }
-                          />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 px-2"
-                          onClick={() => handleEditBook(book._id)}
-                          style={
-                            highContrast
-                              ? { borderColor: theme.palette.text.primary }
-                              : {}
-                          }
-                          aria-label={t("buttonEdit")}
-                        >
-                          <Edit
-                            className="h-3.5 w-3.5"
-                            style={
-                              highContrast
-                                ? { color: theme.palette.text.primary }
-                                : editButtonStyle
-                            }
-                          />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 px-2"
-                          onClick={() => handleDeleteBook(book._id)}
-                          style={
-                            highContrast
-                              ? { borderColor: theme.palette.text.primary }
-                              : {}
-                          }
-                          aria-label={t("buttonDelete")}
-                        >
-                          <Trash2
-                            className="h-3.5 w-3.5"
-                            style={
-                              highContrast
-                                ? { color: theme.palette.text.primary }
-                                : deleteButtonStyle
-                            }
-                          />
-                        </Button>
-                      </div>
+                         <div className="flex justify-between">
+                            <h3 className="font-bold">{book.title}</h3>
+                            <span style={categoryChipStyle} className="px-2 rounded-full text-xs flex items-center">
+                                {t(`category:${book.category}`)}
+                            </span>
+                         </div>
+                         <div className="mt-2 flex justify-end gap-2">
+                             <Button variant="ghost" size="sm" onClick={() => handleEditBook(book._id)}><Edit size={16}/></Button>
+                             <Button variant="ghost" size="sm" onClick={() => handleDeleteBook(book._id)}><Trash2 size={16}/></Button>
+                         </div>
                     </div>
-                  ))}
-            </div>
+                ))
+             )}
           </div>
+
+          {/* --- Pagination Controls --- */}
+          {totalPages > 1 && (
+            <Box display="flex" justifyContent="center" mt={4}>
+                <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={handlePageChange}
+                    color="primary"
+                    shape="rounded"
+                    showFirstButton 
+                    showLastButton
+                    disabled={isLoading}
+                    dir="ltr"
+                    sx={{
+                        '& .MuiPaginationItem-root': {
+                            color: theme.palette.text.primary
+                        }
+                    }}
+                />
+            </Box>
+          )}
+
         </CardContent>
-      </Card>{" "}
+      </Card>
     </div>
   );
 };
