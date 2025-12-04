@@ -23,14 +23,15 @@ import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function ResetPassword() {
   const isKeyboardMode = useKeyboardModeBodyClass();
-  const { t } = useTranslation(["auth","validation"]);
+  const { t } = useTranslation(["auth", "validation"]);
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-const schema = createResetPasswordSchema(t);
+  const schema = createResetPasswordSchema(t);
+  const isRtl = t("dir") === "rtl";
   const {
     register,
     handleSubmit,
@@ -90,13 +91,39 @@ const schema = createResetPasswordSchema(t);
               {...register("password")}
               error={!!errors.password}
               helperText={errors.password?.message}
+
+              // NEW FIX: העברת הכיוון ישירות לקומפוננטה
+              dir={isRtl ? "rtl" : "ltr"}
+
+              // NEW FIX: תיקון הלייבל כך שיצוף לצד ימין ולא יישאר בשמאל
+              InputLabelProps={{
+                sx: {
+                  transformOrigin: isRtl ? "right top" : "left top",
+                  left: isRtl ? "auto" : 0,
+                  right: isRtl ? 0 : "auto",
+                }
+              }}
+
+              // NEW FIX: יישור הטקסט + מניעת חפיפה עם האייקון
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  // מוודא שהאייקון בצד הנכון
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                },
+                "& .MuiOutlinedInput-input": {
+                  textAlign: isRtl ? "right" : "left",
+                }
+              }}
+
               InputProps={{
+                // שימי לב: ב-RTL ה-Start הופך ויזואלית לימין וה-End לשמאל
+                // כדי למנוע בלבול, נשאיר ב-endAdornment ונסמוך על ה-CSS למעלה
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
                       onClick={() => setShowPassword(!showPassword)}
                       edge="end"
-                      aria-label={showPassword ?t("hidePassword") :t("showPassword")}
+                      aria-label={showPassword ? t("hidePassword") : t("showPassword")}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -105,6 +132,7 @@ const schema = createResetPasswordSchema(t);
               }}
             />
 
+            {/* --- שדה אישור סיסמה --- */}
             <TextField
               label={t("resetPassword.confirmPasswordLabel")}
               type={showConfirmPassword ? "text" : "password"}
@@ -112,13 +140,34 @@ const schema = createResetPasswordSchema(t);
               {...register("confirmPassword")}
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword?.message}
+
+              // NEW FIX: העתק של התיקונים לשדה השני
+              dir={isRtl ? "rtl" : "ltr"}
+
+              InputLabelProps={{
+                sx: {
+                  transformOrigin: isRtl ? "right top" : "left top",
+                  left: isRtl ? "auto" : 0,
+                  right: isRtl ? 0 : "auto",
+                }
+              }}
+
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  flexDirection: isRtl ? "row-reverse" : "row",
+                },
+                "& .MuiOutlinedInput-input": {
+                  textAlign: isRtl ? "right" : "left",
+                }
+              }}
+
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       edge="end"
-                      aria-label={showConfirmPassword ?t("hidePassword") :t("showPassword")}
+                      aria-label={showConfirmPassword ? t("hidePassword") : t("showPassword")}
                     >
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -145,7 +194,7 @@ const schema = createResetPasswordSchema(t);
                 ? t("resetPassword.updatingButton")
                 : t("resetPassword.submitButton")}
             >
-             {isSubmitting
+              {isSubmitting
                 ? t("resetPassword.updatingButton")
                 : t("resetPassword.submitButton")}
             </Button>
