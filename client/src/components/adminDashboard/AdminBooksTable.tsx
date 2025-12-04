@@ -326,7 +326,7 @@ const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
                           </span>
                         </td>
                         <td className="py-3 px-4" style={lightTextColorStyle}>
-                          {userMap[book.user_id]}
+                          {userMap[book.user_id] || booksTableTexts.unknownUser}
                         </td>
                         <td className="py-3 px-4" style={lightTextColorStyle}>
                           {new Date(book.date_created).toLocaleDateString(t("common:locale"))}
