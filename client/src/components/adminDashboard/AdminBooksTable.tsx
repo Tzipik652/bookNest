@@ -21,11 +21,9 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAccessibilityStore } from "../../store/accessibilityStore";
 
-interface AdminBooksTableProps {
-  userMap: Record<string, string>;
-}
 
-export const AdminBooksTable = ({ userMap }: AdminBooksTableProps) => {
+
+export const AdminBooksTable = () => {
   const { t } = useTranslation(["adminDashboard", "common"]);
   const booksTableTexts = t("dashboard.booksTable", {
     returnObjects: true,
@@ -326,7 +324,7 @@ const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
                           </span>
                         </td>
                         <td className="py-3 px-4" style={lightTextColorStyle}>
-                          {userMap[book.user_id] || booksTableTexts.unknownUser}
+                          {book.user?.name || booksTableTexts.unknownUser}
                         </td>
                         <td className="py-3 px-4" style={lightTextColorStyle}>
                           {new Date(book.date_created).toLocaleDateString(t("common:locale"))}
