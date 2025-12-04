@@ -34,7 +34,8 @@
       "headerActions": "Actions",
       "deleteConfirm": "Are you sure you want to delete this book? This will also remove all associated comments and favorites.",
       "deleteSuccess": "Book deleted successfully",
-      "deleteFailed": "Failed to delete book"
+      "deleteFailed": "Failed to delete book",
+      "unknownUser":"Unknown User"
     },
     "commentsCard": {
       "cardTitle": "Recent Comments",

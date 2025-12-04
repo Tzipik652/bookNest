@@ -34,7 +34,8 @@
       "headerActions": "פעולות",
       "deleteConfirm": "האם אתה בטוח שברצונך למחוק ספר זה? פעולה זו תסיר גם את כל התגובות והמועדפים המשויכים אליו.",
       "deleteSuccess": "הספר נמחק בהצלחה",
-      "deleteFailed": "המחיקה של הספר נכשלה"
+      "deleteFailed": "המחיקה של הספר נכשלה",
+      "unknownUser":"משתמש לא ידוע"
     },
     "commentsCard": {
       "cardTitle": "תגובות אחרונות",
