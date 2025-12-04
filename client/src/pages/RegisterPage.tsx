@@ -18,7 +18,8 @@ import { useUserStore } from "../store/useUserStore";
 import { register } from "../services/userService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createRegisterSchema, RegisterFormValues } from "../schemas/register.schema"; import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { createRegisterSchema, RegisterFormValues } from "../schemas/register.schema"; 
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
@@ -31,6 +32,10 @@ export function RegisterPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  // 1. זיהוי כיוון השפה
+  const isRtl = t("dir") === "rtl";
+  
   const schema = createRegisterSchema(t);
 
   const getRedirectPath = () => {
@@ -69,6 +74,24 @@ export function RegisterPage() {
     }
   };
 
+  // אובייקט עיצוב משותף לכל השדות למניעת חזרות בקוד
+  const commonTextFieldStyles = {
+    "& .MuiOutlinedInput-root": {
+       flexDirection: isRtl ? "row-reverse" : "row",
+    },
+    "& .MuiOutlinedInput-input": {
+        textAlign: isRtl ? "right" : "left",
+    }
+  };
+
+  const commonLabelProps = {
+    sx: {
+      transformOrigin: isRtl ? "right top" : "left top",
+      left: isRtl ? "auto" : 0,
+      right: isRtl ? 0 : "auto",
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -100,14 +123,21 @@ export function RegisterPage() {
           <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {error && <Alert severity="error">{error}</Alert>}
 
+            {/* --- שם מלא --- */}
             <TextField
               label={t("register.nameLabel")}
               fullWidth
               {...formRegister("name")}
               error={!!errors.name}
               helperText={errors.name?.message}
+              
+              // תיקוני RTL
+              dir={isRtl ? "rtl" : "ltr"}
+              InputLabelProps={commonLabelProps}
+              sx={commonTextFieldStyles}
             />
 
+            {/* --- אימייל --- */}
             <TextField
               label={t("register.emailLabel")}
               type="email"
@@ -115,8 +145,14 @@ export function RegisterPage() {
               {...formRegister("email")}
               error={!!errors.email}
               helperText={errors.email?.message}
+
+              // תיקוני RTL
+              dir={isRtl ? "rtl" : "ltr"}
+              InputLabelProps={commonLabelProps}
+              sx={commonTextFieldStyles}
             />
 
+            {/* --- סיסמה --- */}
             <TextField
               label={t("register.passwordLabel")}
               type={showPassword ? "text" : "password"}
@@ -124,6 +160,12 @@ export function RegisterPage() {
               {...formRegister("password")}
               error={!!errors.password}
               helperText={errors.password?.message}
+              
+              // תיקוני RTL
+              dir={isRtl ? "rtl" : "ltr"}
+              InputLabelProps={commonLabelProps}
+              sx={commonTextFieldStyles}
+
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -135,6 +177,7 @@ export function RegisterPage() {
               }}
             />
 
+            {/* --- אימות סיסמה --- */}
             <TextField
               label={t("register.confirmPasswordLabel")}
               type={showConfirmPassword ? "text" : "password"}
@@ -142,6 +185,12 @@ export function RegisterPage() {
               {...formRegister("confirmPassword")}
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword?.message}
+              
+              // תיקוני RTL
+              dir={isRtl ? "rtl" : "ltr"}
+              InputLabelProps={commonLabelProps}
+              sx={commonTextFieldStyles}
+
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">

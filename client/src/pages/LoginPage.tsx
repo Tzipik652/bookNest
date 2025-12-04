@@ -14,8 +14,10 @@ import {
   Alert,
   Container,
   Divider,
-  CircularProgress,
+  InputAdornment, // הוספתי
+  IconButton,     // הוספתי
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material"; // הוספתי
 import { useUserStore } from "../store/useUserStore";
 import { loginLocal, loginWithGoogle } from "../services/userService";
 import { useForm } from "react-hook-form";
@@ -25,13 +27,16 @@ import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function LoginPage() {
-  const { t } = useTranslation(["auth","common","validation"]);
+  const { t } = useTranslation(["auth", "common", "validation"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useUserStore();
-const schema = createLoginSchema(t);
+  const schema = createLoginSchema(t);
+    const isRtl = t("dir") === "rtl";
+
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // הוספתי את ה-State הזה
 
   const getRedirectPath = () => {
     const params = new URLSearchParams(location.search);
@@ -124,11 +129,27 @@ const schema = createLoginSchema(t);
 
               <TextField
                 label={t("login.passwordLabel")}
-                type="password"
+                // כאן השינוי: סוג השדה משתנה בהתאם ל-State
+                type={showPassword ? "text" : "password"}
                 fullWidth
                 {...register("password")}
                 error={!!errors.password}
                 helperText={errors.password?.message}
+                dir={isRtl ? "rtl" : "ltr"}
+                // הוספת האייקון של העין
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </CardContent>
 
@@ -139,7 +160,6 @@ const schema = createLoginSchema(t);
                 fullWidth
                 size="large"
                 disabled={isSubmitting}
-                startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
                 aria-label={isSubmitting
                   ? t("login.loggingInButton")
                   : t("login.submitButton")}
