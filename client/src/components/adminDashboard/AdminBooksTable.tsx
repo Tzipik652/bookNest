@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Card,
   CardHeader,
@@ -39,6 +39,7 @@ export const AdminBooksTable = () => {
   
   // Pagination
   const [page, setPage] = useState(1);
+    const prevPageRef = useRef(page);
   const [totalPages, setTotalPages] = useState(1);
   const ITEMS_PER_PAGE = 20;
 
