@@ -36,7 +36,7 @@ export function LoginPage() {
     const isRtl = t("dir") === "rtl";
 
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // הוספתי את ה-State הזה
+  const [showPassword, setShowPassword] = useState(false); 
 
   const getRedirectPath = () => {
     const params = new URLSearchParams(location.search);

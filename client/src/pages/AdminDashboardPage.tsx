@@ -180,11 +180,7 @@ export function AdminDashboardPage() {
         <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
           {adminTexts.booksMgtTitle}
         </Typography>
-        <AdminBooksTable
-          books={books}
-          userMap={userMap}
-          isLoading={isLoading}
-        />
+        <AdminBooksTable/>
 
         {/* Users Management Section */}
         <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
