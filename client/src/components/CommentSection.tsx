@@ -64,7 +64,6 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
 
       const commentsWithUserReaction = await Promise.all(
         loadedComments.map(async (comment) => {
-          console.log(comment);
           const userReaction = currentUser? await getUserReactionOnComment(comment.id, currentUser._id) : null;
             
           return {
