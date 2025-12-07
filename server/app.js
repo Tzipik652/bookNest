@@ -9,6 +9,8 @@ import commentReactionRouter from "./routes/commentReactionRouter.js";
 import authRouter from "./routes/authRouter.js";
 import contactRouter from "./routes/contactRouter.js";
 import categoryRouter from './routes/categoryRouter.js';
+import loansRouter from './routes/loansRouter.js';
+import userCopiesRouter from './routes/userCopiesRouter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import path from "path";
 import { fileURLToPath } from "url";
@@ -35,6 +37,10 @@ app.use("/comments", commentRouter);
 app.use("/comment-reactions", commentReactionRouter);
 app.use("/contact", contactRouter);
 app.use("/api/auth", authRouter);
+app.use("loans", loansRouter);
+app.use("userCopies", userCopiesRouter);
+
+
 
 // Error handling
 app.use(errorHandler);
