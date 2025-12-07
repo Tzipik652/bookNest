@@ -1,5 +1,5 @@
 import axios from "axios";
-import { User } from "../types";
+import { PaginatedResponse, User } from "../types";
 import { useUserStore } from "../store/useUserStore";
 import api from "../lib/axiosInstance";
 const API_BASE_URL =
@@ -100,4 +100,16 @@ export const deleteUser = async (userId: string): Promise<void> => {
       handleAxiosError(error);
     }
 }
-
+export const getPaginatedUsers = async (params = { page: 1, limit: 20 }) :Promise<PaginatedResponse<User>>=> {
+  try {
+     const query = new URLSearchParams({ 
+            page: (params.page || 1).toString(), 
+            limit: (params.limit || 20).toString() 
+          });
+          const response = await api.get(`${API_BASE_URL}/paginated/?${query.toString()}`);
+          return response.data; 
+  } catch (error) {
+    console.error('Error fetching users from API:', error);
+        throw error;
+  }
+}

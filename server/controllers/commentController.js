@@ -112,12 +112,33 @@ export const updateComment = catchAsync(async (req, res, next) => {
   res.status(200).json({ success });
 });
 
+// export const getAllComments = catchAsync(async (req, res, next) => {  
+//   const user= req.user;
+
+//   if (!user || user.role !== 'admin') {
+//     throw new AppError("Unauthorized: Admin access required", 403);
+//   }
+//   const comments = await CommentModel.findAll();
+//   res.status(200).json(comments);
+// });
 export const getAllComments = catchAsync(async (req, res, next) => {
-  const user= req.user;
+  const user = req.user;
 
   if (!user || user.role !== 'admin') {
     throw new AppError("Unauthorized: Admin access required", 403);
   }
-  const comments = await CommentModel.findAll();
-  res.status(200).json(comments);
+
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+
+  const { comments, total } = await CommentModel.findAll(page, limit);
+
+  const totalPages = Math.ceil(total / limit);
+
+  res.status(200).json({
+    comments,
+    totalItems: total,
+    totalPages,
+    currentPage: page
+  });
 });

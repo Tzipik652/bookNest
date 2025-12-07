@@ -263,7 +263,7 @@ export function BookDetailsPage() {
       </Box>
 
       <Box mt={8}>
-        <CommentSection bookId={book._id} bookOwnerId={book.user_id} />
+        <CommentSection bookId={book._id} bookOwnerId={book.user_id}/>
       </Box>
 
       <Dialog

@@ -12,6 +12,8 @@ import categoryRouter from './routes/categoryRouter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import path from "path";
 import { fileURLToPath } from "url";
+import dashboardStats from './routes/dashboardRouter.js';
+
 
 dotenv.config();
 
@@ -35,6 +37,8 @@ app.use("/comments", commentRouter);
 app.use("/comment-reactions", commentReactionRouter);
 app.use("/contact", contactRouter);
 app.use("/api/auth", authRouter);
+app.use("/dashboard", dashboardStats);
+
 
 // Error handling
 app.use(errorHandler);

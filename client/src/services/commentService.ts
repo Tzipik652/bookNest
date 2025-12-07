@@ -1,7 +1,7 @@
 import api from "../lib/axiosInstance";
 import axios from "axios";
 import { useUserStore } from "../store/useUserStore";
-import { Comment } from "../types";
+import { Comment, PaginatedResponse } from "../types";
 
 const API_BASE_URL =
   `${import.meta.env.VITE_SERVER_URL}/comments` ||
@@ -114,14 +114,14 @@ export async function getCommentById(commentId: string): Promise<Comment> {
     throw error;
   }
 }
-export async function getAllComments(): Promise<Comment[]> {
+export async function getAllComments(page = 1, limit = 10): Promise<PaginatedResponse<Comment>> {
   const user = useUserStore.getState().user;
   const token = useUserStore.getState().token;
 
   if (!token) throw new Error("Must be logged in to add books");
   if (user?.role !== "admin") throw new Error("Admin access required");
   try {
-    const res = await api.get(`${API_BASE_URL}`);
+    const res = await api.get<PaginatedResponse<Comment>>(`${API_BASE_URL}?page=${page}&limit=${limit}`);
     return res.data;
   } catch (error) {
     handleAxiosError(error);

@@ -10,6 +10,9 @@ import {
 } from "lucide-react";
 import { Box, Typography, Skeleton, useTheme, alpha } from '@mui/material';
 import { useAccessibilityStore } from "../../store/accessibilityStore";
+import { toast } from "sonner";
+import { getDashboardStats } from "../../services/adminService";
+import { getFavoritesCount } from "../../services/favoriteService";
 
 interface StatTranslationKeys {
   totalBooks: string;
@@ -62,14 +65,6 @@ function useAnimatedNumber(
 }
 
 interface StatsCardsProps {
-  favoritesCount: number;
-  totalBooksCount: number;
-  totalUsersCount: number;
-  commentsCount: number;
-  reactionsCount: number;
-  recentUploads: number;
-  isLoading?: boolean;
-  isReactionsLoading?: boolean;
   translationKeys: StatTranslationKeys;
 }
 
@@ -96,26 +91,58 @@ function StatCardSkeleton() {
   );
 }
 
-export function StatsCards({
-  favoritesCount,
-  totalBooksCount,
-  totalUsersCount,
-  commentsCount,
-  reactionsCount,
-  recentUploads,
-  translationKeys,
-  isLoading = false,
-  isReactionsLoading = false,
-}: StatsCardsProps) {
+export function StatsCards({ translationKeys }: StatsCardsProps) {
   const theme = useTheme();
   const { highContrast } = useAccessibilityStore();
   
-  const booksAnim = useAnimatedNumber(totalBooksCount, 2000);
-  const usersAnim = useAnimatedNumber(totalUsersCount, 2200);
-  const commentsAnim = useAnimatedNumber(commentsCount, 2400);
-  const favoritesAnim = useAnimatedNumber(favoritesCount, 2600);
-  const reactionsAnim = useAnimatedNumber(reactionsCount, 2800, isReactionsLoading);
-  const recentAnim = useAnimatedNumber(recentUploads, 2000);
+  // State פנימי לנתונים ולטעינה
+  const [statsData, setStatsData] = useState({
+    booksCount: 0,
+    usersCount: 0,
+    commentsCount: 0,
+    favoritesCount: 0,
+    reactionsCount: 0,
+    recentBooksCount: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  // טעינת הנתונים בתוך הקומפוננטה
+  useEffect(() => {
+    const fetchStats = async () => {
+      setIsLoading(true);
+      try {
+        const [dashboardStats, favorites] = await Promise.all([
+          getDashboardStats(),
+          getFavoritesCount(),
+        ]);
+
+        setStatsData({
+          booksCount: dashboardStats.booksCount || 0,
+          usersCount: dashboardStats.usersCount || 0,
+          commentsCount: dashboardStats.commentsCount || 0,
+          reactionsCount: dashboardStats.reactionsCount || 0,
+          recentBooksCount: dashboardStats.recentBooksCount || 0,
+          favoritesCount: favorites || 0,
+        });
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+        toast.error("Failed to load dashboard statistics");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []); // רץ פעם אחת בטעינה
+
+  // שימוש בנתונים מתוך ה-State המקומי לאנימציות
+  // אנו מעבירים את ה-isLoading המקומי לכל ה-Hooks
+  const booksAnim = useAnimatedNumber(statsData.booksCount, 2000, isLoading);
+  const usersAnim = useAnimatedNumber(statsData.usersCount, 2200, isLoading);
+  const commentsAnim = useAnimatedNumber(statsData.commentsCount, 2400, isLoading);
+  const favoritesAnim = useAnimatedNumber(statsData.favoritesCount, 2600, isLoading);
+  const reactionsAnim = useAnimatedNumber(statsData.reactionsCount, 2800, isLoading);
+  const recentAnim = useAnimatedNumber(statsData.recentBooksCount, 2000, isLoading);
 
   const handleCardClick = (scrollTo?: string) => {
     if (scrollTo) {
@@ -188,6 +215,7 @@ export function StatsCards({
       ? (reactionsAnim.value / commentsAnim.value).toFixed(1)
       : "0.0";
 
+  // תצוגת טעינה (Skeleton) אם isLoading הוא true
   if (isLoading) {
     return (
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: '1fr 1fr 1fr 1fr' }, gap: 3, mb: 4 }}>
@@ -270,7 +298,7 @@ export function StatsCards({
           onClick={() => handleCardClick("total-comments-section")}
           className="group transition-all duration-500 hover:scale-105 hover:shadow-xl cursor-pointer relative overflow-hidden"
           sx={{
-            ...getCardStyles('warning'), // שימוש בכתום
+            ...getCardStyles('warning'),
             borderRadius: 3,
             p: 3,
             boxShadow: theme.shadows[1],
@@ -338,7 +366,7 @@ export function StatsCards({
           onClick={() => handleCardClick("total-books-section")}
           className="group transition-all duration-500 hover:scale-105 hover:shadow-xl cursor-pointer relative overflow-hidden"
           sx={{
-            ...getCardStyles('info'), // שימוש בכחול/אינדיגו
+            ...getCardStyles('info'),
             borderRadius: 3,
             p: 3,
             boxShadow: theme.shadows[1],

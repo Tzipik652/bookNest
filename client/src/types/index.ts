@@ -58,19 +58,40 @@ export interface Comment {
   id: string;
   book_id: string;
   user_id: string;
-  user_name:string; 
-  profile_picture?:string;
   text: string;
   created_at: string;
   updated_at: string;
-  reactions: CommentReaction[];
+  user_name?: string;
+  profile_picture?: string | null;
+  user?: {
+    name: string;
+    email: string;
+    profile_picture?: string | null;
+  };
+  book?: {
+    id: string;
+    title: string;
+  };
+  reaction_counts?: {
+    like: number;
+    dislike: number;
+    happy: number;
+    angry: number;
+  };
+  reactions?: CommentReaction[];
 }
 
 export type CommentWithReactions = Comment & {
   userReaction?: ReactionType;
-  reactionCounts: ReactionCounts;
+  reaction_counts: ReactionCounts;
 };
 
 export type BookWithFavorite = Book & {
   isFavorited: boolean;
 };
+export type PaginatedResponse<T> = {
+  [key: string]: T[] | number; 
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+} & { comments?: T[]; books?: T[]; users?: T[] };
