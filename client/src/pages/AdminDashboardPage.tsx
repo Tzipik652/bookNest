@@ -115,14 +115,6 @@ export function AdminDashboardPage() {
         </Typography>
 
         <StatsCards
-          favoritesCount={stats.favoritesCount}
-          totalBooksCount={stats.booksCount}
-          totalUsersCount={stats.usersCount}
-          commentsCount={stats.commentsCount}
-          reactionsCount={stats.reactionsCount} 
-          recentUploads={stats.recentBooksCount} 
-          isLoading={isLoading}
-          isReactionsLoading={false} 
           translationKeys={adminTexts.stats}
         />
 
