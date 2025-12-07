@@ -126,13 +126,11 @@ export function AdminDashboardPage() {
         <AdminBooksTable/> 
 
         {/* Users Management Section */}
-        <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mt: 5, mb: 2 }}>
+        <Typography variant="h5" component="h2" fontWeight="bold" color="text.primary" sx={{ mt: 5, mb: 2 }} id="users-list-section">
           {adminTexts.usersTitle}
         </Typography>
         <UserList
-          users={users}
           currentUser={currentUser}
-          isLoading={isLoading}
         />
 
         {/* Recent Comments Section */}

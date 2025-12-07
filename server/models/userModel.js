@@ -62,11 +62,42 @@ export async function getUsers() {
 export async function deleteUser(id) {
   const { data, error } = await supabase
     .from('users')
-    .update({ is_deleted: true }) // ⬅️ עדכון דגל המחיקה
+    .update({ is_deleted: true })
     .eq('_id', id)
     .select()
     .single();
 
   if (error) throw error;
   return data;
+}
+
+/**
+ * Fetch a paginated list of users with pagination support.
+ * @param {number} page - Current page number (starting at 1).
+ * @param {number} limit - Maximum items per page.
+ * @returns {Promise<{users: Object[], totalCount: number}>} - The data and total record count.
+ */
+export async function findPaginatedUsers(page = 1, limit = 10, category = null) {
+  try {
+    const pageNum = Math.max(1, page);
+    const limitNum = Math.max(1, limit);
+    const start = (pageNum - 1) * limitNum;
+    const end = start + limitNum - 1;
+
+    const { data, count, error } = await supabase
+      .from("users")
+      .select('*', { count: "exact" })
+      .order("name", { ascending: true })
+      .range(start, end);
+
+    if (error) throw error;
+
+    return {
+    users: data,
+    totalCount: count || 0,
+  };
+  } catch (err) {
+    console.error("Failed to fetch users in findPaginatedUsers model:", err);
+    throw err;
+  }
 }
