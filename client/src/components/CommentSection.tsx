@@ -8,7 +8,6 @@ import {
 } from "../services/commentService";
 import {
   toggleReaction,
-  getCommentReactionCounts,
   getUserReactionOnComment,
 } from "../services/commentReactionService";
 import CommentItem from "./CommentItem";
@@ -63,24 +62,23 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     try {
       const loadedComments = await getComments(bookId);
 
-      const commentsWithReactions = await Promise.all(
+      const commentsWithUserReaction = await Promise.all(
         loadedComments.map(async (comment) => {
-          const reactionCounts = await getCommentReactionCounts(comment);
-          const userReaction = currentUser
-            ? await getUserReactionOnComment(comment.id, currentUser._id)
-            : null;
+          console.log(comment);
+          const userReaction = currentUser? await getUserReactionOnComment(comment.id, currentUser._id) : null;
+            
           return {
             ...comment,
-            reactionCounts,
             userReaction,
+            reaction_counts: comment.reaction_counts || { like: 0, dislike: 0, happy: 0, angry: 0 }
           };
         })
       );
-      setComments(commentsWithReactions);
+      
+      setComments(commentsWithUserReaction);      
     } catch (error) {
       console.error(error);
       toast.error(t("errorLoadFailed"));
-      setIsLoading(false);
     } finally {
       setIsLoading(false);
     }
@@ -101,15 +99,11 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     try {
       const addedComment = await addComment(bookId, newComment.trim());
 
-      const reactionCounts = await getCommentReactionCounts(addedComment);
-      const userReaction = currentUser
-        ? await getUserReactionOnComment(addedComment.id, currentUser._id)
-        : undefined;
-
+      // יצירת תגובה חדשה עם מונים מאופסים (שימוש בשם החדש)
       const commentWithReactions: CommentWithReactions = {
         ...addedComment,
-        reactionCounts,
-        userReaction,
+        reaction_counts: { like: 0, dislike: 0, happy: 0, angry: 0 },
+        userReaction: undefined,
       };
 
       setComments((prevComments) => [commentWithReactions, ...prevComments]);
@@ -129,10 +123,12 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       setIsSubmitting(false);
     }
   };
+
   const handleDeleteComment = async (commentId: string) => {
     try {
       await deleteComment(commentId);
-      await loadComments();
+      // עדכון אופטימי (מחיקה מהרשימה)
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
       toast.success(t("successDelete"));
       setCommentToDelete(null);
     } catch (error) {
@@ -152,12 +148,14 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
 
     setLoadingComments((prev) => new Set(prev).add(commentId));
 
+    // עדכון אופטימי
     setComments((prevComments) =>
       prevComments.map((comment) => {
         if (comment.id !== commentId) return comment;
 
         const wasActive = comment.userReaction === reactionType;
-        const newReactionCounts = { ...comment.reactionCounts };
+        
+        const newReactionCounts = { ...comment.reaction_counts! };
 
         if (wasActive) {
           newReactionCounts[reactionType] = Math.max(
@@ -166,11 +164,12 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
           );
           return {
             ...comment,
-            reactionCounts: newReactionCounts,
+            reaction_counts: newReactionCounts, // עדכון השדה החדש
             userReaction: undefined,
           };
         }
 
+        // החלפת ריאקציה (אם הייתה אחרת)
         if (comment.userReaction) {
           newReactionCounts[comment.userReaction] = Math.max(
             0,
@@ -178,19 +177,20 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
           );
         }
 
+        // הוספת הריאקציה החדשה
         newReactionCounts[reactionType] =
           (newReactionCounts[reactionType] || 0) + 1;
 
         return {
           ...comment,
-          reactionCounts: newReactionCounts,
+          reaction_counts: newReactionCounts, // עדכון השדה החדש
           userReaction: reactionType,
         };
       })
     );
+
     try {
       await toggleReaction(commentId, reactionType);
-
     } catch (error) {
       console.error(error);
       toast.error(t("errorAddFailed"));
@@ -223,6 +223,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
         />
       </Stack>
 
+      {/* Input Area */}
       <Card
         elevation={0}
         sx={{
