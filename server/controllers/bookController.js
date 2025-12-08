@@ -200,6 +200,7 @@ export const deleteBook = catchAsync(async (req, res, next) => {
 
 export const searchBooks = catchAsync(async (req, res) => {
   const searchTerm = req.query.s || "";
+  console.log("Search term:", searchTerm);
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const categoryId = req.query.category;
