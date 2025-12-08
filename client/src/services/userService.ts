@@ -113,3 +113,16 @@ export const getPaginatedUsers = async (params = { page: 1, limit: 20 }) :Promis
         throw error;
   }
 }
+export const searchUsers = async (searchTerm: string, params = { page: 1, limit: 20 }) :Promise<PaginatedResponse<User>>=> {
+  try {
+     const query = new URLSearchParams({
+            s: searchTerm,
+            page: (params.page || 1).toString(),
+            limit: (params.limit || 20).toString()
+          });
+          const response = await api.get(`${API_BASE_URL}/search/?${query.toString()}`);
+          return response.data; 
+  } catch (error) {
+    handleAxiosError(error);
+  }
+}

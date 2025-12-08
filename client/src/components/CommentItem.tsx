@@ -41,7 +41,6 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({
       { type: "happy", emoji: "😀", color: "#ec4899" },
       { type: "angry", emoji: "😠", color: "#f59e0b" },
     ];
-console.log(comment);
 
   return (
     <Card
@@ -64,15 +63,22 @@ console.log(comment);
             justifyContent="space-between"
             alignItems="flex-start"
           >
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={0} alignItems="center">
               <Avatar
-                sx={{ width: 40, height: 40, bgcolor: "primary.main" }}
+                sx={{
+                  width: 40,
+                  height: 40,
+                  bgcolor: "primary.main",
+                  mr: commonDir === 'ltr' ? 2 : 0,
+                  ml: commonDir === 'rtl' ? 2 : 0,
+                }}
                 src={comment.user?.profile_picture || undefined}
               >
                 {!comment.user?.profile_picture &&
                   comment.user?.name.charAt(0).toUpperCase()}
               </Avatar>
-              <Stack spacing={0.5}>
+              
+              <Stack spacing={0.5} >
                 <Typography variant="subtitle1" fontWeight={600} color="text.primary">
                   {comment.user?.name}
                 </Typography>
@@ -124,7 +130,7 @@ console.log(comment);
           <Stack direction="row" spacing={1}>
             {reactions.map(({ type, emoji, color }) => {
               const count = comment.reaction_counts?.[type] || 0;
-              const isActive = comment.userReaction === type;
+              const isActive = comment.user_reaction === type;
 
               return (
                 <Button

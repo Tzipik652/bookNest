@@ -8,7 +8,7 @@ import crypto from "crypto";
 import AppError from "../utils/AppError.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { registerSchema } from "../validations/userValidation.js";
-import { getUsers, updateUser, deleteUser as deleteUserRecord, findPaginatedUsers } from "../models/userModel.js";
+import { getUsers, updateUser, deleteUser as deleteUserRecord, findPaginatedUsers, searchUsersByNameOrEmail } from "../models/userModel.js";
 
 dotenv.config();
 
@@ -290,6 +290,25 @@ export const getPaginatedUsers = catchAsync(async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
   const { users, totalCount } = await findPaginatedUsers(page, limit);
 
+  const totalPages = Math.ceil(totalCount / limit);
+  res.json({
+    users: users,
+    currentPage: page,
+    limit: limit,
+    totalItems: totalCount,
+    totalPages: totalPages,
+  });
+});
+export const searchUsers = catchAsync(async (req, res, next) => {
+  const user = req.user;
+  if (!user || user.role !== "admin") {
+    throw new AppError("Forbidden", 403);
+  }
+  const searchTerm = req.query.s || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+  const { users, totalCount } = await searchUsersByNameOrEmail(searchTerm, page, limit);  
   const totalPages = Math.ceil(totalCount / limit);
   res.json({
     users: users,

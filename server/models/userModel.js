@@ -101,3 +101,28 @@ export async function findPaginatedUsers(page = 1, limit = 10, category = null) 
     throw err;
   }
 }
+export async function searchUsersByNameOrEmail(searchTerm, page = 1, limit = 10) {
+  try {
+    const pageNum = Math.max(1, page);
+    const limitNum = Math.max(1, limit);
+    const start = (pageNum - 1) * limitNum;
+    const end = start + limitNum - 1;
+
+    const { data, count, error } = await supabase
+      .from("users")
+      .select("*",{ count: "exact" })
+      .or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`)
+      .order("name", { ascending: true })
+      .range(start, end);
+
+    if (error) throw error;
+
+    return {
+      users: data,
+      totalCount: count || 0,
+    };
+  } catch (err) {
+    console.error("Failed to search users in searchUsersByNameOrEmail model:", err);
+    throw err;
+  }
+}

@@ -81,10 +81,10 @@ export interface Comment {
   reactions?: CommentReaction[];
 }
 
-export type CommentWithReactions = Comment & {
-  userReaction?: ReactionType;
+export interface CommentWithReactions extends Omit<Comment, 'reaction_counts'> {
   reaction_counts: ReactionCounts;
-};
+  user_reaction?: ReactionType | null;
+}
 
 export type BookWithFavorite = Book & {
   isFavorited: boolean;
