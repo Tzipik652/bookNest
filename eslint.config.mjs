@@ -23,11 +23,31 @@ export default [
     plugins: {
       react: reactPlugin,
       "@typescript-eslint": tsPlugin,
+      "unused-imports": unusedImports,
     },
     rules: {
-      "no-unused-vars": "warn",
-      "react/prop-types": "off"
-    }
+      "react/prop-types": "off",
+
+      // מכבים את הכללים הרגילים כדי למנוע כפילויות
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+
+      // --- הגדרות לאזהרה בלבד (Warning) ---
+      
+      // אזהרה על imports שלא בשימוש (צבע צהוב)
+      "unused-imports/no-unused-imports": "warn",
+      
+      // אזהרה על משתנים שלא בשימוש (צבע צהוב)
+      "unused-imports/no-unused-vars": [
+        "warn",
+        {
+          "vars": "all",
+          "varsIgnorePattern": "^_",
+          "args": "after-used",
+          "argsIgnorePattern": "^_",
+        },
+      ],
+    },
   },
 
   // צד שרת - Node + TS
@@ -48,9 +68,26 @@ export default [
     },
     plugins: {
       "@typescript-eslint": tsPlugin,
+      "unused-imports": unusedImports,
     },
-    rules: {
-      "no-unused-vars": "warn"
-    }
+   rules: {
+      // גם בשרת - מכבים את הרגיל
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+
+      // --- הגדרות לאזהרה בלבד (Warning) ---
+      
+      "unused-imports/no-unused-imports": "warn",
+      
+      "unused-imports/no-unused-vars": [
+        "warn",
+        {
+          "vars": "all",
+          "varsIgnorePattern": "^_",
+          "args": "after-used",
+          "argsIgnorePattern": "^_",
+        },
+      ],
+    },
   }
 ];
