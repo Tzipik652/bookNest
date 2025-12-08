@@ -130,7 +130,7 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({
           <Stack direction="row" spacing={1}>
             {reactions.map(({ type, emoji, color }) => {
               const count = comment.reaction_counts?.[type] || 0;
-              const isActive = comment.userReaction === type;
+              const isActive = comment.user_reaction === type;
 
               return (
                 <Button

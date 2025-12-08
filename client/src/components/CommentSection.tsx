@@ -62,19 +62,19 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     try {
       const loadedComments = await getComments(bookId);
 
-      const commentsWithUserReaction = await Promise.all(
-        loadedComments.map(async (comment) => {
-          const userReaction = currentUser? await getUserReactionOnComment(comment.id, currentUser._id) : null;
+      // const commentsWithUserReaction = await Promise.all(
+      //   loadedComments.map(async (comment) => {
+      //     const userReaction = currentUser? await getUserReactionOnComment(comment.id, currentUser._id) : null;
             
-          return {
-            ...comment,
-            userReaction,
-            reaction_counts: comment.reaction_counts || { like: 0, dislike: 0, happy: 0, angry: 0 }
-          };
-        })
-      );
+      //     return {
+      //       ...comment,
+      //       userReaction,
+      //       reaction_counts: comment.reaction_counts || { like: 0, dislike: 0, happy: 0, angry: 0 }
+      //     };
+      //   })
+      // );
       
-      setComments(commentsWithUserReaction);      
+      setComments(loadedComments);      
     } catch (error) {
       console.error(error);
       toast.error(t("errorLoadFailed"));
@@ -102,7 +102,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       const commentWithReactions: CommentWithReactions = {
         ...addedComment,
         reaction_counts: { like: 0, dislike: 0, happy: 0, angry: 0 },
-        userReaction: undefined,
+        user_reaction: undefined,
       };
 
       setComments((prevComments) => [commentWithReactions, ...prevComments]);
@@ -152,7 +152,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       prevComments.map((comment) => {
         if (comment.id !== commentId) return comment;
 
-        const wasActive = comment.userReaction === reactionType;
+        const wasActive = comment.user_reaction === reactionType;
         
         const newReactionCounts = { ...comment.reaction_counts! };
 
@@ -169,10 +169,10 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
         }
 
         // החלפת ריאקציה (אם הייתה אחרת)
-        if (comment.userReaction) {
-          newReactionCounts[comment.userReaction] = Math.max(
+        if (comment.user_reaction) {
+          newReactionCounts[comment.user_reaction] = Math.max(
             0,
-            (newReactionCounts[comment.userReaction] || 0) - 1
+            (newReactionCounts[comment.user_reaction] || 0) - 1
           );
         }
 
@@ -183,7 +183,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
         return {
           ...comment,
           reaction_counts: newReactionCounts, // עדכון השדה החדש
-          userReaction: reactionType,
+          user_reaction: reactionType,
         };
       })
     );

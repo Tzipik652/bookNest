@@ -60,7 +60,7 @@ export async function create({ bookId, userId, text }) {
 //       c.users?.auth_provider == "google" ? c.users?.profile_picture : null,
 //   }));
 // }
-export async function findByBookId(bookId) {
+export async function findByBookId(bookId, userId=null) {
   const { data: comments, error, count } = await supabase
     .from("comments")
     .select(`
@@ -78,7 +78,7 @@ export async function findByBookId(bookId) {
 
   const { data: reactionsData, error: reactionsError } = await supabase
     .from("comment_reactions")
-    .select("comment_id, reaction_type")
+    .select("comment_id, reaction_type, user_id")
     .in("comment_id", commentIds);
 
   if (reactionsError) {
@@ -94,11 +94,14 @@ export async function findByBookId(bookId) {
       happy: myReactions.filter(r => r.reaction_type === 'happy').length,
       angry: myReactions.filter(r => r.reaction_type === 'angry').length,
     };
-
+const userReaction = userId 
+        ? myReactions.find(r => r.user_id === userId)?.reaction_type 
+        : null;
     return {
       ...c,
       user: c.users ? { ...c.users } : null,
-      reaction_counts: reactionCounts
+      reaction_counts: reactionCounts,
+      user_reaction: userReaction
     };
   }
   );
