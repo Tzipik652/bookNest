@@ -338,13 +338,6 @@ export async function searchBooks(searchTerm, page, limit, categoryId) {
       query = query.eq("category", categoryId);
     }
     const { data, count, error } = await query.range(from, to);
-
-    // if (error) {
-    //   console.error("Error searching books:", error);
-
-    //   throw error
-    // };
-
     return {
       books: data.map(normalizeBook),
       totalPages: Math.ceil(count / limit),
