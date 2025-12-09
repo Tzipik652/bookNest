@@ -242,10 +242,20 @@ export const getCachedRecommendations = catchAsync(async (req, res, next) => {
 
     const recommendedIds = recommendationsWithReasons.map((rec) => rec.id);
     const fullBooks = await bookModel.findBooksByIds(recommendedIds);
+//----
+const booksWithReasons = fullBooks.map((book) => {
+  const matchingRec = recommendationsWithReasons.find(
+        (rec) => rec.id === book._id.toString() || rec.id === book._id
+      );
+  return {
+    ...book,
+    recommendation_reason: matchingRec ? matchingRec.reason : "No reason provided",
+  };
+});
+//----
+    await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(booksWithReasons));
 
-    await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(fullBooks));
-
-    return res.status(200).json(fullBooks);
+    return res.status(200).json(booksWithReasons);
   } catch (error) {
     console.error("AI Recommendation Error:", error);
 
