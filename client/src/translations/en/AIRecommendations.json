@@ -6,5 +6,6 @@
   "buttonGenerating": "Generating...",
   "buttonGetMore": "Get More Recommendations",
   "noRecommendationsTitle": "No Recommendations Available",
-  "noRecommendationsText": "Add some books to your favorites to get started"
+  "noRecommendationsText": "Add some books to your favorites to get started",
+  "whyFitsYou": "Why this fits you?"
 }
