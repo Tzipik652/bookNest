@@ -33,6 +33,16 @@ const LazyBookDetailsPage = React.lazy(() =>
     default: module.BookDetailsPage,
   }))
 );
+const LazyLoansPage = React.lazy(() =>
+  import("./pages/LoansPage").then((module) => ({
+    default: module.LoansPage,
+  }))
+);
+const LazyLoanChatPage = React.lazy(() =>
+  import("./pages/LoanChatPage").then((module) => ({
+    default: module.LoanChatPage,
+  }))
+);
 const LazyAddBookPage = React.lazy(() =>
   import("./pages/AddBookPage").then((module) => ({
     default: module.AddBookPage,
@@ -131,7 +141,6 @@ function App() {
     screenReader,
   } = useAccessibilityStore();
 
-  
   useEffect(() => {
     document.documentElement.dir = i18n.dir(i18n.language);
 
@@ -149,7 +158,7 @@ function App() {
 
       <Navbar />
       <AccessibilityMenu />
-      
+
       {/* Global Accessibility Overrides */}
       <GlobalStyles
         styles={{
@@ -157,8 +166,8 @@ function App() {
             backgroundColor: darkMode
               ? "#121212"
               : highContrast
-              ? "#000"
-              : "#fff",
+                ? "#000"
+                : "#fff",
 
             color: darkMode || highContrast ? "#fff" : "#000",
             fontSize: largeText ? "1.2rem" : "1rem",
@@ -190,7 +199,22 @@ function App() {
             <Route path="/home" element={<LazyHomePage />} />
 
             <Route path="/book/:id" element={<LazyBookDetailsPage />} />
-
+            <Route
+              path="/loans"
+              element={
+                <ProtectedRoute>
+                  <LazyLoansPage />
+                </ProtectedRoute>
+              }
+            />
+             <Route
+              path="/loans/:loanId"
+              element={
+                <ProtectedRoute>
+                  <LazyLoanChatPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/add-book"
               element={

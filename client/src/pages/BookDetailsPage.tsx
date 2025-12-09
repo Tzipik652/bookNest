@@ -33,6 +33,7 @@ import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
 import Narrator from "../components/Narrator";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { BookLoanAvailability } from "../components/BookLoanAvailability";
 
 export function BookDetailsPage() {
   const { t } = useTranslation(["bookDetails", "common"]);
@@ -154,7 +155,7 @@ export function BookDetailsPage() {
 
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
                   <Chip
-                    label={t(`category:${book.category.replace(/\s+/g, '')}`)}
+                    label={t(`category:${book.category.replace(/\s+/g, "")}`)}
                     variant="outlined"
                   />
 
@@ -265,7 +266,9 @@ export function BookDetailsPage() {
       <Box mt={8}>
         <CommentSection bookId={book._id} bookOwnerId={book.user_id} />
       </Box>
-
+      <Box mt={8}>
+        <BookLoanAvailability bookId={book._id} bookTitle={book.title} />
+      </Box>
       <Dialog
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
