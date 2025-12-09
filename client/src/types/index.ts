@@ -25,7 +25,12 @@ export interface Book {
   date_created: string;
   favorites_count?: number;
 }
-
+export interface RecommendedBook extends Book {
+  recommendation_reason: {
+    en: string;
+    he: string;
+  };
+}
 export interface Favorite {
   userId: string;
   bookId: string;
@@ -81,13 +86,17 @@ export interface Comment {
   reactions?: CommentReaction[];
 }
 
-export type CommentWithReactions = Comment & {
-  userReaction?: ReactionType;
+export interface CommentWithReactions extends Omit<Comment, 'reaction_counts'> {
   reaction_counts: ReactionCounts;
-};
+  user_reaction?: ReactionType | null;
+}
 
 export type BookWithFavorite = Book & {
   isFavorited: boolean;
+  recommendation_reason?: {
+    en: string;
+    he: string;
+  };
 };
 export type PaginatedResponse<T> = {
   [key: string]: T[] | number; 

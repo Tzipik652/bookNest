@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js"
@@ -13,7 +13,6 @@
   "type": "module",
   "dependencies": {
     "@google/genai": "^1.28.0",
-    "@react-oauth/google": "^0.12.2",
     "@supabase/supabase-js": "^2.79.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",

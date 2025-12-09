@@ -10,8 +10,12 @@ export const getComments = catchAsync(async (req, res, next) => {
   if (!bookId) {
     throw new AppError("Book ID is required", 400);
   }
+const user= req.user;
 
-  const comments = await CommentModel.findByBookId(bookId);
+//   if (!user) {
+//     throw new AppError("Must be logged in to view comments", 401);
+//   }
+  const comments = await CommentModel.findByBookId(bookId,user?._id);
   res.status(200).json(comments);
 });
 

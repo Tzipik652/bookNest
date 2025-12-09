@@ -29,18 +29,6 @@ export async function getFavoriteBooks(): Promise<Book[]> {
   }
 };
 
-
-
-export async function isFavorite(bookId: string): Promise<boolean> {
- try {
-    const res = await api.get(`${API_BASE_URL}/${bookId}`);
-    return res.data.favorite;
-  } catch (error) {
-    handleAxiosError(error);
-  }
-};
-
-
 export async function toggleFavorite(bookId: string) {
   try {
     const res = await api.post(
@@ -52,15 +40,6 @@ export async function toggleFavorite(bookId: string) {
     handleAxiosError(error);
   }
 }
-
-export async function getBookLikes(bookId: string): Promise<number> {
- try {
-    const res = await api.get(`${API_BASE_URL}/count/${bookId}`);
-    return res.data;
-  } catch (error) {
-    handleAxiosError(error);
-  }
-};
 
 export async function getFavoritesCount(): Promise<number> {
   const user = useUserStore.getState().user;

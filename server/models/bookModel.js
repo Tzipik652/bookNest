@@ -321,28 +321,31 @@ export const getBooksByCategory = async (category) => {
 export async function searchBooks(searchTerm, page, limit, categoryId) {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
+  console.log('in search book in model');
+  try {
 
-  let query = supabase
-    .from("books")
-    .select(bookSelectQuery, { count: "exact" })
-    .order("title", { ascending: true });
+    let query = supabase
+      .from("books")
+      .select(bookSelectQuery, { count: "exact" })
+      .order("title", { ascending: true });
 
-  if (searchTerm) {
-    query = query.or(
-      `title.ilike.%${searchTerm}%,author.ilike.%${searchTerm}%`
-    );
+    if (searchTerm) {
+      query = query.or(
+        `title.ilike.%${searchTerm}%,author.ilike.%${searchTerm}%`
+      );
+    }
+    if (categoryId) {
+      query = query.eq("category", categoryId);
+    }
+    const { data, count, error } = await query.range(from, to);
+    return {
+      books: data.map(normalizeBook),
+      totalPages: Math.ceil(count / limit),
+    };
+  } catch (error) {
+    console.error("Error in searchBooks model function:", error);
+    throw error;
   }
-  if (categoryId) {
-    query = query.eq("category", categoryId);
-  }
-  const { data, count, error } = await query.range(from, to);
-
-  if (error) throw error;
-
-  return {
-    books: data.map(normalizeBook),
-    totalPages: Math.ceil(count / limit),
-  };
 }
 
 export default {
