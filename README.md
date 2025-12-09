@@ -1,2 +1,6 @@
-# bookNest
-BookNest: AI-Powered Book Management &amp; Recommendation System. Full-stack web app (Node.js, Express, React, MongoDB) with Google Gemini AI. Users manage book collections, get AI-generated summaries, and personalized recommendations. Features secure auth (local/Google OAuth) and CRUD for books. Modern, intuitive, and designed for book lovers.
+# BookNest
+AI-Powered Book Management & Recommendation System
+
+Full-stack web app using Node.js, React (Vite), Supabase, and Redis. Features secure authentication, CRUD operations for books, AI-generated summaries, personalized recommendations, and multilingual support.
+
+🌐 **Live Demo:** [View on Render](https://booknest-client-mepp.onrender.com)

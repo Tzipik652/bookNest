@@ -16,10 +16,10 @@ import {
   DialogActions,
   Skeleton,
 } from "@mui/material";
+import { Button as ShadcnButton } from "../components/ui/button";
 import {
   Favorite,
   FavoriteBorder,
-  ArrowBack,
   Edit,
   Delete,
   AutoAwesome,
@@ -30,7 +30,9 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useDynamicTheme } from "../theme";
 import { Book, BookWithFavorite } from "../types";
 import { useTranslation } from "react-i18next";
-import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
+import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
+import Narrator from "../components/Narrator";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 export function BookDetailsPage() {
   const { t } = useTranslation(["bookDetails", "common"]);
@@ -87,8 +89,7 @@ export function BookDetailsPage() {
   }
 
   const isOwner = currentUser?._id === book.user_id;
-  const isAdmin = currentUser?.role === 'admin';
-
+  const isAdmin = currentUser?.role === "admin";
 
   const handleFavoriteToggle = () => {
     if (!currentUser) {
@@ -115,14 +116,18 @@ export function BookDetailsPage() {
       py={6}
     >
       <Box maxWidth="md" mx="auto" px={2}>
-        <Button
-          startIcon={<ArrowBack />}
+        <ShadcnButton
+          variant="ghost"
           onClick={() => navigate(-1)}
-          variant="text"
-          sx={{ mb: 3 }}
+          aria-label={t("common:back")}
+          className="mb-6 gap-2"
         >
-          {t("common:buttonGoBack")}
-        </Button>
+          {t("common:dir") === "rtl" ? (
+            <ArrowRight className="h-4 w-4" />
+          ) : null}
+          {t("common:dir") === "ltr" ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t("common:back")}
+        </ShadcnButton>
 
         <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={4}>
           <Box flex={1}>
@@ -148,7 +153,10 @@ export function BookDetailsPage() {
                 </Typography>
 
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
-                  <Chip label={book.category} variant="outlined" />
+                  <Chip
+                    label={t(`category:${book.category.replace(/\s+/g, '')}`)}
+                    variant="outlined"
+                  />
 
                   {book.price && (
                     <Typography variant="h6">
@@ -166,6 +174,18 @@ export function BookDetailsPage() {
                     }
                     onClick={handleFavoriteToggle}
                     disabled={toggleMutation.isPending}
+                    sx={{
+                      gap: 1,
+                      "& .MuiButton-endIcon": {
+                        margin: 0,
+                      },
+                      alignItems: "center",
+                    }}
+                    aria-label={
+                      book.isFavorited
+                        ? t("buttonRemoveFavorite")
+                        : t("buttonAddFavorite")
+                    }
                   >
                     {book.isFavorited
                       ? t("buttonRemoveFavorite")
@@ -178,6 +198,14 @@ export function BookDetailsPage() {
                         variant="outlined"
                         startIcon={<Edit />}
                         onClick={() => navigate(`/edit-book/${book._id}`)}
+                        sx={{
+                          gap: 1,
+                          "& .MuiButton-endIcon": {
+                            margin: 0,
+                          },
+                          alignItems: "center",
+                        }}
+                        aria-label={t("common:buttonEdit")}
                       >
                         {t("common:buttonEdit")}
                       </Button>
@@ -187,6 +215,14 @@ export function BookDetailsPage() {
                         color="error"
                         startIcon={<Delete />}
                         onClick={() => setShowDeleteDialog(true)}
+                        sx={{
+                          gap: 1,
+                          "& .MuiButton-endIcon": {
+                            margin: 0,
+                          },
+                          alignItems: "center",
+                        }}
+                        aria-label={t("common:buttonDelete")}
                       >
                         {t("common:buttonDelete")}
                       </Button>
@@ -195,7 +231,7 @@ export function BookDetailsPage() {
                 </Box>
 
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                 {t("favoritesCount", { count: book.favorites_count })}
+                  {t("favoritesCount", { count: book.favorites_count })}
                 </Typography>
 
                 <Typography variant="h6" gutterBottom>
@@ -206,17 +242,17 @@ export function BookDetailsPage() {
                 </Typography>
 
                 <Box p={3} borderRadius={2} border="1px solid #e0e0e0" mb={3}>
-                  <Box display="flex" alignItems="center" gap={1} mb={1}>
+                  <Box display="flex" alignItems="center" gap={1} mb={0}>
                     <AutoAwesome color="primary" />
                     <Typography variant="h6">{t("headerAISummary")}</Typography>
                   </Box>
-                  <Typography variant="body1" color="text.secondary">
-                    {book.ai_summary}
-                  </Typography>
+                  <Box mt={2}>
+                    <Narrator text={book.ai_summary} />
+                  </Box>
                 </Box>
 
                 <Typography variant="body2" color="text.secondary">
-                 {t("uploadedByPrefix", { userName: book.user?.name })}
+                  {t("uploadedByPrefix", { userName: book.user?.name })}
                   <br />
                   {new Date(book.date_created).toLocaleDateString()}
                 </Typography>
@@ -227,7 +263,7 @@ export function BookDetailsPage() {
       </Box>
 
       <Box mt={8}>
-        <CommentSection bookId={book._id} bookOwnerId={book.user_id} />
+        <CommentSection bookId={book._id} bookOwnerId={book.user_id}/>
       </Box>
 
       <Dialog
@@ -237,12 +273,22 @@ export function BookDetailsPage() {
         <DialogTitle>{t("common:dialogTitleConfirm")}</DialogTitle>
         <DialogContent>
           <Typography>
-           {t("common:confirmDeleteWithName", { name: book.title })}
+            {t("common:confirmDeleteWithName", { name: book.title })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setShowDeleteDialog(false)}>{t("common:buttonCancel")}</Button>
-          <Button onClick={handleDelete} color="error" variant="contained">
+          <Button
+            onClick={() => setShowDeleteDialog(false)}
+            aria-label={t("common:buttonCancel")}
+          >
+            {t("common:buttonCancel")}
+          </Button>
+          <Button
+            onClick={handleDelete}
+            color="error"
+            variant="contained"
+            aria-label={t("common:buttonDelete")}
+          >
             {t("common:buttonDelete")}
           </Button>
         </DialogActions>

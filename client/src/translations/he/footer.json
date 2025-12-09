@@ -1,0 +1,17 @@
+{
+  "tagline": "הפלטפורמה האישית שלך לניהול וגילוי ספרים. ארגן את האוסף שלך, גלה ספרים חדשים וקבל המלצות מבוססות בינה מלאכותית.",
+  "quickLinksTitle": "קישורים מהירים",
+  "linkHome": "בית",
+  "linkMyBooks": "הספרים שלי",
+  "linkFavorites": "מועדפים",
+  "linkRecommendations": "המלצות AI",
+  "featuresTitle": "מאפיינים",
+  "featureDiscovery": "גילוי ספרים",
+  "featureCollection": "אוסף אישי",
+  "featureAI": "המלצות AI",
+  "featureLists": "רשימות קריאה",
+  "copyright": "© {{year}} BookNest. כל הזכויות שמורות.",
+  "privacyPolicy": "מדיניות פרטיות",
+  "termsOfService": "תנאי שירות",
+  "contact": "צור קשר"
+}

@@ -25,13 +25,15 @@ export const useDynamicTheme = () => {
       },
       primary: {
         main: highContrast || darkMode ? "#fff" : "#16A34A",
-        dark: highContrast || darkMode? "#fff" : "#12803A",
+        dark: highContrast || darkMode ? "#e0e0e0" : "#12803A",
         contrastText: highContrast || darkMode ? "#000" : "#fff",
       },
     },
     typography: {
       fontSize: largeText ? 16 : 14,
-      fontFamily: dyslexicFont ? "'OpenDyslexic', Arial, sans-serif" : "Roboto, Arial",
+       fontFamily: dyslexicFont
+    ? '"OpenDyslexic", sans-serif'
+    : 'Rubik, sans-serif',
     },
     components: {
       MuiCssBaseline: {
@@ -43,28 +45,29 @@ export const useDynamicTheme = () => {
           },
         },
       },
-        MuiAlert: {
-    styleOverrides: {
-      root: ({ ownerState }) => ({
-        background:
-          ownerState.severity === "info"
-            ? highContrast
-              ? "#000" // high contrast dark bg
-              : darkMode
-              ? "#1E1E1E" // dark mode bg
-              : "#dffdd7" // light bg
-            : undefined,
-        color: highContrast || darkMode ? "#fff" : "#000",
-        border: highContrast ? "1px solid #fff" : undefined,
-      }),
-    },
-  },
+      MuiAlert: {
+        styleOverrides: {
+          root: ({ ownerState }) => ({
+            background:
+              ownerState.severity === "info"
+                ? highContrast
+                  ? "#000"
+                  : darkMode
+                  ? "#1E1E1E"
+                  : "#dffdd7"
+                : undefined,
+            color: highContrast || darkMode ? "#fff" : "#000",
+            border: highContrast ? "1px solid #fff" : undefined,
+          }),
+        },
+      },
       MuiCard: {
         styleOverrides: {
           root: {
             backgroundColor: highContrast ? "#000" : darkMode ? "#1E1E1E" : "#f9fafb",
             color: highContrast || darkMode ? "#fff" : "#000",
             transition: reduceMotion ? "none" : "all 0.2s ease",
+            border: highContrast ? "1px solid #fff" : "none", 
           },
         },
       },
@@ -82,15 +85,23 @@ export const useDynamicTheme = () => {
           root: {
             backgroundColor: highContrast ? "#000" : darkMode ? "#1A1A1A" : "#16A34A",
             transition: reduceMotion ? "none" : "all 0.2s ease",
+            borderBottom: highContrast ? "1px solid #fff" : "none",
           },
         },
       },
       MuiButton: {
         styleOverrides: {
-          root: {
-            color: highContrast || darkMode ? "#fff" : undefined,
+          root: {            
             transition: reduceMotion ? "none" : "all 0.2s ease",
             borderColor: highContrast ? "#fff" : undefined,
+            
+            "&.MuiButton-outlined": {
+               borderColor: highContrast || darkMode ? "#fff" : undefined,
+               color: highContrast || darkMode ? "#fff" : undefined,
+            },
+            "&.MuiButton-text": {
+               color: highContrast || darkMode ? "#fff" : undefined,
+            }
           },
         },
       },

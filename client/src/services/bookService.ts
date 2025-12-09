@@ -1,4 +1,4 @@
-import { Book } from "../types";
+import { Book, Comment, PaginatedResponse } from "../types";
 import { useUserStore } from "../store/useUserStore";
 import api from "../lib/axiosInstance";
 import axios from "axios";
@@ -24,7 +24,7 @@ function handleAxiosError(error: any): never {
  * @param {number} [params.limit=20] - The limit of items per page.
  * @returns {Promise<{books: Object[], currentPage: number, limit: number, totalItems: number, totalPages: number}>}
  */
-export async function getBooks(params = { page: 1, limit: 20 }) {
+export async function getBooks(params = { page: 1, limit: 20 }):Promise<PaginatedResponse<Book>> {
     try {
         const query = new URLSearchParams({ 
             page: (params.page || 1).toString(), 
@@ -40,7 +40,7 @@ export async function getBooks(params = { page: 1, limit: 20 }) {
         throw error;
     }
 }
-export async function getBookById(id: string): Promise<Book> {
+export async function getBookById(id: string): Promise<Book & { comments: Comment[] }> {
   try {
     const res = await api.get(`${API_BASE_URL}/${id}`);
     return res.data;
@@ -110,11 +110,12 @@ export async function deleteBook(id: string): Promise<void> {
   }
 }
 
-export async function searchBooks(search: string, page = 1, limit = 10) {
+export async function searchBooks(search: string, page = 1, limit = 10, category?:string) {
   try {
     const res = await api.get(`${API_BASE_URL}/search`, {
-      params: { s: search, page, limit },
+      params: { s: search, page, limit, category },
     });
+    console.log("search", search)
     return res.data;
   } catch (error) {
     handleAxiosError(error);

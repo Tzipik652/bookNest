@@ -1,142 +1,214 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Box, Typography, Container, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { ArrowLeft, Shield } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Shield, Circle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function PrivacyPolicyPage() {
+  const { t } = useTranslation(["policy", "common"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
+  const policy = t('privacyPolicy', { returnObjects: true }) as any;
+  const sections = policy.sections;
+
+  const renderContent = (key: string | string[]) => {
+    const direction = t('common:dir');
+    const alignment = direction === 'rtl' ? 'right' : 'left';
+
+    if (Array.isArray(key)) {
+      return (
+        <List dense sx={{ pl: 0, pt: 0, pb: 2 }}>
+          {key.map((item, index) => (
+            <ListItem 
+              key={index} 
+              alignItems="flex-start" 
+              sx={{ pl: 0, py: 0.5 }}
+            >
+              <ListItemIcon sx={{ minWidth: 24, mt: '4px' }}>
+                <Circle size={6} fill="currentColor" />
+              </ListItemIcon>
+              <ListItemText 
+                dir={direction}
+                primary={
+                  <Typography variant="body1" color="text.primary" sx={{ textAlign: alignment }}>
+                    {item}
+                  </Typography>
+                } 
+              />
+            </ListItem>
+          ))}
+        </List>
+      );
+    }
+
+    return (
+      <Typography 
+        variant="body1" 
+        color="text.primary" 
+        paragraph 
+        sx={{ 
+          lineHeight: 1.8, 
+          mb: 3, 
+          textAlign: alignment 
+        }}
+      >
+        {key}
+      </Typography>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <Box 
+      sx={{ 
+        minHeight: '100vh', 
+        bgcolor: 'background.default', 
+        color: 'text.primary', 
+      }} 
+      dir={t('common:dir')}
+    >
+      <Container maxWidth="md" sx={{ py: 4 }}>
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-6 gap-2"
+          aria-label={t('common:back')} 
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t('common:back')}
         </Button>
 
-        <div className="mb-8 flex items-center gap-3">
-          <div className="bg-green-100 p-3 rounded-lg">
-            <Shield className="h-8 w-8 text-green-600" />
-          </div>
-          <div>
-            <h1 className="mb-1">Privacy Policy</h1>
-            <p className="text-gray-600">Last updated: November 17, 2025</p>
-          </div>
-        </div>
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box 
+            sx={{ 
+              p: 1.5, 
+              borderRadius: 2, 
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(22, 163, 74, 0.1)',
+              color: 'primary.main',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Shield className="h-8 w-8" />
+          </Box>
+
+          <Box>
+            <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary" gutterBottom sx={{ mb: 0.5 }}>
+              {policy.pageTitle}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {policy.lastUpdated}
+            </Typography>
+          </Box>
+        </Box>
 
         <Card>
           <CardContent className="pt-6 space-y-6">
-            <section>
-              <h2 className="mb-3">Introduction</h2>
-              <p className="text-gray-700 leading-relaxed">
-                Welcome to BookNest. We respect your privacy and are committed to protecting your personal data.
-                This privacy policy will inform you about how we handle your personal data when you use our book
-                management platform.
-              </p>
-            </section>
+            
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.introduction.title}
+              </Typography>
+              {renderContent(sections.introduction.p1)}
+            </Box>
 
-            <section>
-              <h2 className="mb-3">Information We Collect</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                We collect the following types of information:
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Account information (name, email address)</li>
-                <li>Books you upload or add to the platform</li>
-                <li>Your favorite books and reading preferences</li>
-                <li>Comments and reactions you make on books</li>
-                <li>Usage data and interactions with the platform</li>
-              </ul>
-            </section>
+            {/* 2. Information We Collect */}
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.informationCollected.title}
+              </Typography>
+              {renderContent(sections.informationCollected.p1)}
+              {renderContent(sections.informationCollected.list)}
+            </Box>
 
-            <section>
-              <h2 className="mb-3">How We Use Your Information</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                We use your information to:
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Provide and maintain our service</li>
-                <li>Generate personalized AI recommendations</li>
-                <li>Enable you to share and discover books</li>
-                <li>Improve and optimize our platform</li>
-                <li>Communicate with you about updates and features</li>
-              </ul>
-            </section>
+            {/* 3. How We Use Your Information */}
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.howWeUse.title}
+              </Typography>
+              {renderContent(sections.howWeUse.p1)}
+              {renderContent(sections.howWeUse.list)}
+            </Box>
 
-            <section>
-              <h2 className="mb-3">Data Storage</h2>
-              <p className="text-gray-700 leading-relaxed">
-                Currently, BookNest operates as a frontend-only application with data stored locally in your browser's
-                localStorage. This means your data is stored on your device and is not transmitted to our servers.
-                Please note that clearing your browser data will remove all your BookNest information.
-              </p>
-            </section>
+            {/* 4. Data Storage */}
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.dataStorage.title}
+              </Typography>
+              {renderContent(sections.dataStorage.p1)}
+            </Box>
 
-            <section>
-              <h2 className="mb-3">Data Sharing</h2>
-              <p className="text-gray-700 leading-relaxed">
-                We do not sell, trade, or otherwise transfer your personal information to third parties. Your data
-                remains private and is only used to provide you with the BookNest service.
-              </p>
-            </section>
+            {/* 5. Data Sharing */}
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.dataSharing.title}
+              </Typography>
+              {renderContent(sections.dataSharing.p1)}
+            </Box>
 
-            <section>
-              <h2 className="mb-3">Your Rights</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                You have the right to:
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Access your personal data</li>
-                <li>Correct inaccurate data</li>
-                <li>Delete your account and data</li>
-                <li>Export your data</li>
-                <li>Withdraw consent at any time</li>
-              </ul>
-            </section>
+            {/* 6. Your Rights */}
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.yourRights.title}
+              </Typography>
+              {renderContent(sections.yourRights.p1)}
+              {renderContent(sections.yourRights.list)}
+            </Box>
 
-            <section>
-              <h2 className="mb-3">Cookies and Tracking</h2>
-              <p className="text-gray-700 leading-relaxed">
-                BookNest uses localStorage to maintain your session and store your preferences. We do not use
-                third-party tracking cookies or analytics tools.
-              </p>
-            </section>
+            {/* 7. Cookies and Tracking */}
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.cookies.title}
+              </Typography>
+              {renderContent(sections.cookies.p1)}
+            </Box>
 
-            <section>
-              <h2 className="mb-3">Children's Privacy</h2>
-              <p className="text-gray-700 leading-relaxed">
-                BookNest is not intended for children under 13 years of age. We do not knowingly collect personal
-                information from children under 13.
-              </p>
-            </section>
+            {/* 8. Children's Privacy */}
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.childrensPrivacy.title}
+              </Typography>
+              {renderContent(sections.childrensPrivacy.p1)}
+            </Box>
 
-            <section>
-              <h2 className="mb-3">Changes to This Policy</h2>
-              <p className="text-gray-700 leading-relaxed">
-                We may update our privacy policy from time to time. We will notify you of any changes by posting
-                the new privacy policy on this page and updating the "Last updated" date.
-              </p>
-            </section>
+            {/* 9. Changes to This Policy */}
+            <Box component="section" sx={{ pb: 2 }}>
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.changes.title}
+              </Typography>
+              {renderContent(sections.changes.p1)}
+            </Box>
 
-            <section>
-              <h2 className="mb-3">Contact Us</h2>
-              <p className="text-gray-700 leading-relaxed">
-                If you have any questions about this privacy policy, please contact us at{' '}
-                <a href="/contact" className="text-green-600 hover:underline">
-                  our contact page
-                </a>
-                .
-              </p>
-            </section>
+            {/* 10. Contact Information */}
+            <Box component="section">
+              <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                {sections.contact.title}
+              </Typography>
+              <Typography variant="body1" color="text.primary" sx={{ lineHeight: 1.8 }}>
+                {sections.contact.p1_start}{' '}
+                <Link to="/contact" style={{ textDecoration: 'none' }}>
+                  <Typography 
+                    component="span" 
+                    color="primary" 
+                    sx={{ 
+                      textDecoration: 'underline',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      '&:hover': { opacity: 0.8 }
+                    }}
+                  >
+                    {sections.contact.p1_link}
+                  </Typography>
+                </Link>
+                {' '}{sections.contact.p1_end}
+              </Typography>
+            </Box>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </Container>
+    </Box>
   );
 }

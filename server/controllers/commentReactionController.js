@@ -3,9 +3,6 @@ import * as CommentReactionModel from "../models/commentReactionModel.js";
 import AppError from "../utils/AppError.js";
 import { catchAsync } from "../utils/catchAsync.js";
 
-/**
- * הוספה/הסרה/עדכון של reaction
- */
 export const toggleReaction = catchAsync(async (req, res, next) => {
   const { commentId, reactionType } = req.body;
   const user = req.user;
@@ -18,7 +15,6 @@ export const toggleReaction = catchAsync(async (req, res, next) => {
     throw new AppError("Comment ID and reaction type are required", 400);
   }
 
-  // בדיקה שסוג ה-reaction תקין
   const validReactions = ["like", "dislike", "happy", "angry"];
   if (!validReactions.includes(reactionType)) {
     throw new AppError("Invalid reaction type", 400);
@@ -33,9 +29,6 @@ export const toggleReaction = catchAsync(async (req, res, next) => {
   res.status(200).json(result);
 });
 
-/**
- * קבלת כל ה-reactions לתגובה מסוימת
- */
 export const getReactionsByComment = catchAsync(async (req, res, next) => {
   const { commentId } = req.params;
 
@@ -52,9 +45,6 @@ export const getReactionsByComment = catchAsync(async (req, res, next) => {
   });
 });
 
-/**
- * קבלת ה-reaction של משתמש ספציפי על תגובה
- */
 export const getUserReactionOnComment = catchAsync(async (req, res, next) => {
   const { commentId, userId } = req.params;
 

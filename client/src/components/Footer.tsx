@@ -1,105 +1,150 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, Heart, Sparkles, Home } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Box, Typography, useTheme } from '@mui/material'; 
 
 export function Footer() {
+    const { t } = useTranslation(["footer", "common"]);
     const currentYear = new Date().getFullYear();
+    const commonDir = t('common:dir') as 'rtl' | 'ltr';
+    const theme = useTheme(); 
+
+    const originalColors = {
+        bg: '#0f172a',
+        textSecondary: '#cbd5e1',
+        textPrimary: '#ffffff',
+        highlight: '#4ade80',
+        divider: '#1e293b',
+    };
+
+    const getDynamicColor = (key: keyof typeof originalColors, type: 'bg' | 'text' | 'link' | 'divider') => {
+        if (theme.palette.mode === 'light') {
+            return originalColors[key];
+        }
+        
+        switch (type) {
+            case 'bg': return theme.palette.background.paper;
+            case 'text': return key === 'textPrimary' ? theme.palette.text.primary : theme.palette.text.secondary;
+            case 'link': return theme.palette.text.secondary;
+            case 'divider': return theme.palette.divider;
+            default: return originalColors[key];
+        }
+    };
 
     return (
-        <footer className="bg-slate-900 text-slate-300 mt-auto">
+        <Box 
+            component="footer" 
+            sx={{
+                bgcolor: getDynamicColor('bg', 'bg'), 
+                color: getDynamicColor('textSecondary', 'text'), 
+                mt: 'auto'
+            }}
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div 
+                    className="grid grid-cols-1 md:grid-cols-4 gap-8"
+                    style={{ direction: commonDir }}
+                >
                     {/* Brand Section */}
                     <div className="col-span-1 md:col-span-2">
-                        <div className="flex items-center gap-2 mb-4">
-                            <BookOpen className="h-8 w-8 text-green-400" />
-                            <span className="text-white text-2xl">BookNest</span>
-                        </div>
-                        <p className="text-slate-400 max-w-md">
-                            Your personal book management and discovery platform. Organize your collection, discover new reads, and get AI-powered recommendations.
-                        </p>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                            <BookOpen className="h-8 w-8" style={{ color: getDynamicColor('highlight', 'link') }} />
+                            <Typography variant="h6" sx={{ color: getDynamicColor('textPrimary', 'text'), fontWeight: 'bold' }}>
+                                BookNest
+                            </Typography>
+                        </Box>
+                        <Typography variant="body2" sx={{ color: getDynamicColor('textSecondary', 'text'), maxWidth: '400px' }}>
+                            {t("tagline")}
+                        </Typography>
                     </div>
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className="text-white mb-4">Quick Links</h3>
+                        <Typography variant="subtitle1" sx={{ color: getDynamicColor('textPrimary', 'text'), mb: 2, fontWeight: 'bold' }}>
+                            {t("quickLinksTitle")}
+                        </Typography>
                         <ul className="space-y-2">
-                            <li>
-                                <Link to="/home" className="hover:text-green-400 transition-colors flex items-center gap-2">
-                                    <Home className="h-4 w-4" />
-                                    Home
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/my-books" className="hover:text-green-400 transition-colors flex items-center gap-2">
-                                    <BookOpen className="h-4 w-4" />
-                                    My Books
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/favorites" className="hover:text-green-400 transition-colors flex items-center gap-2">
-                                    <Heart className="h-4 w-4" />
-                                    Favorites
-                                </Link>
-                            </li>
-                            <li>
-                                <Link to="/recommendations" className="hover:text-green-400 transition-colors flex items-center gap-2">
-                                    <Sparkles className="h-4 w-4" />
-                                    AI Recommendations
-                                </Link>
-                            </li>
+                            {[
+                                { to: "/home", icon: Home, text: t("linkHome") },
+                                { to: "/my-books", icon: BookOpen, text: t("linkMyBooks") },
+                                { to: "/favorites", icon: Heart, text: t("linkFavorites") },
+                                { to: "/recommendations", icon: Sparkles, text: t("linkRecommendations") },
+                            ].map((item) => (
+                                <li key={item.to}>
+                                    <Link 
+                                        to={item.to}
+                                        style={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            gap: theme.spacing(1),
+                                            color: getDynamicColor('textSecondary', 'link') 
+                                        }}
+                                        className="transition-colors"
+                                        onMouseOver={e => (e.currentTarget.style.color = getDynamicColor('highlight', 'link'))}
+                                        onMouseOut={e => (e.currentTarget.style.color = getDynamicColor('textSecondary', 'link'))}
+                                    >
+                                        <item.icon className="h-4 w-4" />
+                                        <Box component="span">
+                                            {item.text}
+                                        </Box>
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
 
                     {/* Features */}
                     <div>
-                        <h3 className="text-white mb-4">Features</h3>
+                        <Typography variant="subtitle1" sx={{ color: getDynamicColor('textPrimary', 'text'), mb: 2, fontWeight: 'bold' }}>
+                            {t("featuresTitle")}
+                        </Typography>
                         <ul className="space-y-2">
-                            <li className="text-slate-400">Book Discovery</li>
-                            <li className="text-slate-400">Personal Collection</li>
-                            <li className="text-slate-400">AI Recommendations</li>
-                            <li className="text-slate-400">Reading Lists</li>
+                            <Typography component="li" sx={{ color: getDynamicColor('textSecondary', 'text') }} variant="body2">{t("featureDiscovery")}</Typography>
+                            <Typography component="li" sx={{ color: getDynamicColor('textSecondary', 'text') }} variant="body2">{t("featureCollection")}</Typography>
+                            <Typography component="li" sx={{ color: getDynamicColor('textSecondary', 'text') }} variant="body2">{t("featureAI")}</Typography>
+                            <Typography component="li" sx={{ color: getDynamicColor('textSecondary', 'text') }} variant="body2">{t("featureLists")}</Typography>
                         </ul>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="border-t border-slate-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <p className="text-slate-400 text-sm">
-                        © {currentYear} BookNest. All rights reserved.
-                    </p>
-                    {/* <div className="flex gap-6 text-sm">
-            <button className="text-slate-400 hover:text-green-400 transition-colors">
-              Privacy Policy
-            </button>
-            <button className="text-slate-400 hover:text-green-400 transition-colors">
-              Terms of Service
-            </button>
-            <button className="text-slate-400 hover:text-green-400 transition-colors">
-              Contact
-            </button>
-          </div> */}
+                <Box 
+                    sx={{
+                        borderTop: `1px solid ${getDynamicColor('divider', 'divider')}`, 
+                        mt: 8,
+                        pt: 4,
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: 4
+                    }}
+                >
+                    <Typography variant="caption" sx={{ color: getDynamicColor('textSecondary', 'text') }}>
+                        {t("copyright", { year: currentYear })}
+
+                    </Typography>
+                    
                     <div className="flex gap-6 text-sm">
-                        <Link
-                            to="/privacy-policy"
-                            className="text-slate-400 hover:text-green-400 transition-colors"
-                        >
-                            Privacy Policy
-                        </Link>
-                        <Link
-                            to="/terms-of-service"
-                            className="text-slate-400 hover:text-green-400 transition-colors"
-                        >
-                            Terms of Service
-                        </Link>
-                        <Link
-                            to="/contact"
-                            className="text-slate-400 hover:text-green-400 transition-colors"
-                        >
-                            Contact
-                        </Link>
+                        {[
+                            { to: "/privacy-policy", text: t("privacyPolicy") },
+                            { to: "/terms-of-service", text: t("termsOfService") },
+                            { to: "/contact", text: t("contact") },
+                        ].map((item) => (
+                            <Link
+                                key={item.to}
+                                to={item.to}
+                                className="transition-colors"
+                                style={{ color: getDynamicColor('textSecondary', 'link') }}
+                                onMouseOver={e => (e.currentTarget.style.color = getDynamicColor('highlight', 'link'))}
+                                onMouseOut={e => (e.currentTarget.style.color = getDynamicColor('textSecondary', 'link'))}
+                            >
+                                {item.text}
+                            </Link>
+                        ))}
                     </div>
-                </div>
+                </Box>
             </div>
-        </footer>
+        </Box>
     );
 }

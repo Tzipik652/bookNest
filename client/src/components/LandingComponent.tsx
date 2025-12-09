@@ -1,70 +1,15 @@
-// import { Box, Button, Container, Typography } from '@mui/material'
-// import React from 'react'
-// import { useNavigate } from 'react-router-dom';
-
-// const LandingComponent = () => {
-//       const navigate = useNavigate();
-    
-//   return (
-//     <Box
-//         sx={{
-//           bgcolor: "primary.main",
-//           color: "primary.contrastText",
-//           py: 12,
-//           textAlign: "center",
-//         }}
-//       >
-//         <Container maxWidth="md">
-//           <Typography variant="h3" component="h1" gutterBottom>
-//             Welcome to BookNest
-//           </Typography>
-//           <Typography variant="h6" mb={4}>
-//             Discover, organize, and share your favorite books with AI-powered
-//             recommendations
-//           </Typography>
-//           <Box
-//             sx={{
-//               display: "flex",
-//               justifyContent: "center",
-//               gap: 2,
-//               flexWrap: "wrap",
-//             }}
-//           >
-//             <Button
-//               variant="contained"
-//               color="primary"
-//               onClick={() => navigate("/login")}
-//             >
-//               Login
-//             </Button>
-//             <Button
-//               variant="outlined"
-//               color="inherit"
-//               onClick={() => navigate("/register")}
-//               sx={{
-//                 borderColor: "white",
-//                 color: "main.contrastText",
-//                 "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
-//               }}
-//             >
-//               Register
-//             </Button>
-//           </Box>
-//         </Container>
-//       </Box>
-//   )
-// }
-
-// export default LandingComponent;
-import { Box, Button, Container, Typography } from '@mui/material'
 import React from 'react'
+import { Box, Button, Container, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const LandingComponent = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['landing', 'common']); 
+  const commonDir = t('common:dir') as 'rtl' | 'ltr';
 
   return (
-    <Box
+    <Box dir={commonDir}
       sx={{
         backgroundImage: `url("https://images.unsplash.com/photo-1662582631700-676a217d511f?auto=format&fit=crop&w=1600&q=80")`,
         backgroundSize: "cover",
@@ -75,7 +20,6 @@ const LandingComponent = () => {
         py: 35,
         textAlign: "center",
 
-        // שכבת כהות קלה לקריאה טובה יותר
         position: "relative",
         "&::before": {
           content: '""',
@@ -85,17 +29,16 @@ const LandingComponent = () => {
         }
       }}
     >
-      {/* התוכן – שיהיה מעל האוברליי */}
       <Container
         maxWidth="md"
         sx={{ position: "relative", zIndex: 1 }}
       >
         <Typography variant="h3" component="h1" gutterBottom>
-          Welcome to BookNest
+          {t('heading')}
         </Typography>
 
         <Typography variant="h6" mb={4}>
-          Discover, organize, and share your favorite books with AI-powered recommendations
+          {t('subheading')}
         </Typography>
 
         <Box
@@ -110,8 +53,9 @@ const LandingComponent = () => {
             variant="contained"
             color="primary"
             onClick={() => navigate("/login")}
+            aria-label={t('loginButton')}
           >
-            Login
+            {t('loginButton')}
           </Button>
 
           <Button
@@ -122,8 +66,9 @@ const LandingComponent = () => {
               borderColor: "white",
               "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
             }}
+            aria-label={t('registerButton')}
           >
-            Register
+            {t('registerButton')}
           </Button>
         </Box>
       </Container>

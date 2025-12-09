@@ -137,18 +137,65 @@ export async function findPaginated(page = 1, limit = 10, category = null) {
 /**
  * Get book by ID
  */
-export async function findById(id) {
-  const { data, error } = await supabase
-    .from("books")
-    .select(bookSelectQuery)
-    .eq("_id", id)
+// export async function findById(id) {
+//   const { data, error } = await supabase
+//     .from("books")
+//     .select(bookSelectQuery)
+//     .eq("_id", id)
+//     .single();
+
+//   if (error && error.code !== "PGRST116") throw error; // not found case
+
+//   return normalizeBook(data);
+// }
+
+export async function findById(bookId) {
+  const query = `${bookSelectQuery}, 
+    comments (
+      id, text, created_at, user_id, book_id,
+      users (name, email, profile_picture)
+    )
+  `;
+
+  const { data: book, error } = await supabase
+    .from('books')
+    .select(query)
+    .eq('_id', bookId)
     .single();
 
-  if (error && error.code !== "PGRST116") throw error; // not found case
+  if (error) throw error;
 
-  return normalizeBook(data);
+  if (book.comments && book.comments.length > 0) {
+    const commentIds = book.comments.map((c) => c.id);
+
+    const { data: reactionsData } = await supabase
+      .from("comment_reactions")
+      .select("comment_id, reaction_type")
+      .in("comment_id", commentIds);
+
+    book.comments = book.comments.map((comment) => {
+      const myReactions =
+        reactionsData?.filter((r) => r.comment_id === comment.id) || [];
+
+      const counts = {
+        like: myReactions.filter((r) => r.reaction_type === "like").length,
+        dislike: myReactions.filter((r) => r.reaction_type === "dislike").length,
+        happy: myReactions.filter((r) => r.reaction_type === "happy").length,
+        angry: myReactions.filter((r) => r.reaction_type === "angry").length,
+      };
+
+      return {
+        ...comment,
+        user_name: comment.users?.name || "Unknown",
+        profile_picture: comment.users?.profile_picture,
+        reaction_counts: counts,
+      };
+    });
+  }
+
+  // שימוש בפונקציית הנרמול הקיימת (הערות יעברו כחלק מה-rest)
+  return normalizeBook(book);
 }
-
 export async function update(id, updates) {
   const validKeys = [
     "title",
@@ -257,7 +304,7 @@ export const getBooksByCategory = async (category) => {
 
   if (!categoryData) return [];
 
-  const { data: books, error } = await supabase
+  const { data, error } = await supabase
     .from("books")
     .select(bookSelectQuery)
     .eq("category", categoryData.id)
@@ -271,6 +318,36 @@ export const getBooksByCategory = async (category) => {
   return data.map(normalizeBook);
 };
 
+export async function searchBooks(searchTerm, page, limit, categoryId) {
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+  console.log('in search book in model');
+  try {
+
+    let query = supabase
+      .from("books")
+      .select(bookSelectQuery, { count: "exact" })
+      .order("title", { ascending: true });
+
+    if (searchTerm) {
+      query = query.or(
+        `title.ilike.%${searchTerm}%,author.ilike.%${searchTerm}%`
+      );
+    }
+    if (categoryId) {
+      query = query.eq("category", categoryId);
+    }
+    const { data, count, error } = await query.range(from, to);
+    return {
+      books: data.map(normalizeBook),
+      totalPages: Math.ceil(count / limit),
+    };
+  } catch (error) {
+    console.error("Error in searchBooks model function:", error);
+    throw error;
+  }
+}
+
 export default {
   create,
   findAll,
@@ -281,4 +358,5 @@ export default {
   getFavoriteBooks,
   findPaginated,
   getBooksByCategory,
+  searchBooks,
 };

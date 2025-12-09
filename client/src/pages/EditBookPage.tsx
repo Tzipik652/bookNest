@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom'; // 1. הוספת useLocation
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { bookSchema, BookFormValues } from "../schemas/book.schema";
-import { getBookById, updateBook } from '../services/bookService';
+import { BookFormValues, createBookSchema } from "../schemas/book.schema";
+import { getBookById, updateBook } from "../services/bookService";
 import { getCategories } from "../services/categoryService";
 
 import {
@@ -20,27 +20,29 @@ import {
   MenuItem,
   Alert,
   CircularProgress,
+
 } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
 import { useUserStore } from '../store/useUserStore';
 import { Category } from '../types';
 import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { Button as ShadcnButton } from "../components/ui/button";
+
 
 export function EditBookPage() {
-  const { t } = useTranslation(['editBook', 'common']);
+  const { t } = useTranslation(["editBook", "common","validation"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const location = useLocation(); // 2. שימוש ב-hook כדי לקבל את ה-State
+  const location = useLocation();
   const { user: currentUser } = useUserStore();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitError, setSubmitError] = useState("");
+const formSchema = createBookSchema(t);
 
-  // 🎯 פונקציית עזר לניווט חכם
-  // אם הגענו מהאדמין - נחזור לאדמין. אחרת - נחזור לדף הספר.
   const handleNavigateBack = () => {
     if (location.state?.from) {
       navigate(location.state.from);
@@ -49,15 +51,14 @@ export function EditBookPage() {
     }
   };
 
-  // 🎯 RHF + Zod
   const {
     register,
     handleSubmit,
     setValue,
     control,
-    formState: { errors, isSubmitting, isDirty }
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<BookFormValues>({
-    resolver: zodResolver(bookSchema),
+    resolver: zodResolver(formSchema),
   });
 
   useEffect(() => {
@@ -73,30 +74,26 @@ export function EditBookPage() {
         setCategories(cats);
 
         if (!book) {
-          navigate('/home');
+          navigate("/home");
           return;
         }
 
-        // 3. שינוי לוגיקת הרשאות:
-        // מאפשרים גישה אם המשתמש הוא בעל הספר OR המשתמש הוא אדמין
         const isOwner = book.user_id === currentUser?._id;
-        const isAdmin = currentUser?.role === 'admin';
+        const isAdmin = currentUser?.role === "admin";
 
         if (!isOwner && !isAdmin) {
-          navigate(`/book/${id}`); // אם אין הרשאה, מעיפים לדף הצפייה
+          navigate(`/book/${id}`);
           return;
         }
 
-        // ✔ מילוי נתוני הספר לתוך הטופס
         Object.entries(book).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
             setValue(key as keyof BookFormValues, String(value));
           }
         });
-
       } catch (err) {
         console.error(err);
-        navigate('/home');
+        navigate("/home");
       } finally {
         setLoading(false);
       }
@@ -108,7 +105,6 @@ export function EditBookPage() {
   const onSubmit = async (data: BookFormValues) => {
     setSubmitError("");
 
-    // גם אם לא היו שינויים, אנחנו רוצים לחזור למקום הנכון
     if (!isDirty) {
       console.log("No changes — skipping update");
       handleNavigateBack();
@@ -121,9 +117,7 @@ export function EditBookPage() {
         price: data.price ? parseFloat(data.price) : undefined,
       });
 
-      // הצלחה - חוזרים למקום ממנו באנו (אדמין או דף ספר)
       handleNavigateBack();
-
     } catch (err) {
       console.error(err);
       setSubmitError("Failed to update book. Please try again.");
@@ -132,33 +126,43 @@ export function EditBookPage() {
 
   if (loading) {
     return (
-      <Box minHeight="100vh" display="flex" alignItems="center" justifyContent="center">
+      <Box
+        minHeight="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
         <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', py: 6 }}>
+    <Box sx={{ minHeight: "100vh", py: 6 }}>
       <Container maxWidth="sm">
-        <Button
-          onClick={handleNavigateBack} // שימוש בפונקציה החדשה
-          startIcon={<ArrowBack />}
-          sx={{ mb: 3 }}
+
+         <ShadcnButton
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-6 gap-2"
+          aria-label={t("common:back")}
         >
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
           {t('common:back')}
-        </Button>
+        </ShadcnButton>
 
         <Card sx={{ p: 2 }}>
-          <CardHeader title={t('editBook:pageTitle')} />
+          <CardHeader title={t("editBook:pageTitle")} />
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-
+            <CardContent
+              sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+            >
               {submitError && <Alert severity="error">{submitError}</Alert>}
 
               <TextField
-                label={t('editBook:form.title')}
+                label={t("editBook:form.title")}
                 required
                 {...register("title")}
                 error={!!errors.title}
@@ -166,7 +170,7 @@ export function EditBookPage() {
               />
 
               <TextField
-                label={t('editBook:form.author')}
+                label={t("editBook:form.author")}
                 required
                 {...register("author")}
                 error={!!errors.author}
@@ -174,7 +178,7 @@ export function EditBookPage() {
               />
 
               <TextField
-                label={t('editBook:form.description')}
+                label={t("editBook:form.description")}
                 required
                 multiline
                 rows={5}
@@ -191,14 +195,17 @@ export function EditBookPage() {
                   <TextField
                     {...field}
                     select
-                    label={t('editBook:form.category')}
+                    label={t("editBook:form.category")}
                     required
                     error={!!errors.category}
                     helperText={errors.category?.message}
                   >
                     {categories.map((cat: any) => (
-                      <MenuItem key={cat.id || cat._id || cat.name} value={cat.name}>
-                        {cat.name}
+                      <MenuItem
+                        key={cat.id || cat._id || cat.name}
+                        value={cat.name}
+                      >
+                         {t(`category:${cat.name.replace(/\s+/g, '')}`)}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -206,21 +213,20 @@ export function EditBookPage() {
               />
 
               <TextField
-                label={t('editBook:form.imageUrl')}
+                label={t("editBook:form.imageUrl")}
                 {...register("img_url")}
                 error={!!errors.img_url}
                 helperText={errors.img_url?.message}
               />
 
               <TextField
-                label={t('editBook:form.price')}
+                label={t("editBook:form.price")}
                 type="number"
                 inputProps={{ step: "0.01", min: "0" }}
                 {...register("price")}
                 error={!!errors.price}
                 helperText={errors.price?.message}
               />
-
             </CardContent>
 
             <CardActions sx={{ gap: 2, px: 3, pb: 3 }}>
@@ -229,13 +235,24 @@ export function EditBookPage() {
                 variant="contained"
                 fullWidth
                 disabled={!isDirty || isSubmitting}
+                aria-label={
+                  isSubmitting
+                    ? t("common:saving")
+                    : t("common:buttonSaveChanges")
+                }
               >
-                {isSubmitting ? t('common:saving') : t('common:buttonSaveChanges')}
+                {isSubmitting
+                  ? t("common:saving")
+                  : t("common:buttonSaveChanges")}
               </Button>
 
-              {/* כפתור ביטול שמשתמש גם הוא בניווט החכם */}
-              <Button variant="outlined" fullWidth onClick={handleNavigateBack}>
-                {t('common:buttonCancel')}
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={handleNavigateBack}
+                aria-label={t("common:buttonCancel")}
+              >
+                {t("common:buttonCancel")}
               </Button>
             </CardActions>
           </form>

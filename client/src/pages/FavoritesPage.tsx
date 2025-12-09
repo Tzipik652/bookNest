@@ -14,10 +14,12 @@ import {
 import { Book, BookWithFavorite } from "../types";
 import { useFavoriteBooks } from "../hooks/useFavorites";
 import BookGridSkeleton from "../components/BookGridSkeleton";
+import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function FavoritesPage() {
   const isKeyboardMode = useKeyboardModeBodyClass();
+  const { t } = useTranslation(["favorites", "common"]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -62,7 +64,7 @@ export function FavoritesPage() {
     <Box sx={{ minHeight: "100vh", py: 8 }}>
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight="bold" mb={6}>
-          My Favorites
+          {t('pageTitle')}
         </Typography>
 
         {favoriteBooks.length > 0 || isLoading ? (
@@ -70,7 +72,7 @@ export function FavoritesPage() {
             {/* Search Field */}
             <Box sx={{ maxWidth: 400, mb: 6 }}>
               <TextField
-                placeholder="Search your favorites..."
+                placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 fullWidth
@@ -108,7 +110,7 @@ export function FavoritesPage() {
             ) : (
               <Box textAlign="center" py={10}>
                 <Typography color="text.secondary">
-                  No books found matching your search.
+                  {t('emptySearchMessage')}
                 </Typography>
               </Box>
             )}
@@ -117,18 +119,19 @@ export function FavoritesPage() {
           <Box textAlign="center" py={12}>
             <Heart size={64} color="#d1d5db" style={{ marginBottom: 16 }} />
             <Typography variant="h6" gutterBottom>
-              No Favorites Yet
+              {t('emptyState.title')}
             </Typography>
             <Typography color="text.secondary" mb={3}>
-              Start adding books to your favorites to see them here.
+              {t('emptyState.subtitle')}
             </Typography>
             <Button
               variant="contained"
               size="large"
               onClick={() => navigate("/home")}
               sx={{ textTransform: "none", borderRadius: 3 }}
+              aria-label={t('emptyState.button')}
             >
-              Browse Books
+              {t('emptyState.button')}
             </Button>
           </Box>
         )}

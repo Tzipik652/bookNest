@@ -5,11 +5,9 @@ import {
   getComments,
   addComment,
   deleteComment,
-  getCommentById,
 } from "../services/commentService";
 import {
   toggleReaction,
-  getCommentReactionCounts,
   getUserReactionOnComment,
 } from "../services/commentReactionService";
 import CommentItem from "./CommentItem";
@@ -30,8 +28,10 @@ import {
   Box,
   Chip,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import { toast } from "sonner";
 import CommentItemSkeleton from "./CommentItemSkeleton";
+import { useTranslation } from "react-i18next";
 
 interface CommentSectionProps {
   bookId: string;
@@ -39,8 +39,10 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
+  const { t } = useTranslation(["comments", "common"]);
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
+  const theme = useTheme();
   const [comments, setComments] = useState<CommentWithReactions[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,24 +62,22 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     try {
       const loadedComments = await getComments(bookId);
 
-      const commentsWithReactions = await Promise.all(
-        loadedComments.map(async (comment) => {
-          const reactionCounts = await getCommentReactionCounts(comment);
-          const userReaction = currentUser
-            ? await getUserReactionOnComment(comment.id, currentUser._id)
-            : null;
-          return {
-            ...comment,
-            reactionCounts,
-            userReaction,
-          };
-        })
-      );
-      setComments(commentsWithReactions);
+      // const commentsWithUserReaction = await Promise.all(
+      //   loadedComments.map(async (comment) => {
+      //     const userReaction = currentUser? await getUserReactionOnComment(comment.id, currentUser._id) : null;
+            
+      //     return {
+      //       ...comment,
+      //       userReaction,
+      //       reaction_counts: comment.reaction_counts || { like: 0, dislike: 0, happy: 0, angry: 0 }
+      //     };
+      //   })
+      // );
+      
+      setComments(loadedComments);      
     } catch (error) {
       console.error(error);
-      toast.error("Failed to load comments");
-      setIsLoading(false);
+      toast.error(t("errorLoadFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +90,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     }
 
     if (!newComment.trim()) {
-      toast.error("Please enter a comment");
+      toast.error(t("errorCommentRequired"));
       return;
     }
 
@@ -98,21 +98,17 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     try {
       const addedComment = await addComment(bookId, newComment.trim());
 
-      const reactionCounts = await getCommentReactionCounts(addedComment);
-      const userReaction = currentUser
-        ? await getUserReactionOnComment(addedComment.id, currentUser._id)
-        : undefined;
-
+      // יצירת תגובה חדשה עם מונים מאופסים (שימוש בשם החדש)
       const commentWithReactions: CommentWithReactions = {
         ...addedComment,
-        reactionCounts,
-        userReaction,
+        reaction_counts: { like: 0, dislike: 0, happy: 0, angry: 0 },
+        user_reaction: undefined,
       };
 
       setComments((prevComments) => [commentWithReactions, ...prevComments]);
 
       setNewComment("");
-      toast.success("Comment added successfully");
+      toast.success(t("successAdd"));
       setTimeout(() => {
         commentRefs.current[commentWithReactions.id]?.scrollIntoView({
           behavior: "smooth",
@@ -121,20 +117,22 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       }, 100);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to add comment");
+      toast.error(t("errorAddFailed"));
     } finally {
       setIsSubmitting(false);
     }
   };
+
   const handleDeleteComment = async (commentId: string) => {
     try {
       await deleteComment(commentId);
-      await loadComments();
-      toast.success("Comment deleted");
+      // עדכון אופטימי (מחיקה מהרשימה)
+      setComments((prev) => prev.filter((c) => c.id !== commentId));
+      toast.success(t("successDelete"));
       setCommentToDelete(null);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to delete comment");
+      toast.error(t("errorDeleteFailed"));
     }
   };
 
@@ -149,12 +147,14 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
 
     setLoadingComments((prev) => new Set(prev).add(commentId));
 
+    // עדכון אופטימי
     setComments((prevComments) =>
       prevComments.map((comment) => {
         if (comment.id !== commentId) return comment;
 
-        const wasActive = comment.userReaction === reactionType;
-        const newReactionCounts = { ...comment.reactionCounts };
+        const wasActive = comment.user_reaction === reactionType;
+        
+        const newReactionCounts = { ...comment.reaction_counts! };
 
         if (wasActive) {
           newReactionCounts[reactionType] = Math.max(
@@ -163,48 +163,36 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
           );
           return {
             ...comment,
-            reactionCounts: newReactionCounts,
+            reaction_counts: newReactionCounts, // עדכון השדה החדש
             userReaction: undefined,
           };
         }
 
-        if (comment.userReaction) {
-          newReactionCounts[comment.userReaction] = Math.max(
+        // החלפת ריאקציה (אם הייתה אחרת)
+        if (comment.user_reaction) {
+          newReactionCounts[comment.user_reaction] = Math.max(
             0,
-            (newReactionCounts[comment.userReaction] || 0) - 1
+            (newReactionCounts[comment.user_reaction] || 0) - 1
           );
         }
 
+        // הוספת הריאקציה החדשה
         newReactionCounts[reactionType] =
           (newReactionCounts[reactionType] || 0) + 1;
 
         return {
           ...comment,
-          reactionCounts: newReactionCounts,
-          userReaction: reactionType,
+          reaction_counts: newReactionCounts, // עדכון השדה החדש
+          user_reaction: reactionType,
         };
       })
     );
+
     try {
       await toggleReaction(commentId, reactionType);
-      // const updatedComment = await getCommentById(commentId);
-      // const reactionCounts = await getCommentReactionCounts(updatedComment);
-      // const userReaction = await getUserReactionOnComment(
-      //   commentId,
-      //   currentUser._id
-      // );
-
-      // setComments((prevComments) =>
-      //   prevComments.map((comment) =>
-      //     comment.id === commentId
-      //       ? { ...updatedComment, reactionCounts, userReaction }
-      //       : comment
-      //   )
-      // );
-
     } catch (error) {
       console.error(error);
-      toast.error("Failed to add reaction");
+      toast.error(t("errorAddFailed"));
       await loadComments();
     } finally {
       setLoadingComments((prev) => {
@@ -224,7 +212,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       <Stack direction="row" alignItems="center" spacing={2} mb={4}>
         <MessageSquare size={28} />
         <Typography variant="h5" fontWeight={600}>
-          Comments
+          {t("title")}
         </Typography>
         <Chip
           label={comments.length}
@@ -234,7 +222,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
         />
       </Stack>
 
-      {/* Add Comment Form */}
+      {/* Input Area */}
       <Card
         elevation={0}
         sx={{
@@ -252,8 +240,8 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
               rows={4}
               placeholder={
                 currentUser
-                  ? "Share your thoughts about this book..."
-                  : "Please log in to comment"
+                  ? t("placeholderLoggedIn")
+                  : t("placeholderLoggedOut")
               }
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
@@ -271,8 +259,16 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
                 onClick={handleAddComment}
                 disabled={!currentUser || isSubmitting || !newComment.trim()}
                 endIcon={<Send size={18} />}
+                sx={{
+                  gap: 1, 
+                  "& .MuiButton-endIcon": {
+                    margin: 0, 
+                  },
+                  alignItems: "center",
+                }}
+                aria-label={isSubmitting ? t("posting") : t("postButton")}
               >
-                {isSubmitting ? "Posting..." : "Post Comment"}
+                {isSubmitting ? t("posting") : t("postButton")}
               </Button>
             </Box>
           </Stack>
@@ -289,16 +285,17 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
               textAlign: "center",
               py: 8,
               px: 3,
-              bgcolor: "grey.50",
+              bgcolor: theme.palette.background.paper,
               borderRadius: 2,
+              border: `1px solid ${theme.palette.divider}`
             }}
           >
             <MessageSquare
               size={48}
-              style={{ opacity: 0.3, marginBottom: 16 }}
+              style={{ opacity: 0.3, marginBottom: 16, color: theme.palette.text.secondary }}
             />
             <Typography variant="body1" color="text.secondary">
-              No comments yet. Be the first to share your thoughts!
+              {t("noCommentsText")}
             </Typography>
           </Box>
         ) : (
@@ -322,29 +319,28 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
         )}
       </Stack>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog
         open={!!commentToDelete}
         onClose={() => setCommentToDelete(null)}
         PaperProps={{ sx: { borderRadius: 2 } }}
       >
-        <DialogTitle>Delete Comment</DialogTitle>
+        <DialogTitle>{t("deleteTitle")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this comment? This action cannot be
-            undone.
+            {t("deleteConfirm")}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setCommentToDelete(null)}>Cancel</Button>
+          <Button onClick={() => setCommentToDelete(null)}>{t("common:buttonCancel")}</Button>
           <Button
             variant="contained"
             color="error"
             onClick={() =>
               commentToDelete && handleDeleteComment(commentToDelete)
             }
+            aria-label={t("common:buttonDelete")}
           >
-            Delete
+            {t("common:buttonDelete")}
           </Button>
         </DialogActions>
       </Dialog>

@@ -18,11 +18,13 @@ import { useUserStore } from "../store/useUserStore";
 import { register } from "../services/userService";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, RegisterFormValues } from "../schemas/register.schema";
+import { createRegisterSchema, RegisterFormValues } from "../schemas/register.schema"; 
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function RegisterPage() {
+  const { t } = useTranslation(["auth", "common", "validation"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,7 +32,11 @@ export function RegisterPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  
+  // 1. זיהוי כיוון השפה
+  const isRtl = t("dir") === "rtl";
+  
+  const schema = createRegisterSchema(t);
 
   const getRedirectPath = () => {
     const params = new URLSearchParams(location.search);
@@ -43,7 +49,7 @@ export function RegisterPage() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -53,19 +59,36 @@ export function RegisterPage() {
       login(user, token);
       navigate(getRedirectPath());
     } catch (err: any) {
-      // טיפול ידידותי בשגיאות מהשרת
       if (err.response) {
         const status = err.response.status;
         const message = err.response.data?.message || "";
 
         if (status === 400 && message.includes("User already exists")) {
-          setError("This email is already registered.");
+          setError(t("register.errorExists"));
         } else {
-          setError("Registration failed. Please try again.");
+          setError(t("register.errorGeneral"));
         }
       } else {
-        setError("Registration failed. Please try again.");
+        setError(t("register.errorGeneral"));
       }
+    }
+  };
+
+  // אובייקט עיצוב משותף לכל השדות למניעת חזרות בקוד
+  const commonTextFieldStyles = {
+    "& .MuiOutlinedInput-root": {
+       flexDirection: isRtl ? "row-reverse" : "row",
+    },
+    "& .MuiOutlinedInput-input": {
+        textAlign: isRtl ? "right" : "left",
+    }
+  };
+
+  const commonLabelProps = {
+    sx: {
+      transformOrigin: isRtl ? "right top" : "left top",
+      left: isRtl ? "auto" : 0,
+      right: isRtl ? 0 : "auto",
     }
   };
 
@@ -79,6 +102,7 @@ export function RegisterPage() {
         justifyContent: "center",
         p: 2,
       }}
+      dir={t("dir")}
     >
       <Card sx={{ width: "100%", maxWidth: 420, boxShadow: 3 }}>
         <CardHeader
@@ -86,10 +110,10 @@ export function RegisterPage() {
             <Box textAlign="center">
               <BookIcon sx={{ fontSize: 48, color: "primary.main", mb: 1 }} />
               <Typography variant="h5" fontWeight="bold">
-                Join BookNest
+                {t("register.title")}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Create an account to start your reading journey
+                {t("register.subtitle")}
               </Typography>
             </Box>
           }
@@ -99,34 +123,53 @@ export function RegisterPage() {
           <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {error && <Alert severity="error">{error}</Alert>}
 
+            {/* --- שם מלא --- */}
             <TextField
-              label="Full Name"
+              label={t("register.nameLabel")}
               fullWidth
               {...formRegister("name")}
               error={!!errors.name}
               helperText={errors.name?.message}
+              
+              // תיקוני RTL
+              dir={isRtl ? "rtl" : "ltr"}
+              InputLabelProps={commonLabelProps}
+              sx={commonTextFieldStyles}
             />
 
+            {/* --- אימייל --- */}
             <TextField
-              label="Email"
+              label={t("register.emailLabel")}
               type="email"
               fullWidth
               {...formRegister("email")}
               error={!!errors.email}
               helperText={errors.email?.message}
+
+              // תיקוני RTL
+              dir={isRtl ? "rtl" : "ltr"}
+              InputLabelProps={commonLabelProps}
+              sx={commonTextFieldStyles}
             />
 
+            {/* --- סיסמה --- */}
             <TextField
-              label="Password"
+              label={t("register.passwordLabel")}
               type={showPassword ? "text" : "password"}
               fullWidth
               {...formRegister("password")}
               error={!!errors.password}
               helperText={errors.password?.message}
+              
+              // תיקוני RTL
+              dir={isRtl ? "rtl" : "ltr"}
+              InputLabelProps={commonLabelProps}
+              sx={commonTextFieldStyles}
+
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" aria-label={showPassword ? t("hidePassword") : t("showPassword")}>
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
@@ -134,17 +177,24 @@ export function RegisterPage() {
               }}
             />
 
+            {/* --- אימות סיסמה --- */}
             <TextField
-              label="Confirm Password"
+              label={t("register.confirmPasswordLabel")}
               type={showConfirmPassword ? "text" : "password"}
               fullWidth
               {...formRegister("confirmPassword")}
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword?.message}
+              
+              // תיקוני RTL
+              dir={isRtl ? "rtl" : "ltr"}
+              InputLabelProps={commonLabelProps}
+              sx={commonTextFieldStyles}
+
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                    <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" aria-label={showConfirmPassword ? t("hidePassword") : t("showPassword")}>
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
@@ -171,8 +221,13 @@ export function RegisterPage() {
                 color: "primary.contrastText",
               }}
               disabled={isSubmitting}
+              aria-label={isSubmitting
+                ? t("register.registeringButton")
+                : t("register.submitButton")}
             >
-              {isSubmitting ? "Registering..." : "Register"}
+              {isSubmitting
+                ? t("register.registeringButton")
+                : t("register.submitButton")}
             </Button>
 
             <Typography
@@ -180,12 +235,12 @@ export function RegisterPage() {
               textAlign="center"
               color="text.secondary"
             >
-              Already have an account?{" "}
+              {t("register.hasAccountText")}{" "}
               <Link
                 to="/login"
                 style={{ color: "#16A34A", textDecoration: "none" }}
               >
-                Login here
+                {t("register.loginLink")}
               </Link>
             </Typography>
           </CardActions>

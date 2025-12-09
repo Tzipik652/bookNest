@@ -1,275 +1,3 @@
-// import { useQuery, useQueryClient } from "@tanstack/react-query";
-// import { useCallback, useEffect, useState, useRef } from "react";
-// import { BookCard } from "../components/BookCard";
-// import { getBooks, getBooksByCategory } from "../services/bookService";
-// import { getCategories } from "../services/categoryService";
-// import { Search } from "lucide-react";
-// import {
-//   Box,
-//   Container,
-//   Typography,
-//   TextField,
-//   InputAdornment,
-//   FormControl,
-//   InputLabel,
-//   Select,
-//   MenuItem,
-//   Pagination,
-// } from "@mui/material";
-// import { Book, Category, BookWithFavorite } from "../types";
-// import { useUserStore } from "../store/useUserStore";
-// import LandingComponent from "../components/LandingComponent";
-// import BookGridSkeleton from "../components/BookGridSkeleton";
-// import { useFavoriteBooks } from "../hooks/useFavorites";
-// import { useKeyboardGridNavigation } from "../hooks/useKeyboardGridNavigation";
-// import { useNavigate } from "react-router-dom";
-
-
-// const BOOKS_PER_PAGE = 20;
-
-// export function HomePage() {
-//   const navigate = useNavigate();
-//   const [searchQuery, setSearchQuery] = useState("");
-//   const [selectedCategory, setSelectedCategory] = useState("All");
-//   const [currentPage, setCurrentPage] = useState(1);
-
-//   const [firstLoad, setFirstLoad] = useState(true);
-//   const discoverRef = useRef<HTMLHeadingElement | null>(null);
-
-//   const { user } = useUserStore();
-//   const queryClient = useQueryClient();
-//   const { favoriteBooksQuery } = useFavoriteBooks();
-
-//   const { data: categories = [] } = useQuery<Category[]>({
-//     queryKey: ["categories"],
-//     queryFn: getCategories,
-//     staleTime: 10 * 60 * 1000,
-//   });
-
-//   const { data: booksData, isLoading: loading } = useQuery({
-//     queryKey: ["books", selectedCategory, currentPage],
-//     queryFn: async () => {
-//       if (selectedCategory === "All") {
-//         return await getBooks({ page: currentPage, limit: BOOKS_PER_PAGE });
-//       } else {
-//         return await getBooksByCategory(selectedCategory, currentPage, BOOKS_PER_PAGE);
-//       }
-//     },
-//     staleTime: 2 * 60 * 1000,
-//     placeholderData: (previousData) => previousData,
-//   });
-
-//   const books = booksData?.books || [];
-//   const totalPages = booksData?.totalPages || 1;
-//   const totalItems = booksData?.totalItems || 0;
-//   const filteredBooks = books.filter((book: Book) => {
-//     const matchesSearch =
-//       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-//       book.author.toLowerCase().includes(searchQuery.toLowerCase());
-//     return matchesSearch;
-//   });
-
-//   useEffect(() => {
-//     if (!books.length || !favoriteBooksQuery.data) return;
-
-//     const favoriteIds = new Set(favoriteBooksQuery.data.map(b => b._id));
-
-//     books.forEach((book: Book) => {
-//       queryClient.setQueryData<BookWithFavorite>(
-//         ["book", book._id],
-//         (existing) => ({
-//           ...existing,
-//           ...book,
-//           favorites_count: existing?.favorites_count ?? book.favorites_count ?? 0,
-//           isFavorited: existing?.isFavorited ?? favoriteIds.has(book._id),
-//         })
-//       );
-//     });
-//   }, [books, favoriteBooksQuery.data, queryClient]);
-
-//   const {
-//     gridRef,
-//     focusedIndex,
-//     setFocusedIndex,
-//     handleItemKeyDown
-//   } = useKeyboardGridNavigation<Book>({
-//     items: filteredBooks,
-//     getId: (b) => b._id,
-//     onEnter: (b) => navigate(`/books/${b._id}`),
-//     page: currentPage,
-//     setPage: setCurrentPage,
-//     totalPages: totalPages
-//   });
-
-//   useEffect(() => {
-//     const handleKeyDown = (e: KeyboardEvent) => {
-
-//       // Ctrl + K -> פוקוס על החיפוש
-//       if (e.ctrlKey && e.key.toLowerCase() === "k") {
-//         e.preventDefault();
-//         const searchInput = document.getElementById("search-books");
-//         searchInput?.focus();
-//       }
-
-//       // C -> לפתוח תיבת קטגוריות
-//       if (e.key.toLowerCase() === "c") {
-//         const categorySelect = document.getElementById("category-select");
-//         categorySelect?.focus();
-//       }
-
-//       // חצים לדפדוף בדפים
-//       if (e.key === "ArrowRight") {
-//         setCurrentPage((p) => Math.min(p + 1, totalPages));
-//       }
-//       if (e.key === "ArrowLeft") {
-//         setCurrentPage((p) => Math.max(p - 1, 1));
-//       }
-
-//       // ESC -> לנקות חיפוש
-//       if (e.key === "Escape") {
-//         setSearchQuery("");
-//       }
-//     };
-
-//     window.addEventListener("keydown", handleKeyDown);
-//     return () => window.removeEventListener("keydown", handleKeyDown);
-//   }, [totalPages]);
-
-//   useEffect(() => {
-//     if (!loading) {
-//       if (firstLoad) {
-//         window.scrollTo({ top: 0, behavior: "smooth" });
-//         setFirstLoad(false);
-//       } else if (discoverRef.current) {
-//         discoverRef.current.scrollIntoView({ behavior: "smooth" });
-//       }
-//     }
-//   }, [loading]);
-
-
-//   const handlePageChange = (
-//     event: React.ChangeEvent<unknown>,
-//     value: number
-//   ) => {
-//     if (value !== currentPage) {
-//       setCurrentPage(value);
-//     }
-//   };
-
-
-//   return (
-//     <Box sx={{ minHeight: "100vh", paddingBottom: 8 }}>
-//       {!user && <LandingComponent />}
-
-//       <Container maxWidth="lg">
-//         <Typography
-//           variant="h4"
-//           fontWeight="bold"
-//           mb={2}
-//           py={2}
-//           ref={discoverRef}
-//         >
-//           Discover Books
-//         </Typography>
-//         {/* Filters */}
-//         <Box sx={{ display: "flex", gap: 2, mb: 6, flexWrap: "wrap" }}>
-//           <TextField
-//             id="search-books"
-//             placeholder="Search books or authors..."
-//             value={searchQuery}
-//             onChange={(e) => setSearchQuery(e.target.value)}
-//             sx={{ flex: 1, minWidth: 250, maxWidth: 400 }}
-//             InputProps={{
-//               startAdornment: (
-//                 <InputAdornment position="start">
-//                   <Search size={18} />
-//                 </InputAdornment>
-//               ),
-//             }}
-//           />
-
-//           <FormControl sx={{ minWidth: 150 }}>
-//             <InputLabel>Category</InputLabel>
-//             <Select
-//               id="category-select"
-//               value={selectedCategory}
-//               onChange={(e) => {
-//                 setSelectedCategory(e.target.value);
-//                 setCurrentPage(1);
-//               }}
-//               label="Category"
-//             >
-//               {categories.map((cat) => (
-//                 <MenuItem key={cat.id} value={cat.name}>
-//                   {cat.name}
-//                 </MenuItem>
-//               ))}
-//             </Select>
-//           </FormControl>
-//         </Box>
-
-//         {/* Books Grid */}
-//         {loading ? (
-//           <BookGridSkeleton count={20} />
-//         ) : filteredBooks.length > 0 ? (
-//           <Box
-//             ref={gridRef}
-//             display="flex"
-//             flexWrap="wrap"
-//             gap={3}
-//             justifyContent="flex-start"
-//           >
-//             {filteredBooks.map((book: Book, index: number) => (
-//               <Box
-//                 key={book._id}
-//                 data-grid-item
-//                 tabIndex={0}
-//                 onFocus={() => setFocusedIndex(index)}
-//                 onKeyDown={(e) => handleItemKeyDown(e, index)}
-//                 sx={{
-//                   flex: "1 1 calc(25% - 24px)",
-//                   minWidth: 250,
-//                   maxWidth: 300,
-//                   outline: "none",
-//                   "&:focus": {
-//                     boxShadow: "0 0 0 3px #1976d2",
-//                     borderRadius: 2
-//                   }
-//                 }}
-//               >
-//                 <BookCard book={book} />
-//               </Box>
-//             ))}
-//           </Box>
-//         ) : (
-//           <Box textAlign="center" py={12}>
-//             <Typography color="text.secondary">
-//               No books found matching your criteria.
-//             </Typography>
-//           </Box>
-//         )}
-
-//         {/* Pagination */}
-//         {totalPages > 1 && (
-//           <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
-//             <Pagination
-//               count={totalPages}
-//               page={currentPage}
-//               onChange={handlePageChange}
-//               variant="outlined"
-//               shape="rounded"
-//               size="large"
-//               disabled={loading}
-//             />
-//           </Box>
-//         )}
-//       </Container>
-//     </Box>
-//   );
-// }
-// ---------------------------
-// Imports
-// ---------------------------
 import {
   Box,
   Container,
@@ -282,13 +10,16 @@ import {
   MenuItem,
   Pagination,
 } from "@mui/material";
-
 import { Search } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getBooks, getBooksByCategory } from "../services/bookService";
+import {
+  getBooks,
+  getBooksByCategory,
+  searchBooks,
+} from "../services/bookService";
 import { getCategories } from "../services/categoryService";
 
 import { BookCard } from "../components/BookCard";
@@ -301,76 +32,58 @@ import { useFavoriteBooks } from "../hooks/useFavorites";
 import { useTranslation } from "react-i18next";
 import { useKeyboardGridNavigation } from "../hooks/useKeyboardGridNavigation";
 
-
-// ---------------------------
-// Constants
-// ---------------------------
 const BOOKS_PER_PAGE = 20;
 
-
-// ---------------------------
-// Component
-// ---------------------------
 export function HomePage() {
-  const { t } = useTranslation(['home', 'common']);
+  const { t } = useTranslation(["home", "common"]);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useUserStore();
 
-  // ---------------------------
-  // State
-  // ---------------------------
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [isCategorySelectOpen, setIsCategorySelectOpen] = useState(false);
   const [firstLoad, setFirstLoad] = useState(true);
 
-  // ---------------------------
-  // Refs
-  // ---------------------------
-  const discoverRef = useRef<HTMLHeadingElement | null>(null);
+  const debounceRef = useRef<number|null>(null);
 
-  // ---------------------------
-  // Queries
-  // ---------------------------
+  const discoverRef = useRef<HTMLHeadingElement | null>(null);
   const { favoriteBooksQuery } = useFavoriteBooks();
 
+  /** Fetch categories */
   const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ["categories"],
     queryFn: getCategories,
     staleTime: 10 * 60 * 1000,
   });
 
-  const {
-    data: booksData,
-    isLoading: loading
-  } = useQuery({
-    queryKey: ["books", selectedCategory, currentPage],
-    queryFn: async () => {
-      if (selectedCategory === "All") {
-        return await getBooks({ page: currentPage, limit: BOOKS_PER_PAGE });
+  const { data: booksResult, isLoading } = useQuery({
+    queryKey: ["books", selectedCategory, debouncedSearchQuery, currentPage],
+    queryFn: () => {
+      if (debouncedSearchQuery) {
+        const categoryObj = categories.find((c) => c.name === selectedCategory);
+        const categoryId = categoryObj ? categoryObj.id : undefined;
+        return searchBooks(
+          debouncedSearchQuery,
+          currentPage,
+          BOOKS_PER_PAGE,
+          categoryId
+        );
       }
-      return await getBooksByCategory(selectedCategory, currentPage, BOOKS_PER_PAGE);
+      if (selectedCategory === "All") {
+        return getBooks({ page: currentPage, limit: BOOKS_PER_PAGE });
+      }
+      return getBooksByCategory(selectedCategory, currentPage, BOOKS_PER_PAGE);
     },
     staleTime: 2 * 60 * 1000,
-    placeholderData: previousData => previousData,
   });
 
-  // ---------------------------
-  // Derived Data
-  // ---------------------------
-  const books = booksData?.books || [];
-  const totalPages = booksData?.totalPages || 1;
+  
+  const displayedBooks: BookWithFavorite[] = booksResult?.books || [];
+  const totalPages = booksResult?.totalPages || 1;
 
-  const filteredBooks = books.filter((b: Book) =>
-    b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    b.author.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // ---------------------------
-  // Keyboard Navigation Hook
-  // ---------------------------
   const {
     gridRef,
     focusedIndex,
@@ -378,87 +91,95 @@ export function HomePage() {
     registerItem,
     handleItemKeyDown,
   } = useKeyboardGridNavigation<Book>({
-    items: filteredBooks,
-    getId: b => b._id,
-    onEnter: b => navigate(`/book/${b._id}`),
-    onNextPage: () => setCurrentPage(p => Math.min(p + 1, totalPages)),
-    onPrevPage: () => setCurrentPage(p => Math.max(p - 1, 1)),
+    items: displayedBooks,
+    getId: (b) => b._id,
+    onEnter: (b) => navigate(`/book/${b._id}`),
+    onNextPage: () => setCurrentPage((p) => Math.min(p + 1, totalPages)),
+    onPrevPage: () => setCurrentPage((p) => Math.max(p - 1, 1)),
   });
 
-  // ---------------------------
-  // Effects
-  // ---------------------------
-
-  // Sync favorite data into individual book queries
+  /** Merge favorite status into books cache */
   useEffect(() => {
-    if (!books.length || !favoriteBooksQuery.data) return;
+    if (!displayedBooks.length || !favoriteBooksQuery.data) return;
+    const favoriteIds = new Set(favoriteBooksQuery.data.map((b) => b._id));
 
-    const favoriteIds = new Set(favoriteBooksQuery.data.map(b => b._id));
-
-    books.forEach((book: Book) => {
+    displayedBooks.forEach((book) => {
       queryClient.setQueryData<BookWithFavorite>(
         ["book", book._id],
-        existing => ({
+        (existing) => ({
           ...existing,
           ...book,
-          favorites_count: existing?.favorites_count ?? book.favorites_count ?? 0,
+          favorites_count:
+            existing?.favorites_count ?? book.favorites_count ?? 0,
           isFavorited: existing?.isFavorited ?? favoriteIds.has(book._id),
         })
       );
     });
-  }, [books, favoriteBooksQuery.data, queryClient]);
+  }, [displayedBooks, favoriteBooksQuery.data, queryClient]);
 
+  /** Close category select on scroll */
+  useEffect(() => {
+    if (!isCategorySelectOpen) return;
+    const handleScroll = () => setIsCategorySelectOpen(false);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isCategorySelectOpen]);
+
+  /** Global keyboard shortcuts */
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const key = e.key?.toLowerCase();
+      if (!key) return;
 
-      // Ctrl+K -> פוקוס על חיפוש
-      if (e.ctrlKey && e.key.toLowerCase() === "k") {
+      // Focus search
+      if (e.ctrlKey && key === "k") {
         e.preventDefault();
         document.getElementById("search-books")?.focus();
         return;
       }
 
-      // C -> פוקוס על קטגוריות
-      if (e.key.toLowerCase() === "c") {
+      // Focus category select
+      if (key === "c") {
         e.preventDefault();
         document.getElementById("category-select")?.focus();
         return;
       }
 
-      // ESC -> נקה חיפוש
+      // Clear search
       if (e.key === "Escape") {
         setSearchQuery("");
         return;
       }
 
-      // Ctrl+N -> עמוד הבא
-      if (e.ctrlKey && e.key.toLowerCase() === "n") {
+      // Pagination
+      if (e.ctrlKey && key === "n") {
         e.preventDefault();
-        setCurrentPage(p => Math.min(p + 1, totalPages));
+        setCurrentPage((p) => Math.min(p + 1, totalPages));
+        return;
+      }
+      if (e.ctrlKey && key === "p") {
+        e.preventDefault();
+        setCurrentPage((p) => Math.max(p - 1, 1));
         return;
       }
 
-      // Ctrl+P -> עמוד קודם
-      if (e.ctrlKey && e.key.toLowerCase() === "p") {
-        e.preventDefault();
-        setCurrentPage(p => Math.max(p - 1, 1));
-        return;
-      }
-
-      // חיצים בתוך הגריד
-      if (["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Home", "End", "Enter", " "].includes(e.key)) {
+      // Grid navigation
+      if (
+        [
+          "ArrowRight",
+          "ArrowLeft",
+          "ArrowUp",
+          "ArrowDown",
+          "Home",
+          "End",
+          "Enter",
+          " ",
+        ].includes(e.key)
+      ) {
         handleItemKeyDown(e as any, focusedIndex);
       }
-    };
 
-    window.addEventListener("keydown", handleGlobalKeyDown);
-    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
-  }, [focusedIndex, handleItemKeyDown, totalPages]);
-
-
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      // Slash -> פוקוס על חיפוש
+      // Focus search with '/'
       if (e.key === "/" || e.code === "Slash") {
         e.preventDefault();
         document.getElementById("search-books")?.focus();
@@ -467,11 +188,11 @@ export function HomePage() {
 
     window.addEventListener("keydown", handleGlobalKeyDown);
     return () => window.removeEventListener("keydown", handleGlobalKeyDown);
-  }, []);
+  }, [focusedIndex, handleItemKeyDown, totalPages]);
 
-  // Auto scroll behavior
+  /** Scroll behavior on load or data change */
   useEffect(() => {
-    if (!loading) {
+    if (isLoading) {
       if (firstLoad) {
         window.scrollTo({ top: 0, behavior: "smooth" });
         setFirstLoad(false);
@@ -479,27 +200,19 @@ export function HomePage() {
         discoverRef.current.scrollIntoView({ behavior: "smooth" });
       }
     }
-  }, [loading]);
+  }, [isLoading]);
 
-  // ---------------------------
-  // Handlers
-  // ---------------------------
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     value: number
   ) => {
-    if (value !== currentPage) {
-      setCurrentPage(value);
-    }
+    if (value !== currentPage) setCurrentPage(value);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // ---------------------------
-  // JSX
-  // ---------------------------
   return (
     <Box sx={{ minHeight: "100vh", paddingBottom: 8 }}>
       {!user && <LandingComponent />}
-
 
       <Container maxWidth="lg">
         <Typography
@@ -508,19 +221,30 @@ export function HomePage() {
           mb={2}
           py={2}
           ref={discoverRef}
-        className="notranslate"
+          className="notranslate"
         >
-          {t('home:page_title')}
+          {t("home:page_title")}
         </Typography>
 
         {/* Filters */}
         <Box sx={{ display: "flex", gap: 2, mb: 6, flexWrap: "wrap" }}>
           <TextField
-          className="notranslate"
+            className="notranslate"
             id="search-books"
+            aria-label={t("home:search_placeholder")}
             value={searchQuery}
-            placeholder={t('home:search_placeholder')}
-            onChange={e => setSearchQuery(e.target.value)}
+            placeholder={t("home:search_placeholder")}
+            onChange={
+              (e) => {
+                const value = e.target.value;
+                setSearchQuery(value)
+                clearTimeout(debounceRef.current || undefined);
+                debounceRef.current = window.setTimeout(()=>{
+                  console.log(e.target.value)
+                  setDebouncedSearchQuery(value)
+                },300)
+              }
+            }
             sx={{ flex: 1, minWidth: 250, maxWidth: 400 }}
             InputProps={{
               startAdornment: (
@@ -532,19 +256,27 @@ export function HomePage() {
           />
 
           <FormControl sx={{ minWidth: 150 }}>
-            <InputLabel className="notranslate">{t('home:category_label')}</InputLabel>
+            <InputLabel className="notranslate">
+              {t("home:category_label")}
+            </InputLabel>
             <Select
               id="category-select"
-              value={selectedCategory}
-              onChange={e => {
+              aria-label={t("home:category_label")}
+              value={selectedCategory || ""}
+              onChange={(e) => {
                 setSelectedCategory(e.target.value);
                 setCurrentPage(1);
               }}
-              label={t('home:category_label')}
+              open={isCategorySelectOpen}
+              onOpen={() => setIsCategorySelectOpen(true)}
+              onClose={() => setIsCategorySelectOpen(false)}
+              MenuProps={{ disableScrollLock: true }}
+              label={t("home:category_label")}
             >
-              {categories.map(cat => (
+              <MenuItem value="All">{t(`category:All`)}</MenuItem>
+              {categories.map((cat) => (
                 <MenuItem key={cat.id} value={cat.name}>
-                  {cat.name}
+                  {t(`category:${cat.name.replace(/\s+/g, "")}`)}
                 </MenuItem>
               ))}
             </Select>
@@ -552,9 +284,9 @@ export function HomePage() {
         </Box>
 
         {/* Books Grid */}
-        {loading ? (
-          <BookGridSkeleton count={20} />
-        ) : filteredBooks.length > 0 ? (
+        {isLoading ? (
+          <BookGridSkeleton count={BOOKS_PER_PAGE} />
+        ) : displayedBooks.length > 0 ? (
           <Box
             ref={gridRef}
             display="flex"
@@ -562,7 +294,7 @@ export function HomePage() {
             gap={3}
             justifyContent="flex-start"
           >
-            {filteredBooks.map((book: Book, index: number) => (
+            {displayedBooks.map((book, index) => (
               <Box
                 key={book._id}
                 tabIndex={0}
@@ -577,19 +309,19 @@ export function HomePage() {
                   "&:focus": {
                     boxShadow: "0 0 0 3px #16A34A",
                     borderRadius: 2,
-                    zIndex: 10
-                  }
+                    zIndex: 10,
+                  },
                 }}
+                aria-label={`${book.title} by ${book.author}`}
               >
                 <BookCard book={book} />
               </Box>
             ))}
-
           </Box>
         ) : (
           <Box textAlign="center" py={12}>
             <Typography color="text.secondary" className="notranslate">
-             {t('home:no_books_found')}
+              {t("home:no_books_found")}
             </Typography>
           </Box>
         )}
@@ -604,7 +336,8 @@ export function HomePage() {
               variant="outlined"
               shape="rounded"
               size="large"
-              disabled={loading}
+              disabled={isLoading}
+              dir="ltr"
             />
           </Box>
         )}

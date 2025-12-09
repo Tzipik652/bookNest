@@ -8,11 +8,18 @@ import commentRouter from "./routes/commentRouter.js";
 import commentReactionRouter from "./routes/commentReactionRouter.js";
 import authRouter from "./routes/authRouter.js";
 import contactRouter from "./routes/contactRouter.js";
+import categoryRouter from './routes/categoryRouter.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import path from "path";
+import { fileURLToPath } from "url";
+import dashboardStats from './routes/dashboardRouter.js';
+
+
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-import categoryRouter from './routes/categoryRouter.js';
 const app = express();
 
 // Middleware
@@ -30,10 +37,15 @@ app.use("/comments", commentRouter);
 app.use("/comment-reactions", commentReactionRouter);
 app.use("/contact", contactRouter);
 app.use("/api/auth", authRouter);
+app.use("/dashboard", dashboardStats);
+
 
 // Error handling
 app.use(errorHandler);
 
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

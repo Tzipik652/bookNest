@@ -1,10 +1,10 @@
 // client/src/App.tsx
 import React, { Suspense, useEffect } from "react";
-import { Routes, Route, useLocation, Router } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { CircularProgress, Box, GlobalStyles } from "@mui/material";
 import { Toaster } from "sonner";
-import { KeyboardShortcutsHelp } from './components/KeyboardShortcutsHelp';
-import { KeyboardWelcomeToast } from './components/KeyboardWelcomeToast';
+import { KeyboardShortcutsHelp } from "./components/KeyboardShortcutsHelp";
+import { KeyboardWelcomeToast } from "./components/KeyboardWelcomeToast";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -12,7 +12,9 @@ import { useUserStore } from "./store/useUserStore";
 import { useAccessibilityStore } from "./store/accessibilityStore";
 import AccessibilityMenu from "./components/AccessibilityMenu";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
+import ScrollButton from "./components/ScrollButton";
 import { useTranslation } from "react-i18next";
+import { useScreenReader } from "./hooks/useScreenReader";
 
 // Lazy-loaded pages
 const LazyLoginPage = React.lazy(() =>
@@ -109,9 +111,9 @@ const RouteFallback = () => (
 );
 
 function App() {
-  const { t, i18n } = useTranslation('common');
-  const { user: currentUser } = useUserStore();
+  const { i18n } = useTranslation("common");
   const { pathname } = useLocation();
+  useScreenReader();
 
   useEffect(() => {
     window.scrollTo({
@@ -126,22 +128,14 @@ function App() {
     largeText,
     reduceMotion,
     underlineLinks,
-    dyslexicFont,
     screenReader,
   } = useAccessibilityStore();
 
-  // Auto ARIA-label for icon-only buttons
-  document.querySelectorAll("button, [role='button'], a").forEach((el) => {
-    const text = el.textContent;
-    if (!el.getAttribute("aria-label") && text && text.trim() === "") {
-      el.setAttribute("aria-label", "button");
-    }
-  });
-useEffect(() => {
+  
+  useEffect(() => {
     document.documentElement.dir = i18n.dir(i18n.language);
-    
-    document.documentElement.lang = i18n.language;
 
+    document.documentElement.lang = i18n.language;
   }, [i18n.language]);
   return (
     <div className="min-h-screen">
@@ -155,7 +149,7 @@ useEffect(() => {
 
       <Navbar />
       <AccessibilityMenu />
-
+      
       {/* Global Accessibility Overrides */}
       <GlobalStyles
         styles={{
@@ -169,7 +163,6 @@ useEffect(() => {
             color: darkMode || highContrast ? "#fff" : "#000",
             fontSize: largeText ? "1.2rem" : "1rem",
             transition: reduceMotion ? "none" : "all 0.3s ease",
-            fontFamily: dyslexicFont ? "OpenDyslexic, Arial" : "inherit",
           },
 
           a: {
@@ -177,107 +170,111 @@ useEffect(() => {
           },
         }}
       />
+      <ScrollButton />
+      <main className="sr-content">
+        <Suspense fallback={<RouteFallback />}>
+          <Toaster position="top-right" richColors />
+          <Routes>
+            <Route path="/" element={<LazyHomePage />} />
+            <Route path="/login" element={<LazyLoginPage />} />
+            <Route path="/register" element={<LazyRegisterPage />} />
+            <Route
+              path="/forgot-password"
+              element={<LazyForgotPasswordPage />}
+            />
+            <Route
+              path="/reset-password/:token"
+              element={<LazyResetPasswordPage />}
+            />
 
-      <Suspense fallback={<RouteFallback />}>
-        <Toaster position="top-right" richColors />
-        <Routes>
-          <Route path="/" element={<LazyHomePage />} />
-          <Route path="/login" element={<LazyLoginPage />} />
-          <Route path="/register" element={<LazyRegisterPage />} />
-          <Route path="/forgot-password" element={<LazyForgotPasswordPage />} />
-          <Route
-            path="/reset-password/:token"
-            element={<LazyResetPasswordPage />}
-          />
+            <Route path="/home" element={<LazyHomePage />} />
 
-          <Route path="/home" element={<LazyHomePage />} />
+            <Route path="/book/:id" element={<LazyBookDetailsPage />} />
 
-          <Route path="/book/:id" element={<LazyBookDetailsPage />} />
+            <Route
+              path="/add-book"
+              element={
+                <ProtectedRoute>
+                  <LazyAddBookPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-dashboard"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/edit-book/:id"
+              element={
+                <ProtectedRoute>
+                  <LazyEditBookPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/add-book"
-            element={
-              <ProtectedRoute>
-                <LazyAddBookPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin-dashboard"
-            element={
-              <ProtectedRoute>
-                <AdminDashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/edit-book/:id"
-            element={
-              <ProtectedRoute>
-                <LazyEditBookPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/my-books"
+              element={
+                <ProtectedRoute>
+                  <LazyMyBooksPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/my-books"
-            element={
-              <ProtectedRoute>
-                <LazyMyBooksPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/favorites"
+              element={
+                <ProtectedRoute>
+                  <LazyFavoritesPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/favorites"
-            element={
-              <ProtectedRoute>
-                <LazyFavoritesPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/recommendations"
+              element={
+                <ProtectedRoute>
+                  <LazyAIRecommendationsPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/recommendations"
-            element={
-              <ProtectedRoute>
-                <LazyAIRecommendationsPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route path="*" element={<LazyNotFoundPage />} />
+            <Route path="/contact" element={<LazyContactPage />} />
+            <Route path="/privacy-policy" element={<LazyPrivacyPolicyPage />} />
+            <Route
+              path="/terms-of-service"
+              element={<LazyTermsOfServicePage />}
+            />
+            <Route path="/faq" element={<LazyFAQPage />} />
+          </Routes>
+        </Suspense>
+      </main>
+      <KeyboardShortcutsHelp />
+      <KeyboardWelcomeToast />
 
-          <Route path="*" element={<LazyNotFoundPage />} />
-          <Route path="/contact" element={<LazyContactPage />} />
-          <Route path="/privacy-policy" element={<LazyPrivacyPolicyPage />} />
-          <Route
-            path="/terms-of-service"
-            element={<LazyTermsOfServicePage />}
-          />
-          <Route path="/faq" element={<LazyFAQPage />} />
-        </Routes>
-      </Suspense>
-
-<KeyboardShortcutsHelp />
-        <KeyboardWelcomeToast />
-
-        {/* Screen reader ARIA announcements */}
-        {screenReader && (
-          <div
-            aria-live="assertive"
-            style={{
-              position: "absolute",
-              width: "1px",
-              height: "1px",
-              margin: "-1px",
-              padding: "0",
-              overflow: "hidden",
-              clip: "rect(0 0 0 0)",
-              border: "0",
-            }}
-          >
-            Screen reader mode enabled
-          </div>
-        )}
+      {/* Screen reader ARIA announcements */}
+      {screenReader && (
+        <div
+          aria-live="assertive"
+          style={{
+            position: "absolute",
+            width: "1px",
+            height: "1px",
+            margin: "-1px",
+            padding: "0",
+            overflow: "hidden",
+            clip: "rect(0 0 0 0)",
+            border: "0",
+          }}
+        >
+          Screen reader mode enabled
+        </div>
+      )}
 
       <Footer />
     </div>

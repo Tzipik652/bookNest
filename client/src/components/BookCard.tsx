@@ -10,15 +10,18 @@ import { useFavoriteBooks } from "../hooks/useFavorites";
 import { useDynamicTheme } from "../theme";
 import { useQueryClient } from "@tanstack/react-query";
 import { BookWithFavorite } from "../types/index";
+import { useTranslation } from "react-i18next";
 interface BookCardProps {
   book: Book;
 }
 
 export function BookCard({ book }: BookCardProps) {
+  const { t } = useTranslation(["bookCard", "common"]);
   const theme = useDynamicTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const { user: currentUser } = useUserStore();
+  const commonDir = t('common:dir') as 'rtl' | 'ltr';
 
   const queryClient = useQueryClient();
   const { toggleMutation } = useFavoriteBooks();
@@ -49,6 +52,7 @@ export function BookCard({ book }: BookCardProps) {
 
   return (
     <Card
+    dir={commonDir}
       className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
       style={{
         backgroundColor: theme.palette.background.paper,
@@ -79,13 +83,13 @@ export function BookCard({ book }: BookCardProps) {
                 onClick={handleFavoriteClick}
                 className="shrink-0"
                 disabled={isLoading}
+                aria-label={t('bookCard:heartAriaLabel')}
               >
                 <Heart
-                  className={`h-5 w-5 transition-colors ${
-                    displayedBook.isFavorited
+                  className={`h-5 w-5 transition-colors ${displayedBook.isFavorited
                       ? "fill-red-500 text-red-500"
                       : "text-gray-400"
-                  } ${isLoading ? "opacity-50" : ""}`}
+                    } ${isLoading ? "opacity-50" : ""}`}
                   style={{ cursor: isLoading ? "not-allowed" : "pointer" }}
                 />
               </Button>
@@ -98,7 +102,7 @@ export function BookCard({ book }: BookCardProps) {
             {book.author}
           </p>
           <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm mb-3">
-            {book.category}
+            {t(`category:${book.category.replace(/\s+/g, '')}`)}
           </span>
           <p
             className="text-sm text-gray-700 line-clamp-3 overflow-hidden"
@@ -116,8 +120,9 @@ export function BookCard({ book }: BookCardProps) {
         <Button
           className="w-full"
           onClick={() => navigate(`/book/${book._id}`)}
+          aria-label={t('viewDetails')}
         >
-          View Details
+          {t('viewDetails')}
         </Button>
       </CardFooter>
     </Card>

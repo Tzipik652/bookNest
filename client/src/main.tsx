@@ -9,7 +9,7 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import AccessibilityMenu from "./components/AccessibilityMenu";
 import { useDynamicTheme } from "./theme";
 import { BrowserRouter } from "react-router-dom";
-import './i18n'
+import "./i18n";
 
 const queryClient = new QueryClient();
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID!;
@@ -20,7 +20,7 @@ function Root() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AccessibilityMenu />
-      <App />
+        <App />
     </ThemeProvider>
   );
 }

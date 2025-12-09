@@ -1,179 +1,146 @@
-import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Box, Typography, Container, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, Circle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
+
 export function TermsOfServicePage() {
+  const { t } = useTranslation(["terms", "common"]);
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
+  const tos = t('termsOfService', { returnObjects: true }) as any;
+  const sections = tos.sections;
+
+
+  const renderContent = (key: string | string[]) => {
+    if (Array.isArray(key)) {
+      return (
+        <List dense sx={{ pl: 0, pt: 0, pb: 2 }}>
+          {key.map((item, index) => (
+            <ListItem
+              key={index}
+              alignItems="flex-start"
+              sx={{ pl: 0, py: 0.5 }}
+              dir={t('common:dir')}
+            >
+              <ListItemIcon sx={{ minWidth: 24, mt: '4px' }}>
+                <Circle size={6} fill="currentColor" />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <Typography variant="body1" color="text.primary" sx={{
+                    textAlign: t('common:dir') === 'rtl' ? 'right' : 'left'
+                  }}>
+                    {item}
+                  </Typography>
+                }
+              />
+            </ListItem>
+          ))}
+        </List>
+      );
+    }
+
+    return (
+      <Typography
+        variant="body1"
+        color="text.primary"
+        paragraph
+        sx={{ lineHeight: 1.8, mb: 3 }} 
+        dir={t('common:dir')}
+      >
+        {key}
+      </Typography>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <Box
+      sx={{
+        minHeight: '100vh',
+        bgcolor: 'background.default', 
+        color: 'text.primary',
+      }}
+      dir={t('common:dir')}
+    >
+      <Container maxWidth="md" sx={{ py: 4 }}>
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
           className="mb-6 gap-2"
+          aria-label={t('common:back')}
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back
+          {t('common:dir') === 'rtl' ? <ArrowRight className="h-4 w-4" /> : null}
+          {t('common:dir') === 'ltr' ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t('common:back')}
         </Button>
 
-        <div className="mb-8 flex items-center gap-3">
-          <div className="bg-green-100 p-3 rounded-lg">
-            <FileText className="h-8 w-8 text-green-600" />
-          </div>
-          <div>
-            <h1 className="mb-1">Terms of Service</h1>
-            <p className="text-gray-600">Last updated: November 17, 2025</p>
-          </div>
-        </div>
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box
+            sx={{
+              p: 1.5,
+              borderRadius: 2,
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(22, 163, 74, 0.1)',
+              color: 'primary.main', 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <FileText className="h-8 w-8" />
+          </Box>
+
+          <Box>
+            <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary" gutterBottom sx={{ mb: 0.5 }}>
+              {tos.pageTitle}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {tos.lastUpdated}
+            </Typography>
+          </Box>
+        </Box>
 
         <Card>
           <CardContent className="pt-6 space-y-6">
-            <section>
-              <h2 className="mb-3">Agreement to Terms</h2>
-              <p className="text-gray-700 leading-relaxed">
-                By accessing and using BookNest, you agree to be bound by these Terms of Service and all applicable
-                laws and regulations. If you do not agree with any of these terms, you are prohibited from using
-                this service.
-              </p>
-            </section>
+            {Object.values(sections).map((section: any, index: number) => (
+              <Box component="section" key={index} sx={{ pb: 2, pt: index === 0 ? 0 : 2 }}>
+                <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" color="text.primary" sx={{ mb: 2 }}>
+                  {section.title}
+                </Typography>
 
-            <section>
-              <h2 className="mb-3">Description of Service</h2>
-              <p className="text-gray-700 leading-relaxed">
-                BookNest is a web-based book management platform that allows users to discover, manage, and get
-                AI-powered recommendations for books. Users can create accounts, upload book information, manage
-                personal libraries, add favorites, and interact with the community through comments and reactions.
-              </p>
-            </section>
+                {section.p1 && renderContent(section.p1)}
+                {section.p2 && renderContent(section.p2)}
+                {section.list && renderContent(section.list)}
 
-            <section>
-              <h2 className="mb-3">User Accounts</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                When you create an account with us, you agree to:
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Provide accurate and complete information</li>
-                <li>Maintain the security of your account credentials</li>
-                <li>Accept responsibility for all activities under your account</li>
-                <li>Notify us immediately of any unauthorized use</li>
-                <li>Not create multiple accounts or share accounts</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="mb-3">User Content</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                When uploading books, comments, or other content, you agree that:
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>You own or have the right to share the content</li>
-                <li>Your content does not infringe on intellectual property rights</li>
-                <li>Your content does not violate any laws or regulations</li>
-                <li>You will not upload malicious, offensive, or inappropriate content</li>
-                <li>BookNest reserves the right to remove any content at our discretion</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="mb-3">Intellectual Property</h2>
-              <p className="text-gray-700 leading-relaxed">
-                The BookNest platform, including its design, features, and functionality, is owned by BookNest and
-                is protected by copyright and other intellectual property laws. You may not reproduce, distribute,
-                modify, or create derivative works without our express written permission.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="mb-3">Prohibited Activities</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                You agree not to:
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Use the service for any illegal purpose</li>
-                <li>Harass, abuse, or harm other users</li>
-                <li>Attempt to gain unauthorized access to the platform</li>
-                <li>Upload viruses, malware, or malicious code</li>
-                <li>Spam or send unsolicited messages</li>
-                <li>Scrape or copy content without permission</li>
-                <li>Impersonate other users or entities</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="mb-3">AI-Generated Content</h2>
-              <p className="text-gray-700 leading-relaxed">
-                BookNest uses AI to generate book summaries and recommendations. While we strive for accuracy,
-                AI-generated content may contain errors or inaccuracies. This content is provided for informational
-                purposes only and should not be considered professional advice.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="mb-3">Community Guidelines</h2>
-              <p className="text-gray-700 leading-relaxed mb-3">
-                When interacting with other users through comments and reactions:
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
-                <li>Be respectful and courteous to all users</li>
-                <li>Keep discussions relevant to books and literature</li>
-                <li>Do not post spam, advertisements, or promotional content</li>
-                <li>Respect diverse opinions and perspectives</li>
-                <li>Report inappropriate content to book owners or administrators</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="mb-3">Disclaimer of Warranties</h2>
-              <p className="text-gray-700 leading-relaxed">
-                BookNest is provided "as is" without warranties of any kind, either express or implied. We do not
-                guarantee that the service will be uninterrupted, secure, or error-free. Your use of the service
-                is at your own risk.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="mb-3">Limitation of Liability</h2>
-              <p className="text-gray-700 leading-relaxed">
-                To the maximum extent permitted by law, BookNest shall not be liable for any indirect, incidental,
-                special, consequential, or punitive damages resulting from your use or inability to use the service.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="mb-3">Termination</h2>
-              <p className="text-gray-700 leading-relaxed">
-                We reserve the right to terminate or suspend your account and access to the service at our sole
-                discretion, without notice, for conduct that we believe violates these Terms of Service or is
-                harmful to other users, us, or third parties.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="mb-3">Changes to Terms</h2>
-              <p className="text-gray-700 leading-relaxed">
-                We reserve the right to modify these terms at any time. We will notify users of any material changes
-                by updating the "Last updated" date. Your continued use of BookNest after changes constitutes
-                acceptance of the new terms.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="mb-3">Contact Information</h2>
-              <p className="text-gray-700 leading-relaxed">
-                If you have any questions about these Terms of Service, please contact us at{' '}
-                <Link to="/contact" className="text-green-600 hover:underline">
-                  our contact page
-                </Link>
-              </p>
-            </section>
+                {section.p1_start && (
+                  <Typography variant="body1" color="text.primary" sx={{ lineHeight: 1.8 }}>
+                    {section.p1_start}{' '}
+                    <Link to="/contact" style={{ textDecoration: 'none' }}>
+                      <Typography
+                        component="span"
+                        color="primary"
+                        sx={{
+                          textDecoration: 'underline',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          '&:hover': { opacity: 0.8 }
+                        }}
+                      >
+                        {section.p1_link}
+                      </Typography>
+                    </Link>
+                    {' '}{section.p1_end}
+                  </Typography>
+                )}
+              </Box>
+            ))}
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </Container>
+    </Box>
   );
 }
+

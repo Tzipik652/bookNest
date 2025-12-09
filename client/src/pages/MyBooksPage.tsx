@@ -16,9 +16,11 @@ import {
 import BookGridSkeleton from "../components/BookGridSkeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFavoriteBooks } from "../hooks/useFavorites";
+import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
 
 export function MyBooksPage() {
+  const { t } = useTranslation("myBooksPage");
   const isKeyboardMode = useKeyboardModeBodyClass();
   const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>([]);
@@ -66,10 +68,12 @@ export function MyBooksPage() {
   const AddBookButton = () => (
     <Button
       variant="contained"
-      startIcon={<BookPlus size={18} />}
+      startIcon={<BookPlus size={18} /> }
       onClick={() => navigate("/add-book")}
+      aria-label={t("addButton")}
+       className="mb-6 gap-2"
     >
-      Add New Book
+      {t("addButton")}
     </Button>
   );
 
@@ -83,10 +87,10 @@ export function MyBooksPage() {
         <Box textAlign="center" py={15}>
           <BookPlus size={64} color="#ccc" />
           <Typography variant="h5" mt={2} mb={1}>
-            No Books Yet
+            {t("emptyState.title")}
           </Typography>
           <Typography color="text.secondary" mb={3}>
-            Start building your library by adding your first book
+            {t("emptyState.subtitle")}
           </Typography>
           <AddBookButton />
         </Box>
@@ -97,7 +101,7 @@ export function MyBooksPage() {
       <>
         <TextField
           fullWidth
-          placeholder="Search your books..."
+          placeholder={t("searchPlaceholder")}
           variant="outlined"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -127,7 +131,7 @@ export function MyBooksPage() {
         ) : (
           <Box textAlign="center" py={10}>
             <Typography color="text.secondary">
-              No books found matching your search.
+              {t("emptySearchMessage")}
             </Typography>
           </Box>
         )}
@@ -147,7 +151,7 @@ export function MyBooksPage() {
           }}
         >
           <Typography variant="h4" fontWeight="bold">
-            My Books
+            {t("pageTitle")}
           </Typography>
           {books.length > 0 && <AddBookButton />}
         </Box>

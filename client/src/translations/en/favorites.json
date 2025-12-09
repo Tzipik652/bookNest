@@ -1,0 +1,10 @@
+{
+  "pageTitle": "My Favorites",
+  "searchPlaceholder": "Search your favorites...",
+  "emptySearchMessage": "No books found matching your search.",
+  "emptyState": {
+    "title": "No Favorites Yet",
+    "subtitle": "Start adding books to your favorites to see them here.",
+    "button": "Browse Books"
+  }
+}
