@@ -136,7 +136,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     }
   };
 
-  const handleReaction = async (
+ const handleReaction = async (
     commentId: string,
     reactionType: ReactionType
   ) => {
@@ -145,17 +145,18 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       return;
     }
 
-    setLoadingComments((prev) => new Set(prev).add(commentId));
 
-    // עדכון אופטימי
+    //optimistic update- see the reaction immediately
     setComments((prevComments) =>
       prevComments.map((comment) => {
         if (comment.id !== commentId) return comment;
 
         const wasActive = comment.user_reaction === reactionType;
         
+        //create copy of reaction counts to modify
         const newReactionCounts = { ...comment.reaction_counts! };
 
+        //case 1: removing an active reaction
         if (wasActive) {
           newReactionCounts[reactionType] = Math.max(
             0,
@@ -163,26 +164,26 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
           );
           return {
             ...comment,
-            reaction_counts: newReactionCounts, // עדכון השדה החדש
-            userReaction: undefined,
+            reaction_counts: newReactionCounts,
+            user_reaction: undefined, 
           };
         }
 
-        // החלפת ריאקציה (אם הייתה אחרת)
+        //case 2: switching reactions
+
+        //if there was a previous reaction, decrease its count
         if (comment.user_reaction) {
           newReactionCounts[comment.user_reaction] = Math.max(
             0,
             (newReactionCounts[comment.user_reaction] || 0) - 1
           );
         }
-
-        // הוספת הריאקציה החדשה
         newReactionCounts[reactionType] =
           (newReactionCounts[reactionType] || 0) + 1;
 
         return {
           ...comment,
-          reaction_counts: newReactionCounts, // עדכון השדה החדש
+          reaction_counts: newReactionCounts,
           user_reaction: reactionType,
         };
       })
@@ -194,13 +195,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       console.error(error);
       toast.error(t("errorAddFailed"));
       await loadComments();
-    } finally {
-      setLoadingComments((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(commentId);
-        return newSet;
-      });
-    }
+    } 
   };
 
   const isBookOwner = currentUser?._id === bookOwnerId;
