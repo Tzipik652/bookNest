@@ -5,18 +5,19 @@ import { verifyJWT } from "../middleware/auth.js";
 
 router.get('/', loansController.getLoans);
 
-router.get('/:id', loansController.getLoanById);
-router.get('/:id/borrower', loansController.getLoansByBorrowerId);
-router.get('/:id/userCopy', loansController.getLoansByUserCopyId);
+router.get('/:loanId', loansController.getLoanById);
+router.get('/:userId/borrower', loansController.getLoansByBorrowerId);
+router.get('/:userId/owner', loansController.getLoansByUserCopyId);
+router.get('/:userCopyId/active-loan-for-copy', loansController.getActiveLoanForCopy);
 
-router.post('/', verifyJWT, loansController.addLoan);
+router.post('/request', verifyJWT, loansController.addLoan);
 
-router.put('/:id/status', verifyJWT, loansController.changeStatus);
+router.put('/:loanId/status', verifyJWT, loansController.changeStatus);
 
-router.put('/:id/loanStartDate', verifyJWT, loansController.updateLoanStartDate);
-router.put('/:id/dueDate', verifyJWT, loansController.updateDueDate);
-router.put('/:id/returnDate', verifyJWT, loansController.updateReturnDate);
+router.put('/:loanId/loanStartDate', verifyJWT, loansController.updateLoanStartDate);
+router.put('/:loanId/dueDate', verifyJWT, loansController.updateDueDate);
+router.put('/:loanId/returnDate', verifyJWT, loansController.updateReturnDate);
 
-router.delete('/:id', verifyJWT, loansController.deleteLoan);
+router.delete('/:loanId', verifyJWT, loansController.deleteLoan);
 
 export default router;

@@ -1,9 +1,9 @@
 import AppError from "../utils/AppError.js";
 import { catchAsync } from "../utils/catchAsync.js";
-import { loansModel } from "../models/loansModel.js";
-import { userCopiesModel } from "../models/userCopiesModel.js";
+import loansModel from "../models/loansModel.js";
+import userCopiesModel from "../models/userCopiesModel.js";
 
-export const addLoan = catchAsync(async (req, res, next) => {
+const addLoan = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const { user_copy_id } = req.body;
   if (!userId) {
@@ -16,7 +16,7 @@ export const addLoan = catchAsync(async (req, res, next) => {
   if (!copy) {
     throw new AppError("copy not found", 404);
   }
-  if (copy.owner_id.toString() === userId.toString()) {
+  if (copy.owner_id._id.toString() === userId.toString()) {
     throw new AppError("You cannot loan your own copy", 400);
   }
   const loanData = {
@@ -30,11 +30,11 @@ export const addLoan = catchAsync(async (req, res, next) => {
     .json({ data: loan, success: true, message: "loan added successfully" });
 });
 
-export const changeStatus = catchAsync(async (req, res, next) => {
+const changeStatus = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const { loanId } = req.params;
   const { status } = req.body;
-  const allowed = ["REQUESTED", "APPROVED", "ACTIVE", "RETURNED", "OVERDUE"];
+  const allowed = ["REQUESTED", "APPROVED", "ACTIVE", "RETURNED", "OVERDUE", "CANCELLED"];
   if (!allowed.includes(status)) {
     throw new AppError("Invalid status", 400);
   }
@@ -44,17 +44,17 @@ export const changeStatus = catchAsync(async (req, res, next) => {
   if (!loanId) {
     throw new AppError("loanId are required", 400);
   }
-  const loan = await loansModel.findById(loanId);
+  const loan = await loansModel.findLoanById(loanId);
   if (!loan) {
     throw new AppError("loan not found", 404);
   }
-  const copy = await userCopiesModel.findById(loan.userCopyId);
+  const copy = await userCopiesModel.findById(loan.user_copy_id.id);
   if (!copy) {
     throw new AppError("copy not found", 404);
   }
   if (
-    loan.borrowerId.toString() !== userId.toString() &&
-    copy.owner_id.toString() !== userId.toString() &&
+    loan.borrower_id._id.toString() !== userId.toString() &&
+    copy.owner_id._id.toString() !== userId.toString() &&
     req.user.role !== "admin"
   ) {
     throw new AppError(
@@ -63,7 +63,6 @@ export const changeStatus = catchAsync(async (req, res, next) => {
     );
   }
   const loanUpdated = await loansModel.update(loanId, {
-    ...loan,
     status: status,
   });
   res.status(200).json({
@@ -73,7 +72,7 @@ export const changeStatus = catchAsync(async (req, res, next) => {
   });
 });
 
-export const updateLoanStartDate = catchAsync(async (req, res, next) => {
+const updateLoanStartDate = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const { loanId } = req.params;
   const { loanStartDate } = req.body;
@@ -83,17 +82,17 @@ export const updateLoanStartDate = catchAsync(async (req, res, next) => {
   if (!loanId) {
     throw new AppError("loanId are required", 400);
   }
-  const loan = await loansModel.findById(loanId);
+  const loan = await loansModel.findLoanById(loanId);
   if (!loan) {
     throw new AppError("loan not found", 404);
   }
-  const copy = await userCopiesModel.findById(loan.userCopyId);
+  const copy = await userCopiesModel.findById(loan.user_copy_id.id);
   if (!copy) {
     throw new AppError("copy not found", 404);
   }
   if (
-    loan.borrowerId.toString() !== userId.toString() &&
-    copy.owner_id.toString() !== userId.toString() &&
+    loan.borrower_id._id.toString() !== userId.toString() &&
+    copy.owner_id._id.toString() !== userId.toString() &&
     req.user.role !== "admin"
   ) {
     throw new AppError(
@@ -102,7 +101,6 @@ export const updateLoanStartDate = catchAsync(async (req, res, next) => {
     );
   }
   const loanUpdated = await loansModel.update(loanId, {
-    ...loan,
     loan_start_date: loanStartDate,
   });
   res.status(200).json({
@@ -112,7 +110,7 @@ export const updateLoanStartDate = catchAsync(async (req, res, next) => {
   });
 });
 
-export const updateDueDate = catchAsync(async (req, res, next) => {
+const updateDueDate = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const { loanId } = req.params;
   const { dueDate } = req.body;
@@ -122,17 +120,17 @@ export const updateDueDate = catchAsync(async (req, res, next) => {
   if (!loanId) {
     throw new AppError("loanId are required", 400);
   }
-  const loan = await loansModel.findById(loanId);
+  const loan = await loansModel.findLoanById(loanId);
   if (!loan) {
     throw new AppError("loan not found", 404);
   }
-  const copy = await userCopiesModel.findById(loan.userCopyId);
+  const copy = await userCopiesModel.findById(loan.user_copy_id.id);
   if (!copy) {
     throw new AppError("copy not found", 404);
   }
   if (
-    loan.borrowerId.toString() !== userId.toString() &&
-    copy.owner_id.toString() !== userId.toString() &&
+    loan.borrower_id._id.toString() !== userId.toString() &&
+    copy.owner_id._id.toString() !== userId.toString() &&
     req.user.role !== "admin"
   ) {
     throw new AppError(
@@ -141,7 +139,6 @@ export const updateDueDate = catchAsync(async (req, res, next) => {
     );
   }
   const loanUpdated = await loansModel.update(loanId, {
-    ...loan,
     due_date: dueDate,
   });
   res.status(200).json({
@@ -151,27 +148,27 @@ export const updateDueDate = catchAsync(async (req, res, next) => {
   });
 });
 
-export const updateReturnDate = catchAsync(async (req, res, next) => {
+const updateReturnDate = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const { loanId } = req.params;
-  const { returnDate } = req.body;
+  const { return_date } = req.body;
   if (!userId) {
     throw new AppError("userId are required", 400);
   }
   if (!loanId) {
     throw new AppError("loanId are required", 400);
   }
-  const loan = await loansModel.findById(loanId);
+  const loan = await loansModel.findLoanById(loanId);
   if (!loan) {
     throw new AppError("loan not found", 404);
   }
-  const copy = await userCopiesModel.findById(loan.userCopyId);
+  const copy = await userCopiesModel.findById(loan.user_copy_id.id);
   if (!copy) {
     throw new AppError("copy not found", 404);
   }
   if (
-    loan.borrowerId.toString() !== userId.toString() &&
-    copy.owner_id.toString() !== userId.toString() &&
+    loan.borrower_id._id.toString() !== userId.toString() &&
+    copy.owner_id._id.toString() !== userId.toString() &&
     req.user.role !== "admin"
   ) {
     throw new AppError(
@@ -180,8 +177,8 @@ export const updateReturnDate = catchAsync(async (req, res, next) => {
     );
   }
   const loanUpdated = await loansModel.update(loanId, {
-    ...loan,
-    return_date: returnDate,
+    return_date: return_date,
+    status: "RETURNED",
   });
   res.status(200).json({
     data: loanUpdated,
@@ -190,7 +187,7 @@ export const updateReturnDate = catchAsync(async (req, res, next) => {
   });
 });
 
-export const deleteLoan = catchAsync(async (req, res, next) => {
+const deleteLoan = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const { loanId } = req.params;
   if (!userId) {
@@ -199,17 +196,17 @@ export const deleteLoan = catchAsync(async (req, res, next) => {
   if (!loanId) {
     throw new AppError("loanId are required", 400);
   }
-  const loan = await loansModel.findById(loanId);
+  const loan = await loansModel.findLoanById(loanId);
   if (!loan) {
     throw new AppError("loan not found", 404);
   }
-  const copy = await userCopiesModel.findById(loan.userCopyId);
+  const copy = await userCopiesModel.findById(loan.user_copy_id.id);
   if (!copy) {
     throw new AppError("copy not found", 404);
   }
   if (
-    loan.borrowerId.toString() !== userId.toString() &&
-    copy.owner_id.toString() !== userId.toString() &&
+    loan.borrower_id._id.toString() !== userId.toString() &&
+    copy.owner_id._id.toString() !== userId.toString() &&
     req.user.role !== "admin"
   ) {
     throw new AppError("You are not authorized to delete this loan", 401);
@@ -218,7 +215,7 @@ export const deleteLoan = catchAsync(async (req, res, next) => {
   res.status(200).json({ success: true, message: "loan deleted successfully" });
 });
 
-export const getLoans = catchAsync(async (req, res, next) => {
+const getLoans = catchAsync(async (req, res, next) => {
   const loans = await loansModel.findAll();
   res
     .status(200)
@@ -229,9 +226,9 @@ export const getLoans = catchAsync(async (req, res, next) => {
     });
 });
 
-export const getLoanById = catchAsync(async (req, res, next) => {
+const getLoanById = catchAsync(async (req, res, next) => {
   const { loanId } = req.params;
-  const loan = await loansModel.findById(loanId);
+  const loan = await loansModel.findLoanById(loanId);
   if (!loan) {
     throw new AppError("loan not found", 404);
   }
@@ -240,7 +237,7 @@ export const getLoanById = catchAsync(async (req, res, next) => {
     .json({ data: loan, success: true, message: "loan fetched successfully" });
 });
 
-export const getLoansByBorrowerId = catchAsync(async (req, res, next) => {
+const getLoansByBorrowerId = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
   if (!userId) {
     throw new AppError("userId are required", 400);
@@ -253,12 +250,12 @@ export const getLoansByBorrowerId = catchAsync(async (req, res, next) => {
   });
 });
 
-export const getLoansByUserCopyId = catchAsync(async (req, res, next) => {
-  const { userCopyId } = req.params;
-  if (!userCopyId) {
-    throw new AppError("userCopyId are required", 400);
+const getLoansByUserCopyId = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
+  if (!userId) {
+    throw new AppError("userId are required", 400);
   }
-  const loans = await loansModel.findLoansByUserCopyId(userCopyId);
+  const loans = await loansModel.findLoansByUserId(userId);
   res
     .status(200)
     .json({
@@ -267,3 +264,34 @@ export const getLoansByUserCopyId = catchAsync(async (req, res, next) => {
       message: "Loans fetched successfully",
     });
 });
+
+const getActiveLoanForCopy = catchAsync(async (req, res, next) => {
+  const { userCopyId } = req.params;
+  if (!userCopyId) {
+    throw new AppError("userCopyId are required", 400);
+  }
+  const loans = await loansModel.findActiveLoansByUserCopyId(userCopyId);
+  res
+    .status(200)
+    .json({
+      data: loans,
+      success: true,
+      message: "Loan fetched successfully",
+    });
+});
+
+
+export default{
+  addLoan,
+  changeStatus,
+  updateLoanStartDate,
+  updateDueDate,
+  updateReturnDate,
+  deleteLoan,
+  getLoans,
+  getLoanById,
+  getLoansByBorrowerId,
+  getLoansByUserCopyId,
+  getActiveLoanForCopy,
+
+}

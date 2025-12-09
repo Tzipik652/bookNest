@@ -5,15 +5,17 @@ import { verifyJWT } from "../middleware/auth.js";
 
 router.get('/', userCopiesController.getCopies);
 
-router.get('/:id', userCopiesController.getCopyById);
-router.get('/:id/userCopies', userCopiesController.getUserCopies);
-router.get('/:id/bookCopies', userCopiesController.getBookCopies);
+router.get('/:copyId', userCopiesController.getCopyById);
+router.get('/:userId/user-copies', userCopiesController.getUserCopies);
+router.get('/:bookId/book-copies', userCopiesController.getBookCopies);
+router.get('/:bookId/available-book-copies', userCopiesController.getAvailableCopiesForBook);
+router.get('/book-copy/:userId/:bookId', userCopiesController.getBookCopyByUserId);
 
 router.post('/', verifyJWT, userCopiesController.addCopy);
 
-router.put('/:id/status', verifyJWT, userCopiesController.changeStatus);
-router.put('/:id/location', verifyJWT, userCopiesController.changeLoanLocation);
+router.put('/:copyId/status', verifyJWT, userCopiesController.changeStatus);
+router.put('/:copyId/location', verifyJWT, userCopiesController.changeLoanLocation);
 
-router.delete('/:id', verifyJWT, userCopiesController.deleteCopy);
+router.delete('/:copyId', verifyJWT, userCopiesController.deleteCopy);
 
 export default router;

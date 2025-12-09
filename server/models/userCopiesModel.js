@@ -2,13 +2,12 @@ import supabase from "../config/supabaseClient.js";
 
 const copySelectQuery =`
     id,
-    book_id (name),
-    owner_id (name, email),
+    book_id (_id, title),
+    owner_id (_id, name, email),
     is_available_for_loan,
     loan_location_lat,
     loan_location_lon,
-    loan_location,
-    date_added,
+    date_added
 `;
 
 export async function add(copyData) {
@@ -40,7 +39,7 @@ export async function update(copyId, copyData) {
     .update(copyData)
     .eq("id", copyId)
     .select()
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("Error updating copy:", error);
@@ -85,6 +84,11 @@ export async function findById(copyId) {
     console.error("Error fetching copy by ID:", error);
     throw error;
   }
+
+  if (!data) {
+    throw new Error(`Copy with id ${copyId} not found`);
+  }
+
   return data;
 }
 
@@ -113,7 +117,20 @@ export async function findByBookId(bookId) {
   }
   return data
 }
+export async function findBookCopyByUserId(userId,bookId) {
+  const { data, error } = await supabase
+    .from("user_copies")
+    .select(copySelectQuery)
+    .eq("owner_id", userId)
+    .eq("book_id", bookId);
+    // .single();
 
+  if (error) {
+    console.error("Error fetching user copy:", error);
+    throw error;
+  }
+  return data[0]
+}
 export async function isCopyExist(userId, bookId){
   const { data, error } = await supabase
     .from("user_copies")
@@ -128,8 +145,24 @@ export async function isCopyExist(userId, bookId){
   return data.length > 0;
 }
 
+export async function getAvailableCopiesForBook(bookId) {
+  const { data, error } = await supabase
+    .from("user_copies")
+    .select(copySelectQuery)
+    .eq("book_id", bookId)
+    .eq("is_available_for_loan", true);
+
+  console.log("get available copies for book",data);
+  if (error) {
+    console.error("Error fetching available copies by book ID:", error);
+    throw error;
+  }
+  return data;
+}
+
 export default {
   add,
+  getAvailableCopiesForBook,
   update,
   remove,
   findAll,
@@ -137,4 +170,5 @@ export default {
   findByUserId,
   findByBookId,
   isCopyExist,
+  findBookCopyByUserId,
 };

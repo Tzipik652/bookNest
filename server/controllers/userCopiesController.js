@@ -1,24 +1,42 @@
 import AppError from "../utils/AppError.js";
 import { catchAsync } from "../utils/catchAsync.js";
-import { userCopiesModel } from "../models/userCopiesModel.js";
+import userCopiesModel from "../models/userCopiesModel.js";
 
-export const addCopy = catchAsync(async (req, res, next) => {
+const addCopy = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
-  const { bookId, ...rest } = req.body;
-  if (!userId || !bookId) {
-    throw new AppError("userId or bookId are required", 400);
+  const {
+    user_copy: { book_id, ...restUserCopy },
+  } = req.body;
+  if (!book_id) {
+    throw new AppError("bookId are required", 400);
   }
-  const alreadyExist = await userCopiesModel.isCopyExist(userId, bookId);
+  const alreadyExist = await userCopiesModel.isCopyExist(userId, book_id);
   if (alreadyExist) {
     throw new AppError("Copy already exist", 400);
+    // const copy = await userCopiesModel.findByBookId(book_id);
+    // console.log(copy);
+    // if (!copy) {
+    //   throw new AppError("Copy not found", 404);
+    // }
+    // const copyUpdated = await userCopiesModel.update(copy[0].id, {
+    // });
+    // res.status(200).json({
+    //   data: copyUpdated,
+    //   success: true,
+    //   message: "Copy updated successfully",
+    // });
   }
-  const copy = await userCopiesModel.add({ userId, bookId, rest });
+  const copy = await userCopiesModel.add({
+    userId,
+    bookId: book_id,
+    restUserCopy,
+  });
   res
     .status(201)
     .json({ data: copy, success: true, message: "Copy added successfully" });
 });
 
-export const changeStatus = catchAsync(async (req, res, next) => {
+const changeStatus = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const { copyId } = req.params;
   if (!userId) {
@@ -32,7 +50,7 @@ export const changeStatus = catchAsync(async (req, res, next) => {
     throw new AppError("Copy not found", 404);
   }
   if (
-    copy.owner_id.toString() !== userId.toString() &&
+    copy.owner_id._id.toString() !== userId.toString() &&
     req.user.role !== "admin"
   ) {
     throw new AppError(
@@ -41,7 +59,6 @@ export const changeStatus = catchAsync(async (req, res, next) => {
     );
   }
   const copyUpdated = await userCopiesModel.update(copyId, {
-    ...copy,
     is_available_for_loan: !copy.is_available_for_loan,
   });
   res.status(200).json({
@@ -51,7 +68,7 @@ export const changeStatus = catchAsync(async (req, res, next) => {
   });
 });
 
-export const changeLoanLocation = catchAsync(async (req, res, next) => {
+const changeLoanLocation = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const { copyId } = req.params;
   const { loan_location_lat, loan_location_lon } = req.body;
@@ -66,7 +83,7 @@ export const changeLoanLocation = catchAsync(async (req, res, next) => {
     throw new AppError("Copy not found", 404);
   }
   if (
-    copy.owner_id.toString() !== userId.toString() &&
+    copy.owner_id._id.toString() !== userId.toString() &&
     req.user.role !== "admin"
   ) {
     throw new AppError(
@@ -75,7 +92,6 @@ export const changeLoanLocation = catchAsync(async (req, res, next) => {
     );
   }
   const copyUpdated = await userCopiesModel.update(copyId, {
-    ...copy,
     loan_location_lat: loan_location_lat,
     loan_location_lon: loan_location_lon,
   });
@@ -86,7 +102,7 @@ export const changeLoanLocation = catchAsync(async (req, res, next) => {
   });
 });
 
-export const deleteCopy = catchAsync(async (req, res, next) => {
+const deleteCopy = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const { copyId } = req.params;
   if (!userId) {
@@ -100,7 +116,7 @@ export const deleteCopy = catchAsync(async (req, res, next) => {
     throw new AppError("Copy not found", 404);
   }
   if (
-    copy.owner_id.toString() !== userId.toString() &&
+    copy.owner_id._id.toString() !== userId.toString() &&
     req.user.role !== "admin"
   ) {
     throw new AppError("You are not authorized to delete this copy", 401);
@@ -109,14 +125,16 @@ export const deleteCopy = catchAsync(async (req, res, next) => {
   res.status(200).json({ success: true, message: "Copy deleted successfully" });
 });
 
-export const getCopies = catchAsync(async (req, res, next) => {
+const getCopies = catchAsync(async (req, res, next) => {
   const copies = await userCopiesModel.findAll();
-  res
-    .status(200)
-    .json({ data: copies, success: true, message: "Copies fetched successfully" });
+  res.status(200).json({
+    data: copies,
+    success: true,
+    message: "Copies fetched successfully",
+  });
 });
 
-export const getCopyById = catchAsync(async (req, res, next) => {
+const getCopyById = catchAsync(async (req, res, next) => {
   const { copyId } = req.params;
   const copy = await userCopiesModel.findById(copyId);
   if (!copy) {
@@ -127,8 +145,8 @@ export const getCopyById = catchAsync(async (req, res, next) => {
     .json({ data: copy, success: true, message: "Copy fetched successfully" });
 });
 
-export const getUserCopies = catchAsync(async (req, res, next) => {
-  const {userId} = req.params;
+const getUserCopies = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
   if (!userId) {
     throw new AppError("userId are required", 400);
   }
@@ -136,21 +154,63 @@ export const getUserCopies = catchAsync(async (req, res, next) => {
   if (!copies) {
     throw new AppError("Copies not found", 404);
   }
-  res
-    .status(200)
-    .json({
-      data: copies,
-      success: true,
-      message: "Copies fetched successfully",
-    });
+  res.status(200).json({
+    data: copies,
+    success: true,
+    message: "Copies fetched successfully",
+  });
 });
 
-export const getBookCopies = catchAsync(async (req, res, next) => {
+const getBookCopies = catchAsync(async (req, res, next) => {
   const { bookId } = req.params;
   const copies = await userCopiesModel.findByBookId(bookId);
   if (!copies) {
     throw new AppError("Copies not found", 404);
   }
-  res.status(200);
-  json({ data: copies, success: true, message: "Copies fetched successfully" });
+  res.status(200).json({
+    data: copies,
+    success: true,
+    message: "Copies fetched successfully",
+  });
 });
+const getBookCopyByUserId = catchAsync(async (req, res, next) => {
+  const { userId, bookId } = req.params;
+  const copy = await userCopiesModel.findBookCopyByUserId(userId,bookId);
+  if (!copy) {
+    throw new AppError("Copy not found", 404);
+  }
+  res.status(200).json({
+    data: copy,
+    success: true,
+    message: "Copy fetched successfully",
+  });
+});
+const getAvailableCopiesForBook = catchAsync(async (req, res, next) => {
+  const { bookId } = req.params;
+  if (!bookId) {
+    throw new AppError("bookId are required", 400);
+  }
+  console.log("getAvailableCopiesForBook :controller",bookId)
+  const copies = await userCopiesModel.getAvailableCopiesForBook(bookId);
+  if (!copies) {
+    throw new AppError("Copies not found", 404);
+  }
+  console.log("getAvailableCopiesForBook :controller",copies)
+  res.status(200).json({
+    data: copies,
+    success: true,
+    message: "Copies fetched successfully",
+  });
+});
+export default {
+  addCopy,
+  changeStatus,
+  changeLoanLocation,
+  deleteCopy,
+  getCopies,
+  getCopyById,
+  getUserCopies,
+  getBookCopies,
+  getAvailableCopiesForBook,
+  getBookCopyByUserId,
+};

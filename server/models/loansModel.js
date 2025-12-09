@@ -2,13 +2,20 @@ import supabase from "../config/supabaseClient.js";
 
 const loanSelectQuery = `
       id,
-      user_copy_id,
-      borrower_id,
+      user_copy_id(  
+        id,
+        book_id (_id, title),
+        owner_id (_id, name, email),
+        is_available_for_loan,
+        loan_location_lat,
+        loan_location_lon,
+        date_added),
+      borrower_id(_id, name, email),
       status,
       request_date,
       loan_start_date,
       due_date,
-      return_date,
+      return_date
 `;
 
 export async function add(loanData) {
@@ -17,7 +24,7 @@ export async function add(loanData) {
     .insert({
       user_copy_id: loanData.userCopyId,
       borrower_id: loanData.borrowerId,
-      status: 'REQUESTED',
+      status: "REQUESTED",
     })
     .select()
     .single();
@@ -67,14 +74,28 @@ export async function findLoansByBorrowerId(borrowerId) {
   return data;
 }
 
-export async function findLoansByUserCopyId(userCopyId) {
+export async function findLoansByUserId(userId) {
+  const { data, error } = await supabase
+  .from("loans")
+  .select(loanSelectQuery)
+  .eq("user_copy_id.owner_id._id", userId);
+
+  if (error) {
+    console.error("Error fetching loans by user ID:", error);
+    throw error;
+  }
+  return data;
+}
+
+export async function findActiveLoansByUserCopyId(userCopyId) {
   const { data, error } = await supabase
     .from("loans")
     .select(loanSelectQuery)
-    .eq("user_copy_id", userCopyId);
+    .eq("user_copy_id", userCopyId)
+    .eq("status", "ACTIVE");
 
   if (error) {
-    console.error("Error fetching loans by user copy ID:", error);
+    console.error("Error fetching active loan by user copy ID:", error);
     throw error;
   }
   return data;
@@ -99,6 +120,7 @@ export default {
   update,
   remove,
   findLoansByBorrowerId,
-  findLoansByUserCopyId,
+  findLoansByUserId,
+  findActiveLoansByUserCopyId,
   findLoanById,
 };
