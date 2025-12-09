@@ -33,6 +33,7 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({
   const theme = useTheme();
   const currentLocale = t('locale'); 
   const commonDir = t('dir') as 'rtl' | 'ltr';
+  
   const reactions: Array<{ type: ReactionType; emoji: string; color: string }> =
     [
       { type: "like", emoji: "👍", color: "#3b82f6" },
@@ -62,17 +63,24 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({
             justifyContent="space-between"
             alignItems="flex-start"
           >
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={0} alignItems="center">
               <Avatar
-                sx={{ width: 40, height: 40, bgcolor: "primary.main" }}
-                src={comment.profile_picture || undefined}
+                sx={{
+                  width: 40,
+                  height: 40,
+                  bgcolor: "primary.main",
+                  mr: commonDir === 'ltr' ? 2 : 0,
+                  ml: commonDir === 'rtl' ? 2 : 0,
+                }}
+                src={comment.user?.profile_picture || undefined}
               >
-                {!comment.profile_picture &&
-                  comment.user_name?.charAt(0).toUpperCase()}
+                {!comment.user?.profile_picture &&
+                  comment.user?.name.charAt(0).toUpperCase()}
               </Avatar>
-              <Stack spacing={0.5}>
+              
+              <Stack spacing={0.5} >
                 <Typography variant="subtitle1" fontWeight={600} color="text.primary">
-                  {comment.user_name}
+                  {comment.user?.name}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {new Date(comment.created_at).toLocaleDateString(currentLocale, {
@@ -121,8 +129,8 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({
           {/* Reactions */}
           <Stack direction="row" spacing={1}>
             {reactions.map(({ type, emoji, color }) => {
-              const count = comment.reactionCounts[type] || 0;
-              const isActive = comment.userReaction === type;
+              const count = comment.reaction_counts?.[type] || 0;
+              const isActive = comment.user_reaction === type;
 
               return (
                 <Button
@@ -147,10 +155,12 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({
                     style={{
                       fontSize: "18px",
                       marginRight: count > 0 ? "6px" : 0,
+                      marginLeft: count > 0 && commonDir === 'rtl' ? "6px" : 0, // תיקון כיוון למספר
                     }}
                   >
                     {emoji}
                   </span>
+                  {/* המספר יוצג רק אם הוא גדול מ-0 */}
                   {count > 0 && (
                     <span style={{ fontWeight: 600 }}>{count}</span>
                   )}

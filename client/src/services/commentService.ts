@@ -1,7 +1,7 @@
 import api from "../lib/axiosInstance";
 import axios from "axios";
 import { useUserStore } from "../store/useUserStore";
-import { Comment } from "../types";
+import { Comment, CommentWithReactions, PaginatedResponse } from "../types";
 
 const API_BASE_URL =
   `${import.meta.env.VITE_SERVER_URL}/comments` ||
@@ -19,10 +19,15 @@ function handleAxiosError(error: any): never {
   }
 }
 
-export async function getComments(bookId: string): Promise<Comment[]> {
-  const res = await fetch(`${API_BASE_URL}/${bookId}`);
-  if (!res.ok) throw new Error("Failed to fetch comments");
-  return res.json();
+export async function getComments(bookId: string): Promise<CommentWithReactions[]> {
+  console.log("Fetching comments for bookId:", bookId);
+  try {
+    const res = await api.get(`${API_BASE_URL}/${bookId}`);
+    return res.data;
+  } catch (error) {
+    handleAxiosError(error);
+    throw error;
+  }
 }
 
 export async function addComment(
@@ -94,34 +99,14 @@ export async function editComment(
   }
 }
 
-export async function getCommentById(commentId: string): Promise<Comment> {
-  try {
-    const res = await api.get(`${API_BASE_URL}/single/${commentId}`);
-    const serverComment = res.data;
-    return {
-      id: serverComment.id || serverComment._id,
-      book_id: serverComment.book_id,
-      user_id: serverComment.user_id,
-      user_name: serverComment.user_name,
-      profile_picture: serverComment.profile_picture,
-      text: serverComment.text,
-      created_at: serverComment.created_at || new Date().toISOString(),
-      updated_at: serverComment.updated_at || new Date().toISOString(),
-      reactions: serverComment.reactions || [],
-    };
-  } catch (error) {
-    handleAxiosError(error);
-    throw error;
-  }
-}
-export async function getAllComments(): Promise<Comment[]> {
+export async function getAllComments(page = 1, limit = 10): Promise<PaginatedResponse<Comment>> {
   const user = useUserStore.getState().user;
   const token = useUserStore.getState().token;
 
   if (!token) throw new Error("Must be logged in to add books");
   if (user?.role !== "admin") throw new Error("Admin access required");
   try {
-    const res = await api.get(`${API_BASE_URL}`);
+    const res = await api.get<PaginatedResponse<Comment>>(`${API_BASE_URL}?page=${page}&limit=${limit}`);
     return res.data;
   } catch (error) {
     handleAxiosError(error);

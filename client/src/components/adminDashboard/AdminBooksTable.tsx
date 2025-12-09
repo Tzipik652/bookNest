@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Card,
   CardHeader,
@@ -36,11 +36,12 @@ export const AdminBooksTable = () => {
   // --- States ---
   const [currentBooks, setCurrentBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Pagination
   const [page, setPage] = useState(1);
+  const prevPageRef = useRef(page);
   const [totalPages, setTotalPages] = useState(1);
-  const ITEMS_PER_PAGE = 20;
+  const ITEMS_PER_PAGE = 10;
 
   // Search
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,7 +51,7 @@ export const AdminBooksTable = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm);
-      setPage(1); 
+      setPage(1);
     }, 500);
 
     return () => {
@@ -88,14 +89,15 @@ export const AdminBooksTable = () => {
   // 3. Trigger Fetch on Page or Search Change
   useEffect(() => {
     fetchBooksData();
-        setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      const tableTop = document.getElementById("table-top-anchor");
-      if (tableTop) {
-        tableTop.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 100); 
+    if (prevPageRef.current !== page) {
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const tableTop = document.getElementById("table-top-anchor");
+        if (tableTop) {
+          tableTop.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, debouncedSearch]);
@@ -105,9 +107,9 @@ export const AdminBooksTable = () => {
       try {
         await deleteBook(bookId);
         toast.success(booksTableTexts.deleteSuccess);
-        
+
         fetchBooksData();
-        
+
       } catch (error) {
         toast.error(booksTableTexts.deleteFailed);
       }
@@ -118,7 +120,7 @@ export const AdminBooksTable = () => {
     navigate(`/edit-book/${bookId}`, { state: { from: "/admin-dashboard" } });
   };
 
-const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
   };
 
@@ -130,19 +132,19 @@ const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
   const lightTextColorStyle = highContrast
     ? { color: theme.palette.text.primary }
     : {
-        color:
-          theme.palette.mode === "light"
-            ? theme.palette.grey[700]
-            : theme.palette.text.secondary,
-      };
+      color:
+        theme.palette.mode === "light"
+          ? theme.palette.grey[700]
+          : theme.palette.text.secondary,
+    };
 
   const headerBgStyle = {
     backgroundColor: highContrast
       ? theme.palette.background.default
       : alpha(
-          theme.palette.divider,
-          theme.palette.mode === "dark" ? 0.05 : 0.1
-        ),
+        theme.palette.divider,
+        theme.palette.mode === "dark" ? 0.05 : 0.1
+      ),
     borderBottom: highContrast
       ? `2px solid ${theme.palette.text.primary}`
       : `1px solid ${theme.palette.divider}`,
@@ -159,9 +161,9 @@ const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     backgroundColor: highContrast
       ? "transparent"
       : alpha(
-          theme.palette.success.main,
-          theme.palette.mode === "dark" ? 0.15 : 0.05
-        ),
+        theme.palette.success.main,
+        theme.palette.mode === "dark" ? 0.15 : 0.05
+      ),
     color: highContrast
       ? theme.palette.text.primary
       : theme.palette.success.main,
@@ -194,7 +196,7 @@ const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
   return (
     <div dir={t("common:dir")}>
       <Card
-        id="table-top-anchor" 
+        id="table-top-anchor"
         className="mb-8 shadow-sm"
         style={
           highContrast
@@ -202,15 +204,15 @@ const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
             : { border: "0" }
         }
       >
-<CardHeader
+        <CardHeader
           title={
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                flexDirection: { xs: 'column', md: 'row' }, 
-                justifyContent: 'space-between', 
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                justifyContent: 'space-between',
                 alignItems: { xs: 'stretch', md: 'center' },
-                gap: 2 
+                gap: 2
               }}
             >
               <Box>
@@ -222,7 +224,7 @@ const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
                 </CardDescription>
               </Box>
 
-              {/* שדה החיפוש */}
+              {/* --- Search Bar --- */}
               <TextField
                 placeholder={t("common:search", "Search...")}
                 variant="outlined"
@@ -242,178 +244,201 @@ const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
           }
         />
 
-        <CardContent>
+       <CardContent>
           {/* --- Desktop Table --- */}
-          <div
-            className="hidden md:block rounded-md border"
-            style={
-              highContrast
-                ? { border: `2px solid ${theme.palette.text.primary}` }
-                : { borderColor: theme.palette.divider }
-            }
-          >
-            <table className="w-full text-sm">
-              <thead>
-                <tr style={headerBgStyle}>
-                  <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
-                    {booksTableTexts.headerTitle}
-                  </th>
-                  <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
-                    {booksTableTexts.headerAuthor}
-                  </th>
-                  <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
-                    {booksTableTexts.headerCategory}
-                  </th>
-                  <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
-                    {booksTableTexts.headerUploader}
-                  </th>
-                  <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
-                    {booksTableTexts.headerDate}
-                  </th>
-                  <th className="text-right py-3 px-4 font-medium" style={textColorStyle}>
-                    {booksTableTexts.headerActions}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {isLoading
-                  ? Array.from({ length: 5 }).map((_, i) => (
-                      <tr key={i} className="border-b last:border-0">
-                        <td className="py-3 px-4"><Skeleton className="h-4 w-32" /></td>
-                        <td className="py-3 px-4"><Skeleton className="h-4 w-24" /></td>
-                        <td className="py-3 px-4"><Skeleton className="h-6 w-20 rounded-full" /></td>
-                        <td className="py-3 px-4"><Skeleton className="h-4 w-24" /></td>
-                        <td className="py-3 px-4"><Skeleton className="h-4 w-20" /></td>
-                        <td className="py-3 px-4">
-                          <div className="flex justify-end gap-2">
-                            <Skeleton className="h-8 w-8" />
-                            <Skeleton className="h-8 w-8" />
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  : currentBooks?.map((book) => (
-                      <tr
-                        key={book._id}
-                        style={{
-                          borderBottom: highContrast
-                            ? `1px solid ${theme.palette.text.primary}`
-                            : `1px solid ${theme.palette.divider}`,
-                          cursor: "pointer",
-                          ...(!highContrast && { "&:hover": hoverBgStyle }),
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!highContrast) e.currentTarget.style.backgroundColor = hoverBgStyle.backgroundColor;
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!highContrast) e.currentTarget.style.backgroundColor = "transparent";
-                        }}
-                      >
-                        <td className="py-3 px-4 font-medium" style={{ color: theme.palette.text.primary }}>
-                          {book.title}
-                        </td>
-                        <td className="py-3 px-4" style={lightTextColorStyle}>
-                          {book.author}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0"
-                            style={categoryChipStyle}
-                          >
-                            {t(`category:${book.category.replace(/\s+/g, "")}`)}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4" style={lightTextColorStyle}>
-                          {book.user?.name || booksTableTexts.unknownUser}
-                        </td>
-                        <td className="py-3 px-4" style={lightTextColorStyle}>
-                          {new Date(book.date_created).toLocaleDateString(t("common:locale"))}
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="flex gap-2 justify-end">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => navigate(`/book/${book._id}`)}
-                              style={viewButtonStyle}
+          {/* הסתרת הטבלה כולה אם אין תוצאות ואין טעינה, כדי למנוע טבלה ריקה */}
+          {(isLoading || currentBooks.length > 0) && (
+            <div
+              className="hidden md:block rounded-md border"
+              style={
+                highContrast
+                  ? { border: `2px solid ${theme.palette.text.primary}` }
+                  : { borderColor: theme.palette.divider }
+              }
+            >
+              <table className="w-full text-sm">
+                <thead>
+                  <tr style={headerBgStyle}>
+                    <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
+                      {booksTableTexts.headerTitle}
+                    </th>
+                    <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
+                      {booksTableTexts.headerAuthor}
+                    </th>
+                    <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
+                      {booksTableTexts.headerCategory}
+                    </th>
+                    <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
+                      {booksTableTexts.headerUploader}
+                    </th>
+                    <th className="text-start py-3 px-4 font-medium" style={textColorStyle}>
+                      {booksTableTexts.headerDate}
+                    </th>
+                    <th className="text-right py-3 px-4 font-medium" style={textColorStyle}>
+                      {booksTableTexts.headerActions}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isLoading
+                    ? Array.from({ length: 5 }).map((_, i) => (
+                        <tr key={i} className="border-b last:border-0">
+                          <td className="py-3 px-4"><Skeleton className="h-4 w-32" /></td>
+                          <td className="py-3 px-4"><Skeleton className="h-4 w-24" /></td>
+                          <td className="py-3 px-4"><Skeleton className="h-6 w-20 rounded-full" /></td>
+                          <td className="py-3 px-4"><Skeleton className="h-4 w-24" /></td>
+                          <td className="py-3 px-4"><Skeleton className="h-4 w-20" /></td>
+                          <td className="py-3 px-4">
+                            <div className="flex justify-end gap-2">
+                              <Skeleton className="h-8 w-8" />
+                              <Skeleton className="h-8 w-8" />
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    : currentBooks.map((book) => (
+                        <tr
+                          key={book._id}
+                          style={{
+                            borderBottom: highContrast
+                              ? `1px solid ${theme.palette.text.primary}`
+                              : `1px solid ${theme.palette.divider}`,
+                            cursor: "pointer",
+                            ...(!highContrast && { "&:hover": hoverBgStyle }),
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!highContrast) e.currentTarget.style.backgroundColor = hoverBgStyle.backgroundColor;
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!highContrast) e.currentTarget.style.backgroundColor = "transparent";
+                          }}
+                        >
+                          <td className="py-3 px-4 font-medium" style={{ color: theme.palette.text.primary }}>
+                            {book.title}
+                          </td>
+                          <td className="py-3 px-4" style={lightTextColorStyle}>
+                            {book.author}
+                          </td>
+                          <td className="py-3 px-4">
+                            <span
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium shrink-0"
+                              style={categoryChipStyle}
                             >
-                              <BookOpen className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleEditBook(book._id)}
-                              style={editButtonStyle}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeleteBook(book._id)}
-                              style={deleteButtonStyle}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-              </tbody>
-            </table>
-
-            {!isLoading && currentBooks.length === 0 && (
-                 <div className="p-8 text-center text-gray-500">
-                     {t("common:noResults", "No books found.")}
-                 </div>
-            )}
-          </div>
-
-          {/* Small Screen Cards */}
-          <div className="md:hidden space-y-4">
-             {isLoading ? (
-                 <Skeleton className="h-20 w-full" />
-             ) : (
-                currentBooks.map((book) => (
-                    <div
-                      key={book._id}
-                      className="border rounded-lg p-3"
-                      style={{ borderColor: theme.palette.divider }}
-                    >
-                         <div className="flex justify-between">
-                            <h3 className="font-bold">{book.title}</h3>
-                            <span style={categoryChipStyle} className="px-2 rounded-full text-xs flex items-center">
-                                {t(`category:${book.category}`)}
+                              {t(`category:${book.category.replace(/\s+/g, "")}`)}
                             </span>
-                         </div>
-                         <div className="mt-2 flex justify-end gap-2">
-                             <Button variant="ghost" size="sm" onClick={() => handleEditBook(book._id)}><Edit size={16}/></Button>
-                             <Button variant="ghost" size="sm" onClick={() => handleDeleteBook(book._id)}><Trash2 size={16}/></Button>
-                         </div>
+                          </td>
+                          <td className="py-3 px-4" style={lightTextColorStyle}>
+                            {book.user?.name || booksTableTexts.unknownUser}
+                          </td>
+                          <td className="py-3 px-4" style={lightTextColorStyle}>
+                            {new Date(book.date_created).toLocaleDateString(t("common:locale"))}
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex gap-2 justify-end">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => navigate(`/book/${book._id}`)}
+                                style={viewButtonStyle}
+                              >
+                                <BookOpen className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleEditBook(book._id)}
+                                style={editButtonStyle}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteBook(book._id)}
+                                style={deleteButtonStyle}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* --- Small Screen Cards --- */}
+          {/* מציגים רק אם יש טעינה או תוצאות */}
+          {(isLoading || currentBooks.length > 0) && (
+            <div className="md:hidden space-y-4">
+              {isLoading ? (
+                <Skeleton className="h-20 w-full" />
+              ) : (
+                currentBooks.map((book) => (
+                  <div
+                    key={book._id}
+                    className="border rounded-lg p-3"
+                    style={{ borderColor: theme.palette.divider }}
+                  >
+                    <div className="flex justify-between">
+                      <h3 className="font-bold">{book.title}</h3>
+                      <span style={categoryChipStyle} className="px-2 rounded-full text-xs flex items-center">
+                        {t(`category:${book.category}`)}
+                      </span>
                     </div>
+                    <div className="mt-2 flex justify-end gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => handleEditBook(book._id)}><Edit size={16} /></Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDeleteBook(book._id)}><Trash2 size={16} /></Button>
+                    </div>
+                  </div>
                 ))
-             )}
-          </div>
+              )}
+            </div>
+          )}
+
+          {/* --- No Results State (Unified) --- */}
+          {/* זה יופיע גם במובייל וגם בדסקטופ */}
+          {!isLoading && currentBooks.length === 0 && (
+            <Box 
+              sx={{ 
+                textAlign: "center", 
+                py: 8, 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                gap: 2,
+                color: theme.palette.text.secondary
+              }}
+            >
+              <SearchIcon size={48} style={{ opacity: 0.2 }} />
+              <Box>
+                <Box component="p" sx={{ fontWeight: 500, fontSize: '1.1rem', color: theme.palette.text.primary }}>
+                 {t('common:noSearchResults') || "No book found matching your search."}
+                </Box>
+              </Box>
+            </Box>
+          )}
 
           {/* --- Pagination Controls --- */}
           {totalPages > 1 && (
             <Box display="flex" justifyContent="center" mt={4}>
-                <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={handlePageChange}
-                    color="primary"
-                    shape="rounded"
-                    showFirstButton 
-                    showLastButton
-                    disabled={isLoading}
-                    dir="ltr"
-                    sx={{
-                        '& .MuiPaginationItem-root': {
-                            color: theme.palette.text.primary
-                        }
-                    }}
-                />
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+                color="primary"
+                shape="rounded"
+                showFirstButton
+                showLastButton
+                disabled={isLoading}
+                dir="ltr"
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    color: theme.palette.text.primary
+                  }
+                }}
+              />
             </Box>
           )}
 

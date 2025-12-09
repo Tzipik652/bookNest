@@ -25,7 +25,12 @@ export interface Book {
   date_created: string;
   favorites_count?: number;
 }
-
+export interface RecommendedBook extends Book {
+  recommendation_reason: {
+    en: string;
+    he: string;
+  };
+}
 export interface Favorite {
   userId: string;
   bookId: string;
@@ -58,21 +63,40 @@ export interface Comment {
   id: string;
   book_id: string;
   user_id: string;
-  user_name: string;
-  profile_picture?: string;
   text: string;
   created_at: string;
   updated_at: string;
-  reactions: CommentReaction[];
+  user_name?: string;
+  profile_picture?: string | null;
+  user?: {
+    name: string;
+    email: string;
+    profile_picture?: string | null;
+  };
+  book?: {
+    id: string;
+    title: string;
+  };
+  reaction_counts?: {
+    like: number;
+    dislike: number;
+    happy: number;
+    angry: number;
+  };
+  reactions?: CommentReaction[];
 }
 
-export type CommentWithReactions = Comment & {
-  userReaction?: ReactionType;
-  reactionCounts: ReactionCounts;
-};
+export interface CommentWithReactions extends Omit<Comment, 'reaction_counts'> {
+  reaction_counts: ReactionCounts;
+  user_reaction?: ReactionType | null;
+}
 
 export type BookWithFavorite = Book & {
   isFavorited: boolean;
+  recommendation_reason?: {
+    en: string;
+    he: string;
+  };
 };
 
 export enum LoanStatus {
@@ -118,3 +142,9 @@ export interface ChatMessage{
     message_text: string;
     date_sent: string;
 }
+export type PaginatedResponse<T> = {
+  [key: string]: T[] | number; 
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+} & { comments?: T[]; books?: T[]; users?: T[] };

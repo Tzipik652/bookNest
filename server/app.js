@@ -14,6 +14,8 @@ import userCopiesRouter from './routes/userCopiesRouter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import path from "path";
 import { fileURLToPath } from "url";
+import dashboardStats from './routes/dashboardRouter.js';
+
 
 dotenv.config();
 
@@ -40,6 +42,7 @@ app.use("/api/auth", authRouter);
 app.use("/loans", loansRouter);
 app.use("/user-copies", userCopiesRouter);
 
+app.use("/dashboard", dashboardStats);
 
 
 // Error handling

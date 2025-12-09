@@ -8,7 +8,7 @@ import crypto from "crypto";
 import AppError from "../utils/AppError.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { registerSchema } from "../validations/userValidation.js";
-import { getUsers, updateUser, deleteUser as deleteUserRecord } from "../models/userModel.js";
+import { getUsers, updateUser, deleteUser as deleteUserRecord, findPaginatedUsers, searchUsersByNameOrEmail } from "../models/userModel.js";
 
 dotenv.config();
 
@@ -118,10 +118,10 @@ export const login = catchAsync(async (req, res, next) => {
     .single();
 
   if (!user) throw new AppError("Invalid credentials", 401);
-  
+
   if (user.is_deleted) throw new AppError("Account is inactive. Please contact support or try registering.", 401);
   if (user.auth_provider !== "local") throw new AppError("Please login with Google", 401);
-  
+
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new AppError("Invalid credentials", 401);
 
@@ -165,7 +165,7 @@ export const googleLogin = catchAsync(async (req, res, next) => {
     // תרחיש א': משתמש חדש לגמרי
     // -------------------------
     const password = crypto.randomBytes(Math.ceil(12 / 2)).toString("hex").slice(0, 12);
-    
+
     const { data: newUser, error: insertError } = await supabase
       .from("users")
       .insert([
@@ -218,7 +218,7 @@ export const googleLogin = catchAsync(async (req, res, next) => {
         .eq("_id", user._id)
         .select()
         .single();
-      
+
       if (updateError) throw updateError;
       user = updatedUser; // מעדכנים את המשתמש המקומי לגרסה החדשה
     }
@@ -278,5 +278,43 @@ export const deleteUser = catchAsync(async (req, res, next) => {
   res.json({
     success: true,
     deletedUser
+  });
+});
+
+export const getPaginatedUsers = catchAsync(async (req, res, next) => {
+  const user = req.user;
+  if (!user || user.role !== "admin") {
+    throw new AppError("Forbidden", 403);
+  }
+   const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+  const { users, totalCount } = await findPaginatedUsers(page, limit);
+
+  const totalPages = Math.ceil(totalCount / limit);
+  res.json({
+    users: users,
+    currentPage: page,
+    limit: limit,
+    totalItems: totalCount,
+    totalPages: totalPages,
+  });
+});
+export const searchUsers = catchAsync(async (req, res, next) => {
+  const user = req.user;
+  if (!user || user.role !== "admin") {
+    throw new AppError("Forbidden", 403);
+  }
+  const searchTerm = req.query.s || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+  const { users, totalCount } = await searchUsersByNameOrEmail(searchTerm, page, limit);  
+  const totalPages = Math.ceil(totalCount / limit);
+  res.json({
+    users: users,
+    currentPage: page,
+    limit: limit,
+    totalItems: totalCount,
+    totalPages: totalPages,
   });
 });

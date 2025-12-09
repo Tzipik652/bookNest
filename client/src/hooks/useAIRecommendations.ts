@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useUserStore } from "../store/useUserStore";
 import { getAIRecommendations } from "../services/bookService";
-import { Book } from "../types";
+import { Book, RecommendedBook } from "../types";
 
 export function useAIRecommendations() {
   const user = useUserStore((state) => state.user);
 
-  const AIRecommendationsQuery = useQuery<Book[]>({
+  const AIRecommendationsQuery = useQuery<RecommendedBook[]>({
     queryKey: ["aiRecommendations", user?._id], 
     queryFn: getAIRecommendations,
     staleTime: 1000 * 60 * 10,
