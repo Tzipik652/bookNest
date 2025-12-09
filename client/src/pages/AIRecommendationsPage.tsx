@@ -11,14 +11,15 @@ import {
 import { AutoAwesome, Refresh } from "@mui/icons-material";
 import { useAIRecommendations } from "../hooks/useAIRecommendations";
 import { useFavoriteBooks } from "../hooks/useFavorites";
-import { Book, BookWithFavorite } from "../types";
+import { Book, BookWithFavorite, RecommendedBook } from "../types";
 import BookGridSkeleton from "../components/BookGridSkeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from '../hooks/useKeyboardMode';
+import { AIReasonBubble } from "../components/AIReasonBubble";
 
 export function AIRecommendationsPage() {
-  const { t } = useTranslation(['AIRecommendations', 'common'])
+  const { t , i18n } = useTranslation(['AIRecommendations', 'common'])
   const isKeyboardMode = useKeyboardModeBodyClass();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +34,9 @@ export function AIRecommendationsPage() {
   const AIRecommendations = AIRecommendationsQuery.data || [];
   useEffect(() => {
     if (!AIRecommendations) return;
+console.log(AIRecommendations);
+console.log(typeof AIRecommendations);
+
 
     AIRecommendations.forEach((book) => {
       queryClient.setQueryData<BookWithFavorite>(
@@ -140,13 +144,14 @@ export function AIRecommendationsPage() {
             gap: 3,
           }}
         >
-          {AIRecommendations.map((book: Book) => (
+          {AIRecommendations.map((book: any) => (
             <Box
               key={`${book._id}`}
               flex="1 1 calc(25% - 24px)"
               minWidth={250}
               maxWidth={300}
             >
+              <AIReasonBubble reason={i18n.language === 'he' ? book.recommendation_reason.he : book.recommendation_reason.en} />
               <BookCard book={book} />
             </Box>
           ))}

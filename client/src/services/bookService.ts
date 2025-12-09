@@ -1,4 +1,4 @@
-import { Book, Comment, PaginatedResponse } from "../types";
+import { Book, Comment, PaginatedResponse, RecommendedBook } from "../types";
 import { useUserStore } from "../store/useUserStore";
 import api from "../lib/axiosInstance";
 import axios from "axios";
@@ -148,7 +148,7 @@ export async function getBooksByUserId() {
 
 
 // AI Recommendations
-export const getAIRecommendations = async (): Promise<Book[]> => {
+export const getAIRecommendations = async (): Promise<RecommendedBook[]> => {
   try {
     const res = await api.get(`${API_BASE_URL}/recommendations`);
     return res.data;
