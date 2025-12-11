@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { UserCopy } from "../types";
-import { addUserCopy, changeLoanLocation, changeStatus } from "../services/userCopiesService";
+import {
+  addUserCopy,
+  changeLoanLocation,
+  changeStatus,
+} from "../services/userCopiesService";
 import {
   Dialog,
   DialogContent,
@@ -11,11 +15,11 @@ import {
 } from "./ui/dialog";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import { Switch } from "./ui/switch";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { MapPin } from "lucide-react";
 import { useUserStore } from "../store/useUserStore";
+import { FormControlLabel, Switch } from "@mui/material";
 
 interface LoanFormModalProps {
   bookId: string;
@@ -54,7 +58,7 @@ export function LoanFormModal({
 
     try {
       if (existingCopy && existingCopy.is_available_for_loan !== isAvailable) {
-        await changeStatus(existingCopy.id?.toString()??"");
+        await changeStatus(existingCopy.id?.toString() ?? "");
       }
 
       if (isAvailable && existingCopy) {
@@ -62,7 +66,11 @@ export function LoanFormModal({
         const lonChanged = existingCopy.loan_location_lon !== locationLon;
 
         if (latChanged || lonChanged) {
-          await changeLoanLocation(locationLat, locationLon, existingCopy.id?.toString()??'');
+          await changeLoanLocation(
+            locationLat,
+            locationLon,
+            existingCopy.id?.toString() ?? ""
+          );
         }
       }
 
@@ -100,16 +108,17 @@ export function LoanFormModal({
           <div className="space-y-2">
             <Label htmlFor="lending-status">{t("lending.lendingStatus")}</Label>
             <div className="flex items-center gap-3">
-              <Switch
-                id="lending-status"
-                checked={isAvailable}
-                onCheckedChange={setIsAvailable}
-              />
-              <span className="text-sm">
-                {isAvailable
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isAvailable}
+                    onChange={(event) => setIsAvailable(event.target.checked)}
+                  />
+                }
+                label={isAvailable
                   ? t("lending.availableForLoan")
                   : t("lending.notAvailableForLoan")}
-              </span>
+              />
             </div>
           </div>
 

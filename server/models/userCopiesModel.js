@@ -152,7 +152,6 @@ export async function getAvailableCopiesForBook(bookId) {
     .eq("book_id", bookId)
     .eq("is_available_for_loan", true);
 
-  console.log("get available copies for book",data);
   if (error) {
     console.error("Error fetching available copies by book ID:", error);
     throw error;

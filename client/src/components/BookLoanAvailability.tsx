@@ -20,11 +20,11 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Badge } from "./ui/badge";
 import { BookOpen, MapPin, User, MessageCircle } from "lucide-react";
 import { LoanFormModal } from "./LoanFormModal";
 import { toast } from "sonner";
 import { useUserStore } from "../store/useUserStore";
+import { Chip } from "@mui/material";
 
 interface BookLoanAvailabilityProps {
   bookId: string;
@@ -49,48 +49,44 @@ export function BookLoanAvailability({
   // Mock user location (in a real app, this would come from geolocation API or user settings)
   const userLocation = { lat: 40.7128, lon: -74.006 }; // New York City
 
-useEffect(() => {
-  const fetchUserCopy = async () => {
-    let copy = null;
-    
-    try {
-      if (currentUser) {
-        try {
-          copy = await getUserCopy(bookId);
-          setUserCopy(copy);
-          console.log("getUserCopy:", copy);
-        } catch (err: any) {
-          if (err?.response?.status === 404) {
-            setUserCopy(null);
-          } else {
-            throw err;
-          }
-        }
+  useEffect(() => {
+    const fetchUserCopy = async () => {
+      let copy = null;
 
-        if (copy) {
+      try {
+        if (currentUser) {
           try {
-            const loan = await getActiveLoanForCopy(copy.id);
-            setActiveLoan(loan);
-            console.log("getActiveLoanForCopy:", loan);
-          } catch (err) {
-            console.error("Error fetching loan:", err);
+            copy = await getUserCopy(bookId);
+            setUserCopy(copy);
+          } catch (err: any) {
+            if (err?.response?.status === 404) {
+              setUserCopy(null);
+            } else {
+              throw err;
+            }
+          }
+
+          if (copy) {
+            try {
+              const loan = await getActiveLoanForCopy(copy.id);
+              setActiveLoan(loan);
+            } catch (err) {
+              console.error("Error fetching loan:", err);
+              setActiveLoan(null);
+            }
+          } else {
             setActiveLoan(null);
           }
-        } else {
-          setActiveLoan(null);
         }
+        const copies = await getAvailableCopiesForBook(bookId);
+        setAvailableCopies(copies);
+      } catch (err) {
+        console.error("Unexpected error:", err);
       }
-      const copies = await getAvailableCopiesForBook(bookId);
-      setAvailableCopies(copies);
+    };
 
-    } catch (err) {
-      console.error("Unexpected error:", err);
-    }
-  };
-
-  fetchUserCopy();
-}, [bookId, refreshKey]);
-
+    fetchUserCopy();
+  }, [bookId, refreshKey]);
 
   if (!currentUser) {
     return null; // Or show a message to log in
@@ -170,7 +166,11 @@ useEffect(() => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-2">
-              <Badge variant="secondary">{t("lending.active")}</Badge>
+              <Chip
+                label={t("lending.active")}
+                color="secondary"
+                variant="outlined"
+              />
               <span className="text-sm text-gray-600">
                 {t("lending.currentlyOnLoan")} {t("lending.to")}{" "}
                 {activeLoan.borrowerName}
@@ -227,9 +227,11 @@ useEffect(() => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Badge variant="default" className="bg-green-600">
-              {t("lending.availableForLoan")}
-            </Badge>
+            <Chip
+              label={t("lending.availableForLoan")}
+              color="default"
+              variant="outlined"
+            />
             <p className="text-sm text-gray-600 mt-2">
               {t("lending.copyAvailable")}{" "}
               {userCopy.loan_location_lat && userCopy.loan_location_lon && (
@@ -310,9 +312,11 @@ useEffect(() => {
                   <span>{copy.owner_name}</span>
                 </div>
                 {copy.distance !== undefined && (
-                  <Badge variant="secondary">
-                    {copy.distance} {t("lending.km")}
-                  </Badge>
+                  <Chip
+                    label={`${copy.distance} ${t("lending.km")}`}
+                    color="secondary"
+                    variant="outlined"
+                  />
                 )}
               </div>
 

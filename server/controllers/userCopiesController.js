@@ -13,18 +13,6 @@ const addCopy = catchAsync(async (req, res, next) => {
   const alreadyExist = await userCopiesModel.isCopyExist(userId, book_id);
   if (alreadyExist) {
     throw new AppError("Copy already exist", 400);
-    // const copy = await userCopiesModel.findByBookId(book_id);
-    // console.log(copy);
-    // if (!copy) {
-    //   throw new AppError("Copy not found", 404);
-    // }
-    // const copyUpdated = await userCopiesModel.update(copy[0].id, {
-    // });
-    // res.status(200).json({
-    //   data: copyUpdated,
-    //   success: true,
-    //   message: "Copy updated successfully",
-    // });
   }
   const copy = await userCopiesModel.add({
     userId,
@@ -190,12 +178,10 @@ const getAvailableCopiesForBook = catchAsync(async (req, res, next) => {
   if (!bookId) {
     throw new AppError("bookId are required", 400);
   }
-  console.log("getAvailableCopiesForBook :controller",bookId)
   const copies = await userCopiesModel.getAvailableCopiesForBook(bookId);
   if (!copies) {
     throw new AppError("Copies not found", 404);
   }
-  console.log("getAvailableCopiesForBook :controller",copies)
   res.status(200).json({
     data: copies,
     success: true,

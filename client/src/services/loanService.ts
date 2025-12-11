@@ -51,7 +51,6 @@ export const getUserLoansAsBorrower = async (): Promise<Loan[]> => {
       throw new Error("User not found");
     }
     const res = await api.get(`${API_BASE_URL}/${currentUser._id}/borrower`);
-    console.log("get user loans as borrower",res.data)
     return res.data.data.map(transformLoan);
   } catch (error) {
     handleAxiosError(error);
@@ -65,7 +64,6 @@ export const getUserLoansAsLender = async (): Promise<Loan[]> => {
       throw new Error("User not found");
     }
     const res = await api.get(`${API_BASE_URL}/${currentUser._id}/owner`);
-    console.log("get user loans as lender",res.data.data.map(transformLoan))
     return res.data.data.map(transformLoan);
   } catch (error) {
     handleAxiosError(error);
@@ -122,9 +120,7 @@ export const markLoanAsReturned = async (loanId: string): Promise<Loan> => {
 
 export const getActiveLoanForCopy = async (userCopyId: string) => {
   try {
-    console.log('get active loan for copy',userCopyId)
     const res = await api.get(`${API_BASE_URL}/${userCopyId}/active-loan-for-copy`);
-    console.log(res.data)
     return res.data.map(transformLoan);
   } catch (error) {
     handleAxiosError(error);
@@ -133,9 +129,7 @@ export const getActiveLoanForCopy = async (userCopyId: string) => {
 
 export const createLoanRequest = async (userCopyId: string) => {
   try {
-    console.log('create loan request')
     const res = await api.post(`${API_BASE_URL}/request`,{user_copy_id:userCopyId});
-    console.log(res.data)
     return res.data.data;
   } catch (error) {
     handleAxiosError(error);

@@ -120,12 +120,10 @@ export const deleteCopy = async (copyId: string) => {
 
 export const getAvailableCopiesForBook = async (bookId: string) => {
   try {
-    console.log("get available copies for book",bookId)
     if (!bookId) {
       throw new Error("Book not found");
     }
     const res = await api.get(`${API_BASE_URL}/${bookId}/available-book-copies`);
-    console.log("available copies for book",res.data)
     return res.data.data;
   } catch (error) {
     handleAxiosError(error);

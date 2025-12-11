@@ -15,18 +15,15 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../components/ui/tabs";
 import { MessageCircle, BookOpen, User, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { useUserStore } from "../store/useUserStore";
 import { LoanStatus } from "../types";
+import { Chip, Typography } from "@mui/material";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
 
 export function LoansPage() {
   const { t } = useTranslation();
@@ -34,6 +31,7 @@ export function LoansPage() {
   const [borrowerLoans, setBorrowerLoans] = useState<Loan[]>([]);
   const [lenderLoans, setLenderLoans] = useState<Loan[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [tab, setTab] = useState(0);
   const { user: currentUser } = useUserStore();
 
   useEffect(() => {
@@ -74,20 +72,22 @@ export function LoansPage() {
     }
   };
 
-  const getStatusBadgeVariant = (status: string) => {
+  function getStatusColor(status: LoanStatus) {
     switch (status) {
-      case "PENDING":
-        return "secondary";
-      case "ACTIVE":
-        return "default";
-      case "RETURNED":
-        return "outline";
-      case "CANCELLED":
-        return "destructive";
+      case LoanStatus.REQUESTED:
+        return "warning";
+      case LoanStatus.ACTIVE:
+      case LoanStatus.APPROVED:
+        return "success";
+      case LoanStatus.CANCELLED:
+      case LoanStatus.OVERDUE:
+        return "error";
+      case LoanStatus.RETURNED:
+        return "info";
       default:
-        return "secondary";
+        return "default";
     }
-  };
+  }
 
   const renderLoanCard = (loan: Loan, isBorrower: boolean) => {
     return (
@@ -106,9 +106,11 @@ export function LoansPage() {
                   : `Borrower: ${loan.borrower_name}`}
               </CardDescription>
             </div>
-            <Badge variant={getStatusBadgeVariant(loan.status)}>
-              {t(`lending.${loan.status.toLowerCase()}`)}
-            </Badge>
+            <Chip
+              label={t(`lending.${loan.status.toLowerCase()}`)}
+              color={getStatusColor(loan.status)}
+              variant="outlined"
+            />
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -181,57 +183,41 @@ export function LoansPage() {
           </p>
         </div>
 
-        <Tabs defaultValue="borrowing" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="borrowing">
-              Borrowing ({borrowerLoans.length})
-            </TabsTrigger>
-            <TabsTrigger value="lending">
-              Lending ({lenderLoans.length})
-            </TabsTrigger>
-          </TabsList>
+       <Tabs value={tab} onChange={(e, v) => setTab(v)}>
+  <Tab label={`Borrowing (${borrowerLoans.length})`} />
+  <Tab label={`Lending (${lenderLoans.length})`} />
+</Tabs>
 
-          <TabsContent value="borrowing" className="space-y-4 mt-6">
-            {borrowerLoans.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                  <p className="text-gray-600">No borrowing requests yet</p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Browse books and request to borrow from the community
-                  </p>
-                  <Button onClick={() => navigate("/")} className="mt-4">
-                    Browse Books
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              borrowerLoans.map((loan) => renderLoanCard(loan, true))
-            )}
-          </TabsContent>
+{/* Borrowing */}
+{tab === 0 && (
+  <Box sx={{ mt: 3 }}>
+    {borrowerLoans.length === 0 ? (
+      <Card>
+        <CardContent className="space-y-8 py-8 text-center">
+          <Typography>No borrowing requests yet</Typography>
+        </CardContent>
+      </Card>
+    ) : (
+      borrowerLoans.map((loan) => renderLoanCard(loan, true))
+    )}
+  </Box>
+)}
 
-          <TabsContent value="lending" className="space-y-4 mt-6">
-            {lenderLoans.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                  <p className="text-gray-600">No lending requests yet</p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Make your books available for lending to start sharing
-                  </p>
-                  <Button
-                    onClick={() => navigate("/my-books")}
-                    className="mt-4"
-                  >
-                    My Books
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              lenderLoans.map((loan) => renderLoanCard(loan, false))
-            )}
-          </TabsContent>
-        </Tabs>
+{/* Lending */}
+{tab === 1 && (
+  <Box sx={{ mt: 3 }}>
+    {lenderLoans.length === 0 ? (
+      <Card>
+        <CardContent className="space-y-8 py-8 text-center">
+          <Typography>No lending requests yet</Typography>
+        </CardContent>
+      </Card>
+    ) : (
+      lenderLoans.map((loan) => renderLoanCard(loan, false))
+    )}
+  </Box>
+)}
+
       </div>
     </div>
   );

@@ -20,11 +20,10 @@ import {
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import { Badge } from "../components/ui/badge";
-import { Separator } from "../components/ui/separator";
 import { ArrowLeft, Send, BookOpen, User, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { useUserStore } from "../store/useUserStore";
+import { Chip, Divider } from "@mui/material";
 
 export function LoanChatPage() {
   const { loanId } = useParams<{ loanId: string }>();
@@ -139,23 +138,22 @@ export function LoanChatPage() {
       toast.error(error.message);
     }
   };
-
-  const getStatusBadgeVariant = (status: LoanStatus) => {
+  function getStatusColor(status: LoanStatus) {
     switch (status) {
       case LoanStatus.REQUESTED:
-        return "secondary";
+        return "warning";
       case LoanStatus.ACTIVE:
       case LoanStatus.APPROVED:
-        return "default";
-      case LoanStatus.RETURNED:
-        return "outline";
+        return "success";
       case LoanStatus.CANCELLED:
       case LoanStatus.OVERDUE:
-        return "destructive";
+        return "error";
+      case LoanStatus.RETURNED:
+        return "info";
       default:
-        return "secondary";
+        return "default";
     }
-  };
+  }
 
   if (!loan || !currentUser) return null;
 
@@ -191,9 +189,11 @@ export function LoanChatPage() {
                   {isLender ? "Borrowing" : "Lending"} with {otherUserName}
                 </div>
               </div>
-              <Badge variant={getStatusBadgeVariant(loan.status)}>
-                {t(`lending.${loan.status.toLowerCase()}`)}
-              </Badge>
+              <Chip
+                label={t(`lending.${loan.status.toLowerCase()}`)}
+                color={getStatusColor(loan.status)}
+                variant="outlined"
+              />
             </div>
           </CardHeader>
           <CardContent>
@@ -258,7 +258,7 @@ export function LoanChatPage() {
           <CardHeader>
             <CardTitle>Messages</CardTitle>
           </CardHeader>
-          <Separator />
+          <Divider />
           <CardContent className="p-0">
             {/* Messages List */}
             <div className="h-96 overflow-y-auto p-4 space-y-4">
@@ -298,7 +298,7 @@ export function LoanChatPage() {
               <div ref={messagesEndRef} />
             </div>
 
-            <Separator />
+            <Divider />
 
             {/* Message Input */}
             <div className="p-4">

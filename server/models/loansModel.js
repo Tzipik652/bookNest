@@ -4,8 +4,8 @@ const loanSelectQuery = `
       id,
       user_copy_id(  
         id,
-        book_id (_id, title),
-        owner_id (_id, name, email),
+        book_id:books!fk_copy_book(_id, title),
+        owner_id:users!fk_copy_owner(_id, name, email),
         is_available_for_loan,
         loan_location_lat,
         loan_location_lon,
@@ -71,18 +71,25 @@ export async function findLoansByBorrowerId(borrowerId) {
     console.error("Error fetching loans by borrower ID:", error);
     throw error;
   }
+    if (!data || data.length === 0|| data[0].borrower_id === null) {
+    console.log(`No loans found for user ID: ${userId}`);
+    return []; 
+  }
   return data;
 }
 
 export async function findLoansByUserId(userId) {
   const { data, error } = await supabase
-  .from("loans")
-  .select(loanSelectQuery)
-  .eq("user_copy_id.owner_id._id", userId);
-
+    .from("loans")
+    .select(loanSelectQuery)
+    .filter("user_copy_id.owner_id._id", "eq", userId);
   if (error) {
     console.error("Error fetching loans by user ID:", error);
     throw error;
+  }
+  if (!data || data.length === 0|| data[0].user_copy_id.owner_id === null) {
+    console.log(`No loans found for user ID: ${userId}`);
+    return []; 
   }
   return data;
 }
