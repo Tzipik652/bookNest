@@ -8,18 +8,20 @@ import {
 } from "../services/userCopiesService";
 import {
   Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+  DialogContent,
+  DialogActions,
+  FormControlLabel,
+  Switch,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Divider,
+} from "@mui/material";
 import { toast } from "sonner";
 import { MapPin } from "lucide-react";
 import { useUserStore } from "../store/useUserStore";
-import { FormControlLabel, Switch } from "@mui/material";
 
 interface LoanFormModalProps {
   bookId: string;
@@ -96,106 +98,102 @@ export function LoanFormModal({
   };
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white shadow-xl border rounded-xl">
-        <DialogHeader>
-          <DialogTitle>{t("lending.manageCopy")}</DialogTitle>
-          <DialogDescription>{bookTitle}</DialogDescription>
-        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Lending Status */}
-          <div className="space-y-2">
-            <Label htmlFor="lending-status">{t("lending.lendingStatus")}</Label>
-            <div className="flex items-center gap-3">
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={isAvailable}
-                    onChange={(event) => setIsAvailable(event.target.checked)}
-                  />
-                }
-                label={isAvailable
-                  ? t("lending.availableForLoan")
-                  : t("lending.notAvailableForLoan")}
-              />
-            </div>
-          </div>
+<Dialog open={true} onClose={onClose} maxWidth="md" fullWidth>
+  <DialogTitle>{t("lending.manageCopy")}</DialogTitle>
 
-          {/* Location Selection (only show if available for loan) */}
-          {isAvailable && (
-            <div className="space-y-2">
-              <Label>{t("lending.pickupLocation")}</Label>
-              <p className="text-sm text-gray-500 mb-2">
-                {t("lending.enterLocationCoordinates")}
-              </p>
+  <DialogContent dividers>
+    <Typography variant="subtitle1" color="textSecondary" gutterBottom>
+      {bookTitle}
+    </Typography>
 
-              {/* Location Coordinates */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="latitude" className="text-xs text-gray-500">
-                    {t("lending.latitude")}
-                  </Label>
-                  <Input
-                    id="latitude"
-                    type="number"
-                    step="0.0001"
-                    value={locationLat}
-                    onChange={(e) => {
-                      const lat = parseFloat(e.target.value);
-                      if (!isNaN(lat)) {
-                        setLocationLat(lat);
-                      }
-                    }}
-                    placeholder="40.7128"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="longitude" className="text-xs text-gray-500">
-                    {t("lending.longitude")}
-                  </Label>
-                  <Input
-                    id="longitude"
-                    type="number"
-                    step="0.0001"
-                    value={locationLon}
-                    onChange={(e) => {
-                      const lon = parseFloat(e.target.value);
-                      if (!isNaN(lon)) {
-                        setLocationLon(lon);
-                      }
-                    }}
-                    placeholder="-74.0060"
-                  />
-                </div>
-              </div>
+    <form onSubmit={handleSubmit}>
+      {/* Lending Status */}
+      <Box my={2}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={isAvailable}
+              onChange={(event) => setIsAvailable(event.target.checked)}
+            />
+          }
+          label={
+            isAvailable
+              ? t("lending.availableForLoan")
+              : t("lending.notAvailableForLoan")
+          }
+        />
+      </Box>
 
-              {/* Visual Location Display */}
-              <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-primary mt-1" />
-                  <div>
-                    <p className="text-sm">
-                      <strong>{t("lending.pickupLocationLabel")}:</strong>
-                    </p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {locationLat.toFixed(4)}°, {locationLon.toFixed(4)}°
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+      {/* Location Selection */}
+      {isAvailable && (
+        <Box my={2}>
+          <Typography variant="body2" gutterBottom>
+            {t("lending.pickupLocation")}
+          </Typography>
+          <Typography variant="caption" color="textSecondary" gutterBottom>
+            {t("lending.enterLocationCoordinates")}
+          </Typography>
 
-          {/* Actions */}
-          <div className="flex gap-3 justify-end">
-            <Button type="button" variant="outline" onClick={onClose}>
-              {t("lending.cancel")}
-            </Button>
-            <Button type="submit">{t("lending.saveCopy")}</Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+          <Box display="flex" gap={2} mb={2} mt={2}>
+            <TextField
+              label={t("lending.latitude")}
+              type="number"
+              value={locationLat}
+              onChange={(e) => {
+                const lat = parseFloat(e.target.value);
+                if (!isNaN(lat)) setLocationLat(lat);
+              }}
+              fullWidth
+            />
+            <TextField
+              label={t("lending.longitude")}
+              type="number"
+              value={locationLon}
+              onChange={(e) => {
+                const lon = parseFloat(e.target.value);
+                if (!isNaN(lon)) setLocationLon(lon);
+              }}
+              fullWidth
+            />
+          </Box>
+
+          {/* Visual Location Display */}
+          <Box
+            display="flex"
+            alignItems="flex-start"
+            gap={1}
+            p={2}
+            bgcolor="grey.100"
+            borderRadius={1}
+          >
+            <MapPin size={20} className="text-primary" />
+            <Box>
+              <Typography variant="caption" fontWeight="bold">
+                {t("lending.pickupLocationLabel")}:
+              </Typography>
+              <Typography variant="caption" color="textSecondary">
+                {locationLat.toFixed(4)}°, {locationLon.toFixed(4)}°
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      )}
+
+      <Divider sx={{ my: 2 }} />
+
+      {/* Actions */}
+      <DialogActions>
+        <Button variant="outlined" onClick={onClose}>
+          {t("lending.cancel")}
+        </Button>
+        <Button type="submit" variant="contained">
+          {t("lending.saveCopy")}
+        </Button>
+      </DialogActions>
+    </form>
+  </DialogContent>
+</Dialog>
+
   );
 }

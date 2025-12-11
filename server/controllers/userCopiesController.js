@@ -164,9 +164,9 @@ const getBookCopies = catchAsync(async (req, res, next) => {
 const getBookCopyByUserId = catchAsync(async (req, res, next) => {
   const { userId, bookId } = req.params;
   const copy = await userCopiesModel.findBookCopyByUserId(userId,bookId);
-  if (!copy) {
-    throw new AppError("Copy not found", 404);
-  }
+  // if (!copy) {
+  //   return res.status(404).json({ error: "Copy not found" });
+  // }
   res.status(200).json({
     data: copy,
     success: true,

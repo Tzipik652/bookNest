@@ -19,7 +19,7 @@ function handleAxiosError(error: any): never {
 }
 
 export const addUserCopy = async (user_copy: UserCopy) => {
-  try {    
+  try {
     const response = await api.post(API_BASE_URL, {
       user_copy,
     });
@@ -71,10 +71,12 @@ export const getUserCopy = async (bookId: string) => {
     if (!currentUser) {
       throw new Error("User not found");
     }
-    const response = await api.get(`${API_BASE_URL}/book-copy/${currentUser._id}/${bookId}`);
+    const response = await api.get(
+      `${API_BASE_URL}/book-copy/${currentUser._id}/${bookId}`
+    );
     return response.data.data;
   } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
       return null;
     }
     handleAxiosError(error);
@@ -123,13 +125,14 @@ export const getAvailableCopiesForBook = async (bookId: string) => {
     if (!bookId) {
       throw new Error("Book not found");
     }
-    const res = await api.get(`${API_BASE_URL}/${bookId}/available-book-copies`);
+    const res = await api.get(
+      `${API_BASE_URL}/${bookId}/available-book-copies`
+    );
     return res.data.data;
   } catch (error) {
     handleAxiosError(error);
   }
 };
-
 
 export const disableLending = async (userCopyId: string) => {
   try {
