@@ -71,8 +71,8 @@ export async function findLoansByBorrowerId(borrowerId) {
     console.error("Error fetching loans by borrower ID:", error);
     throw error;
   }
-    if (!data || data.length === 0|| data[0].borrower_id === null) {
-    console.log(`No loans found for user ID: ${userId}`);
+    if (!data || data.length === 0) {
+    console.log(`No loans found for user ID: ${borrowerId}`);
     return []; 
   }
   return data;
