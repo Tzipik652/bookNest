@@ -88,9 +88,13 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     try {
       const addedComment = await addComment(bookId, newComment.trim());
 
-      // יצירת תגובה חדשה עם מונים מאופסים (שימוש בשם החדש)
       const commentWithReactions: CommentWithReactions = {
         ...addedComment,
+        user: {
+            name: currentUser.name,
+            profile_picture: currentUser.profile_picture,
+            email: currentUser.email,
+        },
         reaction_counts: { like: 0, dislike: 0, happy: 0, angry: 0 },
         user_reaction: undefined,
       };
