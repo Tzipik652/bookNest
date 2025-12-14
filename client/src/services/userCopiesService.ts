@@ -144,7 +144,6 @@ export const getAvailableCopiesForBook = async (bookId: string) => {
     const res = await api.get(
       `${API_BASE_URL}/${bookId}/available-book-copies`
     );
-    console.log(res.data.data.map(transformUserCopy))
     return res.data.data.map(transformUserCopy);
   } catch (error) {
     handleAxiosError(error);

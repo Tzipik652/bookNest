@@ -163,7 +163,7 @@ const getBookCopies = catchAsync(async (req, res, next) => {
 });
 const getBookCopyByUserId = catchAsync(async (req, res, next) => {
   const { userId, bookId } = req.params;
-  const copy = await userCopiesModel.findBookCopyByUserId(userId,bookId);
+  const copy = await userCopiesModel.findBookCopyByUserId(userId, bookId);
   // if (!copy) {
   //   return res.status(404).json({ error: "Copy not found" });
   // }

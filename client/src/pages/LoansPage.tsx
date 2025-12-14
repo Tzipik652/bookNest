@@ -64,7 +64,7 @@ export function LoansPage() {
 
   const handleApproveLoan = async (loanId: string) => {
     try {
-      const loan = await approveLoan(loanId);
+      await approveLoan(loanId);
       toast.success(t("lending.loanApproved"));
       setRefreshKey((prev) => prev + 1);
     } catch (error: any) {
@@ -165,7 +165,6 @@ export function LoansPage() {
 
             {loan.status === LoanStatus.REQUESTED && (
               <Button
-                variant="destructive"
                 onClick={() => handleCancelLoan(loan.id)}
                 className="gap-2"
               >

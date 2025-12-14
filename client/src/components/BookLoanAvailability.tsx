@@ -42,7 +42,7 @@ export function BookLoanAvailability({
   const [availableCopies, setAvailableCopies] = useState<
     (UserCopy & { distance?: number })[]
   >([]);
-  const [activeLoan, setActiveLoan] = useState<any>(null);
+  const [activeLoan, setActiveLoan] = useState<Loan | null>(null);
   const [showLoanModal, setShowLoanModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const { user: currentUser } = useUserStore();
@@ -116,7 +116,7 @@ export function BookLoanAvailability({
   };
 
   const handleMarkAsReturned = () => {
-    if (activeLoan) {
+    if (activeLoan && activeLoan.id) {
       const { markLoanAsReturned } = require("../lib/storage");
       markLoanAsReturned(activeLoan.id);
       setRefreshKey((prev) => prev + 1);
@@ -153,7 +153,7 @@ export function BookLoanAvailability({
       );
     }
 
-    if (activeLoan) {
+    if (activeLoan && activeLoan.id) {
       // Copy is under active loan
       return (
         <Card>
@@ -172,7 +172,7 @@ export function BookLoanAvailability({
               />
               <span className="text-sm text-gray-600">
                 {t("lending.currentlyOnLoan")} {t("lending.to")}{" "}
-                {activeLoan.borrowerName}
+                {activeLoan.borrower_name}
               </span>
             </div>
             <div className="flex gap-2">
@@ -304,7 +304,6 @@ export function BookLoanAvailability({
         </CardHeader>
         <CardContent className="space-y-3">
           {availableCopies.map((copy) => {
-            console.log(copy);
             return (
               <div key={copy.id} className="border rounded-lg p-4 space-y-3">
                 <div className="flex items-center justify-between">

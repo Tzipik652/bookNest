@@ -111,7 +111,6 @@ export function LoanChatPage() {
   if (isLoading || !loan)
     return <div className="py-20 text-center">Loading…</div>;
 
-  console.log(loan);
   const isLender = loan.user_copy?.owner_id === user._id;
   const otherUserName = isLender
     ? loan.borrower_name

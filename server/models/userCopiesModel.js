@@ -1,6 +1,6 @@
 import supabase from "../config/supabaseClient.js";
 
-const copySelectQuery =`
+const copySelectQuery = `
     id,
     book_id (_id, title),
     owner_id (_id, name, email),
@@ -11,9 +11,14 @@ const copySelectQuery =`
 `;
 
 export async function add(copyData) {
-  if (copyData.isAvailableForLoan && (!copyData.loanLocationLat || !copyData.loanLocationLon)) {
-        throw new Error("Validation Error: Loan location is required when available for loan.");
-    }
+  if (
+    copyData.isAvailableForLoan &&
+    (!copyData.loanLocationLat || !copyData.loanLocationLon)
+  ) {
+    throw new Error(
+      "Validation Error: Loan location is required when available for loan."
+    );
+  }
   const { data, error } = await supabase
     .from("user_copies")
     .insert({
@@ -23,9 +28,9 @@ export async function add(copyData) {
       loan_location_lat: copyData.loanLocationLat,
       loan_location_lon: copyData.loanLocationLon,
     })
-    .select()
+    .select(copySelectQuery)
     .single();
-  
+
   if (error) {
     console.error("Error add copy:", error);
     throw error;
@@ -38,7 +43,7 @@ export async function update(copyId, copyData) {
     .from("user_copies")
     .update(copyData)
     .eq("id", copyId)
-    .select()
+    .select(copySelectQuery)
     .maybeSingle();
 
   if (error) {
@@ -115,30 +120,30 @@ export async function findByBookId(bookId) {
     console.error("Error fetching copies by book ID:", error);
     throw error;
   }
-  return data
+  return data;
 }
-export async function findBookCopyByUserId(userId,bookId) {
+export async function findBookCopyByUserId(userId, bookId) {
   const { data, error } = await supabase
     .from("user_copies")
     .select(copySelectQuery)
     .eq("owner_id", userId)
     .eq("book_id", bookId);
-    // .single();
+  // .single();
 
   if (error) {
     console.error("Error fetching user copy:", error);
     throw error;
   }
-  return data[0]
+  return data[0];
 }
-export async function isCopyExist(userId, bookId){
+export async function isCopyExist(userId, bookId) {
   const { data, error } = await supabase
     .from("user_copies")
     .select("id")
     .eq("owner_id", userId)
-    .eq("book_id", bookId);   
-  
-    if (error) {
+    .eq("book_id", bookId);
+
+  if (error) {
     console.error("Error fetching copies by user ID:", error);
     throw error;
   }

@@ -51,7 +51,12 @@ export const getUserLoansAsBorrower = async (): Promise<Loan[]> => {
       throw new Error("User not found");
     }
     const res = await api.get(`${API_BASE_URL}/${currentUser._id}/borrower`);
-    return res.data.data.map(transformLoan);
+    const loans = res.data?.data ?? [];
+
+    return loans
+      .filter(Boolean)
+      .filter((l: any) => l.user_copy_id)
+      .map(transformLoan);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -64,7 +69,13 @@ export const getUserLoansAsLender = async (): Promise<Loan[]> => {
       throw new Error("User not found");
     }
     const res = await api.get(`${API_BASE_URL}/${currentUser._id}/owner`);
-    return res.data.data.map(transformLoan);
+
+    const loans = res.data?.data ?? [];
+
+    return loans
+      .filter(Boolean)
+      .filter((l: any) => l.user_copy_id)
+      .map(transformLoan);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -79,39 +90,39 @@ export const getLoanById = async (loanId: string): Promise<Loan> => {
 };
 export const approveLoan = async (loanId: string): Promise<Loan> => {
   try {
-    if(!loanId){
+    if (!loanId) {
       throw new Error("Loan are required");
     }
-    const res = await api.put(`${API_BASE_URL}/${loanId}/status`,{
-      status: LoanStatus.APPROVED
+    const res = await api.put(`${API_BASE_URL}/${loanId}/status`, {
+      status: LoanStatus.APPROVED,
     });
-    return transformLoan(res.data);
+    return transformLoan(res.data.data);
   } catch (error) {
     handleAxiosError(error);
   }
 };
 export const activeLoan = async (loanId: string): Promise<Loan> => {
   try {
-    if(!loanId){
+    if (!loanId) {
       throw new Error("Loan are required");
     }
-    const res = await api.put(`${API_BASE_URL}/${loanId}/status`,{
-      status: LoanStatus.ACTIVE
+    const res = await api.put(`${API_BASE_URL}/${loanId}/status`, {
+      status: LoanStatus.ACTIVE,
     });
-    return transformLoan(res.data);
+    return transformLoan(res.data.data);
   } catch (error) {
     handleAxiosError(error);
   }
 };
 export const cancelLoan = async (loanId: string): Promise<Loan> => {
   try {
-    if(!loanId){
+    if (!loanId) {
       throw new Error("Loan not found");
     }
-    const res = await api.put(`${API_BASE_URL}/${loanId}/status`,{
-      status: LoanStatus.CANCELED
+    const res = await api.put(`${API_BASE_URL}/${loanId}/status`, {
+      status: LoanStatus.CANCELED,
     });
-    return transformLoan(res.data);
+    return transformLoan(res.data.data);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -119,12 +130,10 @@ export const cancelLoan = async (loanId: string): Promise<Loan> => {
 
 export const markLoanAsReturned = async (loanId: string): Promise<Loan> => {
   try {
-    const res = await api.put(`${API_BASE_URL}/${loanId}/returnDate`,
-      {
-         return_date: new Date().toISOString(),
-      }
-    );
-    return transformLoan(res.data);
+    const res = await api.put(`${API_BASE_URL}/${loanId}/returnDate`, {
+      return_date: new Date().toISOString(),
+    });
+    return transformLoan(res.data.data);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -132,8 +141,13 @@ export const markLoanAsReturned = async (loanId: string): Promise<Loan> => {
 
 export const getActiveLoanForCopy = async (userCopyId: string) => {
   try {
-    const res = await api.get(`${API_BASE_URL}/${userCopyId}/active-loan-for-copy`);
-    return res.data.map(transformLoan);
+    const res = await api.get(
+      `${API_BASE_URL}/${userCopyId}/active-loan-for-copy`
+    );
+    if (!res.data.data) {
+      return;
+    }
+    return res.data.data.map(transformLoan)[0];
   } catch (error) {
     handleAxiosError(error);
   }
@@ -141,11 +155,9 @@ export const getActiveLoanForCopy = async (userCopyId: string) => {
 
 export const createLoanRequest = async (userCopyId: string) => {
   try {
-    console.log("create loan");
-    console.log("create loan");
-    const res = await api.post(`${API_BASE_URL}/request`,{user_copy_id:userCopyId});
-    console.log("create loan data", res.data);
-    console.log(transformLoan(res.data.data));
+    const res = await api.post(`${API_BASE_URL}/request`, {
+      user_copy_id: userCopyId,
+    });
     return transformLoan(res.data.data);
   } catch (error) {
     handleAxiosError(error);

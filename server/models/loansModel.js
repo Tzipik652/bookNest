@@ -5,7 +5,7 @@ const loanSelectQuery = `
       user_copy_id(  
         id,
         book_id:books!fk_copy_book(_id, title),
-        owner_id:users!fk_copy_owner(_id, name, email),
+        owner_id:users!fk_copy_owner!inner(_id, name, email),
         is_available_for_loan,
         loan_location_lat,
         loan_location_lon,
@@ -41,7 +41,7 @@ export async function update(loanId, loanData) {
     .from("loans")
     .update(loanData)
     .eq("id", loanId)
-    .select()
+    .select(loanSelectQuery)
     .single();
 
   if (error) {
@@ -71,8 +71,8 @@ export async function findLoansByBorrowerId(borrowerId) {
     console.error("Error fetching loans by borrower ID:", error);
     throw error;
   }
-    if (!data || data.length === 0) {
-    return []; 
+  if (!data || data.length === 0) {
+    return [];
   }
   return data;
 }
@@ -86,10 +86,7 @@ export async function findLoansByUserId(userId) {
     console.error("Error fetching loans by user ID:", error);
     throw error;
   }
-  if (!data || data.length === 0|| data[0].user_copy_id.owner_id === null) {
-    return []; 
-  }
-  return data;
+  return data ?? [];
 }
 
 export async function findActiveLoansByUserCopyId(userCopyId) {
