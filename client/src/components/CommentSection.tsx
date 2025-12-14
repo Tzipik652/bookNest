@@ -5,6 +5,7 @@ import {
   getComments,
   addComment,
   deleteComment,
+  editComment,
 } from "../services/commentService";
 import {
   toggleReaction,
@@ -42,6 +43,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
   const { t } = useTranslation(["comments", "common"]);
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
+
   const theme = useTheme();
   const [comments, setComments] = useState<CommentWithReactions[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -62,18 +64,6 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     try {
       const loadedComments = await getComments(bookId);
 
-      // const commentsWithUserReaction = await Promise.all(
-      //   loadedComments.map(async (comment) => {
-      //     const userReaction = currentUser? await getUserReactionOnComment(comment.id, currentUser._id) : null;
-            
-      //     return {
-      //       ...comment,
-      //       userReaction,
-      //       reaction_counts: comment.reaction_counts || { like: 0, dislike: 0, happy: 0, angry: 0 }
-      //     };
-      //   })
-      // );
-      
       setComments(loadedComments);      
     } catch (error) {
       console.error(error);
@@ -98,9 +88,13 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     try {
       const addedComment = await addComment(bookId, newComment.trim());
 
-      // יצירת תגובה חדשה עם מונים מאופסים (שימוש בשם החדש)
       const commentWithReactions: CommentWithReactions = {
         ...addedComment,
+        user: {
+            name: currentUser.name,
+            profile_picture: currentUser.profile_picture,
+            email: currentUser.email,
+        },
         reaction_counts: { like: 0, dislike: 0, happy: 0, angry: 0 },
         user_reaction: undefined,
       };
@@ -122,7 +116,22 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       setIsSubmitting(false);
     }
   };
+const handleEditComment = async (commentId: string, newText: string) => {
+    try {
+      await editComment(commentId, newText);
 
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.id === commentId ? { ...comment, text: newText } : comment
+        )
+      );
+
+      toast.success(t("common:toastUpdateSuccess")); 
+    } catch (error) {
+      console.error(error);
+      toast.error(t("common:toastUpdateFailed"));
+    }
+  };
   const handleDeleteComment = async (commentId: string) => {
     try {
       await deleteComment(commentId);
@@ -198,7 +207,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     } 
   };
 
-  const isBookOwner = currentUser?._id === bookOwnerId;
+  const isBookOwner = currentUser?._id === bookOwnerId;  
   const isAdmin = currentUser?.role === "admin";
 
   return (
@@ -298,17 +307,19 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
             loadingComments.has(comment.id) ? (
               <CommentItemSkeleton key={comment.id} />
             ) : (
-              <CommentItem
+             <CommentItem
                 ref={(el) => {
                   if (el) commentRefs.current[comment.id] = el;
                 }}
                 key={comment.id}
                 comment={comment}
-                isBookOwner={isBookOwner || isAdmin}
+                isBookOwner={isBookOwner} 
+                isAdmin={isAdmin} 
                 currentUserId={currentUser?._id || ""}
                 onDelete={() => setCommentToDelete(comment.id)}
+                onEdit={handleEditComment} 
                 onReaction={handleReaction}
-              />
+            />
             )
           )
         )}
