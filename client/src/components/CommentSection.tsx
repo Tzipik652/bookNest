@@ -5,6 +5,7 @@ import {
   getComments,
   addComment,
   deleteComment,
+  editComment,
 } from "../services/commentService";
 import {
   toggleReaction,
@@ -42,6 +43,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
   const { t } = useTranslation(["comments", "common"]);
   const navigate = useNavigate();
   const { user: currentUser } = useUserStore();
+
   const theme = useTheme();
   const [comments, setComments] = useState<CommentWithReactions[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -62,18 +64,6 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     try {
       const loadedComments = await getComments(bookId);
 
-      // const commentsWithUserReaction = await Promise.all(
-      //   loadedComments.map(async (comment) => {
-      //     const userReaction = currentUser? await getUserReactionOnComment(comment.id, currentUser._id) : null;
-            
-      //     return {
-      //       ...comment,
-      //       userReaction,
-      //       reaction_counts: comment.reaction_counts || { like: 0, dislike: 0, happy: 0, angry: 0 }
-      //     };
-      //   })
-      // );
-      
       setComments(loadedComments);      
     } catch (error) {
       console.error(error);
@@ -98,9 +88,13 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     try {
       const addedComment = await addComment(bookId, newComment.trim());
 
-      // יצירת תגובה חדשה עם מונים מאופסים (שימוש בשם החדש)
       const commentWithReactions: CommentWithReactions = {
         ...addedComment,
+        user: {
+            name: currentUser.name,
+            profile_picture: currentUser.profile_picture,
+            email: currentUser.email,
+        },
         reaction_counts: { like: 0, dislike: 0, happy: 0, angry: 0 },
         user_reaction: undefined,
       };
@@ -122,7 +116,22 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       setIsSubmitting(false);
     }
   };
+const handleEditComment = async (commentId: string, newText: string) => {
+    try {
+      await editComment(commentId, newText);
 
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.id === commentId ? { ...comment, text: newText } : comment
+        )
+      );
+
+      toast.success(t("common:toastUpdateSuccess")); 
+    } catch (error) {
+      console.error(error);
+      toast.error(t("common:toastUpdateFailed"));
+    }
+  };
   const handleDeleteComment = async (commentId: string) => {
     try {
       await deleteComment(commentId);
@@ -136,7 +145,7 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
     }
   };
 
-  const handleReaction = async (
+ const handleReaction = async (
     commentId: string,
     reactionType: ReactionType
   ) => {
@@ -145,17 +154,18 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       return;
     }
 
-    setLoadingComments((prev) => new Set(prev).add(commentId));
 
-    // עדכון אופטימי
+    //optimistic update- see the reaction immediately
     setComments((prevComments) =>
       prevComments.map((comment) => {
         if (comment.id !== commentId) return comment;
 
         const wasActive = comment.user_reaction === reactionType;
         
+        //create copy of reaction counts to modify
         const newReactionCounts = { ...comment.reaction_counts! };
 
+        //case 1: removing an active reaction
         if (wasActive) {
           newReactionCounts[reactionType] = Math.max(
             0,
@@ -163,26 +173,26 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
           );
           return {
             ...comment,
-            reaction_counts: newReactionCounts, // עדכון השדה החדש
-            userReaction: undefined,
+            reaction_counts: newReactionCounts,
+            user_reaction: undefined, 
           };
         }
 
-        // החלפת ריאקציה (אם הייתה אחרת)
+        //case 2: switching reactions
+
+        //if there was a previous reaction, decrease its count
         if (comment.user_reaction) {
           newReactionCounts[comment.user_reaction] = Math.max(
             0,
             (newReactionCounts[comment.user_reaction] || 0) - 1
           );
         }
-
-        // הוספת הריאקציה החדשה
         newReactionCounts[reactionType] =
           (newReactionCounts[reactionType] || 0) + 1;
 
         return {
           ...comment,
-          reaction_counts: newReactionCounts, // עדכון השדה החדש
+          reaction_counts: newReactionCounts,
           user_reaction: reactionType,
         };
       })
@@ -194,16 +204,10 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
       console.error(error);
       toast.error(t("errorAddFailed"));
       await loadComments();
-    } finally {
-      setLoadingComments((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(commentId);
-        return newSet;
-      });
-    }
+    } 
   };
 
-  const isBookOwner = currentUser?._id === bookOwnerId;
+  const isBookOwner = currentUser?._id === bookOwnerId;  
   const isAdmin = currentUser?.role === "admin";
 
   return (
@@ -303,17 +307,19 @@ export function CommentSection({ bookId, bookOwnerId }: CommentSectionProps) {
             loadingComments.has(comment.id) ? (
               <CommentItemSkeleton key={comment.id} />
             ) : (
-              <CommentItem
+             <CommentItem
                 ref={(el) => {
                   if (el) commentRefs.current[comment.id] = el;
                 }}
                 key={comment.id}
                 comment={comment}
-                isBookOwner={isBookOwner || isAdmin}
+                isBookOwner={isBookOwner} 
+                isAdmin={isAdmin} 
                 currentUserId={currentUser?._id || ""}
                 onDelete={() => setCommentToDelete(comment.id)}
+                onEdit={handleEditComment} 
                 onReaction={handleReaction}
-              />
+            />
             )
           )
         )}

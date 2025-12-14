@@ -67,17 +67,33 @@ export async function generateBookSummary(title, author, description) {
  * @returns {Promise<Array<Object>>} List of recommendations (up to 5) in JSON format.
  */
 export async function getBookRecommendations(favoriteBooks, candidateBooks) {
-  const prompt = `
-  The user liked the following books:
+const prompt = `
+  You are an expert librarian and book matchmaker.
+  
+  User's reading history (Favorite Books):
   ${JSON.stringify(favoriteBooks, null, 2)}
 
-  Here are the books available in the system:
+  Available library books (Candidates):
   ${JSON.stringify(candidateBooks, null, 2)}
 
-  Choose up to 5 books only from the candidate list.
-  Return in JSON format:
+  Instructions:
+  1. Select up to 5 books from the "Available library books" that best match the user's taste.
+  2. Explain WHY you chose each book.
+  3. Provide the reason in TWO languages: English ('en') and Hebrew ('he').
+  4. IMPORTANT: The Hebrew reason must sound natural, warm, and native (not a direct Google Translate style).
+
+  Output Format:
+  Return ONLY a raw JSON object with this exact structure:
   {
-    "recommendations": [ { "id": "string", "reason": "string" } ]
+    "recommendations": [ 
+      { 
+        "id": "string (original book id)", 
+        "reason": {
+          "en": "Explanation in English",
+          "he": "הסבר בעברית שנשמע טבעי וזורם"
+        } 
+      } 
+    ]
   }
   `;
 
