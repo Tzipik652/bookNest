@@ -17,13 +17,26 @@ function handleAxiosError(error: any): never {
     throw new Error("Unexpected error: " + error);
   }
 }
-
+function transformUserCopy(raw: any): UserCopy {
+  return {
+    id: raw.id,
+    book_id: raw.book_id._id,
+    book_title: raw.book_id.title,
+    owner_id: raw.owner_id._id,
+    owner_name: raw.owner_id.name,
+    owner_email: raw.owner_id.email,
+    is_available_for_loan: raw.is_available_for_loan,
+    loan_location_lat: raw.loan_location_lat,
+    loan_location_lon: raw.loan_location_lon,
+    date_added: raw.date_added,
+  };
+}
 export const addUserCopy = async (user_copy: UserCopy) => {
   try {
     const response = await api.post(API_BASE_URL, {
       user_copy,
     });
-    return response.data;
+    return transformUserCopy(response.data);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -32,7 +45,7 @@ export const addUserCopy = async (user_copy: UserCopy) => {
 export const getCopies = async () => {
   try {
     const response = await api.get(API_BASE_URL);
-    return response.data;
+    return response.data.map(transformUserCopy);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -41,7 +54,7 @@ export const getCopies = async () => {
 export const getCopyById = async (id: string) => {
   try {
     const response = await api.get(`${API_BASE_URL}/${id}`);
-    return response.data;
+    return transformUserCopy(response.data);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -50,7 +63,7 @@ export const getCopyById = async (id: string) => {
 export const getUserCopies = async (userId: string) => {
   try {
     const response = await api.get(`${API_BASE_URL}/${userId}/user-copies`);
-    return response.data;
+    return response.data.map(transformUserCopy);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -59,7 +72,7 @@ export const getUserCopies = async (userId: string) => {
 export const getBookCopies = async (bookId: string) => {
   try {
     const response = await api.get(`${API_BASE_URL}/${bookId}/book-copies`);
-    return response.data;
+    return response.data.map(transformUserCopy);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -74,7 +87,10 @@ export const getUserCopy = async (bookId: string) => {
     const response = await api.get(
       `${API_BASE_URL}/book-copy/${currentUser._id}/${bookId}`
     );
-    return response.data.data;
+    if(!response.data.data){
+      return
+    }
+    return transformUserCopy(response.data.data);
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       return null;
@@ -89,7 +105,7 @@ export const changeStatus = async (copyId: string) => {
       throw new Error("Copy not found");
     }
     const response = await api.put(`${API_BASE_URL}/${copyId}/status`);
-    return response.data;
+    return transformUserCopy(response.data.data);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -105,7 +121,7 @@ export const changeLoanLocation = async (
       loan_location_lat,
       loan_location_lon,
     });
-    return response.data;
+    return transformUserCopy(response.data);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -128,7 +144,8 @@ export const getAvailableCopiesForBook = async (bookId: string) => {
     const res = await api.get(
       `${API_BASE_URL}/${bookId}/available-book-copies`
     );
-    return res.data.data;
+    console.log(res.data.data.map(transformUserCopy))
+    return res.data.data.map(transformUserCopy);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -137,7 +154,7 @@ export const getAvailableCopiesForBook = async (bookId: string) => {
 export const disableLending = async (userCopyId: string) => {
   try {
     const copyUpdated = await changeStatus(userCopyId);
-    return copyUpdated.data;
+    return copyUpdated;
   } catch (error) {
     handleAxiosError(error);
   }

@@ -85,21 +85,33 @@ export const approveLoan = async (loanId: string): Promise<Loan> => {
     const res = await api.put(`${API_BASE_URL}/${loanId}/status`,{
       status: LoanStatus.APPROVED
     });
-    return res.data.data.map(transformLoan);
+    return transformLoan(res.data);
   } catch (error) {
     handleAxiosError(error);
   }
 };
-
+export const activeLoan = async (loanId: string): Promise<Loan> => {
+  try {
+    if(!loanId){
+      throw new Error("Loan are required");
+    }
+    const res = await api.put(`${API_BASE_URL}/${loanId}/status`,{
+      status: LoanStatus.ACTIVE
+    });
+    return transformLoan(res.data);
+  } catch (error) {
+    handleAxiosError(error);
+  }
+};
 export const cancelLoan = async (loanId: string): Promise<Loan> => {
   try {
-    if(loanId){
+    if(!loanId){
       throw new Error("Loan not found");
     }
     const res = await api.put(`${API_BASE_URL}/${loanId}/status`,{
-      status: LoanStatus.CANCELLED
+      status: LoanStatus.CANCELED
     });
-    return res.data.map(transformLoan);
+    return transformLoan(res.data);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -112,7 +124,7 @@ export const markLoanAsReturned = async (loanId: string): Promise<Loan> => {
          return_date: new Date().toISOString(),
       }
     );
-    return res.data.map(transformLoan);
+    return transformLoan(res.data);
   } catch (error) {
     handleAxiosError(error);
   }
@@ -129,8 +141,12 @@ export const getActiveLoanForCopy = async (userCopyId: string) => {
 
 export const createLoanRequest = async (userCopyId: string) => {
   try {
+    console.log("create loan");
+    console.log("create loan");
     const res = await api.post(`${API_BASE_URL}/request`,{user_copy_id:userCopyId});
-    return res.data.data;
+    console.log("create loan data", res.data);
+    console.log(transformLoan(res.data.data));
+    return transformLoan(res.data.data);
   } catch (error) {
     handleAxiosError(error);
   }

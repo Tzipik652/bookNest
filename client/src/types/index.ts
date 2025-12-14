@@ -105,7 +105,7 @@ export enum LoanStatus {
   ACTIVE = "ACTIVE",
   RETURNED = "RETURNED",
   OVERDUE = "OVERDUE",
-  CANCELLED = "CANCELLED",
+  CANCELED = "CANCELED",
 }
 
 export interface Loan {
@@ -133,8 +133,10 @@ export interface UserCopy {
   loan_location_lon: number;
   date_added?: string;
 }
+export type ChatMessageType = "user" | "system" | "status";
 
 export interface ChatMessage{
+  type?:ChatMessageType;
     id: string;
     loan_id: string;
     sender_id: string;

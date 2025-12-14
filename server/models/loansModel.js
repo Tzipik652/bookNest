@@ -26,7 +26,7 @@ export async function add(loanData) {
       borrower_id: loanData.borrowerId,
       status: "REQUESTED",
     })
-    .select()
+    .select(loanSelectQuery)
     .single();
 
   if (error) {
@@ -72,7 +72,6 @@ export async function findLoansByBorrowerId(borrowerId) {
     throw error;
   }
     if (!data || data.length === 0) {
-    console.log(`No loans found for user ID: ${borrowerId}`);
     return []; 
   }
   return data;
@@ -88,7 +87,6 @@ export async function findLoansByUserId(userId) {
     throw error;
   }
   if (!data || data.length === 0|| data[0].user_copy_id.owner_id === null) {
-    console.log(`No loans found for user ID: ${userId}`);
     return []; 
   }
   return data;

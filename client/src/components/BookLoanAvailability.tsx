@@ -25,6 +25,7 @@ import { LoanFormModal } from "./LoanFormModal";
 import { toast } from "sonner";
 import { useUserStore } from "../store/useUserStore";
 import { Chip } from "@mui/material";
+import { sendChatMessage } from "../services/chatMessagesService";
 
 interface BookLoanAvailabilityProps {
   bookId: string;
@@ -46,7 +47,6 @@ export function BookLoanAvailability({
   const [refreshKey, setRefreshKey] = useState(0);
   const { user: currentUser } = useUserStore();
 
-  // Mock user location (in a real app, this would come from geolocation API or user settings)
   const userLocation = { lat: 40.7128, lon: -74.006 }; // New York City
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export function BookLoanAvailability({
         if (currentUser) {
           try {
             copy = await getUserCopy(bookId);
-            setUserCopy(copy);
+            setUserCopy(copy || null);
           } catch (err: any) {
             if (err?.response?.status === 404) {
               setUserCopy(null);
@@ -68,7 +68,7 @@ export function BookLoanAvailability({
 
           if (copy) {
             try {
-              const loan = await getActiveLoanForCopy(copy.id);
+              const loan = await getActiveLoanForCopy(copy.id??'');
               setActiveLoan(loan);
             } catch (err) {
               console.error("Error fetching loan:", err);
@@ -108,8 +108,7 @@ export function BookLoanAvailability({
     try {
       const loan: Loan = await createLoanRequest(copyId);
       toast.success(t("lending.loanRequestSent"));
-
-      // Auto-generate first message and navigate to chat
+      await sendChatMessage(loan.id,`Hi! I would like to borrow "${loan.user_copy?.book_title}". When would be a good time to pick it up?`,"status");
       navigate(`/loans/${loan.id}`);
     } catch (error: any) {
       toast.error(error.message || t("lending.loanRequestError"));
@@ -304,30 +303,33 @@ export function BookLoanAvailability({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          {availableCopies.map((copy) => (
-            <div key={copy.id} className="border rounded-lg p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span>{copy.owner_name}</span>
+          {availableCopies.map((copy) => {
+            console.log(copy);
+            return (
+              <div key={copy.id} className="border rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-gray-500" />
+                    <span>{copy?.owner_name}</span>
+                  </div>
+                  {copy?.distance !== undefined && (
+                    <Chip
+                      label={`${copy?.distance} ${t("lending.km")}`}
+                      color="secondary"
+                      variant="outlined"
+                    />
+                  )}
                 </div>
-                {copy.distance !== undefined && (
-                  <Chip
-                    label={`${copy.distance} ${t("lending.km")}`}
-                    color="secondary"
-                    variant="outlined"
-                  />
-                )}
-              </div>
 
-              <Button
-                onClick={() => handleLoanRequest(copy.id ?? "")}
-                className="w-full"
-              >
-                {t("lending.sendLoanRequest")}
-              </Button>
-            </div>
-          ))}
+                <Button
+                  onClick={() => handleLoanRequest(copy.id ?? "")}
+                  className="w-full"
+                >
+                  {t("lending.sendLoanRequest")}
+                </Button>
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
     );

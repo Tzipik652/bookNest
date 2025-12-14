@@ -34,7 +34,7 @@ const changeStatus = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const { loanId } = req.params;
   const { status } = req.body;
-  const allowed = ["REQUESTED", "APPROVED", "ACTIVE", "RETURNED", "OVERDUE", "CANCELLED"];
+  const allowed = ["REQUESTED", "APPROVED", "ACTIVE", "RETURNED", "OVERDUE", "CANCELED"];
   if (!allowed.includes(status)) {
     throw new AppError("Invalid status", 400);
   }
@@ -63,7 +63,7 @@ const changeStatus = catchAsync(async (req, res, next) => {
     );
   }
   const loanUpdated = await loansModel.update(loanId, {
-    status: status,
+    status: status    
   });
   res.status(200).json({
     data: loanUpdated,

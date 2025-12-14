@@ -15,8 +15,18 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
+import { Button as ShadcnButton } from "../components/ui/button";
+
 import { Button } from "../components/ui/button";
-import { MessageCircle, BookOpen, User, Check, X } from "lucide-react";
+import {
+  MessageCircle,
+  BookOpen,
+  User,
+  Check,
+  X,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useUserStore } from "../store/useUserStore";
 import { LoanStatus } from "../types";
@@ -79,7 +89,7 @@ export function LoansPage() {
       case LoanStatus.ACTIVE:
       case LoanStatus.APPROVED:
         return "success";
-      case LoanStatus.CANCELLED:
+      case LoanStatus.CANCELED:
       case LoanStatus.OVERDUE:
         return "error";
       case LoanStatus.RETURNED:
@@ -176,6 +186,18 @@ export function LoansPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
+        <ShadcnButton
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          aria-label={t("common:back")}
+          className="mb-6 gap-2"
+        >
+          {t("common:dir") === "rtl" ? (
+            <ArrowRight className="h-4 w-4" />
+          ) : null}
+          {t("common:dir") === "ltr" ? <ArrowLeft className="h-4 w-4" /> : null}
+          {t("common:back")}
+        </ShadcnButton>
         <div className="mb-8">
           <h1 className="mb-2">My Loans</h1>
           <p className="text-gray-600">
@@ -183,41 +205,40 @@ export function LoansPage() {
           </p>
         </div>
 
-       <Tabs value={tab} onChange={(e, v) => setTab(v)}>
-  <Tab label={`Borrowing (${borrowerLoans.length})`} />
-  <Tab label={`Lending (${lenderLoans.length})`} />
-</Tabs>
+        <Tabs value={tab} onChange={(e, v) => setTab(v)}>
+          <Tab label={`Borrowing (${borrowerLoans.length})`} />
+          <Tab label={`Lending (${lenderLoans.length})`} />
+        </Tabs>
 
-{/* Borrowing */}
-{tab === 0 && (
-  <Box sx={{ mt: 3 }}>
-    {borrowerLoans.length === 0 ? (
-      <Card>
-        <CardContent className="space-y-8 py-8 text-center">
-          <Typography>No borrowing requests yet</Typography>
-        </CardContent>
-      </Card>
-    ) : (
-      borrowerLoans.map((loan) => renderLoanCard(loan, true))
-    )}
-  </Box>
-)}
+        {/* Borrowing */}
+        {tab === 0 && (
+          <Box sx={{ mt: 3 }}>
+            {borrowerLoans.length === 0 ? (
+              <Card>
+                <CardContent className="space-y-8 py-8 text-center">
+                  <Typography>No borrowing requests yet</Typography>
+                </CardContent>
+              </Card>
+            ) : (
+              borrowerLoans.map((loan) => renderLoanCard(loan, true))
+            )}
+          </Box>
+        )}
 
-{/* Lending */}
-{tab === 1 && (
-  <Box sx={{ mt: 3 }}>
-    {lenderLoans.length === 0 ? (
-      <Card>
-        <CardContent className="space-y-8 py-8 text-center">
-          <Typography>No lending requests yet</Typography>
-        </CardContent>
-      </Card>
-    ) : (
-      lenderLoans.map((loan) => renderLoanCard(loan, false))
-    )}
-  </Box>
-)}
-
+        {/* Lending */}
+        {tab === 1 && (
+          <Box sx={{ mt: 3 }}>
+            {lenderLoans.length === 0 ? (
+              <Card>
+                <CardContent className="space-y-8 py-8 text-center">
+                  <Typography>No lending requests yet</Typography>
+                </CardContent>
+              </Card>
+            ) : (
+              lenderLoans.map((loan) => renderLoanCard(loan, false))
+            )}
+          </Box>
+        )}
       </div>
     </div>
   );

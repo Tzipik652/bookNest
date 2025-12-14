@@ -5,7 +5,8 @@ const loanMessagesSelectQuery =`
     loan_id,
     sender_id(_id, name),
     message_text,
-    date_sent
+    date_sent,
+    type
 `;
 
 export async function add(loanMessagesData) {
@@ -15,8 +16,9 @@ export async function add(loanMessagesData) {
       loan_id: loanMessagesData.loanId,
       sender_id: loanMessagesData.senderId,
       message_text: loanMessagesData.messageText,
+      type: loanMessagesData.type
     })
-    .select()
+    .select(loanMessagesSelectQuery)
     .single();
   
   if (error) {
@@ -59,7 +61,7 @@ export async function findLoanMessagesByLoanId(loanId) {
     .from("loan_messages")
     .select(loanMessagesSelectQuery)
     .eq("loan_id", loanId)
-    .order("date_sent", { ascending: false });
+    .order("date_sent", { ascending: true });
 
   if (error) {
     console.error("Error fetching loan messages by loan ID:", error);

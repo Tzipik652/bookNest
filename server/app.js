@@ -11,10 +11,11 @@ import contactRouter from "./routes/contactRouter.js";
 import categoryRouter from './routes/categoryRouter.js';
 import loansRouter from './routes/loansRouter.js';
 import userCopiesRouter from './routes/userCopiesRouter.js';
+import loanMessagesRouter from './routes/loanMessagesRouter.js';
+import dashboardStats from './routes/dashboardRouter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import path from "path";
 import { fileURLToPath } from "url";
-import dashboardStats from './routes/dashboardRouter.js';
 
 
 dotenv.config();
@@ -41,6 +42,7 @@ app.use("/contact", contactRouter);
 app.use("/api/auth", authRouter);
 app.use("/loans", loansRouter);
 app.use("/user-copies", userCopiesRouter);
+app.use("/loan-messages", loanMessagesRouter);
 
 app.use("/dashboard", dashboardStats);
 
