@@ -18,6 +18,8 @@ function handleAxiosError(error: any): never {
   }
 }
 function transformUserCopy(raw: any): UserCopy {
+  console.log(raw);
+  
   return {
     id: raw.id,
     book_id: raw.book_id._id,
@@ -36,7 +38,7 @@ export const addUserCopy = async (user_copy: UserCopy) => {
     const response = await api.post(API_BASE_URL, {
       user_copy,
     });
-    return transformUserCopy(response.data);
+    return transformUserCopy(response.data.data);
   } catch (error) {
     handleAxiosError(error);
   }
