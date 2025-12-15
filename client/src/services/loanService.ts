@@ -101,6 +101,22 @@ export const approveLoan = async (loanId: string): Promise<Loan> => {
     handleAxiosError(error);
   }
 };
+export const updateDueDate = async (loanId: string, date: string): Promise<Loan> => {
+  try {
+    if (!loanId) {
+      throw new Error("Loan are required");
+    }
+    if (!date){
+      throw new Error("Date are required");
+    }
+    const res = await api.put(`${API_BASE_URL}/${loanId}/due-date`, {
+      due_date: date
+    });
+    return transformLoan(res.data.data);
+  } catch (error) {
+    handleAxiosError(error);
+  }
+};
 export const activeLoan = async (loanId: string): Promise<Loan> => {
   try {
     if (!loanId) {
@@ -130,7 +146,7 @@ export const cancelLoan = async (loanId: string): Promise<Loan> => {
 
 export const markLoanAsReturned = async (loanId: string): Promise<Loan> => {
   try {
-    const res = await api.put(`${API_BASE_URL}/${loanId}/returnDate`, {
+    const res = await api.put(`${API_BASE_URL}/${loanId}/return-date`, {
       return_date: new Date().toISOString(),
     });
     return transformLoan(res.data.data);

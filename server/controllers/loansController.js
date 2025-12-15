@@ -113,7 +113,7 @@ const updateLoanStartDate = catchAsync(async (req, res, next) => {
 const updateDueDate = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   const { loanId } = req.params;
-  const { dueDate } = req.body;
+  const { due_date } = req.body;
   if (!userId) {
     throw new AppError("userId are required", 400);
   }
@@ -139,7 +139,7 @@ const updateDueDate = catchAsync(async (req, res, next) => {
     );
   }
   const loanUpdated = await loansModel.update(loanId, {
-    due_date: dueDate,
+    due_date: due_date,
   });
   res.status(200).json({
     data: loanUpdated,
@@ -281,6 +281,7 @@ const getActiveLoanForCopy = catchAsync(async (req, res, next) => {
 });
 
 
+
 export default{
   addLoan,
   changeStatus,
@@ -293,5 +294,4 @@ export default{
   getLoansByBorrowerId,
   getLoansByUserCopyId,
   getActiveLoanForCopy,
-
 }
