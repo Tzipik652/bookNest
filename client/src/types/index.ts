@@ -86,7 +86,7 @@ export interface Comment {
   reactions?: CommentReaction[];
 }
 
-export interface CommentWithReactions extends Omit<Comment, 'reaction_counts'> {
+export interface CommentWithReactions extends Omit<Comment, "reaction_counts"> {
   reaction_counts: ReactionCounts;
   user_reaction?: ReactionType | null;
 }
@@ -135,17 +135,19 @@ export interface UserCopy {
 }
 export type ChatMessageType = "user" | "system" | "status";
 
-export interface ChatMessage{
-  type?:ChatMessageType;
-    id: string;
-    loan_id: string;
-    sender_id: string;
-    sender_name: string;
-    message_text: string;
-    date_sent: string;
+export interface ChatMessage {
+  id: string;
+  loan_id: string;
+  sender_id: string;
+  sender_name: string;
+  message_text: string;
+  date_sent: string;
+  type?: ChatMessageType;
+  action?: "approve" | "set_due" | "activate" | "return" | "cancel";
+  payload?: any;
 }
 export type PaginatedResponse<T> = {
-  [key: string]: T[] | number; 
+  [key: string]: T[] | number;
   totalItems: number;
   totalPages: number;
   currentPage: number;
