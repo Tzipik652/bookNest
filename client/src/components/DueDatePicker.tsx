@@ -5,6 +5,7 @@ interface DueDatePickerProps{
 }
 export default function DueDatePicker({ onConfirm }:DueDatePickerProps) {
   const [date, setDate] = useState("");
+  const today = new Date().toISOString().split("T")[0];
 
   return (
     <div className="flex gap-2 justify-center mt-2">
@@ -13,6 +14,7 @@ export default function DueDatePicker({ onConfirm }:DueDatePickerProps) {
         value={date}
         onChange={(e) => setDate(e.target.value)}
         size="small"
+        inputProps={{min:today}}
       />
       <Button
         size="small"

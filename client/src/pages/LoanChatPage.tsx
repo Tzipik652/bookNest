@@ -26,10 +26,11 @@ import {
   Input,
 } from "@mui/material";
 import { Button as ShadcnButton } from "../components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { Send } from "@mui/icons-material";
+import { ArrowLeft, ArrowRight, Edit, X } from "lucide-react";
+import { Send, Update } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import DueDatePicker from "../components/DueDatePicker";
+import { toast } from "sonner";
 
 // ---------------- query keys ----------------
 const loanKey = (id: string) => ["loan", id];
@@ -59,7 +60,7 @@ export function LoanChatPage() {
   const { user } = useUserStore();
   const qc = useQueryClient();
   const { t } = useTranslation();
-
+  const [isEditingDueDate, setIsEditingDueDate] = useState(false);
   const [text, setText] = useState("");
   const messagesRef = useRef<HTMLDivElement>(null);
 
@@ -82,33 +83,52 @@ export function LoanChatPage() {
   });
 
   const approve = async () => {
-    await approveLoan(loanId ?? "");
-    await sendChatMessage(loanId ?? "", "ההשאלה אושרה", "system");
-    qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
+    try {
+      await approveLoan(loanId ?? "");
+      await sendChatMessage(loanId ?? "", "ההשאלה אושרה", "system");
+      qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
+    } catch (err) {
+      toast.error("error approve lone");
+    }
   };
   const handle_loan_overdue = async (date: string) => {
-    await updateDueDate(loanId ?? "", date);
-    await sendChatMessage(loanId ?? "", "תאריך אחרון להחזרה עודכן", "system");
-    qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
+    try {
+      await updateDueDate(loanId ?? "", date);
+      await sendChatMessage(loanId ?? "", "תאריך אחרון להחזרה עודכן", "system");
+      qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
+    } catch (err) {
+      toast.error(`error update due date lone`);
+    }
   };
 
   const activate = async () => {
-    await activeLoan(loanId ?? "");
-    await sendChatMessage(loanId ?? "", "הספר נמסר", "system");
-    qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
+    try {
+      await activeLoan(loanId ?? "");
+      await sendChatMessage(loanId ?? "", "הספר נמסר", "system");
+      qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
+    } catch (err) {
+      toast.error("error activate lone");
+    }
   };
 
   const returned = async () => {
-    await markLoanAsReturned(loanId ?? "");
-    await sendChatMessage(loanId ?? "", "הספר הוחזר", "system");
-    qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
+    try {
+      await markLoanAsReturned(loanId ?? "");
+      await sendChatMessage(loanId ?? "", "הספר הוחזר", "system");
+      qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
+    } catch (err) {
+      toast.error("error mark loan as returned");
+    }
   };
 
   const cancel = async () => {
-    await cancelLoan(loanId ?? "");
-    await sendChatMessage(loanId ?? "", "❌ ההשאלה בוטלה", "system");
-    qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
-    navigate("/loans");
+    try {
+      await cancelLoan(loanId ?? "");
+      await sendChatMessage(loanId ?? "", "❌ ההשאלה בוטלה", "system");
+      qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
+    } catch (err) {
+      toast.error("error cancel");
+    }
   };
 
   useEffect(() => {
@@ -139,11 +159,6 @@ export function LoanChatPage() {
   if (!loanId || !user || isLoading || !loan) {
     return <div className="py-20 text-center">Loading…</div>;
   }
-
-  const isOverdue =
-    loan?.due_date &&
-    new Date(loan.due_date) < new Date() &&
-    loan.status === LoanStatus.ACTIVE;
 
   function getStatusColor(status: LoanStatus) {
     switch (status) {
@@ -189,18 +204,31 @@ export function LoanChatPage() {
               {loan.due_date
                 ? new Date(loan.due_date).toLocaleDateString()
                 : "-"}
-                {isLender && loan.status === LoanStatus.ACTIVE || loan.status === LoanStatus.APPROVED &&
-                  (
-                    <DueDatePicker
-                      onConfirm={(date) => handle_loan_overdue(date)}
-                    />)
-                  }
+              {(isLender && loan.status === LoanStatus.ACTIVE) ||
+                (loan.status === LoanStatus.APPROVED && (
+                  <button
+                    onClick={() => setIsEditingDueDate((prev) => !prev)}
+                    className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                    aria-label="Edit Due Date"
+                  >
+                    {isEditingDueDate ? (
+                      <X className="w-4 h-4 ml-2" />
+                    ) : (
+                      <Edit className="w-4 h-4 ml-2" />
+                    )}
+                  </button>
+                ))}
+              {isEditingDueDate && (
+                <DueDatePicker
+                  onConfirm={(date) => {
+                    setIsEditingDueDate(false);
+                    handle_loan_overdue(date);
+                  }}
+                />
+              )}
             </div>
           </div>
-          <Chip
-            label={isOverdue ? "Overdue" : loan.status}
-            color={getStatusColor(loan.status)}
-          />
+          <Chip label={loan.status} color={getStatusColor(loan.status)} />
         </div>
       </Card>
 
