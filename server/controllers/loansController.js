@@ -138,9 +138,6 @@ const updateDueDate = catchAsync(async (req, res, next) => {
       401
     );
   }
-  if(new Date(due_date).getTime()<Date.now()){
-    throw new AppError("Due date passed")
-  }
   const loanUpdated = await loansModel.update(loanId, {
     due_date: due_date,
   });

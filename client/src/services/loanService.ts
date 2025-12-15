@@ -112,9 +112,7 @@ export const updateDueDate = async (
     if (!date) {
       throw new Error("Date are required");
     }
-    if (new Date(date).getTime()<Date.now()) {
-      throw new Error("Due date passed");
-    }
+
     const res = await api.put(`${API_BASE_URL}/${loanId}/due-date`, {
       due_date: date,
     });
