@@ -18,10 +18,13 @@ import {
   Typography,
   Box,
   Divider,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import { toast } from "sonner";
-import { MapPin } from "lucide-react";
+import { MapPin, Navigation } from "lucide-react";
 import { useUserStore } from "../store/useUserStore";
+import { useGeoLocation } from "../hooks/useGeoLocation";
 
 interface LoanFormModalProps {
   bookId: string;
@@ -38,26 +41,54 @@ export function LoanFormModal({
   onClose,
   onSuccess,
 }: LoanFormModalProps) {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const { t } = useTranslation(["lending", "common"]);
+  const {
+    coordinates,
+    address,
+    isLoading: loadingLocation,
+    error: locationError,
+    getCurrentLocation,
+    getAddressFromCoordinates
+  } = useGeoLocation();
   const [isAvailable, setIsAvailable] = useState(
     existingCopy?.is_available_for_loan ?? true
   );
   const [locationLat, setLocationLat] = useState(
-    existingCopy?.loan_location_lat ?? 40.7128
+    existingCopy?.loan_location_lat ?? 0
   );
   const [locationLon, setLocationLon] = useState(
-    existingCopy?.loan_location_lon ?? -74.006
+    existingCopy?.loan_location_lon ?? 0
   );
   const { user: currentUser } = useUserStore();
+
+  useEffect(() => {
+    if (coordinates) {
+      setLocationLat(coordinates.lat);
+      setLocationLon(coordinates.lon);
+    }
+  }, [coordinates]);
+
+  useEffect(() => {
+    const latToUse = coordinates?.lat || locationLat;
+    const lonToUse = coordinates?.lon || locationLon;
+
+    if (latToUse && lonToUse && latToUse !== 0) {
+      getAddressFromCoordinates(latToUse, lonToUse, i18n.language);
+    }
+  }, [existingCopy, i18n.language]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!currentUser?._id) {
-      toast.error(t("common.missingRequiredData"));
+      toast.error(t("common:missingRequiredData"));
       return;
     }
-
+    if (isAvailable && (locationLat === 0 || locationLon === 0)) {
+      toast.error(t("pleaseSelectLocation") || "Please select a location");
+      return;
+    }
     try {
       if (existingCopy && existingCopy.is_available_for_loan !== isAvailable) {
         await changeStatus(existingCopy.id?.toString() ?? "");
@@ -88,112 +119,102 @@ export function LoanFormModal({
 
       toast.success(
         existingCopy
-          ? t("lending.copyUpdatedSuccess")
-          : t("lending.copyAddedSuccess")
+          ? t("copyUpdatedSuccess")
+          : t("copyAddedSuccess")
       );
       onSuccess();
     } catch (error: any) {
-      toast.error(error.message || t("common.error"));
+      toast.error(error.message || t("common:error"));
     }
   };
 
   return (
 
-<Dialog open={true} onClose={onClose} maxWidth="md" fullWidth>
-  <DialogTitle>{t("lending.manageCopy")}</DialogTitle>
+    <Dialog open={true} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>{t("manageCopy")}</DialogTitle>
 
-  <DialogContent dividers>
-    <Typography variant="subtitle1" color="textSecondary" gutterBottom>
-      {bookTitle}
-    </Typography>
+      <DialogContent dividers>
+        <Typography variant="subtitle1" color="textSecondary" gutterBottom>
+          {bookTitle}
+        </Typography>
 
-    <form onSubmit={handleSubmit}>
-      {/* Lending Status */}
-      <Box my={2}>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={isAvailable}
-              onChange={(event) => setIsAvailable(event.target.checked)}
-            />
-          }
-          label={
-            isAvailable
-              ? t("lending.availableForLoan")
-              : t("lending.notAvailableForLoan")
-          }
-        />
-      </Box>
-
-      {/* Location Selection */}
-      {isAvailable && (
-        <Box my={2}>
-          <Typography variant="body2" gutterBottom>
-            {t("lending.pickupLocation")}
-          </Typography>
-          <Typography variant="caption" color="textSecondary" gutterBottom>
-            {t("lending.enterLocationCoordinates")}
-          </Typography>
-
-          <Box display="flex" gap={2} mb={2} mt={2}>
-            <TextField
-              label={t("lending.latitude")}
-              type="number"
-              value={locationLat}
-              onChange={(e) => {
-                const lat = parseFloat(e.target.value);
-                if (!isNaN(lat)) setLocationLat(lat);
-              }}
-              fullWidth
-            />
-            <TextField
-              label={t("lending.longitude")}
-              type="number"
-              value={locationLon}
-              onChange={(e) => {
-                const lon = parseFloat(e.target.value);
-                if (!isNaN(lon)) setLocationLon(lon);
-              }}
-              fullWidth
+        <form onSubmit={handleSubmit}>
+          {/* Lending Status */}
+          <Box my={2}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isAvailable}
+                  onChange={(event) => setIsAvailable(event.target.checked)}
+                />
+              }
+              label={
+                isAvailable
+                  ? t("availableForLoan")
+                  : t("notAvailableForLoan")
+              }
             />
           </Box>
 
-          {/* Visual Location Display */}
-          <Box
-            display="flex"
-            alignItems="flex-start"
-            gap={1}
-            p={2}
-            bgcolor="grey.100"
-            borderRadius={1}
-          >
-            <MapPin size={20} className="text-primary" />
-            <Box>
-              <Typography variant="caption" fontWeight="bold">
-                {t("lending.pickupLocationLabel")}:
+          {/* Location Selection Area */}
+          {isAvailable && (
+            <Box my={2} p={2} bgcolor="grey.50" borderRadius={2} border="1px solid #e0e0e0">
+              <Typography variant="subtitle2" gutterBottom fontWeight="bold">
+                {t("pickupLocation")}
               </Typography>
-              <Typography variant="caption" color="textSecondary">
-                {locationLat.toFixed(4)}°, {locationLon.toFixed(4)}°
-              </Typography>
+
+              <Box display="flex" flexDirection="column" gap={2} mt={1}>
+
+                {/* Location Button */}
+                <Button
+                  variant="outlined"
+                  startIcon={loadingLocation ? <CircularProgress size={20} /> : <Navigation size={18} />}
+                  onClick={() => getCurrentLocation(i18n.language)} // Pass current language
+                  disabled={loadingLocation}
+                  fullWidth
+                  sx={{ justifyContent: "flex-start", py: 1.5, textTransform: 'none' }}
+                >
+                  {loadingLocation ? t("common:loading") : t("useMyLocation") || "Use my current location"}
+                </Button>
+
+                {locationError && (
+                  <Alert severity="error">{locationError}</Alert>
+                )}
+
+                {/* Address Display Card */}
+                {(locationLat !== 0 || locationLon !== 0) && (
+                  <Box mt={1} p={2} bgcolor="white" borderRadius={1} border="1px solid #eee">
+                    <Box display="flex" gap={1.5} alignItems="flex-start">
+                      <MapPin className="text-primary" size={20} style={{ marginTop: 4 }} />
+                      <Box>
+                        <Typography variant="body2" fontWeight="bold">
+                          {address || t("locationSelected")}
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary" sx={{ fontFamily: 'monospace' }}>
+                          {locationLat.toFixed(6)}, {locationLon.toFixed(6)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+              </Box>
             </Box>
-          </Box>
-        </Box>
-      )}
+          )}
 
-      <Divider sx={{ my: 2 }} />
+          <Divider sx={{ my: 2 }} />
 
-      {/* Actions */}
-      <DialogActions>
-        <Button variant="outlined" onClick={onClose}>
-          {t("lending.cancel")}
-        </Button>
-        <Button type="submit" variant="contained">
-          {t("lending.saveCopy")}
-        </Button>
-      </DialogActions>
-    </form>
-  </DialogContent>
-</Dialog>
+          {/* Actions */}
+          <DialogActions>
+            <Button variant="outlined" onClick={onClose}>
+              {t("cancel")}
+            </Button>
+            <Button type="submit" variant="contained">
+              {t("saveCopy")}
+            </Button>
+          </DialogActions>
+        </form>
+      </DialogContent>
+    </Dialog>
 
   );
 }

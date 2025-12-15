@@ -18,6 +18,8 @@ function handleAxiosError(error: any): never {
   }
 }
 function transformUserCopy(raw: any): UserCopy {
+  console.log(raw);
+  
   return {
     id: raw.id,
     book_id: raw.book_id._id,
