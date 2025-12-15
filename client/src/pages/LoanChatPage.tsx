@@ -257,7 +257,6 @@ export function LoanChatPage() {
               className="flex-1"
               fullWidth
               disabled={
-                !text.trim() ||
                 loan.status === LoanStatus.CANCELED ||
                 loan.status === LoanStatus.RETURNED
               }
