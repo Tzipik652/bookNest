@@ -223,7 +223,6 @@ export function LoanChatPage() {
                           : "bg-gray-200 text-gray-900"
                       }`}
                     >
-                      {/* שם שולח + תאריך */}
                       <div
                         className={`text-xs mb-1 ${
                           isOwn ? "text-green-100" : "text-gray-600"
@@ -232,7 +231,6 @@ export function LoanChatPage() {
                         {m.sender_name} • {formatDateTime(m.date_sent)}
                       </div>
 
-                      {/* תוכן ההודעה */}
                       <div>{m.message_text}</div>
                     </div>
                   </div>
@@ -250,12 +248,19 @@ export function LoanChatPage() {
               sendMessage.mutate(text.trim());
               setText("");
             }}
-            className="flex gap-2 mt-2"
+            className="flex gap-2 mt-2 w-full"
           >
             <Input
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Type a message…"
+              className="flex-1"
+              fullWidth
+              disabled={
+                !text.trim() ||
+                loan.status === LoanStatus.CANCELED ||
+                loan.status === LoanStatus.RETURNED
+              }
             />
             <Button
               type="submit"
@@ -267,7 +272,7 @@ export function LoanChatPage() {
               className="gap-2"
             >
               {" "}
-              <Send className="h-4 w-4" /> Send{" "}
+              <Send className="h-4 w-4" />
             </Button>
           </form>
         </CardContent>
