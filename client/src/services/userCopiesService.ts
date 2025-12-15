@@ -36,7 +36,7 @@ export const addUserCopy = async (user_copy: UserCopy) => {
     const response = await api.post(API_BASE_URL, {
       user_copy,
     });
-    return transformUserCopy(response.data);
+    return transformUserCopy(response.data.data);
   } catch (error) {
     handleAxiosError(error);
   }

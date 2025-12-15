@@ -8,12 +8,14 @@ import {
   activeLoan,
   cancelLoan,
   markLoanAsReturned,
+  updateDueDate,
 } from "../services/loanService";
 import {
   getChatMessages,
   sendChatMessage,
 } from "../services/chatMessagesService";
 import { LoanStatus } from "../types";
+import SystemMessage from "../components/SystemMessage";
 import {
   Button,
   Card,
@@ -27,6 +29,7 @@ import { Button as ShadcnButton } from "../components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Send } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
+import DueDatePicker from "../components/DueDatePicker";
 
 // ---------------- query keys ----------------
 const loanKey = (id: string) => ["loan", id];
@@ -60,47 +63,51 @@ export function LoanChatPage() {
   const [text, setText] = useState("");
   const messagesRef = useRef<HTMLDivElement>(null);
 
-  if (!loanId || !user) return null;
-
   // ---------------- data ----------------
   const { data: loan, isLoading } = useQuery({
-    queryKey: loanKey(loanId),
-    queryFn: () => getLoanById(loanId),
+    queryKey: loanKey(loanId ?? ""),
+    queryFn: () => getLoanById(loanId ?? ""),
   });
 
   const { data: messages = [] } = useQuery({
-    queryKey: messagesKey(loanId),
-    queryFn: () => getChatMessages(loanId),
+    queryKey: messagesKey(loanId ?? ""),
+    queryFn: () => getChatMessages(loanId ?? ""),
   });
 
   // ---------------- mutations ----------------
   const sendMessage = useMutation({
-    mutationFn: (msg: string) => sendChatMessage(loanId, msg),
-    onSuccess: () => qc.invalidateQueries({ queryKey: messagesKey(loanId) }),
+    mutationFn: (msg: string) => sendChatMessage(loanId ?? "", msg),
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: messagesKey(loanId ?? "") }),
   });
 
   const approve = async () => {
-    await approveLoan(loanId);
-    await sendChatMessage(loanId, "📘 ההשאלה אושרה", "system");
-    qc.invalidateQueries({ queryKey: loanKey(loanId) });
+    await approveLoan(loanId ?? "");
+    await sendChatMessage(loanId ?? "", "ההשאלה אושרה", "system");
+    qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
+  };
+  const handle_loan_overdue = async (date: string) => {
+    await updateDueDate(loanId ?? "", date);
+    await sendChatMessage(loanId ?? "", "תאריך אחרון להחזרה עודכן", "system");
+    qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
   };
 
   const activate = async () => {
-    await activeLoan(loanId);
-    await sendChatMessage(loanId, "📘 הספר נמסר", "system");
-    qc.invalidateQueries({ queryKey: loanKey(loanId) });
+    await activeLoan(loanId ?? "");
+    await sendChatMessage(loanId ?? "", "הספר נמסר", "system");
+    qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
   };
 
   const returned = async () => {
-    await markLoanAsReturned(loanId);
-    await sendChatMessage(loanId, "📘 הספר הוחזר", "system");
-    qc.invalidateQueries({ queryKey: loanKey(loanId) });
+    await markLoanAsReturned(loanId ?? "");
+    await sendChatMessage(loanId ?? "", "הספר הוחזר", "system");
+    qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
   };
 
   const cancel = async () => {
-    await cancelLoan(loanId);
-    await sendChatMessage(loanId, "❌ ההשאלה בוטלה", "system");
-    qc.invalidateQueries({ queryKey: loanKey(loanId) });
+    await cancelLoan(loanId ?? "");
+    await sendChatMessage(loanId ?? "", "❌ ההשאלה בוטלה", "system");
+    qc.invalidateQueries({ queryKey: loanKey(loanId ?? "") });
     navigate("/loans");
   };
 
@@ -108,16 +115,33 @@ export function LoanChatPage() {
     messagesRef.current?.scrollTo({ top: messagesRef.current.scrollHeight });
   }, [messages]);
 
-  if (isLoading || !loan)
-    return <div className="py-20 text-center">Loading…</div>;
-
-  const isLender = loan.user_copy?.owner_id === user._id;
+  const isLender = loan?.user_copy?.owner_id === user?._id;
   const otherUserName = isLender
-    ? loan.borrower_name
-    : loan.user_copy?.owner_name;
+    ? loan?.borrower_name
+    : loan?.user_copy?.owner_name;
+
+  useEffect(() => {
+    if (
+      loan?.status === LoanStatus.REQUESTED &&
+      messages.length > 0 &&
+      !messages.some(
+        (m) => m.type === "system" && m.message_text.includes("בקשת")
+      )
+    ) {
+      sendChatMessage(loanId ?? "", "בקשת השאלה ממתינה לאישור", "system").then(
+        () => {
+          qc.invalidateQueries({ queryKey: messagesKey(loanId ?? "") });
+        }
+      );
+    }
+  }, [loan, messages, isLender]);
+
+  if (!loanId || !user || isLoading || !loan) {
+    return <div className="py-20 text-center">Loading…</div>;
+  }
 
   const isOverdue =
-    loan.due_date &&
+    loan?.due_date &&
     new Date(loan.due_date) < new Date() &&
     loan.status === LoanStatus.ACTIVE;
 
@@ -140,17 +164,15 @@ export function LoanChatPage() {
   return (
     <div className="container max-w-3xl mx-auto py-8">
       <ShadcnButton
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          aria-label={t("common:back")}
-          className="mb-6 gap-2"
-        >
-          {t("common:dir") === "rtl" ? (
-            <ArrowRight className="h-4 w-4" />
-          ) : null}
-          {t("common:dir") === "ltr" ? <ArrowLeft className="h-4 w-4" /> : null}
-          {t("common:back")}
-        </ShadcnButton>
+        variant="ghost"
+        onClick={() => navigate(-1)}
+        aria-label={t("common:back")}
+        className="mb-6 gap-2"
+      >
+        {t("common:dir") === "rtl" ? <ArrowRight className="h-4 w-4" /> : null}
+        {t("common:dir") === "ltr" ? <ArrowLeft className="h-4 w-4" /> : null}
+        {t("common:back")}
+      </ShadcnButton>
 
       {/* Loan Details */}
       <Card className="mb-4">
@@ -167,6 +189,12 @@ export function LoanChatPage() {
               {loan.due_date
                 ? new Date(loan.due_date).toLocaleDateString()
                 : "-"}
+                {isLender && loan.status === LoanStatus.ACTIVE || loan.status === LoanStatus.APPROVED &&
+                  (
+                    <DueDatePicker
+                      onConfirm={(date) => handle_loan_overdue(date)}
+                    />)
+                  }
             </div>
           </div>
           <Chip
@@ -174,41 +202,34 @@ export function LoanChatPage() {
             color={getStatusColor(loan.status)}
           />
         </div>
-        <CardContent className="flex gap-2 mt-2">
-          {isLender && loan.status === LoanStatus.REQUESTED && (
-            <Button onClick={approve}>אישור</Button>
-          )}
-          {isLender && loan.status === LoanStatus.APPROVED && (
-            <Button onClick={activate}>נמסר</Button>
-          )}
-          {isLender && loan.status === LoanStatus.ACTIVE && (
-            <Button onClick={returned}>הוחזר</Button>
-          )}
-          {loan.status === LoanStatus.REQUESTED && (
-            <Button color="error" onClick={cancel}>
-              ביטול
-            </Button>
-          )}
-        </CardContent>
       </Card>
 
       {/* Chat */}
       <Card>
         <CardContent>
           <div ref={messagesRef} className="h-96 overflow-y-auto p-4 space-y-4">
-            {messages.map((m) => {
-              const isOwn = m.sender_id === user._id;
-
+            {messages.map((m, index) => {
               if (m.type === "system") {
+                const isLastSystemMessage =
+                  m.type === "system" &&
+                  index ===
+                    messages.map((msg) => msg.type).lastIndexOf("system");
                 return (
-                  <div
+                  <SystemMessage
                     key={m.id}
-                    className="text-center text-xs text-gray-500 italic"
-                  >
-                    {m.message_text} ({formatDateTime(m.date_sent)})
-                  </div>
+                    message={m}
+                    loan={loan}
+                    isLender={isLender}
+                    onApprove={approve}
+                    onActivate={activate}
+                    onReturned={returned}
+                    onCancel={cancel}
+                    onUpdateDueDate={handle_loan_overdue}
+                    showActions={isLastSystemMessage}
+                  />
                 );
               }
+              const isOwn = m.sender_id === user._id;
 
               return (
                 <div
@@ -257,7 +278,6 @@ export function LoanChatPage() {
               className="flex-1"
               fullWidth
               disabled={
-                !text.trim() ||
                 loan.status === LoanStatus.CANCELED ||
                 loan.status === LoanStatus.RETURNED
               }

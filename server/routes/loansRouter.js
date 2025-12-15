@@ -14,9 +14,9 @@ router.post('/request', verifyJWT, loansController.addLoan);
 
 router.put('/:loanId/status', verifyJWT, loansController.changeStatus);
 
-router.put('/:loanId/loanStartDate', verifyJWT, loansController.updateLoanStartDate);
-router.put('/:loanId/dueDate', verifyJWT, loansController.updateDueDate);
-router.put('/:loanId/returnDate', verifyJWT, loansController.updateReturnDate);
+router.put('/:loanId/loan-start-date', verifyJWT, loansController.updateLoanStartDate);
+router.put('/:loanId/due-date', verifyJWT, loansController.updateDueDate);
+router.put('/:loanId/return-date', verifyJWT, loansController.updateReturnDate);
 
 router.delete('/:loanId', verifyJWT, loansController.deleteLoan);
 
