@@ -15,8 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-// שימי לב: מחקתי כפילות של Button import והשארתי אחד
-import { Button } from "../components/ui/button"; 
+import { Button } from "../components/ui/button";
 import {
   MessageCircle,
   BookOpen,
@@ -83,22 +82,27 @@ export function LoansPage() {
 
   // פונקציית עזר לפרמוט תאריך לפי השפה הנוכחית
   const formatDate = (dateString: string) => {
-      return new Date(dateString).toLocaleDateString(i18n.language, {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-      });
+    return new Date(dateString).toLocaleDateString(i18n.language, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   function getStatusColor(status: LoanStatus) {
     switch (status) {
-      case LoanStatus.REQUESTED: return "warning";
+      case LoanStatus.REQUESTED:
+        return "warning";
       case LoanStatus.ACTIVE:
-      case LoanStatus.APPROVED: return "success";
+      case LoanStatus.APPROVED:
+        return "success";
       case LoanStatus.CANCELED:
-      case LoanStatus.OVERDUE: return "error";
-      case LoanStatus.RETURNED: return "info";
-      default: return "default";
+      case LoanStatus.OVERDUE:
+        return "error";
+      case LoanStatus.RETURNED:
+        return "info";
+      default:
+        return "default";
     }
   }
 
@@ -153,6 +157,7 @@ export function LoansPage() {
               variant="outline"
               onClick={() => navigate(`/loans/${loan.id}`)}
               className="flex-1 gap-2"
+              aria-label={t("openChat")}
             >
               <MessageCircle className="h-4 w-4" />
               {t("openChat")}
@@ -162,6 +167,7 @@ export function LoansPage() {
               <Button
                 onClick={() => handleApproveLoan(loan.id)}
                 className="flex-1 gap-2"
+                aria-label={t("approveLoan")}
               >
                 <Check className="h-4 w-4" />
                 {t("approveLoan")}
@@ -170,9 +176,10 @@ export function LoansPage() {
 
             {loan.status === LoanStatus.REQUESTED && (
               <Button
-                variant="destructive" // שינוי ל-destructive עבור ביטול
+                variant="destructive"
                 onClick={() => handleCancelLoan(loan.id)}
                 className="gap-2"
+                aria-label={t("cancelLoan")}
               >
                 <X className="h-4 w-4" />
                 {t("cancelLoan")}
@@ -203,21 +210,21 @@ export function LoansPage() {
           {t("common:dir") === "ltr" ? <ArrowLeft className="h-4 w-4" /> : null}
           {t("common:back")}
         </Button>
-        
+
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2">{t("loansPage.title")}</h1>
-          <p className="text-gray-600">
-            {t("loansPage.subtitle")}
-          </p>
+          <p className="text-gray-600">{t("loansPage.subtitle")}</p>
         </div>
 
-        <Tabs 
-            value={tab} 
-            onChange={(e, v) => setTab(v)}
-            variant="fullWidth"
-            className="mb-6 bg-white rounded-lg shadow-sm"
+        <Tabs
+          value={tab}
+          onChange={(e, v) => setTab(v)}
+          variant="fullWidth"
+          className="mb-6 bg-white rounded-lg shadow-sm"
         >
-          <Tab label={`${t("loansPage.borrowing")} (${borrowerLoans.length})`} />
+          <Tab
+            label={`${t("loansPage.borrowing")} (${borrowerLoans.length})`}
+          />
           <Tab label={`${t("loansPage.lending")} (${lenderLoans.length})`} />
         </Tabs>
 
@@ -228,7 +235,9 @@ export function LoansPage() {
               <Card>
                 <CardContent className="space-y-4 py-12 text-center">
                   <BookOpen className="h-12 w-12 mx-auto text-gray-300" />
-                  <Typography color="textSecondary">{t("loansPage.noBorrowingRequests")}</Typography>
+                  <Typography color="textSecondary">
+                    {t("loansPage.noBorrowingRequests")}
+                  </Typography>
                 </CardContent>
               </Card>
             ) : (
@@ -244,7 +253,9 @@ export function LoansPage() {
               <Card>
                 <CardContent className="space-y-4 py-12 text-center">
                   <User className="h-12 w-12 mx-auto text-gray-300" />
-                  <Typography color="textSecondary">{t("loansPage.noLendingRequests")}</Typography>
+                  <Typography color="textSecondary">
+                    {t("loansPage.noLendingRequests")}
+                  </Typography>
                 </CardContent>
               </Card>
             ) : (

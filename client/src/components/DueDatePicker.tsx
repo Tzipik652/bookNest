@@ -1,11 +1,13 @@
 import { Button, Input } from "@mui/material";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 interface DueDatePickerProps{
   onConfirm: (date:string)=>void;
 }
 export default function DueDatePicker({ onConfirm }:DueDatePickerProps) {
   const [date, setDate] = useState("");
   const today = new Date().toISOString().split("T")[0];
+  const { t } = useTranslation(["loanChat"]);
 
   return (
     <div className="flex gap-2 justify-center mt-2">
@@ -20,8 +22,9 @@ export default function DueDatePicker({ onConfirm }:DueDatePickerProps) {
         size="small"
         disabled={!date}
         onClick={() => onConfirm(date)}
+        aria-label={t('confirmDate')}
       >
-        אישור תאריך
+       {t('confirmDate')}
       </Button>
     </div>
   );

@@ -209,7 +209,11 @@ export function BookLoanAvailability({
     try {
       const loan: Loan = await createLoanRequest(copyId);
       toast.success(t("loanRequestSent"));
-      await sendChatMessage(loan.id, `Hi! I would like to borrow "${loan.user_copy?.book_title}". When would be a good time to pick it up?`, "status");
+      await sendChatMessage(
+        loan.id,
+        `Hi! I would like to borrow "${loan.user_copy?.book_title}". When would be a good time to pick it up?`,
+        "status"
+      );
       navigate(`/loans/${loan.id}`);
     } catch (error: any) {
       toast.error(error.message || t("loanRequestError"));
@@ -274,10 +278,16 @@ export function BookLoanAvailability({
             </div>
             <div className="flex gap-2">
               <Button onClick={() => navigate(`/loans/${activeLoan.id}`)} variant="outline" className="flex-1 gap-2">
+              <Button
+                onClick={() => navigate(`/loans/${activeLoan.id}`)}
+                variant="outline"
+                className="flex-1 gap-2"
+                aria-label={t("openChat")}
+              >
                 <MessageCircle className="h-4 w-4" />
                 {t("openChat")}
               </Button>
-              <Button onClick={handleMarkAsReturned} className="flex-1">
+              <Button onClick={handleMarkAsReturned} className="flex-1" aria-label={t("markAsReturned")}>
                 {t("markAsReturned")}
               </Button>
             </div>
@@ -347,6 +357,13 @@ export function BookLoanAvailability({
             </Button>
             <Button onClick={handleDisableLending} variant="secondary" className="flex-1">
               {t("disableLending")}
+            <Button
+              onClick={handleDisableLending}
+              variant="secondary"
+              className="flex-1"
+              aria-label={t("makeUnavailable")}
+            >
+              {t("makeUnavailable")}
             </Button>
           </div>
         </CardContent>

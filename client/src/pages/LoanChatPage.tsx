@@ -209,7 +209,7 @@ export function LoanChatPage() {
                   <button
                     onClick={() => setIsEditingDueDate((prev) => !prev)}
                     className="text-gray-400 hover:text-gray-600 focus:outline-none"
-                    aria-label="Edit Due Date"
+                    aria-label={t("ediDueDate")}
                   >
                     {isEditingDueDate ? (
                       <X className="w-4 h-4 ml-2" />
@@ -318,6 +318,7 @@ export function LoanChatPage() {
                 loan.status === LoanStatus.RETURNED
               }
               className="gap-2"
+              aria-label={t("sendMessage")}
             >
               {" "}
               <Send className="h-4 w-4" />

@@ -6,6 +6,7 @@
     "locationUnknown": "Location Unknown",
     "due": "Due:",
     "typeMessage": "Type a message...",
+    "sendMessage": "send a message",
     "status": {
         "REQUESTED": "Requested",
         "APPROVED": "Approved",
@@ -25,5 +26,7 @@
         "handedOver": "Book handed over successfully",
         "returned": "Book returned to owner",
         "canceled": "Loan canceled"
-    }
+    },
+    "confirmDate": "confirm",
+    "ediDueDate": "Edit Due Date"
 }
