@@ -42,7 +42,7 @@ export function BookLoanAvailability({
   const {
     address: userCopyAddress,
     getAddressFromCoordinates,
-    isLoading: loadingAddress
+    isLoading: loadingAddress,
   } = useGeoLocation();
 
   const [userCopy, setUserCopy] = useState<UserCopy | null>(null);
@@ -57,15 +57,15 @@ export function BookLoanAvailability({
   useEffect(() => {
     if (userCopy?.loan_location_lat && userCopy?.loan_location_lon) {
       getAddressFromCoordinates(
-        userCopy.loan_location_lat, 
-        userCopy.loan_location_lon, 
+        userCopy.loan_location_lat,
+        userCopy.loan_location_lon,
         i18n.language
       );
     }
   }, [userCopy, i18n.language]);
 
   // const userLocation = { lat: 40.7128, lon: -74.006 }; // New York City
- 
+
   useEffect(() => {
     const fetchUserCopy = async () => {
       let copy = null;
@@ -85,7 +85,7 @@ export function BookLoanAvailability({
 
           if (copy) {
             try {
-              const loan = await getActiveLoanForCopy(copy.id ?? '');
+              const loan = await getActiveLoanForCopy(copy.id ?? "");
               setActiveLoan(loan);
             } catch (err) {
               console.error("Error fetching loan:", err);
@@ -124,7 +124,11 @@ export function BookLoanAvailability({
     try {
       const loan: Loan = await createLoanRequest(copyId);
       toast.success(t("loanRequestSent"));
-      await sendChatMessage(loan.id, `Hi! I would like to borrow "${loan.user_copy?.book_title}". When would be a good time to pick it up?`, "status");
+      await sendChatMessage(
+        loan.id,
+        `Hi! I would like to borrow "${loan.user_copy?.book_title}". When would be a good time to pick it up?`,
+        "status"
+      );
       navigate(`/loans/${loan.id}`);
     } catch (error: any) {
       toast.error(error.message || t("loanRequestError"));
@@ -158,10 +162,8 @@ export function BookLoanAvailability({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600 mb-4">
-              {t("noCopyRegistered")}
-            </p>
-            <Button onClick={() => setShowLoanModal(true)} className="w-full">
+            <p className="text-gray-600 mb-4">{t("noCopyRegistered")}</p>
+            <Button onClick={() => setShowLoanModal(true)} className="w-full" aria-label={t("addCopyForLending")}>
               {t("addCopyForLending")}
             </Button>
           </CardContent>
@@ -181,14 +183,9 @@ export function BookLoanAvailability({
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-2">
-              <Chip
-                label={t("active")}
-                color="secondary"
-                variant="outlined"
-              />
+              <Chip label={t("active")} color="secondary" variant="outlined" />
               <span className="text-sm text-gray-600">
-                {t("currentlyOnLoan")} {t("to")}{" "}
-                {activeLoan.borrower_name}
+                {t("currentlyOnLoan")} {t("to")} {activeLoan.borrower_name}
               </span>
             </div>
             <div className="flex gap-2">
@@ -196,11 +193,12 @@ export function BookLoanAvailability({
                 onClick={() => navigate(`/loans/${activeLoan.id}`)}
                 variant="outline"
                 className="flex-1 gap-2"
+                aria-label={t("openChat")}
               >
                 <MessageCircle className="h-4 w-4" />
                 {t("openChat")}
               </Button>
-              <Button onClick={handleMarkAsReturned} className="flex-1">
+              <Button onClick={handleMarkAsReturned} className="flex-1" aria-label={t("markAsReturned")}>
                 {t("markAsReturned")}
               </Button>
             </div>
@@ -220,10 +218,8 @@ export function BookLoanAvailability({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600 mb-4">
-              {t("copyNotAvailable")}
-            </p>
-            <Button onClick={() => setShowLoanModal(true)} className="w-full">
+            <p className="text-gray-600 mb-4">{t("copyNotAvailable")}</p>
+            <Button onClick={() => setShowLoanModal(true)} className="w-full" aria-label={t("makeAvailable")}>
               {t("makeAvailable")}
             </Button>
           </CardContent>
@@ -240,7 +236,7 @@ export function BookLoanAvailability({
             {t("yourCopy")}
           </CardTitle>
         </CardHeader>
-       <CardContent className="space-y-4">
+        <CardContent className="space-y-4">
           <div>
             <Chip
               label={t("availableForLoan")}
@@ -248,28 +244,28 @@ export function BookLoanAvailability({
               variant="outlined"
               className="mb-2"
             />
-            
+
             <div className="bg-gray-50 p-3 rounded-md border border-gray-100 mt-2">
-                <div className="flex items-start gap-2 text-sm text-gray-700">
-                    <MapPin className="w-4 h-4 mt-1 text-primary shrink-0" />
-                    <div>
-                        <span className="font-semibold block">{t("pickupLocationLabel")}:</span>
-                        {/* תצוגת הכתובת או טעינה */}
-                        {loadingAddress ? (
-                           <Skeleton width={150} height={20} />
-                        ) : (
-                           <span>
-                             {userCopyAddress || t("locationUnknown")}
-                           </span>
-                        )}
-                        
-                        {/* הצגת קואורדינטות בקטן למפתחים/דיבוג (אופציונלי) */}
-                        {/* <span className="text-xs text-gray-400 block mt-1 font-mono">
+              <div className="flex items-start gap-2 text-sm text-gray-700">
+                <MapPin className="w-4 h-4 mt-1 text-primary shrink-0" />
+                <div>
+                  <span className="font-semibold block">
+                    {t("pickupLocationLabel")}:
+                  </span>
+                  {/* תצוגת הכתובת או טעינה */}
+                  {loadingAddress ? (
+                    <Skeleton width={150} height={20} />
+                  ) : (
+                    <span>{userCopyAddress || t("locationUnknown")}</span>
+                  )}
+
+                  {/* הצגת קואורדינטות בקטן למפתחים/דיבוג (אופציונלי) */}
+                  {/* <span className="text-xs text-gray-400 block mt-1 font-mono">
                             {userCopy.loan_location_lat.toFixed(4)}, {userCopy.loan_location_lon.toFixed(4)}
                         </span>
                         */}
-                    </div>
                 </div>
+              </div>
             </div>
           </div>
 
@@ -278,6 +274,7 @@ export function BookLoanAvailability({
               onClick={() => setShowLoanModal(true)}
               variant="outline"
               className="flex-1"
+              aria-label={t("common:buttonEdit")}
             >
               {t("common:buttonEdit")}
             </Button>
@@ -285,8 +282,9 @@ export function BookLoanAvailability({
               onClick={handleDisableLending}
               variant="secondary"
               className="flex-1"
+              aria-label={t("makeUnavailable")}
             >
-              {t("disableLending")}
+              {t("makeUnavailable")}
             </Button>
           </div>
         </CardContent>
@@ -311,12 +309,8 @@ export function BookLoanAvailability({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-600 mb-2">
-              {t("noCopiesAvailable")}
-            </p>
-            <p className="text-sm text-gray-500">
-              {t("tryDifferentLocation")}
-            </p>
+            <p className="text-gray-600 mb-2">{t("noCopiesAvailable")}</p>
+            <p className="text-sm text-gray-500">{t("tryDifferentLocation")}</p>
           </CardContent>
         </Card>
       );
@@ -355,6 +349,7 @@ export function BookLoanAvailability({
                 <Button
                   onClick={() => handleLoanRequest(copy.id ?? "")}
                   className="w-full"
+                  aria-label={t("sendLoanRequest")}
                 >
                   {t("sendLoanRequest")}
                 </Button>
@@ -370,9 +365,7 @@ export function BookLoanAvailability({
     <div className="space-y-6">
       <div>
         <h2 className="mb-2">{t("lendingAvailability")}</h2>
-        <p className="text-gray-600">
-          {t("manageYourCopyOrBorrow")}
-        </p>
+        <p className="text-gray-600">{t("manageYourCopyOrBorrow")}</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">

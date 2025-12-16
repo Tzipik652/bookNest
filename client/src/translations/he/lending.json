@@ -14,7 +14,7 @@
     "notAvailableForLoan": "לא זמין להשאלה",
     "copyNotAvailable": "העותק שלך מוגדר כרגע כלא זמין.",
     "makeAvailable": "הפוך לזמין",
-    "disableLending": "הסר מהשאלה",
+    "makeUnavailable": "השבת זמינות",
     "copyAvailable": "העותק שלך זמין להשאלה",
     "at": "במיקום",
     "active": "פעיל",

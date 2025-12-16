@@ -173,6 +173,7 @@ export function LoanFormModal({
                   disabled={loadingLocation}
                   fullWidth
                   sx={{ justifyContent: "flex-start", py: 1.5, textTransform: 'none' }}
+                  aria-label={loadingLocation ? t("common:loading") : t("useMyLocation") || "Use my current location"}
                 >
                   {loadingLocation ? t("common:loading") : t("useMyLocation") || "Use my current location"}
                 </Button>
@@ -205,10 +206,10 @@ export function LoanFormModal({
 
           {/* Actions */}
           <DialogActions>
-            <Button variant="outlined" onClick={onClose}>
+            <Button variant="outlined" onClick={onClose} aria-label={t("cancel")}>
               {t("cancel")}
             </Button>
-            <Button type="submit" variant="contained">
+            <Button type="submit" variant="contained" aria-label={t("saveCopy")}>
               {t("saveCopy")}
             </Button>
           </DialogActions>

@@ -6,6 +6,7 @@
     "locationUnknown": "מיקום לא צוין",
     "due": "תאריך יעד:",
     "typeMessage": "הקלד הודעה...",
+    "sendMessage": "שלח הודעה",
     "status": {
         "REQUESTED": "ממתין לאישור",
         "APPROVED": "אושר",
@@ -25,5 +26,8 @@
         "handedOver": "הספר נמסר בהצלחה",
         "returned": "הספר הוחזר לבעליו",
         "canceled": "ההשאלה בוטלה"
-    }
+    },
+    "confirmDate": "אישור",
+    "ediDueDate": "עריכת תאריך יעד"
+
 }

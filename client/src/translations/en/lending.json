@@ -13,7 +13,7 @@
   "notAvailableForLoan": "Not Available",
   "copyNotAvailable": "Your copy is currently not available for lending.",
   "makeAvailable": "Make Available",
-  "disableLending": "Disable Lending",
+  "makeUnavailable": "Make Unavailable",
   "copyAvailable": "Your copy is available for lending",
   "at": "at",
   "active": "Active",

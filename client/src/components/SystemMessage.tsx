@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import { ChatMessage, Loan, LoanStatus } from "../types";
 import DueDatePicker from "./DueDatePicker";
+import { useTranslation } from "react-i18next";
 
 interface SystemMessageProps {
   message: ChatMessage;
@@ -24,6 +25,7 @@ export default function SystemMessage({
   onUpdateDueDate,
   showActions,
 }: SystemMessageProps) {
+  const { t } = useTranslation(["loanChat"]);
   const formatDateTime = (dateString: string) => {
     const d = new Date(dateString);
     const now = new Date();
@@ -49,26 +51,30 @@ export default function SystemMessage({
       </div>
 
       {showActions && isLender && loan.status === LoanStatus.REQUESTED && (
-        <Button size="small" onClick={onApprove}>
-          אישור השאלה
+        <Button size="small" onClick={onApprove} aria-label={t("approve")}>
+          {t("approve")}
         </Button>
       )}
 
       {showActions && isLender && loan.status === LoanStatus.APPROVED && (
-        <Button size="small" onClick={onActivate}>
-          סימון "נמסר"
+        <Button size="small" onClick={onActivate} aria-label={t("handedOver")}>
+          {t("handedOver")}
         </Button>
       )}
 
-      {showActions &&isLender && loan.status === LoanStatus.ACTIVE && (
-        <Button size="small" onClick={onReturned}>
-          סימון "הוחזר"
+      {showActions && isLender && loan.status === LoanStatus.ACTIVE && (
+        <Button
+          size="small"
+          onClick={onReturned}
+          aria-label={t("markReturned")}
+        >
+          {t("markReturned")}
         </Button>
       )}
 
-      {showActions &&loan.status === LoanStatus.REQUESTED && (
-        <Button size="small" color="error" onClick={onCancel}>
-          ביטול
+      {showActions && loan.status === LoanStatus.REQUESTED && (
+        <Button size="small" color="error" onClick={onCancel} aria-label={t("cancel")}>
+          {t("cancel")}
         </Button>
       )}
       {isLender && loan.status === LoanStatus.REQUESTED && (
