@@ -70,5 +70,12 @@
             "RETURNED": "הוחזר",
             "CANCELED": "בוטל"
         }
-    }
+    },
+  "availableCopies": "עותקים זמינים",
+  "copiesNearby": "עותקים בקרבת מקום",
+  "noCopiesNearbyShowingAll": "לא נמצאו עותקים קרובים. מציג את כל המיקומים.",
+  "show": "הצג",
+  "moreCopiesFurtherAway": "עותקים נוספים רחוקים יותר",
+  "furtherLocations": "מיקומים מרוחקים יותר",
+  "distanceUnknown": "מרחק לא ידוע"
 }

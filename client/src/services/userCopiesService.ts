@@ -123,7 +123,7 @@ export const changeLoanLocation = async (
       loan_location_lat,
       loan_location_lon,
     });
-    return transformUserCopy(response.data);
+    return transformUserCopy(response.data.data);
   } catch (error) {
     handleAxiosError(error);
   }
