@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface Coordinates {
     lat: number;
@@ -12,7 +12,7 @@ interface GeoLocationState {
     error: string | null;
 }
 
-export const useGeoLocation = () => {
+export const useGeoLocation = (autoFetch: boolean = false) => { // הוספנו פרמטר להפעלה אוטומטית
     const [locationState, setLocationState] = useState<GeoLocationState>({
         coordinates: null,
         address: '',
@@ -20,12 +20,9 @@ export const useGeoLocation = () => {
         error: null,
     });
 
-    const fetchAddress = async (lat: number, lon: number,lang: string): Promise<string> => {
+    const fetchAddress = async (lat: number, lon: number, lang: string): Promise<string> => {
         const apiKey = import.meta.env.VITE_GEOAPIFY_KEY;
-        if (!apiKey) {
-            console.error("Geoapify API key is missing");
-            return "";
-        }
+        if (!apiKey) return "";
 
         try {
             const res = await fetch(
@@ -41,20 +38,23 @@ export const useGeoLocation = () => {
         return "";
     };
 
-    const getAddressFromCoordinates = async (lat: number, lon: number, lang: string = 'en') => {
+    const getAddressFromCoordinates = useCallback(async (lat: number, lon: number, lang: string = 'en') => {
         if (lat === 0 && lon === 0) return;
 
+        // עדכון שנטען, אבל משאירים את הקואורדינטות אם יש
         setLocationState(prev => ({ ...prev, isLoading: true, error: null }));
+        
         const address = await fetchAddress(lat, lon, lang);
+        
         setLocationState(prev => ({
             ...prev,
             isLoading: false,
-            coordinates: { lat, lon },
+            coordinates: { lat, lon }, // מוודאים שהקואורדינטות מעודכנות
             address
         }));
-    };
+    }, []);
 
-    const getCurrentLocation = (lang: string = 'en') => {
+    const getCurrentLocation = useCallback((lang: string = 'en') => {
         setLocationState((prev) => ({ ...prev, isLoading: true, error: null }));
 
         if (!navigator.geolocation) {
@@ -70,14 +70,25 @@ export const useGeoLocation = () => {
             async (position) => {
                 const { latitude, longitude } = position.coords;
 
+                // שיפור ביצועים קריטי:
+                // 1. קודם כל מעדכנים קואורדינטות (כדי שחישוב המרחק יעבוד מיד)
+                setLocationState(prev => ({
+                    ...prev,
+                    coordinates: { lat: latitude, lon: longitude },
+                    // עדיין טוען כי אנחנו מחכים לכתובת
+                    isLoading: true 
+                }));
+
+                // 2. רק אחר כך מביאים את הכתובת
                 const address = await fetchAddress(latitude, longitude, lang);
 
-                setLocationState({
-                    coordinates: { lat: latitude, lon: longitude },
+                // 3. מעדכנים את הכתובת ומסיימים טעינה
+                setLocationState(prev => ({
+                    ...prev,
                     address: address,
                     isLoading: false,
                     error: null,
-                });
+                }));
             },
             (error) => {
                 setLocationState((prev) => ({
@@ -88,7 +99,13 @@ export const useGeoLocation = () => {
             },
             { enableHighAccuracy: true }
         );
-    };
+    }, []);
+
+    useEffect(() => {
+        if (autoFetch) {
+            getCurrentLocation();
+        }
+    }, [autoFetch, getCurrentLocation]);
 
     return {
         ...locationState,

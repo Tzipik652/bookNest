@@ -31,6 +31,7 @@
   "latitude": "Latitude",
   "longitude": "Longitude",
   "borrowFromCommunity": "Borrow from Community",
+  "locationUnknown": "Location unknown (Please check your location)",
   "noCopiesAvailable": "No copies currently available.",
   "tryDifferentLocation": "Try checking back later.",
   "copiesAvailableNearYou": "Copies Available Near You",
@@ -65,5 +66,12 @@
       "RETURNED": "Returned",
       "CANCELED": "Canceled"
     }
-  }
+  },
+  "availableCopies": "Available Copies",
+  "copiesNearby": "copies nearby",
+  "noCopiesNearbyShowingAll": "No copies nearby. Showing all locations.",
+  "show": "Show",
+  "moreCopiesFurtherAway": "more copies further away",
+  "furtherLocations": "Further Locations",
+  "distanceUnknown": "Distance unknown"
 }
