@@ -46,10 +46,9 @@ export function BookLoanAvailability({
   bookTitle,
 }: BookLoanAvailabilityProps) {
   const navigate = useNavigate();
-  const { t } = useTranslation(["lending", "common"]);
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation(["lending", "common"]);
   const { user: currentUser } = useUserStore();
-  
+
   // Get theme state
   const { darkMode, highContrast } = useAccessibilityStore();
 
@@ -57,26 +56,26 @@ export function BookLoanAvailability({
   const cardClass = highContrast
     ? "bg-black text-white border-2 border-white"
     : darkMode
-    ? "bg-gray-900 text-white border-gray-700"
-    : "bg-white text-gray-900 border-gray-200";
+      ? "bg-gray-900 text-white border-gray-700"
+      : "bg-white text-gray-900 border-gray-200";
 
   const subTextClass = highContrast
     ? "text-yellow-300" // High contrast usually needs bright colors on black
     : darkMode
-    ? "text-gray-300"
-    : "text-gray-600";
+      ? "text-gray-300"
+      : "text-gray-600";
 
   const locationBoxClass = highContrast
     ? "bg-black border border-white"
     : darkMode
-    ? "bg-gray-800 border-gray-700"
-    : "bg-gray-50 border-gray-100";
+      ? "bg-gray-800 border-gray-700"
+      : "bg-gray-50 border-gray-100";
 
   const iconClass = highContrast
     ? "text-white"
     : darkMode
-    ? "text-gray-400"
-    : "text-gray-500";
+      ? "text-gray-400"
+      : "text-gray-500";
 
   // --- Location Hooks ---
   const { coordinates: userCurrentCoordinates } = useGeoLocation(true);
@@ -99,8 +98,8 @@ export function BookLoanAvailability({
   useEffect(() => {
     if (userCopy?.loan_location_lat && userCopy?.loan_location_lon) {
       resolveCopyAddress(
-        userCopy.loan_location_lat, 
-        userCopy.loan_location_lon, 
+        userCopy.loan_location_lat,
+        userCopy.loan_location_lon,
         i18n.language
       );
     }
@@ -134,7 +133,7 @@ export function BookLoanAvailability({
             setActiveLoan(null);
           }
         }
-        
+
         const copies = await getAvailableCopiesForBook(bookId);
         setAvailableCopies(copies);
       } catch (err) {
@@ -151,9 +150,9 @@ export function BookLoanAvailability({
 
     const copiesWithDist: CopyWithDistance[] = availableCopies.map((copy) => {
       if (
-        userCurrentCoordinates?.lat && 
-        userCurrentCoordinates?.lon && 
-        copy.loan_location_lat && 
+        userCurrentCoordinates?.lat &&
+        userCurrentCoordinates?.lon &&
+        copy.loan_location_lat &&
         copy.loan_location_lon
       ) {
         return {
@@ -223,12 +222,12 @@ export function BookLoanAvailability({
   const handleMarkAsReturned = () => {
     if (activeLoan && activeLoan.id) {
       try {
-          const { markLoanAsReturned } = require("../lib/storage"); 
-          markLoanAsReturned(activeLoan.id);
-          setRefreshKey((prev) => prev + 1);
-          toast.success(t("loanReturned"));
+        const { markLoanAsReturned } = require("../lib/storage");
+        markLoanAsReturned(activeLoan.id);
+        setRefreshKey((prev) => prev + 1);
+        toast.success(t("loanReturned"));
       } catch (e) {
-          console.error("Mark as returned error", e);
+        console.error("Mark as returned error", e);
       }
     }
   };
@@ -277,7 +276,6 @@ export function BookLoanAvailability({
               </span>
             </div>
             <div className="flex gap-2">
-              <Button onClick={() => navigate(`/loans/${activeLoan.id}`)} variant="outline" className="flex-1 gap-2">
               <Button
                 onClick={() => navigate(`/loans/${activeLoan.id}`)}
                 variant="outline"
@@ -287,6 +285,7 @@ export function BookLoanAvailability({
                 <MessageCircle className="h-4 w-4" />
                 {t("openChat")}
               </Button>
+
               <Button onClick={handleMarkAsReturned} className="flex-1" aria-label={t("markAsReturned")}>
                 {t("markAsReturned")}
               </Button>
@@ -325,29 +324,29 @@ export function BookLoanAvailability({
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Chip 
-                label={t("availableForLoan")} 
-                color="default" 
-                variant="outlined" 
-                className="mb-2"
-                // Material UI Chip might need inline styles or sx prop for dark mode overrides, 
-                // but here we keep it standard as per your request.
+            <Chip
+              label={t("availableForLoan")}
+              color="default"
+              variant="outlined"
+              className="mb-2"
+            // Material UI Chip might need inline styles or sx prop for dark mode overrides, 
+            // but here we keep it standard as per your request.
             />
-            
+
             <div className={`${locationBoxClass} p-3 rounded-md mt-2`}>
-                <div className={`flex items-start gap-2 text-sm ${highContrast || darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                    <MapPin className="w-4 h-4 mt-1 text-primary shrink-0" />
-                    <div>
-                        <span className="font-semibold block">{t("pickupLocationLabel")}:</span>
-                        {loadingCopyAddress ? (
-                           <Skeleton width={150} height={20} />
-                        ) : (
-                           <span>
-                             {copyDisplayAddress || t("locationUnknown")}
-                           </span>
-                        )}
-                    </div>
+              <div className={`flex items-start gap-2 text-sm ${highContrast || darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                <MapPin className="w-4 h-4 mt-1 text-primary shrink-0" />
+                <div>
+                  <span className="font-semibold block">{t("pickupLocationLabel")}:</span>
+                  {loadingCopyAddress ? (
+                    <Skeleton width={150} height={20} />
+                  ) : (
+                    <span>
+                      {copyDisplayAddress || t("locationUnknown")}
+                    </span>
+                  )}
                 </div>
+              </div>
             </div>
           </div>
 
@@ -357,6 +356,8 @@ export function BookLoanAvailability({
             </Button>
             <Button onClick={handleDisableLending} variant="secondary" className="flex-1">
               {t("disableLending")}
+            </Button>
+
             <Button
               onClick={handleDisableLending}
               variant="secondary"
@@ -402,54 +403,54 @@ export function BookLoanAvailability({
             {nearbyCopies.length > 0 ? t("copiesAvailableNearYou") : t("availableCopies")}
           </CardTitle>
           <CardDescription className={subTextClass}>
-            {nearbyCopies.length > 0 
-              ? `${nearbyCopies.length} ${t("copiesNearby")}` 
+            {nearbyCopies.length > 0
+              ? `${nearbyCopies.length} ${t("copiesNearby")}`
               : t("noCopiesNearbyShowingAll")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          
+
           {nearbyCopies.map((copy) => (
-            <CopyItem 
-                key={copy.id} 
-                copy={copy} 
-                t={t} 
-                onLoan={() => handleLoanRequest(copy.id!)} 
-                iconClass={iconClass}
+            <CopyItem
+              key={copy.id}
+              copy={copy}
+              t={t}
+              onLoan={() => handleLoanRequest(copy.id!)}
+              iconClass={iconClass}
             />
           ))}
 
           {nearbyCopies.length > 0 && farCopies.length > 0 && !showAllLocations && (
-             <div className={`pt-2 border-t mt-2 ${highContrast ? 'border-white' : darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                <Button 
-                    variant="ghost" 
-                    className={`w-full text-sm ${subTextClass}`} 
-                    onClick={() => setShowAllLocations(true)}
-                >
-                  {t("show")} {farCopies.length} {t("moreCopiesFurtherAway")}
-                </Button>
+            <div className={`pt-2 border-t mt-2 ${highContrast ? 'border-white' : darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+              <Button
+                variant="ghost"
+                className={`w-full text-sm ${subTextClass}`}
+                onClick={() => setShowAllLocations(true)}
+              >
+                {t("show")} {farCopies.length} {t("moreCopiesFurtherAway")}
+              </Button>
             </div>
           )}
 
           {shouldShowFar && farCopies.length > 0 && (
-             <div className={nearbyCopies.length > 0 ? `pt-4 border-t ${highContrast ? 'border-white' : darkMode ? 'border-gray-700' : 'border-gray-200'}` : ""}>
-               {nearbyCopies.length > 0 && (
-                 <h4 className={`text-sm font-semibold mb-3 uppercase tracking-wider ${subTextClass}`}>
-                   {t("furtherLocations")}
-                 </h4>
-               )}
-               <div className="space-y-3">
-                 {farCopies.map((copy) => (
-                    <CopyItem 
-                        key={copy.id} 
-                        copy={copy} 
-                        t={t} 
-                        onLoan={() => handleLoanRequest(copy.id!)} 
-                        iconClass={iconClass}
-                    />
-                 ))}
-               </div>
-             </div>
+            <div className={nearbyCopies.length > 0 ? `pt-4 border-t ${highContrast ? 'border-white' : darkMode ? 'border-gray-700' : 'border-gray-200'}` : ""}>
+              {nearbyCopies.length > 0 && (
+                <h4 className={`text-sm font-semibold mb-3 uppercase tracking-wider ${subTextClass}`}>
+                  {t("furtherLocations")}
+                </h4>
+              )}
+              <div className="space-y-3">
+                {farCopies.map((copy) => (
+                  <CopyItem
+                    key={copy.id}
+                    copy={copy}
+                    t={t}
+                    onLoan={() => handleLoanRequest(copy.id!)}
+                    iconClass={iconClass}
+                  />
+                ))}
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -490,8 +491,8 @@ const CopyItem = ({ copy, t, onLoan, iconClass }: { copy: CopyWithDistance; t: a
   const itemClass = highContrast
     ? "border border-white hover:bg-gray-900"
     : darkMode
-    ? "bg-slate-950 border border-slate-800 hover:bg-slate-900"
-    : "bg-white border border-gray-200 hover:bg-gray-50";
+      ? "bg-slate-950 border border-slate-800 hover:bg-slate-900"
+      : "bg-white border border-gray-200 hover:bg-gray-50";
 
   const textClass = highContrast || darkMode ? "text-white" : "text-gray-900";
 
