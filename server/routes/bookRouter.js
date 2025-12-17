@@ -1,5 +1,5 @@
 import express from 'express';
-import { createBook, deleteBook, getAllBooks, getBookById, getBooksByCategory, getBooksByUserId, getCachedRecommendations, searchBooks, updateBook } from '../controllers/bookController.js';
+import { createBook, deleteBook, getAllBooks, getBookById, getBooksByCategory, getBooksByUserId, getCachedRecommendations, searchBooks, updateBook, getBooksForLoanDisplay } from '../controllers/bookController.js';
 import { verifyJWT } from '../middleware/auth.js';
 const router = express.Router();
 
@@ -15,6 +15,7 @@ router.get('/user',verifyJWT, getBooksByUserId);
 router.get('/:id',getBookById);
 router.put('/:id',verifyJWT, updateBook);
 router.delete('/:id',verifyJWT, deleteBook);
+router.get('/loanDisplay/all', getBooksForLoanDisplay);
 
 
 export default router;

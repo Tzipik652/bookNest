@@ -348,6 +348,37 @@ export async function searchBooks(searchTerm, page, limit, categoryId) {
   }
 }
 
+export async function getBooksWithCopies() {
+  const { data, error } = await supabase
+    .from("books")
+    .select(`
+      _id,
+      title,
+      author,
+      description,
+      user_copies (
+        id,
+        is_available_for_loan
+      )
+    `);
+
+  if (error) throw error;
+
+  return data.map(book => {
+    const totalCopies = book.user_copies.length;
+    const availableCopies = book.user_copies.filter(
+      c => c.is_available_for_loan
+    ).length;
+
+    return {
+      ...book,
+      totalCopies,
+      availableCopies,
+      isCurrentlyLoaned: totalCopies > 0 && availableCopies === 0
+    };
+  });
+}
+
 export default {
   create,
   findAll,
@@ -359,4 +390,5 @@ export default {
   findPaginated,
   getBooksByCategory,
   searchBooks,
+  getBooksWithCopies,
 };
