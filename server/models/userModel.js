@@ -6,11 +6,10 @@ export async function getUserById(id) {
     .from('users')
     .select('*')
     .eq('_id', id)
-    .eq('is_deleted', false) // ⬅️ נוסף: סינון משתמשים מחוקים
+    .eq('is_deleted', false) 
     .single();
 
   if (error) throw error;
-  // הערה: אם המשתמש קיים אך is_deleted=true, השאילתה תחזיר NULL.
   return data;
 }
 
@@ -54,7 +53,7 @@ export async function getUsers() {
   const { data, error } = await supabase
     .from('users')
     .select('*')
-    .eq('is_deleted', false); // ⬅️ נוסף: סינון משתמשים מחוקים
+    .eq('is_deleted', false);
 
   if (error) throw error;
   return data;

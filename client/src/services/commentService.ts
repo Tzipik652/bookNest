@@ -20,7 +20,6 @@ function handleAxiosError(error: any): never {
 }
 
 export async function getComments(bookId: string): Promise<CommentWithReactions[]> {
-  console.log("Fetching comments for bookId:", bookId);
   try {
     const res = await api.get(`${API_BASE_URL}/${bookId}`);
     return res.data;
