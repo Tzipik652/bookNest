@@ -1,0 +1,33 @@
+{
+    "noTitle": "ללא כותרת",
+    "lendingTo": "משאיל ל-",
+    "borrowingFrom": "שואל מ-",
+    "location": "נקודת מפגש",
+    "locationUnknown": "מיקום לא צוין",
+    "due": "תאריך יעד:",
+    "typeMessage": "הקלד הודעה...",
+    "sendMessage": "שלח הודעה",
+    "status": {
+        "REQUESTED": "ממתין לאישור",
+        "APPROVED": "אושר",
+        "ACTIVE": "פעיל",
+        "OVERDUE": "באיחור",
+        "RETURNED": "הוחזר",
+        "CANCELED": "בוטל"
+    },
+    "actions": {
+        "approve": "אשר השאלה",
+        "handedOver": "הספר נמסר",
+        "markReturned": "סמן כהוחזר",
+        "cancel": "בטל השאלה"
+    },
+    "systemMessages": {
+        "approved": "ההשאלה אושרה",
+        "handedOver": "הספר נמסר בהצלחה",
+        "returned": "הספר הוחזר לבעליו",
+        "canceled": "ההשאלה בוטלה"
+    },
+    "confirmDate": "אישור",
+    "ediDueDate": "עריכת תאריך יעד"
+
+}

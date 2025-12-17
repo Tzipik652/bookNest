@@ -24,6 +24,7 @@ export interface Book {
   };
   date_created: string;
   favorites_count?: number;
+  availableCopies: number;
 }
 export interface RecommendedBook extends Book {
   recommendation_reason: {
@@ -86,7 +87,7 @@ export interface Comment {
   reactions?: CommentReaction[];
 }
 
-export interface CommentWithReactions extends Omit<Comment, 'reaction_counts'> {
+export interface CommentWithReactions extends Omit<Comment, "reaction_counts"> {
   reaction_counts: ReactionCounts;
   user_reaction?: ReactionType | null;
 }
@@ -98,8 +99,56 @@ export type BookWithFavorite = Book & {
     he: string;
   };
 };
+
+export enum LoanStatus {
+  REQUESTED = "REQUESTED",
+  APPROVED = "APPROVED",
+  ACTIVE = "ACTIVE",
+  RETURNED = "RETURNED",
+  OVERDUE = "OVERDUE",
+  CANCELED = "CANCELED",
+}
+
+export interface Loan {
+  id: string;
+  user_copy: UserCopy;
+  borrower_id: string;
+  borrower_name: string;
+  borrower_email: string;
+  status: LoanStatus;
+  request_date: string;
+  loan_start_date: string;
+  due_date: string;
+  return_date: string;
+}
+
+export interface UserCopy {
+  id?: string;
+  book_id: string;
+  book_title?: string;
+  owner_id?: string;
+  owner_name?: string;
+  owner_email?: string;
+  is_available_for_loan: boolean;
+  loan_location_lat: number;
+  loan_location_lon: number;
+  date_added?: string;
+}
+export type ChatMessageType = "user" | "system" | "status";
+
+export interface ChatMessage {
+  id: string;
+  loan_id: string;
+  sender_id: string;
+  sender_name: string;
+  message_text: string;
+  date_sent: string;
+  type?: ChatMessageType;
+  action?: "approve" | "set_due" | "activate" | "return" | "cancel";
+  payload?: any;
+}
 export type PaginatedResponse<T> = {
-  [key: string]: T[] | number; 
+  [key: string]: T[] | number;
   totalItems: number;
   totalPages: number;
   currentPage: number;

@@ -13,6 +13,7 @@ import {
   Shield,
   Menu,
   X,
+  BookMarked,
 } from "lucide-react";
 
 import { useUserStore } from "../store/useUserStore";
@@ -53,8 +54,8 @@ export function Navbar() {
             highContrast
               ? "text-white hover:text-gray-400"
               : darkMode
-              ? "text-white hover:text-gray-300"
-              : "text-black hover:text-green-700 hover:bg-green-100"
+                ? "text-white hover:text-gray-300"
+                : "text-black hover:text-green-700 hover:bg-green-100"
           }`
     }`;
 
@@ -65,14 +66,14 @@ export function Navbar() {
   const navBgClass = highContrast
     ? "bg-black text-white"
     : darkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-black";
+      ? "bg-gray-900 text-white"
+      : "bg-white text-black";
 
   const drawerBgClass = highContrast
     ? "bg-black text-white"
     : darkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-black";
+      ? "bg-gray-900 text-white"
+      : "bg-white text-black";
 
   return (
     <nav className={`border-b sticky top-0 z-[100] ${navBgClass}`}>
@@ -113,6 +114,16 @@ export function Navbar() {
                   aria-label={t("favorites")}
                 >
                   <Heart className="h-4 w-4" /> {t("favorites")}
+                </Button>
+              </Link>
+              <Link to="/loans">
+                <Button
+                  variant="ghost"
+                  className={getButtonClasses("/loans")}
+                  aria-label={t("Loans")}
+                >
+                  <BookMarked className="h-4 w-4" />
+                  {t("Loans")}
                 </Button>
               </Link>
               <Link to="/add-book">
@@ -210,8 +221,8 @@ export function Navbar() {
                           ? "left-0 translate-x-0"
                           : "left-0 -translate-x-full"
                         : open
-                        ? "right-0 translate-x-0"
-                        : "right-0 translate-x-full"
+                          ? "right-0 translate-x-0"
+                          : "right-0 translate-x-full"
                     }`}
           onClick={(e) => e.stopPropagation()}
         >
@@ -256,6 +267,16 @@ export function Navbar() {
                   aria-label={t("favorites")}
                 >
                   <Heart className="h-4 w-4" /> {t("favorites")}
+                </Button>
+              </Link>
+              <Link to="/loans">
+                <Button
+                  variant={isActive("/loans") ? "default" : "ghost"}
+                  className="gap-2"
+                  aria-current={isActive("/loans") ? "page" : undefined}
+                >
+                  <BookMarked className="h-4 w-4" aria-hidden="true" />
+                  {t("Loans")}
                 </Button>
               </Link>
               <Link to="/add-book" onClick={() => setOpen(false)}>

@@ -75,7 +75,11 @@ import heValidation from './translations/he/validation.json'
 import enCategory from './translations/en/category.json'
 import heCategory from './translations/he/category.json'
 
+import enLending from './translations/en/lending.json'
+import heLending from './translations/he/lending.json'
 
+import enLoanChat from './translations/en/loanChat.json'
+import heLoanChat from './translations/he/loanChat.json'
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -105,7 +109,9 @@ i18n
         landing:enLanding,
         navbar:enNavbar,
         category:enCategory,
-        validation:enValidation
+        validation:enValidation,
+        lending:enLending,
+        loanChat:enLoanChat
       },
       he: {
         common: heCommon,
@@ -131,10 +137,12 @@ i18n
         landing:heLanding,
         navbar:heNavbar,
         category:heCategory,
-        validation:heValidation
+        validation:heValidation,
+        lending:heLending,
+        loanChat:heLoanChat
       },
     },
-    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms','accessibility','bookCard','comments','footer','keyboardShortcutsHelp','welcomeToast','landing','navbar','category','validation'],
+    ns: ['common', 'home','bookDetails','addBook','AIRecommendations','adminDashboard','contact','editBook','faq','favorites','auth','myBooksPage','policy','terms','accessibility','bookCard','comments','footer','keyboardShortcutsHelp','welcomeToast','landing','navbar','category','validation','lending','loanChat'],
     defaultNS: 'common',
     supportedLngs: ['en', 'he'],
     fallbackLng: 'en',

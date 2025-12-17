@@ -8,6 +8,7 @@
   "login": "Login",
   "register": "Register",
   "logout": "Logout",
-  "language":"Language"
+  "language":"Language",
+  "Loans": "Loans"
 
 }
