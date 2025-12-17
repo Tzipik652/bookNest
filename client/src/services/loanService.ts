@@ -2,6 +2,8 @@ import { Loan, LoanStatus } from "../types";
 import api from "../lib/axiosInstance";
 import axios from "axios";
 import { useUserStore } from "../store/useUserStore";
+import { sendChatMessage } from "./chatMessagesService";
+import { useTranslation } from "react-i18next";
 const API_BASE_URL =
   `${import.meta.env.VITE_SERVER_URL}/loans` || "http://localhost:5000/loans";
 
@@ -43,7 +45,6 @@ function transformLoan(raw: any): Loan {
     },
   };
 }
-
 export const getUserLoansAsBorrower = async (): Promise<Loan[]> => {
   try {
     const { user: currentUser } = useUserStore.getState();
@@ -88,7 +89,10 @@ export const getLoanById = async (loanId: string): Promise<Loan> => {
     handleAxiosError(error);
   }
 };
-export const approveLoan = async (loanId: string): Promise<Loan> => {
+export const approveLoan = async (
+  loanId: string,
+  t: (key: string) => string
+): Promise<Loan> => {
   try {
     if (!loanId) {
       throw new Error("Loan are required");
@@ -96,6 +100,7 @@ export const approveLoan = async (loanId: string): Promise<Loan> => {
     const res = await api.put(`${API_BASE_URL}/${loanId}/status`, {
       status: LoanStatus.APPROVED,
     });
+    await sendChatMessage(loanId, t("systemMessages.approved"), "system");
     return transformLoan(res.data.data);
   } catch (error) {
     handleAxiosError(error);
@@ -103,7 +108,8 @@ export const approveLoan = async (loanId: string): Promise<Loan> => {
 };
 export const updateDueDate = async (
   loanId: string,
-  date: string
+  date: string,
+  t: (key: string) => string
 ): Promise<Loan> => {
   try {
     if (!loanId) {
@@ -116,12 +122,20 @@ export const updateDueDate = async (
     const res = await api.put(`${API_BASE_URL}/${loanId}/due-date`, {
       due_date: date,
     });
+    await sendChatMessage(
+      loanId ?? "",
+      t("systemMessages.returnDeadline"),
+      "system"
+    );
     return transformLoan(res.data.data);
   } catch (error) {
     handleAxiosError(error);
   }
 };
-export const activeLoan = async (loanId: string): Promise<Loan> => {
+export const activeLoan = async (
+  loanId: string,
+  t: (key: string) => string
+): Promise<Loan> => {
   try {
     if (!loanId) {
       throw new Error("Loan are required");
@@ -129,12 +143,17 @@ export const activeLoan = async (loanId: string): Promise<Loan> => {
     const res = await api.put(`${API_BASE_URL}/${loanId}/status`, {
       status: LoanStatus.ACTIVE,
     });
+    await sendChatMessage(
+      loanId ?? "",
+      t("systemMessages.handedOver"),
+      "system"
+    );
     return transformLoan(res.data.data);
   } catch (error) {
     handleAxiosError(error);
   }
 };
-export const cancelLoan = async (loanId: string): Promise<Loan> => {
+export const cancelLoan = async (loanId: string,t: (key: string) => string): Promise<Loan> => {
   try {
     if (!loanId) {
       throw new Error("Loan not found");
@@ -142,17 +161,22 @@ export const cancelLoan = async (loanId: string): Promise<Loan> => {
     const res = await api.put(`${API_BASE_URL}/${loanId}/status`, {
       status: LoanStatus.CANCELED,
     });
+    await sendChatMessage(loanId ?? "", t("systemMessages.canceled"), "system");
     return transformLoan(res.data.data);
   } catch (error) {
     handleAxiosError(error);
   }
 };
 
-export const markLoanAsReturned = async (loanId: string): Promise<Loan> => {
+export const markLoanAsReturned = async (
+  loanId: string,
+  t: (key: string) => string
+): Promise<Loan> => {
   try {
     const res = await api.put(`${API_BASE_URL}/${loanId}/return-date`, {
       return_date: new Date().toISOString(),
     });
+    await sendChatMessage(loanId ?? "", t("systemMessages.returned"), "system");
     return transformLoan(res.data.data);
   } catch (error) {
     handleAxiosError(error);

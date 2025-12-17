@@ -34,7 +34,7 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 
 export function LoansPage() {
-  const { t, i18n } = useTranslation(["lending", "common"]); // הוספת i18n
+  const { t, i18n } = useTranslation(["lending", "common", "loanChat"]);
   const navigate = useNavigate();
   const [borrowerLoans, setBorrowerLoans] = useState<Loan[]>([]);
   const [lenderLoans, setLenderLoans] = useState<Loan[]>([]);
@@ -62,7 +62,7 @@ export function LoansPage() {
 
   const handleApproveLoan = async (loanId: string) => {
     try {
-      await approveLoan(loanId);
+      await approveLoan(loanId,t);
       toast.success(t("loanApproved"));
       setRefreshKey((prev) => prev + 1);
     } catch (error: any) {
@@ -72,7 +72,7 @@ export function LoansPage() {
 
   const handleCancelLoan = (loanId: string) => {
     try {
-      cancelLoan(loanId);
+      cancelLoan(loanId,t);
       toast.success(t("loanCancelled"));
       setRefreshKey((prev) => prev + 1);
     } catch (error: any) {

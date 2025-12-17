@@ -17,9 +17,7 @@ function handleAxiosError(error: any): never {
     throw new Error("Unexpected error: " + error);
   }
 }
-function transformUserCopy(raw: any): UserCopy {
-  console.log(raw);
-  
+function transformUserCopy(raw: any): UserCopy {  
   return {
     id: raw.id,
     book_id: raw.book_id._id,
@@ -123,7 +121,7 @@ export const changeLoanLocation = async (
       loan_location_lat,
       loan_location_lon,
     });
-    return transformUserCopy(response.data);
+    return transformUserCopy(response.data.data);
   } catch (error) {
     handleAxiosError(error);
   }

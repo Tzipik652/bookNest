@@ -22,10 +22,12 @@
         "cancel": "בטל השאלה"
     },
     "systemMessages": {
+        "loanAwaitingApproval":"השאלה ממתינה לאישור",
         "approved": "ההשאלה אושרה",
         "handedOver": "הספר נמסר בהצלחה",
         "returned": "הספר הוחזר לבעליו",
-        "canceled": "ההשאלה בוטלה"
+        "canceled": "ההשאלה בוטלה",
+        "returnDeadline":"תאריך אחרון להחזרה עודכן"
     },
     "confirmDate": "אישור",
     "ediDueDate": "עריכת תאריך יעד"

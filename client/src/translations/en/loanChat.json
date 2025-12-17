@@ -22,10 +22,12 @@
         "cancel": "Cancel Loan"
     },
     "systemMessages": {
+        "loanAwaitingApproval":"Loan awaiting approval",
         "approved": "Loan approved",
         "handedOver": "Book handed over successfully",
         "returned": "Book returned to owner",
-        "canceled": "Loan canceled"
+        "canceled": "Loan canceled",
+        "returnDeadline":"Return deadline updated"
     },
     "confirmDate": "confirm",
     "ediDueDate": "Edit Due Date"

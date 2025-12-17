@@ -1,10 +1,16 @@
-import { Book, ChatMessage, ChatMessageType, Loan, LoanStatus } from "../types";
-import api from "../lib/axiosInstance";
+// services/chatMessagesService.ts
+import { ChatMessage, ChatMessageType } from "../types";
 import axios from "axios";
-const API_BASE_URL =
-  `${import.meta.env.VITE_SERVER_URL}/loan-messages` ||
-  "http://localhost:5000/loan-messages";
-
+import { useUserStore } from "../store/useUserStore";
+import { supabaseFrontendClient } from "../utils/supabaseFrontendClient";
+const loanMessagesSelectQuery =`
+    id,
+    loan_id,
+    sender_id(_id, name),
+    message_text,
+    date_sent,
+    type
+`;
 function handleAxiosError(error: any): never {
   if (axios.isAxiosError(error)) {
     throw new Error(
@@ -27,25 +33,36 @@ function transformChatMessages(raw: any): ChatMessage {
     type: raw.type
   };
 }
-export const getChatMessages = async (
-  loanId: string
-): Promise<ChatMessage[]> => {
-  try {
-    const res = await api.get(`${API_BASE_URL}/${loanId}/chat-messages`);
-    return res.data.data.map(transformChatMessages);
-  } catch (error) {
-    handleAxiosError(error);
-  }
-};
+export async function sendChatMessage(
+  loanId: string,
+  text: string,
+  type: ChatMessageType = "user"
+) {
+  try{
+    const { user: currentUser } = useUserStore();
 
-export const sendChatMessage = async (loanId: string, message: string, type:ChatMessageType = "user") => {
-  try {
-    const res = await api.post(`${API_BASE_URL}/${loanId}/chat-messages`, {
-      message,
-      type
+    const { error } = await supabaseFrontendClient.from("loan_messages").insert({
+      loan_id: loanId,
+      message_text: text,
+      type,
+      sender_id: currentUser?._id,
     });
-    return transformChatMessages(res.data.data);
-  } catch (error) {
+  }catch(error){
     handleAxiosError(error);
   }
-};
+
+}
+export async function getChatMessages(loanId: string) {
+  try{
+    const { data, error } = await supabaseFrontendClient
+      .from("loan_messages")
+      .select(loanMessagesSelectQuery)
+      .eq("loan_id", loanId)
+      .order("date_sent", { ascending: true });
+    return data?.map(transformChatMessages);
+  }catch(error){
+    handleAxiosError(error);
+  }
+
+}
+

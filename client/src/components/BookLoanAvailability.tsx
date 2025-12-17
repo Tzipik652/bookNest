@@ -252,7 +252,6 @@ export function BookLoanAvailability({
                   <span className="font-semibold block">
                     {t("pickupLocationLabel")}:
                   </span>
-                  {/* תצוגת הכתובת או טעינה */}
                   {loadingAddress ? (
                     <Skeleton width={150} height={20} />
                   ) : (

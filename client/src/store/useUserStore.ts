@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import { QueryClient } from "@tanstack/react-query";
 import { User } from "../types";
+import { supabaseFrontendClient } from "../utils/supabaseFrontendClient";
 
 
 interface UserStore {
@@ -26,7 +27,7 @@ export const useUserStore = create<UserStore>((set) => ({
   user: initialUser,
   token: storedToken,
 
-  login: (user, token) => {
+  login:async (user, token) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
     set({ user, token });

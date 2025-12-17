@@ -51,14 +51,14 @@ export default function SystemMessage({
       </div>
 
       {showActions && isLender && loan.status === LoanStatus.REQUESTED && (
-        <Button size="small" onClick={onApprove} aria-label={t("approve")}>
-          {t("approve")}
+        <Button size="small" onClick={onApprove} aria-label={t("actions.approve")}>
+          {t("actions.approve")}
         </Button>
       )}
 
       {showActions && isLender && loan.status === LoanStatus.APPROVED && (
-        <Button size="small" onClick={onActivate} aria-label={t("handedOver")}>
-          {t("handedOver")}
+        <Button size="small" onClick={onActivate} aria-label={t("actions.handedOver")}>
+          {t("actions.handedOver")}
         </Button>
       )}
 
@@ -66,15 +66,15 @@ export default function SystemMessage({
         <Button
           size="small"
           onClick={onReturned}
-          aria-label={t("markReturned")}
+          aria-label={t("actions.markReturned")}
         >
-          {t("markReturned")}
+          {t("actions.markReturned")}
         </Button>
       )}
 
       {showActions && loan.status === LoanStatus.REQUESTED && (
-        <Button size="small" color="error" onClick={onCancel} aria-label={t("cancel")}>
-          {t("cancel")}
+        <Button size="small" color="error" onClick={onCancel} aria-label={t("actions.cancel")}>
+          {t("actions.cancel")}
         </Button>
       )}
       {isLender && loan.status === LoanStatus.REQUESTED && (
