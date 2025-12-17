@@ -52,7 +52,7 @@ export function BookCard({ book }: BookCardProps) {
 
   return (
     <Card
-    dir={commonDir}
+      dir={commonDir}
       className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
       style={{
         backgroundColor: theme.palette.background.paper,
@@ -87,8 +87,8 @@ export function BookCard({ book }: BookCardProps) {
               >
                 <Heart
                   className={`h-5 w-5 transition-colors ${displayedBook.isFavorited
-                      ? "fill-red-500 text-red-500"
-                      : "text-gray-400"
+                    ? "fill-red-500 text-red-500"
+                    : "text-gray-400"
                     } ${isLoading ? "opacity-50" : ""}`}
                   style={{ cursor: isLoading ? "not-allowed" : "pointer" }}
                 />
@@ -104,6 +104,25 @@ export function BookCard({ book }: BookCardProps) {
           <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm mb-3">
             {t(`category:${book.category.replace(/\s+/g, '')}`)}
           </span>
+          {/* Loan status */}
+          <div className="mt-2">
+            {book.availableCopies > 0 ? (
+              <span className="inline-block px-2 py-1 text-sm rounded bg-green-100 text-green-800">
+                Available ({book.availableCopies})
+              </span>
+            ) : (
+              <span className="inline-block px-2 py-1 text-sm rounded bg-gray-200 text-gray-700">
+                Not Available To Loan
+              </span>
+            )}
+          </div>
+          {/* <Button
+            className="w-full"
+            disabled={book.availableCopies === 0}
+            onClick={() => navigate(`/book/${book._id}`)}
+          >
+            {book.availableCopies > 0 ? "View details" : "Not available"}
+          </Button> */}
           <p
             className="text-sm text-gray-700 line-clamp-3 overflow-hidden"
             style={{

@@ -273,3 +273,8 @@ export const invalidateRecommendationsCache = catchAsync(async (userId) => {
   const keys = await redisClient.keys(`recommendations:${userId}:*`);
   if (keys.length) await redisClient.del(keys);
 });
+
+export const getBooksForLoanDisplay = catchAsync(async (req, res) => {
+  const books = await bookModel.getBooksWithCopies();
+  res.status(200).json(books);
+});

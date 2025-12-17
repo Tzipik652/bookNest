@@ -24,6 +24,7 @@ export interface Book {
   };
   date_created: string;
   favorites_count?: number;
+  availableCopies: number;
 }
 export interface RecommendedBook extends Book {
   recommendation_reason: {
