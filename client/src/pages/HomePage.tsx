@@ -23,7 +23,6 @@ import {
 import { getCategories } from "../services/categoryService";
 
 import { BookCard } from "../components/BookCard";
-import LandingComponent from "../components/LandingComponent";
 import BookGridSkeleton from "../components/BookGridSkeleton";
 
 import { Book, Category, BookWithFavorite } from "../types";
@@ -212,8 +211,6 @@ export function HomePage() {
 
   return (
     <Box sx={{ minHeight: "100vh", paddingBottom: 8 }}>
-      {!user && <LandingComponent />}
-
       <Container maxWidth="lg">
         <Typography
           variant="h4"
