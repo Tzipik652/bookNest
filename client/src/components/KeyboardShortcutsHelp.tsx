@@ -131,8 +131,8 @@ export function KeyboardShortcutsHelp() {
         sx={{
           position: "fixed",
           bottom: 20,
-          right: commonDir === "ltr" ? 20 : "auto",
-          left: commonDir === "rtl" ? 20 : "auto",
+          right: "auto",
+          left: 20,
           zIndex: 1000,
         }}
       >

@@ -1,6 +1,86 @@
 {
-  "heading": "Welcome to BookNest",
-  "subheading": "Discover, organize, and share your favorite books with AI-powered recommendations",
-  "loginButton": "Login",
-  "registerButton": "Register"
+  "hero": {
+    "title": "Book Recommendations ",
+    "rotatingWords": [
+      "Smart",
+      "Accurate",
+      "Personal",
+      "Tailored"
+    ],
+    "subtitle": "BookNest analyzes your reading preferences and suggests books chosen especially for you — clearly, transparently, and accurately.",
+    "cta": {
+      "main": "Start Your BookNest Experience",
+      "sub": "Free · No commitment"
+    }
+  },
+  "problem": {
+    "title": "Choosing a good book isn’t easy",
+    "description": "The book world is full of generic recommendations, conflicting ratings, and endless lists. BookNest simplifies the choice and makes it personal, focused, and taste-driven."
+  },
+  "features": {
+    "title": "Recommendations with real reasoning",
+    "subtitle": "Not trends. Not random bestsellers. Real personalization.",
+    "personalization": {
+      "title": "Precise personalization",
+      "description": "The system learns your reading history and identifies unique preference patterns"
+    },
+    "ai": {
+      "title": "Advanced AI",
+      "description": "Content analysis technology that understands style, tone, and themes you connect with"
+    },
+    "transparency": {
+      "title": "Full transparency",
+      "description": "Every recommendation includes a clear explanation of why it fits you"
+    },
+    "summaries": {
+      "title": "Smart book summaries",
+      "description": "Concise AI-based summaries to help you decide faster"
+    }
+  },
+  "howItWorks": {
+    "title": "A simple, clear process",
+    "subtitle": "Three steps to personalized recommendations",
+    "steps": {
+      "one": {
+        "title": "Mark books",
+        "description": "Choose books you loved or add your own"
+      },
+      "two": {
+        "title": "Automatic analysis",
+        "description": "The system analyzes style, themes, and preferred genres"
+      },
+      "three": {
+        "title": "Get recommendations",
+        "description": "A tailored list with clear explanations for each choice"
+      }
+    }
+  },
+  "trust": {
+    "title": "Informed, not random choices",
+    "description": "BookNest supports your judgment with transparent content analysis, helping you choose with confidence.",
+    "badge": "Trust & transparency first"
+  },
+  "accessibility": {
+    "title": "Accessibility & privacy first",
+    "subtitle": "Technology that respects you",
+    "items": {
+      "accessibility": {
+        "title": "Full accessibility",
+        "description": "Screen reader support, keyboard navigation, high contrast and more"
+      },
+      "audio": {
+        "title": "Text-to-speech",
+        "description": "Listen to summaries and recommendations in clear audio"
+      },
+      "privacy": {
+        "title": "Protected privacy",
+        "description": "Your data stays yours — no sharing, no selling"
+      }
+    }
+  },
+  "finalCta": {
+    "title": "Find your next great book",
+    "button": "Join BookNest now",
+    "note": "Free · No commitment · Start in under a minute"
+  }
 }
