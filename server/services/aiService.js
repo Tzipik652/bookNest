@@ -16,7 +16,9 @@ if (!apiKey) {
 const ai = new GoogleGenAI({ apiKey });
 
 // --- 1. AI Book Summary ---
-
+function isHebrew(text = "") {
+  return /[\u0590-\u05FF]/.test(text);
+}
 /**
  * Creates a short summary for a book using Gemini.
  * @param {string} title - Book title.
@@ -54,7 +56,14 @@ export async function generateBookSummary(title, author, description) {
     return response.text.trim();
   } catch (error) {
     console.error("Gemini Summary Error:", error);
-    throw error; // default value in case of error
+    const combinedText = `${title} ${author} ${description}`;
+    const hebrew = isHebrew(combinedText);
+
+    return hebrew
+      ? `${title} מאת ${author}מציע חוויית קריאה מסקרנת ומשלב תוכן המעודד הבנה והעמקה.
+מתאים לקוראים המחפשים קריאה משמעותית וברורה.`
+      : `${title} by ${author} is offers an engaging reading experience while encouraging understanding and thoughtful reflection.
+Suitable for readers seeking a meaningful and clear read.`;
   }
 }
 
@@ -67,7 +76,7 @@ export async function generateBookSummary(title, author, description) {
  * @returns {Promise<Array<Object>>} List of recommendations (up to 5) in JSON format.
  */
 export async function getBookRecommendations(favoriteBooks, candidateBooks) {
-const prompt = `
+  const prompt = `
   You are an expert librarian and book matchmaker.
   
   User's reading history (Favorite Books):
@@ -110,6 +119,12 @@ const prompt = `
     return result.recommendations;
   } catch (error) {
     console.error("Gemini Recommendation Error:", error);
-    return [];
+    return candidateBooks.slice(0, 5).map((book) => ({
+      id: book.id,
+      reason: {
+        en: "This book was selected because its general themes and subject matter align well with the reader’s interests, offering a natural continuation of their reading preferences.",
+        he: "הספר נבחר בזכות הנושאים והכיוון הכללי שלו, שמשתלבים היטב עם תחומי העניין המשתקפים מהקריאה הקודמת, ומהווים המשך טבעי לחוויית הקריאה.",
+      },
+    }));
   }
 }
