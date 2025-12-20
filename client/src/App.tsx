@@ -25,6 +25,9 @@ const LazyRegisterPage = React.lazy(() =>
     default: module.RegisterPage,
   }))
 );
+const LazyBookNestLanding = React.lazy(() =>
+  import("./pages/BookNestLanding").then((module) => ({ default: module.BookNestLanding }))
+);
 const LazyHomePage = React.lazy(() =>
   import("./pages/HomePage").then((module) => ({ default: module.HomePage }))
 );
@@ -175,7 +178,7 @@ function App() {
         <Suspense fallback={<RouteFallback />}>
           <Toaster position="top-right" richColors />
           <Routes>
-            <Route path="/" element={<LazyHomePage />} />
+            <Route path="/" element={<LazyBookNestLanding />} />
             <Route path="/login" element={<LazyLoginPage />} />
             <Route path="/register" element={<LazyRegisterPage />} />
             <Route
@@ -257,24 +260,6 @@ function App() {
       <KeyboardShortcutsHelp />
       <KeyboardWelcomeToast />
 
-      {/* Screen reader ARIA announcements */}
-      {screenReader && (
-        <div
-          aria-live="assertive"
-          style={{
-            position: "absolute",
-            width: "1px",
-            height: "1px",
-            margin: "-1px",
-            padding: "0",
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            border: "0",
-          }}
-        >
-          Screen reader mode enabled
-        </div>
-      )}
 
       <Footer />
     </div>

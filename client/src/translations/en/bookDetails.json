@@ -5,6 +5,7 @@
   "buttonAddFavorite": "Add to Favorites",
   "favoritesCount_one": "1 user liked this book",
   "favoritesCount": "{{count}} users liked this book",
+  "viewComments": "view comments",
   "headerDescription": "Description",
   "headerAISummary": "AI Summary",
   "uploadedByPrefix": "Uploaded by {{userName}}",

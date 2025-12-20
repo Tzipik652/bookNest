@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { CommentSection } from "../components/CommentSection";
 import { deleteBook, getBookById } from "../services/bookService";
@@ -15,6 +15,8 @@ import {
   DialogContent,
   DialogActions,
   Skeleton,
+  Zoom,
+  Fab,
 } from "@mui/material";
 import { Button as ShadcnButton } from "../components/ui/button";
 import {
@@ -32,7 +34,7 @@ import { Book, BookWithFavorite } from "../types";
 import { useTranslation } from "react-i18next";
 import { useKeyboardModeBodyClass } from "../hooks/useKeyboardMode";
 import Narrator from "../components/Narrator";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, MessageSquare } from "lucide-react";
 
 export function BookDetailsPage() {
   const { t } = useTranslation(["bookDetails", "common"]);
@@ -47,7 +49,16 @@ export function BookDetailsPage() {
   const { toggleMutation, isFavorited } = useFavoriteBooks();
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const commentsSectionRef = useRef<HTMLDivElement>(null);
 
+  const scrollToComments = () => {
+    if (commentsSectionRef.current) {
+      commentsSectionRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
   const {
     data: fetchedBook,
     isLoading,
@@ -154,7 +165,7 @@ export function BookDetailsPage() {
 
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
                   <Chip
-                    label={t(`category:${book.category.replace(/\s+/g, '')}`)}
+                    label={t(`category:${book.category.replace(/\s+/g, "")}`)}
                     variant="outlined"
                   />
 
@@ -230,9 +241,23 @@ export function BookDetailsPage() {
                   )}
                 </Box>
 
-                <Typography variant="body1" sx={{ mb: 2 }}>
-                  {t("favoritesCount", { count: book.favorites_count })}
-                </Typography>
+                <Box display="flex" alignItems="center" gap={2} mb={2}>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    {book.favorites_count==1?
+                    t("favoritesCount_one")
+                    :  
+                    t("favoritesCount", { count: book.favorites_count })
+                  }
+                  </Typography>
+
+                  <Button
+                    size="small"
+                    variant="text"
+                    onClick={scrollToComments}
+                    startIcon={<MessageSquare size={18} />}
+                    aria-label={t("viewComments")}
+                  ></Button>
+                </Box>
 
                 <Typography variant="h6" gutterBottom>
                   {t("headerDescription")}
@@ -262,8 +287,8 @@ export function BookDetailsPage() {
         </Box>
       </Box>
 
-      <Box mt={8}>
-        <CommentSection bookId={book._id} bookOwnerId={book.user_id}/>
+      <Box mt={8} ref={commentsSectionRef}>
+        <CommentSection bookId={book._id} bookOwnerId={book.user_id} />
       </Box>
 
       <Dialog

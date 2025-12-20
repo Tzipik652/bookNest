@@ -5,6 +5,7 @@
   "buttonAddFavorite": "הוסף למועדפים",
   "favoritesCount_one": "משתמש אחד אהב את הספר",
   "favoritesCount": "{{count}} משתמשים אהבו את הספר",
+  "viewComments": "לצפיה בתגובות",
   "headerDescription": "תיאור",
   "headerAISummary": "סיכום AI",
   "uploadedByPrefix": "הועלה על ידי {{userName}}",
