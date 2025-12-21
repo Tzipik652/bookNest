@@ -14,10 +14,10 @@ import {
   Alert,
   Container,
   Divider,
-  InputAdornment, // הוספתי
-  IconButton,     // הוספתי
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material"; // הוספתי
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useUserStore } from "../store/useUserStore";
 import { loginLocal, loginWithGoogle } from "../services/userService";
 import { useForm } from "react-hook-form";
@@ -129,14 +129,12 @@ export function LoginPage() {
 
               <TextField
                 label={t("login.passwordLabel")}
-                // כאן השינוי: סוג השדה משתנה בהתאם ל-State
                 type={showPassword ? "text" : "password"}
                 fullWidth
                 {...register("password")}
                 error={!!errors.password}
                 helperText={errors.password?.message}
                 dir={isRtl ? "rtl" : "ltr"}
-                // הוספת האייקון של העין
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
