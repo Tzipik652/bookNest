@@ -15,6 +15,7 @@ import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import ScrollButton from "./components/ScrollButton";
 import { useTranslation } from "react-i18next";
 import { useScreenReader } from "./hooks/useScreenReader";
+import { PublicOnlyRoute } from "./components/PublicOnlyRoute";
 
 // Lazy-loaded pages
 const LazyLoginPage = React.lazy(() =>
@@ -26,7 +27,9 @@ const LazyRegisterPage = React.lazy(() =>
   }))
 );
 const LazyBookNestLanding = React.lazy(() =>
-  import("./pages/BookNestLanding").then((module) => ({ default: module.BookNestLanding }))
+  import("./pages/BookNestLanding").then((module) => ({
+    default: module.BookNestLanding,
+  }))
 );
 const LazyHomePage = React.lazy(() =>
   import("./pages/HomePage").then((module) => ({ default: module.HomePage }))
@@ -134,7 +137,6 @@ function App() {
     screenReader,
   } = useAccessibilityStore();
 
-  
   useEffect(() => {
     document.documentElement.dir = i18n.dir(i18n.language);
 
@@ -152,7 +154,7 @@ function App() {
 
       <Navbar />
       <AccessibilityMenu />
-      
+
       {/* Global Accessibility Overrides */}
       <GlobalStyles
         styles={{
@@ -160,8 +162,8 @@ function App() {
             backgroundColor: darkMode
               ? "#121212"
               : highContrast
-              ? "#000"
-              : "#fff",
+                ? "#000"
+                : "#fff",
 
             color: darkMode || highContrast ? "#fff" : "#000",
             fontSize: largeText ? "1.2rem" : "1rem",
@@ -178,7 +180,14 @@ function App() {
         <Suspense fallback={<RouteFallback />}>
           <Toaster position="top-right" richColors />
           <Routes>
-            <Route path="/" element={<LazyBookNestLanding />} />
+            <Route
+              path="/"
+              element={
+                <PublicOnlyRoute>
+                  <LazyBookNestLanding />
+                </PublicOnlyRoute>
+              }
+            />
             <Route path="/login" element={<LazyLoginPage />} />
             <Route path="/register" element={<LazyRegisterPage />} />
             <Route
@@ -259,7 +268,6 @@ function App() {
       </main>
       <KeyboardShortcutsHelp />
       <KeyboardWelcomeToast />
-
 
       <Footer />
     </div>

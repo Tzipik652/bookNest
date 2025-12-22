@@ -20,6 +20,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAccessibilityStore } from "../store/accessibilityStore";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useTranslation } from "react-i18next";
+import { Avatar, Stack } from "@mui/material";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -28,8 +29,9 @@ export function Navbar() {
   const { logout, user } = useUserStore();
   const [open, setOpen] = useState(false);
   const { darkMode, highContrast } = useAccessibilityStore();
-  const { t, i18n } = useTranslation(["navbar"]);
+  const { t, i18n } = useTranslation(["navbar", "common"]);
   const isRtl = i18n.dir() === "rtl";
+  const commonDir = t('common:dir') as 'rtl' | 'ltr';
 
   const handleLogout = () => {
     logout(queryClient);
@@ -46,16 +48,14 @@ export function Navbar() {
   const encodedPath = encodeURIComponent(currentPath);
 
   const getButtonClasses = (path: string) =>
-    `gap-2 px-2 lg:px-3 transition-colors duration-200 ${
-      isActive(path)
-        ? "bg-green-600 text-white hover:bg-green-700"
-        : `${
-            highContrast
-              ? "text-white hover:text-gray-400"
-              : darkMode
-              ? "text-white hover:text-gray-300"
-              : "text-black hover:text-green-700 hover:bg-green-100"
-          }`
+    `gap-2 px-2 lg:px-3 transition-colors duration-200 ${isActive(path)
+      ? "bg-green-600 text-white hover:bg-green-700"
+      : `${highContrast
+        ? "text-white hover:text-gray-400"
+        : darkMode
+          ? "text-white hover:text-gray-300"
+          : "text-black hover:text-green-700 hover:bg-green-100"
+      }`
     }`;
 
   useEffect(() => {
@@ -65,14 +65,14 @@ export function Navbar() {
   const navBgClass = highContrast
     ? "bg-black text-white"
     : darkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-black";
+      ? "bg-gray-900 text-white"
+      : "bg-white text-black";
 
   const drawerBgClass = highContrast
     ? "bg-black text-white"
     : darkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-black";
+      ? "bg-gray-900 text-white"
+      : "bg-white text-black";
 
   return (
     <nav className={`border-b sticky top-0 z-[100] ${navBgClass}`}>
@@ -82,6 +82,26 @@ export function Navbar() {
           <BookOpen className="h-8 w-8 text-green-600" />
           <span className="text-2xl">BookNest</span>
         </Link>
+        <div className="lg:hidden" >
+          {user && (
+            <Stack direction="row" spacing={2} alignItems="center" className="lg:hidden " >
+              <Avatar
+                sx={{
+                  width: 30,
+                  height: 30,
+                  bgcolor: "primary.main",
+                  gap: 2,
+                  mr: commonDir === 'ltr' ? 2 : 0,
+                  ml: commonDir === 'rtl' ? 2 : 0,
+                }}
+                src={user?.profile_picture || undefined}
+              >
+                {!user?.profile_picture &&
+                  user?.name.charAt(0).toUpperCase()}
+              </Avatar>
+              <span className="text-sm ">{user.name }</span>
+            </Stack>
+          )}</div>
 
         {/* Desktop Menu */}
         {/* <div className="hidden lg:flex items-center gap-6"> */}
@@ -115,15 +135,6 @@ export function Navbar() {
                   <Heart className="h-4 w-4" /> {t("favorites")}
                 </Button>
               </Link>
-              <Link to="/add-book">
-                <Button
-                  variant="ghost"
-                  className={getButtonClasses("/add-book")}
-                  aria-label={t("addBook")}
-                >
-                  <PlusCircle className="h-4 w-4" /> {t("addBook")}
-                </Button>
-              </Link>
 
               <Link to="/recommendations">
                 <Button
@@ -148,10 +159,24 @@ export function Navbar() {
                 </Link>
               )}
               <div className="flex items-center gap-3 ml-4 pl-4 border-l">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span className="text-sm">{user.name}</span>
-                </div>
+                {user && (
+                  <Stack direction="row" spacing={1} alignItems="center" className="lg:hidden">
+                    <Avatar
+                      sx={{
+                        width: 30,
+                        height: 30,
+                        bgcolor: "primary.main",
+                        mr: commonDir === 'ltr' ? 2 : 0,
+                        ml: commonDir === 'rtl' ? 2 : 0,
+                      }}
+                      src={user?.profile_picture || undefined}
+                    >
+                      {!user?.profile_picture &&
+                        user?.name.charAt(0).toUpperCase()}
+                    </Avatar>
+                    <span className="text-sm">{user.name}</span>
+                  </Stack>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
@@ -195,24 +220,22 @@ export function Navbar() {
       <div className={`lg:hidden`} dir={isRtl ? "rtl" : "ltr"}>
         {/* Overlay */}
         <div
-          className={`fixed inset-0 bg-black/20 z-[100] transition-opacity duration-300 ${
-            open ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+          className={`fixed inset-0 bg-black/20 z-[100] transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
           onClick={() => setOpen(false)}
         ></div>
 
         {/* Drawer Panel */}
         <div
           className={`fixed top-0 h-full w-64 shadow-lg p-6 flex flex-col gap-4 transform transition-transform duration-300 ease-in-out z-[200] ${drawerBgClass} 
-                    ${
-                      isRtl
-                        ? open
-                          ? "left-0 translate-x-0"
-                          : "left-0 -translate-x-full"
-                        : open
-                        ? "right-0 translate-x-0"
-                        : "right-0 translate-x-full"
-                    }`}
+                    ${isRtl
+              ? open
+                ? "left-0 translate-x-0"
+                : "left-0 -translate-x-full"
+              : open
+                ? "right-0 translate-x-0"
+                : "right-0 translate-x-full"
+            }`}
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -256,17 +279,6 @@ export function Navbar() {
                   aria-label={t("favorites")}
                 >
                   <Heart className="h-4 w-4" /> {t("favorites")}
-                </Button>
-              </Link>
-              <Link to="/add-book" onClick={() => setOpen(false)}>
-                <Button
-                  variant="ghost"
-                  className={`w-full justify-start ${getButtonClasses(
-                    "/add-book"
-                  )}`}
-                  aria-label={t("addBook")}
-                >
-                  <PlusCircle className="h-4 w-4" /> {t("addBook")}
                 </Button>
               </Link>
               <Link to="/recommendations" onClick={() => setOpen(false)}>
