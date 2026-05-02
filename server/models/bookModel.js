@@ -134,20 +134,6 @@ export async function findPaginated(page = 1, limit = 10, category = null) {
     throw err;
   }
 }
-/**
- * Get book by ID
- */
-// export async function findById(id) {
-//   const { data, error } = await supabase
-//     .from("books")
-//     .select(bookSelectQuery)
-//     .eq("_id", id)
-//     .single();
-
-//   if (error && error.code !== "PGRST116") throw error; // not found case
-
-//   return normalizeBook(data);
-// }
 
 export async function findById(bookId) {
   const query = `${bookSelectQuery}, 
@@ -321,7 +307,7 @@ export const getBooksByCategory = async (category) => {
 export async function searchBooks(searchTerm, page, limit, categoryId) {
   const from = (page - 1) * limit;
   const to = from + limit - 1;
-  console.log('in search book in model');
+  // console.log('in search book in model');
   try {
 
     let query = supabase
