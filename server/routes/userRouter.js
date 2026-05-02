@@ -1,4 +1,4 @@
-// routes/authRoutes.js
+// routes/userRoutes.js
 import express from 'express';
 import { register, login, googleLogin, getAllUsers, update, deleteUser, getPaginatedUsers, searchUsers } from '../controllers/userController.js';
 import { verifyJWT } from '../middleware/auth.js';

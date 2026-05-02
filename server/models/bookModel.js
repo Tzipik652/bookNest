@@ -1,4 +1,4 @@
-// bookModel.js - using Supabase client
+// bookModel.js
 import supabase from "../config/supabaseClient.js";
 import { getFavoriteBooksList } from "./userModel.js";
 
