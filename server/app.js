@@ -19,6 +19,7 @@ dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const clientDistPath = path.join(__dirname, "..", "client", "dist");
 
 const app = express();
 
@@ -39,12 +40,13 @@ app.use("/contact", contactRouter);
 app.use("/api/auth", authRouter);
 app.use("/dashboard", dashboardStats);
 
+app.use(express.static(clientDistPath));
 
 // Error handling
 app.use(errorHandler);
 
 app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+  res.sendFile(path.join(clientDistPath, "index.html"));
 });
 
 const PORT = process.env.PORT || 5000;
