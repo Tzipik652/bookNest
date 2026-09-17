@@ -231,38 +231,52 @@ export const getCachedRecommendations = catchAsync(async (req, res, next) => {
     .map((b) => b._id)
     .join(",")}`;
 
+  let cachedRecommendations;
   try {
-    const cached = await redisClient.get(cacheKey);
-    if (cached) return res.status(200).json(JSON.parse(cached));
+    if (redisClient.isOpen) {
+      cachedRecommendations = await redisClient.get(cacheKey);
+    }
+  } catch (error) {
+    console.warn("Redis read failed; generating recommendations without cache:", error.message);
+  }
+  if (cachedRecommendations) return res.status(200).json(JSON.parse(cachedRecommendations));
 
-    const recommendationsWithReasons = await getBookRecommendations(
-      favoriteBooks,
-      allBooks
-    );
-
+  try {
+    const recommendationsWithReasons = await getBookRecommendations(favoriteBooks, allBooks);
     const recommendedIds = recommendationsWithReasons.map((rec) => rec.id);
     const fullBooks = await bookModel.findBooksByIds(recommendedIds);
-//----
-const booksWithReasons = fullBooks.map((book) => {
-  const matchingRec = recommendationsWithReasons.find(
+    const booksWithReasons = fullBooks.map((book) => {
+      const matchingRec = recommendationsWithReasons.find(
         (rec) => rec.id === book._id.toString() || rec.id === book._id
       );
-  return {
-    ...book,
-    recommendation_reason: matchingRec ? matchingRec.reason : "No reason provided",
-  };
-});
-//----
-    await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(booksWithReasons));
+      return {
+        ...book,
+        recommendation_reason: matchingRec ? matchingRec.reason : "No reason provided",
+      };
+    });
+
+    try {
+      if (redisClient.isOpen) {
+        await redisClient.setEx(cacheKey, 60 * 5, JSON.stringify(booksWithReasons));
+      }
+    } catch (error) {
+      console.warn("Redis write failed; returning recommendations without cache:", error.message);
+    }
 
     return res.status(200).json(booksWithReasons);
   } catch (error) {
     console.error("AI Recommendation Error:", error);
 
-    const cachedFallback = await redisClient.get(cacheKey);
-    if (cachedFallback) {
-      console.warn("⚠️ Using cached recommendations due to AI failure.");
-      return res.status(200).json(JSON.parse(cachedFallback));
+    try {
+      if (redisClient.isOpen) {
+        const cachedFallback = await redisClient.get(cacheKey);
+        if (cachedFallback) {
+          console.warn("Using cached recommendations due to AI failure.");
+          return res.status(200).json(JSON.parse(cachedFallback));
+        }
+      }
+    } catch (cacheError) {
+      console.warn("Redis fallback read failed; returning the regular error:", cacheError.message);
     }
 
     return next(new AppError("Failed to generate recommendations", 500));
@@ -270,6 +284,11 @@ const booksWithReasons = fullBooks.map((book) => {
 });
 
 export const invalidateRecommendationsCache = catchAsync(async (userId) => {
-  const keys = await redisClient.keys(`recommendations:${userId}:*`);
-  if (keys.length) await redisClient.del(keys);
+  try {
+    if (!redisClient.isOpen) return;
+    const keys = await redisClient.keys(`recommendations:${userId}:*`);
+    if (keys.length) await redisClient.del(keys);
+  } catch (error) {
+    console.warn("Redis cache invalidation failed; continuing without cache:", error.message);
+  }
 });
